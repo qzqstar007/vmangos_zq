@@ -964,12 +964,12 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 				}
 
 				//qzqstar, 250309, add support for the prof boost up
-				case 30873:	//	�ɿ󡢶���רҵ������10249	9786 // 164, 186
-				case 30874:	//	��Ƥ����Ƥרҵ������10769	10663// 393 165
-				case 30875:	//	��ҩ������רҵ������11994	11612// 171 182
-				case 30876:	//	�÷졢��ħרҵ������12181	13921// 197 333
-				case 30877:	//	���㡢���רҵ������18249	18261// 356, 185
-				case 30878:	//	���ȡ�����רҵ������12657	10847// 129, 202
+				case 30873:	//	采矿、锻造专业速升。10249	9786 // 164, 186
+				case 30874:	//	剥皮、制皮专业速升。10769	10663// 393 165
+				case 30875:	//	草药、炼金专业速升。11994	11612// 171 182
+				case 30876:	//	裁缝、附魔专业速升。12181	13921// 197 333
+				case 30877:	//	钓鱼、烹饪专业速升。18249	18261// 356, 185
+				case 30878:	//	急救、工程专业速升。12657	10847// 129, 202
 				{
 					if (m_caster && m_caster->IsPlayer())
 					{
@@ -1012,7 +1012,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						auto p = pPlayer->FindNearestPlayer(20);
 						if (p)
 						{
-							ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|��Χ�����һ��ʰȡ����ʹ��|!<<<")).c_str());
+							ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|周围有玩家一键拾取不能使用|!<<<")).c_str());
 							return;
 						}
 
@@ -1023,14 +1023,14 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						//BASIC_LOG("Now %d-%d-%d", time_info->tm_hour, time_info->tm_min, time_info->tm_sec);
 						if (time_info->tm_hour <= 7)
 						{
-							ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|�賿����˵㲻��ʹ��|!<<<")).c_str());
+							ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|凌晨至早八点不能使用|!<<<")).c_str());
 							return;
 						}
 
 					}
 					//qzqstar, add for auto pick 
 					if (false == OneKeyPickall(m_caster->ToPlayer()))
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|һ��ʰȡ�����������ʹ��|!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|一键拾取不能在组队中使用|!<<<")).c_str());
 					return;
 				}
 
@@ -1053,13 +1053,13 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						|| (itemTarget->GetProto()->ItemId >30400 && itemTarget->GetProto()->ItemId < 30519) /*ignore chenyi, zhanpao*/
 						)
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(">>>|ֻ�ܶ���ɫ����Ʒ���������߻���ʹ��|<<<!");
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(">>>|只能对蓝色以上品质武器或者护甲使用|<<<!");
 						return;
 					}
 
 					if (itemTarget->IsEquipped())
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>��ע�⣺װ��������ڱ����У�ֻ�ܸ��Լ�ʹ�ã�<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>请注意：装备必须放在背包中！只能给自己使用！<<<")).c_str());
 						return;
 					}
 
@@ -1092,7 +1092,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 					if (itemTarget->IsEquipped())
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>��ע�⣺װ��������ڱ����У�ֻ�ܸ��Լ�ʹ�ã�<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>请注意：装备必须放在背包中！只能给自己使用！<<<")).c_str());
 						return;
 					}
 
@@ -1122,7 +1122,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					}
 					else
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>װ���ȼ�̫��!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>装备等级太低!<<<")).c_str());
 						return;
 					}
 
@@ -1259,7 +1259,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					itemTarget = m_targets.getItemTarget();
 					if (!itemTarget || ((itemTarget->GetProto()->Class != ITEM_CLASS_ARMOR) && (itemTarget->GetProto()->Class != ITEM_CLASS_WEAPON)))
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>Ŀ����Ʒ����װ��!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>目标物品不是装备!<<<")).c_str());
 
 						//restore one
 						(m_caster->ToPlayer())->AddItem(_itemID);
@@ -1268,7 +1268,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 					if (itemTarget->IsEquipped())
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>��ע�⣺װ��������ڱ�����!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>请注意：装备必须放在背包中!<<<")).c_str());
 
 						//restore one
 						(m_caster->ToPlayer())->AddItem(_itemID);
@@ -1277,7 +1277,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 					if ((itemTarget->GetProto()->Quality > 4) || (itemTarget->GetProto()->ItemId == 1728))
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>���䡢�᲼�����Ƴ���!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>橙武、提布不可移除绑定!<<<")).c_str());
 
 						//restore one
 						(m_caster->ToPlayer())->AddItem(_itemID);
@@ -1287,7 +1287,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 					//remove binding
 					itemTarget->SetBinding(false);
-					ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>װ���Ѿ��Ƴ��󶨣���ֱ�ӽ��ף���ҪŲ��λ�ã�<<<")).c_str());
+					ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>装备已经移除绑定，请直接交易，不要挪动位置！<<<")).c_str());
 					return;
 				}
 
@@ -1304,18 +1304,18 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					//level must be >= 60
 					if (_me->GetLevel() < 60)
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>60���Ժ����ʹ�ô˼���!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>60级以后才能使用此技能!<<<")).c_str());
 						return;
 					}
 
 					if (_me->MinusXP(__BOOST_XP))
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>�ɹ���ȡһö������!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>成功获取一枚经验珠!<<<")).c_str());
 						_me->AddItem(30524);
 					}
 					else
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>���鲻��������������!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>经验不够，继续修炼！!<<<")).c_str());
 					}
 
 					return;
@@ -1343,12 +1343,12 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					}
 					default:
 					{
-						ChatHandler(pCaster).PSendSysMessage(((std::string)(">>>ֻ�����ű��е���ʹ�ã�!<<<")).c_str());
+						ChatHandler(pCaster).PSendSysMessage(((std::string)(">>>只能在团本中单人使用！!<<<")).c_str());
 						return;
 					}
 					}
 
-					ChatHandler(pCaster).PSendSysMessage(((std::string)(">>>ֻ�����ű��е���ʹ�ã�!<<<")).c_str());
+					ChatHandler(pCaster).PSendSysMessage(((std::string)(">>>只能在团本中单人使用！!<<<")).c_str());
 					return;
 
 				}
@@ -4382,7 +4382,7 @@ void Spell::EffectEnchantItemDiamond(SpellEffectIndex eff_idx)
 	//check if the target has enchant id
 	if (itemTarget->GetEnchantmentId(PROP_ENCHANTMENT_SLOT_1) < 3000)
 	{
-		ChatHandler(p_caster).PSendSysMessage(">>>����Ŀ����Ʒ�С���ʯ�ۡ�λ�����һ��׻�������Ʒ��Ϊ��ɫ�����ϡ�<<<");
+		ChatHandler(p_caster).PSendSysMessage(">>>请检查目标物品有【宝石槽】位，并且护甲或者武器品质为绿色及以上。<<<");
 		return;
 	}
 

@@ -37,7 +37,12 @@ struct DruidFerociousBiteScript : SpellScript
                 spell->damage += pPlayer->GetTotalAttackPowerValue(BASE_ATTACK) * combo * 0.03f;
 #endif
             spell->damage += pPlayer->GetPower(POWER_ENERGY) * spell->m_spellInfo->DmgMultiplier[effIdx];
-            pPlayer->SetPower(POWER_ENERGY, 0);
+			//qzqstar: 241128, todo: fuwen, remove the energy power zero
+			//pPlayer->SetPower(POWER_ENERGY, 0);
+
+			//debug
+			//ChatHandler(pPlayer).PSendSysMessage(">>> Energy:%u dmage=%u", pPlayer->GetPower(POWER_ENERGY), damage);
+			pPlayer->SetPower(POWER_ENERGY, pPlayer->GetPower(POWER_ENERGY) * 0.8f);
         }
     }
 };

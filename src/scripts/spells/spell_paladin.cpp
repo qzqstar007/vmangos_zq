@@ -121,6 +121,41 @@ SpellScript* GetScript_PaladinHolyShock(SpellEntry const*)
     return new PaladinHolyShockScript();
 }
 
+// 20473, 20929, 20930 - Holy Shock
+struct PaladinArtOfWarScript : SpellScript
+{
+	void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+	{
+		if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+		{
+			if (spell->m_caster->GetTypeId() != TYPEID_PLAYER)
+				return;
+
+			// immediately finishes the cooldown on art of war
+			auto cdCheck = [](SpellEntry const & spellEntry) -> bool
+			{
+				/*879,5614,5615,10312,10313,10314*/
+				if ((spellEntry.Id == 879 || spellEntry.Id == 5614 || spellEntry.Id == 5615 ||
+					spellEntry.Id == 10312 || spellEntry.Id == 10313 || spellEntry.Id == 10313) && spellEntry.GetRecoveryTime() > 0)
+					return true;
+				/*20473, 20929, 20930 */
+				if ((spellEntry.Id == 20473 || spellEntry.Id == 20929 || spellEntry.Id == 20930) && spellEntry.GetRecoveryTime() > 0)
+					return true;
+				return false;
+			};
+
+			static_cast<Player*>(spell->m_caster)->RemoveSomeCooldown(cdCheck);
+			return;
+		}
+	}
+};
+
+SpellScript* GetScript_PaladinArtOfWar(SpellEntry const*)
+{
+	return new PaladinArtOfWarScript();
+}
+
+
 void AddSC_paladin_spell_scripts()
 {
     Script* newscript;
@@ -144,4 +179,10 @@ void AddSC_paladin_spell_scripts()
     newscript->Name = "spell_paladin_holy_shock";
     newscript->GetSpellScript = &GetScript_PaladinHolyShock;
     newscript->RegisterSelf();
+
+	newscript = new Script;
+	newscript->Name = "spell_paladin_art_of_war";
+	newscript->GetSpellScript = &GetScript_PaladinArtOfWar;
+	newscript->RegisterSelf();
+
 }
