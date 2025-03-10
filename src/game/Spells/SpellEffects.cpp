@@ -304,103 +304,6 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
 {
     if (unitTarget && unitTarget->IsAlive())
     {
-        switch (m_spellInfo->SpellFamilyName)
-        {
-            case SPELLFAMILY_GENERIC:
-                break;
-            case SPELLFAMILY_MAGE:
-                break;
-            case SPELLFAMILY_WARRIOR:
-                break;
-            case SPELLFAMILY_WARLOCK:
-            {
-                // Conflagrate - consumes Immolate
-                if (m_spellInfo->IsFitToFamilyMask<CF_WARLOCK_CONFLAGRATE>())
-                {
-                    // for caster applied auras only
-                    Unit::AuraList const& mPeriodic = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                    for (const auto i : mPeriodic)
-                    {
-                        // Immolate
-                        if (i->GetSpellProto()->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_IMMOLATE>() &&
-                            i->GetCasterGuid() == m_caster->GetObjectGuid())
-                        {
-                            unitTarget->RemoveAurasByCasterSpell(i->GetId(), m_caster->GetObjectGuid());
-                            break;
-                        }
-                    }
-                }
-                break;
-            }
-            case SPELLFAMILY_DRUID:
-            {
-                // Ferocious Bite
-                if (m_spellInfo->IsFitToFamilyMask<CF_DRUID_RIP_BITE>() && m_spellInfo->SpellVisual == 6587)
-                {
-                    Player* pPlayer = m_caster->ToPlayer();
-                    if (!pPlayer)
-                        break;
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-                    // World of Warcraft Client Patch 1.12.0 (2006-08-22)
-                    // - Ferocious Bite: Book of Ferocious Bite (Rank 5) now drops off The
-                    //   Beast in Black Rock Spire. In addition, Ferocious Bite now increases
-                    //   in potency with greater attack power.
-                    // ( AP * 3% * combo + energy * 2,7 + damage )
-                    if (uint32 combo = ((Player*)pPlayer)->GetComboPoints())
-                        damage += pPlayer->GetTotalAttackPowerValue(BASE_ATTACK) * combo * 0.03f;
-#endif
-                    damage += pPlayer->GetPower(POWER_ENERGY) * m_spellInfo->DmgMultiplier[effect_idx];
-					//qzqstar: 241128, todo: fuwen, remove the energy power zero
-					//pPlayer->SetPower(POWER_ENERGY, 0);
-
-					//debug
-					//ChatHandler(pPlayer).PSendSysMessage(">>> Energy:%u dmage=%u", pPlayer->GetPower(POWER_ENERGY), damage);
-					pPlayer->SetPower(POWER_ENERGY, pPlayer->GetPower(POWER_ENERGY) * 0.8f);
-                }
-                break;
-            }
-            case SPELLFAMILY_ROGUE:
-            {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-                // World of Warcraft Client Patch 1.12.0 (2006-08-22)
-                // - Eviscerate: Manual of Eviscerate (Rank 9) now drops off Blackhand
-                //   Assassins in Black Rock Spire.In addition, Eviscerate now increases
-                //   in potency with greater attack power.
-                if (m_spellInfo->IsFitToFamilyMask<CF_ROGUE_EVISCERATE>())
-                {
-                    if (Player* pPlayer = m_caster->ToPlayer())
-                        if (uint32 combo = pPlayer->GetComboPoints())
-                            damage += pPlayer->GetTotalAttackPowerValue(BASE_ATTACK) * combo * 0.03f;
-                }
-#endif
-                break;
-            }
-            case SPELLFAMILY_HUNTER:
-                break;
-            case SPELLFAMILY_PALADIN:
-            {
-                // Hammer of Wrath - receive bonus from spell damage
-                if (m_spellInfo->SpellIconID == 42)
-                {
-                    m_attackType = BASE_ATTACK;    // Set as base attack to benefit from melee crit
-                    damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, effect_idx, damage, SPELL_DIRECT_DAMAGE);
-                    damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, effect_idx, damage, SPELL_DIRECT_DAMAGE);
-                }
-                // Judgement of Command - receive bonus from spell damage
-                else if (m_spellInfo->SpellIconID == 561)
-                {
-                    // base damage halved if target not stunned.
-                    if (!unitTarget->HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_PENDING_STUNNED))
-                        damage = damage * 0.5f;
-
-                    damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, effect_idx, damage, SPELL_DIRECT_DAMAGE);
-                    damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, effect_idx, damage, SPELL_DIRECT_DAMAGE);
-                }
-                break;
-            }
-        }
-
         if (damage >= 0)
             m_damage += damage;
     }
@@ -1061,12 +964,12 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 				}
 
 				//qzqstar, 250309, add support for the prof boost up
-				case 30873:	//	²É¿ó¡¢¶ÍÔì×¨ÒµËÙÉý¡£10249	9786 // 164, 186
-				case 30874:	//	°þÆ¤¡¢ÖÆÆ¤×¨ÒµËÙÉý¡£10769	10663// 393 165
-				case 30875:	//	²ÝÒ©¡¢Á¶½ð×¨ÒµËÙÉý¡£11994	11612// 171 182
-				case 30876:	//	²Ã·ì¡¢¸½Ä§×¨ÒµËÙÉý¡£12181	13921// 197 333
-				case 30877:	//	µöÓã¡¢Åëâ¿×¨ÒµËÙÉý¡£18249	18261// 356, 185
-				case 30878:	//	¼±¾È¡¢¹¤³Ì×¨ÒµËÙÉý¡£12657	10847// 129, 202
+				case 30873:	//	ï¿½É¿ó¡¢¶ï¿½ï¿½ï¿½×¨Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½10249	9786 // 164, 186
+				case 30874:	//	ï¿½ï¿½Æ¤ï¿½ï¿½ï¿½ï¿½Æ¤×¨Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½10769	10663// 393 165
+				case 30875:	//	ï¿½ï¿½Ò©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¨Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½11994	11612// 171 182
+				case 30876:	//	ï¿½Ã·ì¡¢ï¿½ï¿½Ä§×¨Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½12181	13921// 197 333
+				case 30877:	//	ï¿½ï¿½ï¿½ã¡¢ï¿½ï¿½ï¿½×¨Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½18249	18261// 356, 185
+				case 30878:	//	ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½×¨Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½12657	10847// 129, 202
 				{
 					if (m_caster && m_caster->IsPlayer())
 					{
@@ -1109,7 +1012,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						auto p = pPlayer->FindNearestPlayer(20);
 						if (p)
 						{
-							ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|ÖÜÎ§ÓÐÍæ¼ÒÒ»¼üÊ°È¡²»ÄÜÊ¹ÓÃ|!<<<")).c_str());
+							ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|ï¿½ï¿½Î§ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ê°È¡ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½|!<<<")).c_str());
 							return;
 						}
 
@@ -1120,14 +1023,14 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						//BASIC_LOG("Now %d-%d-%d", time_info->tm_hour, time_info->tm_min, time_info->tm_sec);
 						if (time_info->tm_hour <= 7)
 						{
-							ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|Áè³¿ÖÁÔç°Ëµã²»ÄÜÊ¹ÓÃ|!<<<")).c_str());
+							ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|ï¿½è³¿ï¿½ï¿½ï¿½ï¿½Ëµã²»ï¿½ï¿½Ê¹ï¿½ï¿½|!<<<")).c_str());
 							return;
 						}
 
 					}
 					//qzqstar, add for auto pick 
 					if (false == OneKeyPickall(m_caster->ToPlayer()))
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|Ò»¼üÊ°È¡²»ÄÜÔÚ×é¶ÓÖÐÊ¹ÓÃ|!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|Ò»ï¿½ï¿½Ê°È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½|!<<<")).c_str());
 					return;
 				}
 
@@ -1150,13 +1053,13 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						|| (itemTarget->GetProto()->ItemId >30400 && itemTarget->GetProto()->ItemId < 30519) /*ignore chenyi, zhanpao*/
 						)
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(">>>|Ö»ÄÜ¶ÔÀ¶É«ÒÔÉÏÆ·ÖÊÎäÆ÷»òÕß»¤¼×Ê¹ÓÃ|<<<!");
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(">>>|Ö»ï¿½Ü¶ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß»ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½|<<<!");
 						return;
 					}
 
 					if (itemTarget->IsEquipped())
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>Çë×¢Òâ£º×°±¸±ØÐë·ÅÔÚ±³°üÖÐ£¡Ö»ÄÜ¸ø×Ô¼ºÊ¹ÓÃ£¡<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>ï¿½ï¿½×¢ï¿½â£º×°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú±ï¿½ï¿½ï¿½ï¿½Ð£ï¿½Ö»ï¿½Ü¸ï¿½ï¿½Ô¼ï¿½Ê¹ï¿½Ã£ï¿½<<<")).c_str());
 						return;
 					}
 
@@ -1189,7 +1092,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 					if (itemTarget->IsEquipped())
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>Çë×¢Òâ£º×°±¸±ØÐë·ÅÔÚ±³°üÖÐ£¡Ö»ÄÜ¸ø×Ô¼ºÊ¹ÓÃ£¡<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>ï¿½ï¿½×¢ï¿½â£º×°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú±ï¿½ï¿½ï¿½ï¿½Ð£ï¿½Ö»ï¿½Ü¸ï¿½ï¿½Ô¼ï¿½Ê¹ï¿½Ã£ï¿½<<<")).c_str());
 						return;
 					}
 
@@ -1219,7 +1122,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					}
 					else
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>×°±¸µÈ¼¶Ì«µÍ!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>×°ï¿½ï¿½ï¿½È¼ï¿½Ì«ï¿½ï¿½!<<<")).c_str());
 						return;
 					}
 
@@ -1356,7 +1259,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					itemTarget = m_targets.getItemTarget();
 					if (!itemTarget || ((itemTarget->GetProto()->Class != ITEM_CLASS_ARMOR) && (itemTarget->GetProto()->Class != ITEM_CLASS_WEAPON)))
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>Ä¿±êÎïÆ·²»ÊÇ×°±¸!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>Ä¿ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½ï¿½×°ï¿½ï¿½!<<<")).c_str());
 
 						//restore one
 						(m_caster->ToPlayer())->AddItem(_itemID);
@@ -1365,7 +1268,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 					if (itemTarget->IsEquipped())
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>Çë×¢Òâ£º×°±¸±ØÐë·ÅÔÚ±³°üÖÐ!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>ï¿½ï¿½×¢ï¿½â£º×°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú±ï¿½ï¿½ï¿½ï¿½ï¿½!<<<")).c_str());
 
 						//restore one
 						(m_caster->ToPlayer())->AddItem(_itemID);
@@ -1374,7 +1277,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 					if ((itemTarget->GetProto()->Quality > 4) || (itemTarget->GetProto()->ItemId == 1728))
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>³ÈÎä¡¢Ìá²¼²»¿ÉÒÆ³ý°ó¶¨!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>ï¿½ï¿½ï¿½ä¡¢ï¿½á²¼ï¿½ï¿½ï¿½ï¿½ï¿½Æ³ï¿½ï¿½ï¿½!<<<")).c_str());
 
 						//restore one
 						(m_caster->ToPlayer())->AddItem(_itemID);
@@ -1384,7 +1287,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 					//remove binding
 					itemTarget->SetBinding(false);
-					ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>×°±¸ÒÑ¾­ÒÆ³ý°ó¶¨£¬ÇëÖ±½Ó½»Ò×£¬²»ÒªÅ²¶¯Î»ÖÃ£¡<<<")).c_str());
+					ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>×°ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½Æ³ï¿½ï¿½ó¶¨£ï¿½ï¿½ï¿½Ö±ï¿½Ó½ï¿½ï¿½×£ï¿½ï¿½ï¿½ÒªÅ²ï¿½ï¿½Î»ï¿½Ã£ï¿½<<<")).c_str());
 					return;
 				}
 
@@ -1401,18 +1304,18 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					//level must be >= 60
 					if (_me->GetLevel() < 60)
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>60¼¶ÒÔºó²ÅÄÜÊ¹ÓÃ´Ë¼¼ÄÜ!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>60ï¿½ï¿½ï¿½Ôºï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ã´Ë¼ï¿½ï¿½ï¿½!<<<")).c_str());
 						return;
 					}
 
 					if (_me->MinusXP(__BOOST_XP))
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>³É¹¦»ñÈ¡Ò»Ã¶¾­ÑéÖé!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>ï¿½É¹ï¿½ï¿½ï¿½È¡Ò»Ã¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!<<<")).c_str());
 						_me->AddItem(30524);
 					}
 					else
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>¾­Ñé²»¹»£¬¼ÌÐøÐÞÁ¶£¡!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>ï¿½ï¿½ï¿½é²»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!<<<")).c_str());
 					}
 
 					return;
@@ -1440,12 +1343,12 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					}
 					default:
 					{
-						ChatHandler(pCaster).PSendSysMessage(((std::string)(">>>Ö»ÄÜÔÚÍÅ±¾ÖÐµ¥ÈËÊ¹ÓÃ£¡!<<<")).c_str());
+						ChatHandler(pCaster).PSendSysMessage(((std::string)(">>>Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Å±ï¿½ï¿½Ðµï¿½ï¿½ï¿½Ê¹ï¿½Ã£ï¿½!<<<")).c_str());
 						return;
 					}
 					}
 
-					ChatHandler(pCaster).PSendSysMessage(((std::string)(">>>Ö»ÄÜÔÚÍÅ±¾ÖÐµ¥ÈËÊ¹ÓÃ£¡!<<<")).c_str());
+					ChatHandler(pCaster).PSendSysMessage(((std::string)(">>>Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Å±ï¿½ï¿½Ðµï¿½ï¿½ï¿½Ê¹ï¿½Ã£ï¿½!<<<")).c_str());
 					return;
 
 				}
@@ -2515,84 +2418,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
         }
         case SPELLFAMILY_PALADIN:
         {
-			//qzqstar, 241215, add custom paladin rune
-			switch (m_spellInfo->Id)
-			{
-				case 31076:                                 // art of war
-				{
-					if (m_caster->GetTypeId() != TYPEID_PLAYER)
-						return;
-
-					// immediately finishes the cooldown on art of war
-					auto cdCheck = [](SpellEntry const & spellEntry) -> bool
-					{
-						/*879,5614,5615,10312,10313,10314*/
-						if ((spellEntry.Id == 879 || spellEntry.Id == 5614 || spellEntry.Id == 5615 ||
-							spellEntry.Id == 10312 || spellEntry.Id == 10313 || spellEntry.Id == 10313) && spellEntry.GetRecoveryTime() > 0)
-							return true;
-						/*20473, 20929, 20930 */
-						if ((spellEntry.Id == 20473 || spellEntry.Id == 20929 || spellEntry.Id == 20930) && spellEntry.GetRecoveryTime() > 0)
-							return true;
-						return false;
-					};
-
-					static_cast<Player*>(m_caster)->RemoveSomeCooldown(cdCheck);
-					return;
-				}
-			}
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-            switch (m_spellInfo->SpellIconID)
-            {
-                case 156:                                   // Holy Shock
-                {
-                    if (!unitTarget)
-                        return;
-
-                    int hurt;
-                    int heal;
-
-                    switch (m_spellInfo->Id)
-                    {
-                        case 20473:
-                            hurt = 25912;
-                            heal = 25914;
-                            break;
-                        case 20929:
-                            hurt = 25911;
-                            heal = 25913;
-                            break;
-                        case 20930:
-                            hurt = 25902;
-                            heal = 25903;
-                            break;
-                        default:
-                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell::EffectDummy: Spell %u not handled in HS", m_spellInfo->Id);
-                            return;
-                    }
-
-                    if (m_caster->IsFriendlyTo(unitTarget))
-                        m_caster->CastSpell(unitTarget, heal, true);
-                    else
-                        m_caster->CastSpell(unitTarget, hurt, true);
-
-                    return;
-                }
-                case 561:                                   // Judgement of command
-                {
-                    if (!unitTarget)
-                        return;
-
-                    uint32 spellId = m_currentBasePoints[effIdx];
-                    SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(spellId);
-                    if (!pSpellEntry)
-                        return;
-
-                    m_caster->CastSpell(unitTarget, pSpellEntry, true, nullptr);
-                    return;
-                }
-            }
-#endif
             break;
         }
         case SPELLFAMILY_SHAMAN:
@@ -4557,7 +4382,7 @@ void Spell::EffectEnchantItemDiamond(SpellEffectIndex eff_idx)
 	//check if the target has enchant id
 	if (itemTarget->GetEnchantmentId(PROP_ENCHANTMENT_SLOT_1) < 3000)
 	{
-		ChatHandler(p_caster).PSendSysMessage(">>>Çë¼ì²éÄ¿±êÎïÆ·ÓÐ¡¾±¦Ê¯²Û¡¿Î»£¬²¢ÇÒ»¤¼×»òÕßÎäÆ÷Æ·ÖÊÎªÂÌÉ«¼°ÒÔÉÏ¡£<<<");
+		ChatHandler(p_caster).PSendSysMessage(">>>ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½Æ·ï¿½Ð¡ï¿½ï¿½ï¿½Ê¯ï¿½Û¡ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½×»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½Îªï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½Ï¡ï¿½<<<");
 		return;
 	}
 
