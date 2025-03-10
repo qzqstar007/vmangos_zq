@@ -370,7 +370,7 @@ struct MushgogAI : public ScriptedAI
 enum TheRazzaData
 {
     SPELL_POISON_BOLT                        = 22937,
-    SPELL_CHAIN_LIGHTNING                    = 16033,
+	SPELL_CHAIN_LIGHTNING = 23206, //qzqstar, fix the lighting too big, orig thall, 16033
 
     GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_02 = 9504,
     GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_03 = 9505
@@ -468,7 +468,7 @@ enum SkarrTheUnbreakableData
 {
     SPELL_CLEAVE                             = 15496,
     SPELL_MORTAL_STRIKE                      = 15708,
-    SPELL_KNOCKDOWN                          = 16033,
+	SPELL_KNOCKDOWN = 11428,  //qzqstar fix the spell, chain lighting ...
 
     GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_04 = 9507
 };

@@ -456,6 +456,19 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
         return false;
 
     uint32 randomBoss = m_pInstance->GetData(TYPE_RANDOM_BOSS);
+
+	//qzqstar, 250308, random the boss by urand
+	randomBoss = BOSS_GRILEK;
+	switch (urand(0,4))
+	{
+		case 0: randomBoss = BOSS_GRILEK; break;
+		case 1: randomBoss = BOSS_HAZZARAH; break;
+		case 2: randomBoss = BOSS_RENATAKI; break;
+		case 3: randomBoss = BOSS_WUSHOOLAY; break;
+		default:	randomBoss = BOSS_WUSHOOLAY;  break;
+	}
+	
+	/*
                 if (sGameEventMgr.IsActiveEvent(29))
                     randomBoss = BOSS_GRILEK;
                 else if (sGameEventMgr.IsActiveEvent(30))
@@ -464,7 +477,7 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
                     randomBoss = BOSS_RENATAKI;
                 else if (sGameEventMgr.IsActiveEvent(32))
                     randomBoss = BOSS_WUSHOOLAY;
-
+	*/
 
     if(randomBoss < 0 || randomBoss > 16000)
         return false;

@@ -618,7 +618,9 @@ struct boss_mandokirAI : public ScriptedAI
         // MORTAL STRIKE
         if (m_uiMortalStrike_Timer < diff)
         {
-            if ((m_uiGlobalCooldown == 0) && (m_creature->GetVictim()->GetHealthPercent() < 50.0f))
+			//qzqstar, 24.11.05, fix the cast of SPELL_MORTAL_STRIKE
+			//if ((m_uiGlobalCooldown == 0) && (m_creature->GetVictim()->GetHealthPercent() < 50.0f))
+			if (m_uiGlobalCooldown == 0)
             {
                 if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
                 {

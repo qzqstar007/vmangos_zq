@@ -78,7 +78,8 @@ struct WarriorExecuteDamageScript : SpellScript
     {
         if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
         {
-            spell->m_casterUnit->SetPower(POWER_RAGE, 0);
+            //spell->m_casterUnit->SetPower(POWER_RAGE, 0);
+			spell->m_casterUnit->SetPower(POWER_RAGE, spell->m_casterUnit->GetPower(POWER_RAGE) * 0.8f);
         }
     }
 };

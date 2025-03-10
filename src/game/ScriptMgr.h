@@ -164,6 +164,9 @@ struct SpellScript
     virtual void OnSummon(Spell* /*spell*/, Creature* /*summon*/) const {}
     // called after summoning a gameobject
     virtual void OnSummon(Spell* /*spell*/, GameObject* /*summon*/) const {}
+
+	// qzqstar, 250308, gossip for spell... called when by dummy gossip etc...
+	virtual void OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action) const {}
 };
 
 struct AuraScript

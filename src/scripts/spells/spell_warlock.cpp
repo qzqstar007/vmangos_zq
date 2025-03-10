@@ -45,6 +45,15 @@ struct WarlockDemonicSacrificeScript : SpellScript
             }
 
             spell->m_casterUnit->CastSpell(spell->m_casterUnit, spellId, true);
+
+			// qzqstar, 250201, compassion heart, 31159
+			if (spell->m_casterUnit->HasSpell(31159))
+			{
+				if (spellId == 18789) spell->m_casterUnit->CastSpell(spell->m_casterUnit, 18791, true);
+				else if (spellId == 18792) spell->m_casterUnit->CastSpell(spell->m_casterUnit, 18790, true);
+				else if (spellId == 18790) spell->m_casterUnit->CastSpell(spell->m_casterUnit, 18792, true);
+				else if (spellId == 18791) spell->m_casterUnit->CastSpell(spell->m_casterUnit, 18789, true);
+			}
         }
     }
 };

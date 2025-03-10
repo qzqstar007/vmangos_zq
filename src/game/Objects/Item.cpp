@@ -821,8 +821,20 @@ void Item::SetItemRandomProperties(int32 randomPropId)
                 SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, item_rand->ID);
                 SetState(ITEM_CHANGED);
             }
-            for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < PROP_ENCHANTMENT_SLOT_0 + 3; ++i)
-                SetEnchantment(EnchantmentSlot(i), item_rand->enchant_id[i - PROP_ENCHANTMENT_SLOT_0], 0, 0);
+			//qzqstar, 250213, reuse the enchant slots 1--3
+			if (randomPropId < 3000)
+			{
+				//old settings
+				for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < PROP_ENCHANTMENT_SLOT_0 + 3; ++i)
+					SetEnchantment(EnchantmentSlot(i), item_rand->enchant_id[i - PROP_ENCHANTMENT_SLOT_0], 0, 0);
+			}
+			else
+			{
+				//new enchantments, only set the enchant_id[0] to PROP_ENCHANTMENT_SLOT_0
+				//PROP_ENCHANTMENT_SLOT_1, reused for the 
+				SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_0), item_rand->enchant_id[0], 0, 0);
+			}
+			//end of 250213
         }
     }
 }

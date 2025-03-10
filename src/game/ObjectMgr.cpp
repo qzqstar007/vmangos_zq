@@ -8145,6 +8145,15 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
     std::vector<std::string>& list0 = m_PetHalfNameMap0[entry];
     std::vector<std::string>& list1 = m_PetHalfNameMap1[entry];
 
+	//qzqstar, 250227, add killer chn names
+	if (entry == 777)
+	{
+		static auto __GEN_TIMES = 0;
+		__GEN_TIMES++;
+
+		return *(list0.begin() + (__GEN_TIMES / 10) % 100) + *(list1.begin() + (__GEN_TIMES / 1) % 10);
+	}
+
     if (list0.empty() || list1.empty())
     {
         CreatureInfo const* cinfo = GetCreatureTemplate(entry);
@@ -8710,7 +8719,9 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelationsMap& map, char const* tab
 
     uint32 count = 0;
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `quest` FROM %s WHERE %u BETWEEN `patch_min` AND `patch_max`", table, sWorld.GetWowPatch()));
+	//qzqstar, 241120, fix the quest order...  order by `quest_id` ASC ...
+	std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `quest` FROM %s WHERE %u BETWEEN `patch_min` AND `patch_max` order by `quest` asc", table, sWorld.GetWowPatch()));
+	//std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `quest` FROM %s WHERE %u BETWEEN `patch_min` AND `patch_max` ", table, sWorld.GetWowPatch()));
 
     if (!result)
     {

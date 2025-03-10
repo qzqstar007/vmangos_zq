@@ -1031,6 +1031,28 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     triggered_spell_id = 28848;
                     break;
                 }
+
+
+				// qzqstar, 241215, Tiger's Fury improment, copy from Blade Flurry
+				case 31100:
+				{
+					// BASIC_LOG("Trig 31100x");
+					// prevent chain of triggered spell from same triggered spell
+					if (procSpell && procSpell->Id == 12723)
+						return SPELL_AURA_PROC_FAILED;
+
+					target = SelectRandomUnfriendlyTarget(pVictim, 5.0f, false, true);
+
+					if (!target)
+						return SPELL_AURA_PROC_FAILED;
+
+					// Reconstitute damage before armor reduction
+					basepoints[0] = ditheru(amount * 100 / CalcArmorReducedDamage(pVictim, 100));
+
+					//qzqstar try to do more for the BLF
+					triggered_spell_id = 12723;
+					break;
+				}
             }
             break;
         }
@@ -1071,7 +1093,35 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
             break;
         }
         case SPELLFAMILY_HUNTER:
-            break;
+		{
+
+			switch (dummySpell->Id)
+			{
+				//qzqstar, 241216, dead snipe
+				case 31117:
+				{
+					if (!pVictim)
+					{
+						return SPELL_AURA_PROC_FAILED;
+					}
+					// return damage % to attacker but < 50% own total health
+					auto _can1 = (int32)GetMaxHealth() / 2;
+					//GetTotalAttackPowerValue(RANGED_ATTACK) * 2 which is larger..
+					auto _can2 = GetTotalAttackPowerValue(RANGED_ATTACK) * 2;
+
+					//BASIC_LOG("[DeadSnipe] Player[%s] :: Health/2=%u, AP*2=%u", GetName(), _can1, _can2);
+
+					basepoints[0] = (_can1 > _can2 ? _can1 : _can2);
+
+					triggered_spell_id = 31118;
+					break;
+				}
+
+				default:
+					break;
+			}
+			break;
+		}
         case SPELLFAMILY_PALADIN:
         {
             // Seal of Righteousness - melee proc dummy
@@ -1158,30 +1208,34 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     if (!pVictim)
                         return SPELL_AURA_PROC_FAILED;
 
-                    // Set class defined buff
-                    switch (pVictim->GetClass())
-                    {
-                        case CLASS_PALADIN:
-                        case CLASS_PRIEST:
-                        case CLASS_SHAMAN:
-                        case CLASS_DRUID:
-                            triggered_spell_id = 28795;     // Increases the friendly target's mana regeneration by $s1 per 5 sec. for $d.
-                            break;
-                        case CLASS_MAGE:
-                        case CLASS_WARLOCK:
-                            triggered_spell_id = 28793;     // Increases the friendly target's spell damage and healing by up to $s1 for $d.
-                            break;
-                        case CLASS_HUNTER:
-                        case CLASS_ROGUE:
-                            triggered_spell_id = 28791;     // Increases the friendly target's attack power by $s1 for $d.
-                            break;
-                        case CLASS_WARRIOR:
-                            triggered_spell_id = 28790;     // Increases the friendly target's armor
-                            break;
-                        default:
-                            return SPELL_AURA_PROC_FAILED;
-                    }
-                    break;
+					//qzqstar: modify the PAL, SHA spell dmg, and XD attack power
+					// Set class defined buff
+					switch (pVictim->GetClass())
+					{
+						//case CLASS_PALADIN:
+						case CLASS_PRIEST:
+							//case CLASS_SHAMAN:
+							//case CLASS_DRUID:
+							//    triggered_spell_id = 28795;     // Increases the friendly target's mana regeneration by $s1 per 5 sec. for $d.
+							//    break;
+						case CLASS_MAGE:
+						case CLASS_WARLOCK:
+						case CLASS_SHAMAN:
+							triggered_spell_id = 28793;     // Increases the friendly target's spell damage and healing by up to $s1 for $d.
+							break;
+						case CLASS_HUNTER:
+						case CLASS_ROGUE:
+							triggered_spell_id = 28791;     // Increases the friendly target's attack power by $s1 for $d.
+							break;
+						case CLASS_WARRIOR:
+						case CLASS_PALADIN:
+						case CLASS_DRUID:
+							triggered_spell_id = 28790;     // Increases the friendly target's armor
+							break;
+						default:
+							return SPELL_AURA_PROC_FAILED;
+					}
+					break;
                 }
             }
             break;
@@ -1228,6 +1282,21 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     triggered_spell_id = 28850;
                     break;
                 }
+
+				//qzqstar, 241221, lighting overload
+				case 31173:
+				{
+					if (!pVictim)
+						return SPELL_AURA_PROC_FAILED;
+
+					// prevent damage back from weapon special attacks
+					if (!procSpell)
+						return SPELL_AURA_PROC_FAILED;
+
+					triggered_spell_id = procSpell->Id;
+					basepoints[0] = procSpell->EffectBasePoints[0] / 2;
+					break;
+				}
             }
             break;
         }

@@ -243,6 +243,9 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                 break;
             case CLASS_SHAMAN:
                 val2 = level * 2.0f + strength * 2.0f    - 20.0f;
+
+				//qzqstar, todo, rune increase the strength/agi mult
+
                 break;
             case CLASS_DRUID:
             {
@@ -278,12 +281,20 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                        // World of Warcraft Client Patch 1.7.0 (2005-09-13)
                        // - Cat Form - Each point of agility now adds 1 attack power.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-                        val2 = GetLevel() * mLevelMult + strength * 2.0f + agility - 20.0f;
+						//qzqstar, 241118, modify the cat form agi boost
+						// orig
+						val2 = GetLevel() * mLevelMult + strength * 2.0f + agility - 20.0f;
+						//qzqstar, 241216, set the attackpower upon spells
+						if (HasSpell(31095))    val2 += agility * 1.5f;
+
                         break;
 #endif
                     case FORM_BEAR:
                     case FORM_DIREBEAR:
-                        val2 = GetLevel() * mLevelMult + strength * 2.0f - 20.0f;
+						//old 
+						val2 = GetLevel() * mLevelMult + strength * 2.0f - 20.0f;
+						//qzqstar, 241216, set the attackpower upon spells
+						if (HasSpell(31093))    val2 += strength;
                         break;
                     default:
                         val2 = strength * 2.0f - 20.0f;
@@ -433,7 +444,12 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
         weapon_mindamage += GetAmmoDPS() * att_speed;
         weapon_maxdamage += GetAmmoDPS() * att_speed;
     }
-
+	//qzqstar add ammon dps to local attack
+	else if (attType == BASE_ATTACK && index == 0)    // add ammo DPS to ranged damage
+	{
+		weapon_mindamage += GetAmmoDPS() * att_speed / 4;
+		weapon_maxdamage += GetAmmoDPS() * att_speed / 4;
+	}
     if (index != 0)
     {
         base_value = 0.0f;
@@ -443,6 +459,12 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
 
     min_damage = ((base_value + weapon_mindamage) * base_pct + total_value + total_phys) * total_pct;
     max_damage = ((base_value + weapon_maxdamage) * base_pct + total_value + total_phys) * total_pct;
+
+	//qzqstar 24.11.05 fix the damage avoid too big
+	#define     ___MAX_DAMAGE           (10000)
+	if (min_damage > ___MAX_DAMAGE)  min_damage = ___MAX_DAMAGE + (min_damage - ___MAX_DAMAGE) / 10000;
+	if (max_damage > ___MAX_DAMAGE)  max_damage = ___MAX_DAMAGE + (max_damage - ___MAX_DAMAGE) / 10000;
+
 }
 
 void Player::UpdateDamagePhysical(WeaponAttackType attType)
@@ -622,6 +644,11 @@ void Player::UpdateDodgePercentage()
     }
     // Dodge from agility
     value += GetDodgeFromAgility();
+
+	//qzqstar 241101, restrict the value of dodge from Agility to 50% only
+	if (value > 50.0f) value = 50.0f;
+
+
     // Modify value from defense skill
     value += (int32(GetDefenseSkillValue()) - int32(GetSkillMaxForLevel())) * 0.04f;
     // Dodge from SPELL_AURA_MOD_DODGE_PERCENT aura
@@ -976,6 +1003,18 @@ float Creature::GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType au
 
 bool Pet::UpdateAllStats()
 {
+
+	//qzqstar, 241217, Hunter Pet/SS Pet, more stat
+	//
+	if (GetOwner() && (GetOwner()->HasSpell(31111) || GetOwner()->HasSpell(31153)) && (GetBonusDamage() == 0))
+	{
+		//Indicate already bonused
+		SetBonusDamage(1);
+
+		for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
+			m_createStats[i] += GetOwner()->GetStat(Stats(i)) / 5;
+	}
+
     for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
         UpdateStats(Stats(i));
 
@@ -1085,6 +1124,14 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
                 // 125% of normal damage
                 mindamage = mindamage * 1.25f;
                 maxdamage = maxdamage * 1.25f;
+
+				//qzqstar, 241217, more happy, more dmg
+				if (GetOwner() && GetOwner()->HasSpell(31111))
+				{
+					mindamage = mindamage * 1.25f;
+					maxdamage = maxdamage * 1.25f;
+				}
+
                 break;
             case CONTENT:
                 // 100% of normal damage, nothing to modify
@@ -1096,6 +1143,15 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
                 break;
         }
     }
+	//qzqstar, 241218, more dmg if is Summoned pet (SS).
+	else if (getPetType() == SUMMON_PET)
+	{
+		if (GetOwner() && GetOwner()->HasSpell(31153))
+		{
+			mindamage *= 2;
+			maxdamage *= 2;
+		}
+	}
 
     SetStatFloatValue(UNIT_FIELD_MINDAMAGE, mindamage);
     SetStatFloatValue(UNIT_FIELD_MAXDAMAGE, maxdamage);

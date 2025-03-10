@@ -118,9 +118,9 @@ enum Color
 };
 
 constexpr Color g_logColors[] = {
-    RED,    // error
+	YELLOW,    // error
     RESET,  // minimal
-    RESET,  // basic
+    WHITE,  // basic
     YELLOW, // detail
     BLUE    // debug
 };

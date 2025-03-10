@@ -21,4 +21,10 @@ void AddSC_zero_scripts()
 {
     //AddSC_zero_creatures();
     AddSC_custom_creatures();
+
+
+	AddSC_qzqstar_rune_creatures();
+	AddSC_qzqstar_vip_creatures();
+	AddSC_qzqstar_summon_boss();
+
 }

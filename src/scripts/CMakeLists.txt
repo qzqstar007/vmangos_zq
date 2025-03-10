@@ -38,6 +38,9 @@ set (SCRIPTS_SRCS
     battlegrounds/battleground_alterac.cpp
     custom/boss_arena_hardog.cpp
     custom/custom.cpp
+    custom/qzqstar_rune.cpp
+    custom/qzqstar_vip.cpp
+    custom/qzqstar_summon_boss.cpp
     custom/custom_creatures.cpp
     custom/event_attack_city.cpp
     custom/gmisland.cpp

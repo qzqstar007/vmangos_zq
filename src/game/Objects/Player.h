@@ -862,6 +862,14 @@ class Player final: public Unit
         void SendItemDurations() const;
         uint32 CountFreeInventorySlots() const;
     public:
+		// qzqstar, 250211, add counts for bot cheating
+		uint32 M_Item_Counts;
+		uint32 M_Spare_Data1;
+		uint32 M_Spare_Data2;
+		uint32 M_Spare_Data3;
+		uint32 M_Spare_Data4;
+
+
         Item* AddItem(uint32 itemId, uint32 count = 1);
         void InterruptSpellsWithCastItem(Item const* item);
         uint8 FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const;
@@ -1222,6 +1230,10 @@ class Player final: public Unit
         void _SaveBGData();
         void _SaveStats();
         uint32 m_nextSave;
+
+		//qzqstar add ConstName
+		std::string m_ConstName;
+
         bool m_saveDisabled; // used for temporary bots and faction change
     public:
         // Saves a new character directly in the database, without creating a Player object in memory.
@@ -1238,6 +1250,9 @@ class Player final: public Unit
         uint32 GetSaveTimer() const { return m_nextSave; }
         void   SetSaveTimer(uint32 timer) { m_nextSave = timer; }
         bool   IsSavingDisabled() const { return m_saveDisabled; }
+
+		//qzqstar add save ConstName
+		void SaveConstName(std::string const& name);
 
         /*********************************************************/
         /***                    PET SYSTEM                     ***/
@@ -1429,6 +1444,7 @@ class Player final: public Unit
         void SetPersonalXpRate(float rate) { if (rate >= 0) m_personalXpRate = rate; }
         float GetPersonalXpRate() const { return m_personalXpRate; }
         void GiveXP(uint32 xp, Unit const* victim);
+		bool MinusXP(uint32 _toMinusXp);
         void GiveLevel(uint32 level);
         void InitStatsForLevel(bool reapplyMods = false);
 
@@ -2155,6 +2171,10 @@ class Player final: public Unit
         void UpdatePvPContestedFlagTimer(uint32 diff);
     public:
         PvPInfo pvpInfo;
+
+		bool     wasInPvP = false;		//qzqstar, 250119, pvp related
+		Player * pvpPlayer = nullptr;	//qzqstar, 250119, pvp related
+
         void UpdatePvP(bool state, bool overriding = false);
         void UpdatePvPContested(bool state, bool overriding = false);
 

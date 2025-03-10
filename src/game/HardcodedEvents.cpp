@@ -189,8 +189,11 @@ void DragonsOfNightmare::Update()
         // Decrement and check value. Once we hit zero, event is done.
         if (!varReqUpdate)
         {
-            // We're done, update the permutation and set the respawn time
-            uint32 varRespawnTimer = time(nullptr) + urand(4 * 24 * 3600, 7 * 24 * 3600);
+			// We're done, update the permutation and set the respawn time
+			// uint32 varRespawnTimer = time(nullptr) + urand(4 * 24 * 3600, 7 * 24 * 3600);
+			//qzqstar, 250130, modify the respawn timer of 4 dragons, 12-24hour.
+			uint32 varRespawnTimer = time(nullptr) + urand(1 * 6 * 3600, 2 * 6 * 3600);
+
             GetAliveCountAndUpdateRespawnTime(dragonGUIDs, alive, varRespawnTimer);
 
             sObjectMgr.SetSavedVariable(VAR_RESP_TIME, varRespawnTimer, true);
@@ -373,14 +376,27 @@ DarkmoonState DarkmoonFaire::GetDarkmoonState()
     auto firstMonday = FindMonthFirstMonday(faireAlly, timeinfo);
     auto tm_mday = uint32(timeinfo->tm_mday);
 
-    if (tm_mday + 3 < firstMonday)
-        return DARKMOON_NONE;
-    if (tm_mday < firstMonday)
-        return faireAlly ? DARKMOON_A2_INSTALLATION : DARKMOON_H2_INSTALLATION;
-    if (tm_mday < firstMonday + 7)
-        return faireAlly ? DARKMOON_A2 : DARKMOON_H2;
+	/*
+	if (tm_mday + 3 < firstMonday)
+	return DARKMOON_NONE;
+	if (tm_mday < firstMonday)
+	return faireAlly ? DARKMOON_A2_INSTALLATION : DARKMOON_H2_INSTALLATION;
+	if (tm_mday < firstMonday + 7)
+	return faireAlly ? DARKMOON_A2 : DARKMOON_H2;
 
-    return DARKMOON_NONE;
+	return DARKMOON_NONE;
+	*/
+
+	//qzqstar, set the DMF state
+	//Monday-Wed, Aliiance
+	//Thursday-Sat. Horde
+	auto wkDay = uint32(timeinfo->tm_wday);
+	if (wkDay <= 2)
+		return DARKMOON_A2;
+	else if (wkDay <= 5)
+		return DARKMOON_H2;
+
+	return DARKMOON_NONE;
 }
 
 /*

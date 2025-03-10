@@ -3404,6 +3404,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     break;
                 case SPELL_EFFECT_ENCHANT_ITEM:
                 case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
+				case SPELL_EFFECT_122:  //qzqstar, 250216, add for ESS slot system.
                 case SPELL_EFFECT_DISENCHANT:
                 case SPELL_EFFECT_FEED_PET:
                     if (m_targets.getItemTarget())
@@ -5549,22 +5550,27 @@ void Spell::TakeAmmo()
         if (!pItem || pItem->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
             return;
 
-        if (pItem->GetProto()->InventoryType == INVTYPE_THROWN)
-        {
-            if (pItem->GetMaxStackCount() == 1)
-            {
-                // decrease durability for non-stackable throw weapon
-                pCaster->DurabilityPointLossForEquipSlot(EQUIPMENT_SLOT_RANGED);
-            }
-            else
-            {
-                // decrease items amount for stackable throw weapon
-                uint32 count = 1;
-                pCaster->DestroyItemCount(pItem, count, true);
-            }
-        }
-        else if (uint32 ammo = pCaster->GetUInt32Value(PLAYER_AMMO_ID))
-            pCaster->DestroyItemCount(ammo, 1, true);
+		//qzqstar remove the ammo bullet 2024.10.16
+		if (pItem->GetProto()->InventoryType == INVTYPE_THROWN)
+		{
+			if (pItem->GetMaxStackCount() == 1)
+			{
+				// decrease durability for non-stackable throw weapon
+				pCaster->DurabilityPointLossForEquipSlot(EQUIPMENT_SLOT_RANGED);
+			}
+			else
+			{
+				// decrease items amount for stackable throw weapon
+				/*
+				uint32 count = 1;
+				pCaster->DestroyItemCount(pItem, count, true);
+				*/
+			}
+		}
+		/*
+		else if (uint32 ammo = pCaster->GetUInt32Value(PLAYER_AMMO_ID))
+		pCaster->DestroyItemCount(ammo, 1, true);
+		*/
     }
 }
 
@@ -6097,12 +6103,20 @@ SpellCastResult Spell::CheckCast(bool strict)
             if (target->IsImmuneToSpell(m_spellInfo, target == m_caster))
                 return SPELL_FAILED_TARGET_AURASTATE;
 
-        //Must be behind the target.
-        if (m_spellInfo->IsFromBehindOnlySpell() && m_casterUnit && !m_casterUnit->IsBehindTarget(target, strict))
-        {
-            SendInterrupted(2);
-            return SPELL_FAILED_NOT_BEHIND;
-        }
+		//Must be behind the target.
+		if (m_spellInfo->IsFromBehindOnlySpell() && m_casterUnit && !m_casterUnit->IsBehindTarget(target, strict))
+		{
+			//qzqstar, 241212, skip the check for some rogue spells such as back stab and ambush.
+			if (m_caster->IsPlayer() && ((Player*)m_caster)->HasSpell(31061))
+			{
+				//has the 31061 spell
+			}
+			else
+			{
+				SendInterrupted(2);
+				return SPELL_FAILED_NOT_BEHIND;
+			}
+		}
 
         //Target must be facing you.
         if ((m_spellInfo->Attributes == 0x150010) && !target->HasInArc(m_caster))
@@ -6686,6 +6700,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_TARGET_IN_COMBAT;
 
                     // check if our map is dungeon
+					// qzqstar todo: remove to enable dungeon recalling?
+					/* */
                     MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(m_caster->GetMapId());
                     if (mapEntry && mapEntry->IsDungeon())
                     {
@@ -6883,12 +6899,26 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!m_caster->IsPlayer())
                     return SPELL_FAILED_BAD_TARGETS;
 
+				//qzqstar: 241128 mind control : cannot apply charm to player
+				if ((m_caster->IsPlayer()) && (m_targets.getUnitTarget()->IsPlayer()))
+				{
+					sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Mind Control cannot apply to player. From:%s to:%s", static_cast<Player*>(m_caster)->GetName(), static_cast<Player*>(m_targets.getUnitTarget())->GetName());
+					return SPELL_FAILED_BAD_TARGETS;
+				}
+
                 // no break
             }
             case SPELL_AURA_MOD_CHARM:
             {
                 if (!m_casterUnit)
                     return SPELL_FAILED_BAD_TARGETS;
+
+				//qzqstar, 250118, cannot mind control to players
+				if ((m_casterUnit->IsPlayer()) && (m_targets.getUnitTarget()->IsPlayer()))
+				{
+					sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Mind Control cannot apply to player. From:%s to:%s", static_cast<Player*>(m_casterUnit)->GetName(), static_cast<Player*>(m_targets.getUnitTarget())->GetName());
+					return SPELL_FAILED_BAD_TARGETS;
+				}
 
                 if (!IsScriptTarget(m_spellInfo->EffectImplicitTargetA[i]))
                 {
@@ -6985,10 +7015,16 @@ SpellCastResult Spell::CheckCast(bool strict)
                         }
                         else
                             return SPELL_FAILED_NOT_HERE;
-                    default:
-                        if ((m_casterUnit->GetMapId() == MAP_AHN_QIRAJ_TEMPLE && m_casterUnit->GetTerrain()->IsOutdoors(m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ())))
-                            isAQ40Mount = true;
-                        break;
+					default:
+						//qzqstar, 241202, can use normal mount at AQ40.
+						//if ((m_casterUnit->GetMapId() == 531 && m_casterUnit->GetTerrain()->IsOutdoors(m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ())))
+						if ((m_casterUnit->GetMapId() == 531)  //AQ
+							|| (m_casterUnit->GetMapId() == 409)    //MC
+							|| (m_casterUnit->GetMapId() == 469)    //BWL
+							|| (m_casterUnit->GetMapId() == 533)    //NAXX
+							)
+							isAQ40Mount = true;
+						break;
                 }
 
                 // Ignore map check if spell have AreaId. AreaId already checked and this prevent special mount spells
@@ -7926,6 +7962,25 @@ SpellCastResult Spell::CheckItems()
                 }
                 break;
             }
+
+			// qzqstar, 250216, ESS enchanting system
+			case SPELL_EFFECT_122:
+			{
+				Item *item = m_targets.getItemTarget();
+				if (!item)
+					return SPELL_FAILED_ITEM_GONE;
+				// Not allow enchant in trade slot for some enchant type
+				if (item->GetOwner() != m_caster)
+				{
+					uint32 enchant_id = m_spellInfo->EffectMiscValue[i];
+					SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+					if (!pEnchant)
+						return SPELL_FAILED_ERROR;
+				}
+				break;
+			}
+
+
             case SPELL_EFFECT_ENCHANT_HELD_ITEM:
                 // check item existence in effect code (not output errors at offhand hold item effect to main hand for example
                 break;

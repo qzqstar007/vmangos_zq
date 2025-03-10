@@ -1748,6 +1748,14 @@ void BattleGround::HandleKillPlayer(Player* pVictim, Player* pKiller)
     // add +1 kills to group and +1 killing_blows to killer
     if (pKiller && pVictim->GetFactionTemplateId() != pKiller->GetFactionTemplateId())
     {
+		//qzqstar give money to killer in BG
+		uint32 _RewMoney = 0;
+		_RewMoney = 100 + pKiller->GetLevel() * 10;
+		pKiller->ModifyMoney(_RewMoney);
+		WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
+		data << uint32(_RewMoney);
+		pKiller->GetSession()->SendPacket(&data);
+
         UpdatePlayerScore(pKiller, SCORE_HONORABLE_KILLS, 1);
         UpdatePlayerScore(pKiller, SCORE_KILLING_BLOWS, 1);
 

@@ -233,6 +233,9 @@ class Spell
         void EffectSchoolDMG(SpellEffectIndex effIdx);
         void EffectEnvironmentalDMG(SpellEffectIndex effIdx);
         void EffectInstaKill(SpellEffectIndex effIdx);
+
+		bool OneKeyPickall(Player * caster);		//qzqstar
+
         void EffectDummy(SpellEffectIndex effIdx);
         void EffectTeleportUnits(SpellEffectIndex effIdx);
         void EffectApplyAura(SpellEffectIndex effIdx);
@@ -268,6 +271,7 @@ class Spell
         void EffectTradeSkill(SpellEffectIndex effIdx);
         void EffectEnchantItemPerm(SpellEffectIndex effIdx);
         void EffectEnchantItemTmp(SpellEffectIndex effIdx);
+		void EffectEnchantItemDiamond(SpellEffectIndex eff_idx);
         void EffectTameCreature(SpellEffectIndex effIdx);
         void EffectSummonPet(SpellEffectIndex effIdx);
         void EffectLearnPetSpell(SpellEffectIndex effIdx);

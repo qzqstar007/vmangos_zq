@@ -1529,6 +1529,11 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant)
     return _addMember(guid, name, isAssistant, groupid);
 }
 
+#define __MODE_ONE_LIFE     (30841)
+#define __MODE_ZQ           (30843)
+
+#include "Chat/Chat.h"
+
 bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint8 group)
 {
     if (IsFull())
@@ -1547,6 +1552,45 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint
     }
 
     Player* player = sObjectMgr.GetPlayer(guid);
+
+	// qzqstar, 241204, zq challenge, cancels the invite if has spell
+	if (player)
+	{
+		bool __hasHC = false;
+		uint32 _maxlevel = 0;
+		uint32 _minlevel = 60;
+
+		//now check the players if hc
+		for (const auto& itr : m_memberSlots)
+		{
+			Player* __player = sObjectMgr.GetPlayer(itr.guid);
+			if (__player)
+			{
+				if (__player->GetLevel() > _maxlevel) _maxlevel = __player->GetLevel();
+				if (__player->GetLevel() < _minlevel) _minlevel = __player->GetLevel();
+				if (__player->HasSpell(32990) //remove later
+					|| __player->HasSpell(__MODE_ONE_LIFE)
+					|| __player->HasSpell(__MODE_ZQ)
+					)
+					__hasHC = true;
+			}
+		}
+
+		//now if hasHC 
+		if (__hasHC || player->HasSpell(__MODE_ONE_LIFE) || player->HasSpell(__MODE_ZQ))
+		{
+			if (player->GetLevel() > _maxlevel) _maxlevel = player->GetLevel();
+			if (player->GetLevel() < _minlevel) _minlevel = player->GetLevel();
+
+			if ((_maxlevel < _minlevel) || (_maxlevel - _minlevel > 2))
+			{
+				ChatHandler(player).PSendSysMessage(9035);
+				return false;
+			}
+		}
+	}
+
+
 
     MemberSlot member;
     member.guid      = guid;

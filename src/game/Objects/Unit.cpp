@@ -677,6 +677,31 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
         return true;
     };
 
+
+	//qzqstar, 241119, try to fix the damage too big
+#define __DAMAGE_MAX_PHY     (50000)
+#define __DAMAGE_MAX_SPELL  (150000)
+	if (this->IsPlayer() && pVictim->IsCreature())
+	{
+		//we don't think 5w could accurs
+		if (DIRECT_DAMAGE == damagetype)
+		{
+			if (damage > __DAMAGE_MAX_PHY) damage = __DAMAGE_MAX_PHY + (damage - __DAMAGE_MAX_PHY) / 100;
+		}
+		else if (SPELL_DIRECT_DAMAGE == damagetype)
+		{
+			if (damage > __DAMAGE_MAX_SPELL) damage = __DAMAGE_MAX_SPELL + (damage - __DAMAGE_MAX_SPELL) / 100;
+		}
+	}
+
+	//qzqstar, 250207, reduce the damage for pvp
+	if (this->IsPlayer() && pVictim->IsPlayer())
+	{
+		damage /= 3;
+	}
+
+
+
     if (!damage)
     {
         if (cleanDamage)
@@ -785,6 +810,44 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 
     if (health <= damage && pVictim->GetInvincibilityHpThreshold() == 0)
     {
+
+		//qzqstar, 241217, check the aura of priest the bring back to life
+		// Can't kill gods
+		if (Player* pPlayer = pVictim->ToPlayer())
+		{
+			//old just this statement
+			if (pPlayer->IsGameMaster())
+				return 0;
+
+			if (pPlayer->HasAura(31137))
+			{
+				pPlayer->RemoveAurasDueToSpell(31137);
+				pPlayer->SetHealthPercent(33);
+				return 0;
+			}
+
+			//qzqstar, 250119, set pPlayer killed by ...
+			if (IsPlayer() && (!((Player*)this)->InBattleGround()) && (pVictim->IsPlayer()))
+			{
+				sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player:%s killed by Player:%s...", ((Player*)pVictim)->GetName(), ((Player*)this)->GetName());
+				if (((Player*)pVictim)->GetMapId() == 0 || ((Player*)pVictim)->GetMapId() == 1)
+				{
+					((Player*)pVictim)->wasInPvP = true;
+					((Player*)pVictim)->pvpPlayer = (Player*)this;
+				}
+				else
+				{
+					((Player*)pVictim)->wasInPvP = false;
+				}
+			}
+			//qzqstar, 250228, set player wasInPvp false
+			else {
+				pPlayer->wasInPvP = false;
+			}
+
+		}
+
+
         DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "DealDamage: victim just died");
         Kill(pVictim, spellProto, durabilityLoss);
 
@@ -1121,6 +1184,26 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
     }
 
     pVictim->GetHostileRefManager().deleteReferences();
+
+
+	//qzqstar, 241205, zq mode test here..
+	if (pPlayerVictim)
+	{
+		auto __cr = this->ToCreature();
+		if (__cr)
+			//qzqstar, 250110, save player name if pvp
+		{
+			pPlayerVictim->SaveConstName(__cr->GetNameForLocaleIdx(pPlayerVictim->GetSession()->GetSessionDbLocaleIndex()));
+		}
+		else if (this->IsPlayer())
+		{
+			if (Player* pPlayer = ToPlayer())
+				pPlayerVictim->SaveConstName(pPlayer->GetName());
+		}
+		else
+			pPlayerVictim->SaveConstName("Unknown");
+	}
+
 
     // outdoor pvp things, do these after setting the death state, else the player activity notify won't work... doh...
     // handle player kill only if not suicide (spirit of redemption for example)
@@ -9019,12 +9102,13 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* pTarget, uint32 procFlag,
                 // if victim and dodged attack
                 if (procExtra & PROC_EX_DODGE)
                 {
-                    //Update AURA_STATE on dodge
-                    if (GetClass() != CLASS_ROGUE) // skip Rogue Riposte
-                    {
-                        ModifyAuraState(AURA_STATE_DEFENSE, true);
-                        StartReactiveTimer(REACTIVE_DEFENSE, pTarget->GetObjectGuid());
-                    }
+					//Update AURA_STATE on dodge
+					//qzqstar, 241212, skip checking of dodge or parry if has spell of 31059
+					if ((GetClass() != CLASS_ROGUE) || (IsPlayer() && ((Player*)this)->HasSpell(31059))) // skip Rogue Riposte
+					{
+						ModifyAuraState(AURA_STATE_DEFENSE, true);
+						StartReactiveTimer(REACTIVE_DEFENSE, pTarget->GetObjectGuid());
+					}
                 }
                 // if victim and parried attack
                 if (procExtra & PROC_EX_PARRY)

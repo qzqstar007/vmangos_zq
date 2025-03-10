@@ -1384,6 +1384,32 @@ void Aura::TriggerSpell()
                 }
                 break;
             }
+
+			//qzqstar, 241211, Frenzied Regeneration from druid.
+			case SPELLFAMILY_WARRIOR:
+			{
+				switch (auraId)
+				{
+				case 31029:                             // Frenzied Regeneration
+				{
+					float LifePerRage = GetModifier()->m_amount;
+
+					if (target)
+						LifePerRage += (target->GetStat(STAT_STRENGTH)) / 30;
+
+					int32 lRage = target->GetPower(POWER_RAGE);
+					if (lRage > 100)                    // rage stored as rage*10
+						lRage = 100;
+					target->ModifyPower(POWER_RAGE, -lRage);
+					float FRTriggerBasePoints = lRage * LifePerRage / 10;
+					target->CastCustomSpell(target, 22845, dither(FRTriggerBasePoints), {}, {}, true, nullptr, this);
+					return;
+				}
+				default:
+					break;
+				}
+				break;
+			}
 //            case SPELLFAMILY_WARRIOR:
 //            {
 //                switch(auraId)
@@ -3101,6 +3127,13 @@ void Aura::HandleModPossess(bool apply, bool Real)
     if (!pCaster || !pTarget)
         return;
 
+	//qzqstar, 241230, Mind control cannot be applied to player
+	if (pCaster->IsPlayer() && pTarget->IsPlayer())
+	{
+		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[HandleModPossess] Mind Control cannot apply to player. From:%s to:%s", static_cast<Player*>(pCaster)->GetName(), static_cast<Player*>(pTarget)->GetName());
+		return;
+	}
+
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
     // Fix issue with control on old clients if player is afflicted by mind control,
     // while he himself is possessing another unit. Client needs to first be told
@@ -3397,6 +3430,13 @@ void Aura::HandleModCharm(bool apply, bool Real)
     {
         if (!caster)
             return;
+
+		//qzqstar, 250118, cannot use mind control to player
+		if (caster->IsPlayer() && target->IsPlayer())
+		{
+			sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[HandleModCharm] Mind Control cannot apply to player. From:%s to:%s", static_cast<Player*>(caster)->GetName(), static_cast<Player*>(target)->GetName());
+			return;
+		}
 
         FactionTemplateEntry const* origFactionTemplate = target->GetFactionTemplateEntry();
 
@@ -6115,8 +6155,19 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             uint32 const malus = (resist > 0 ? (absorb + uint32(resist)) : absorb);
             pdamage = (pdamage <= malus ? 0 : (pdamage - malus));
 
-            SpellPeriodicAuraLogInfo pInfo(this, pdamage, absorb, resist, 0.0f);
-            target->SendPeriodicAuraLog(&pInfo, sProto ? auraType : SPELL_AURA_NONE);
+			//qzqstar, 241218, dot crit for the spells if has spell 31151
+			bool __iscrit = false;
+			if (pCaster->HasSpell(31151))
+			{
+				__iscrit = pCaster->IsSpellCrit(target, spellProto, spellProto->GetSpellSchoolMask());
+				if (__iscrit) pdamage *= 2;
+				pCaster->SendSpellNonMeleeDamageLog(target, GetId(), pdamage, spellProto->GetSpellSchoolMask(), absorb, resist, true, 0, __iscrit);
+			}
+			else
+			{
+				SpellPeriodicAuraLogInfo pInfo(this, pdamage, absorb, resist, 0.0f);
+				target->SendPeriodicAuraLog(&pInfo, sProto ? auraType : SPELL_AURA_NONE);
+			}
 
             if (pdamage)
                 procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
@@ -6184,6 +6235,9 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             pCaster->DealDamageMods(target, pdamage, &absorb);
 
+			//qzqstar, 241218, leech bonus for the spells?
+			if (pCaster->HasSpell(31155))    pdamage *= 1.5;
+
             pCaster->SendSpellNonMeleeDamageLog(target, GetId(), pdamage, spellProto->GetSpellSchoolMask(), absorb, resist, true, 0);
 
             float multiplier = spellProto->EffectMultipleValue[GetEffIndex()] > 0 ? spellProto->EffectMultipleValue[GetEffIndex()] : 1;
@@ -6218,6 +6272,9 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 modOwner->ApplySpellMod(GetId(), SPELLMOD_MULTIPLE_VALUE, multiplier);
 
             uint32 heal = int32(new_damage * multiplier);
+
+			//qzqstar, 241218, leech bonus for the heal
+			if (pCaster->HasSpell(31155))    heal *= 1.8;
 
             int32 gain = pCaster->DealHeal(pCaster, heal, spellProto);
             pCaster->GetHostileRefManager().threatAssist(pCaster, gain * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
@@ -7426,10 +7483,14 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
     SetInUse(false);
 }
 
+//qzqstar, todo, 241127, remove spell can cast
 void SpellAuraHolder::HandleCastOnAuraRemoval() const
 {
     uint32 uiTriggeredSpell = 0;
     AuraRemoveMode mode = GetRemoveMode();
+
+	//add custom ind
+	bool __custom = false;
 
     switch (GetId())
     {
@@ -7446,6 +7507,39 @@ void SpellAuraHolder::HandleCastOnAuraRemoval() const
                 GetTarget()->CastSpell(GetTarget(), 24004, true);
             break;
         }
+
+		//rogue
+		case 1784:
+		case 1785:
+		case 1786:
+		case 1787:
+		{
+			__custom = true;
+			Unit* caster = GetCaster();
+			if (caster && caster->IsPlayer() && (caster->ToPlayer())->HasSpell(31063))
+			{
+				uiTriggeredSpell = 31064;
+			}
+			break;
+		}
+
+		//mage, ice bearer
+		case 11426:
+		case 13031:
+		case 13032:
+		case 13033:
+		{
+			__custom = true;
+			Unit* caster = GetCaster();
+			if (caster && caster->IsPlayer() && (caster->ToPlayer())->HasSpell(31047))
+			{
+				//qzqstar, 241212, the ice shiled on/off by spell.
+				if (mode == AURA_REMOVE_BY_SHIELD_BREAK)
+					uiTriggeredSpell = 31048;   //new one
+			}
+			break;
+		}
+
         default:
             return;
     }

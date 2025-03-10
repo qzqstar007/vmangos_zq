@@ -428,6 +428,26 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
         if (!sScriptMgr.OnGossipSelect(_player, pGo, sender, action, code.empty() ? nullptr : code.c_str()))
             _player->OnGossipSelect(pGo, gossipListId);
     }
+
+	//qzqstar, 250308, add support for the player?
+	else if (guid.IsPlayer())
+	{
+		// sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Handling .... player menu sender:%d action:%d", sender, action);
+		// if (!sScriptMgr.OnGossipSelect(_player, (Creature *)_player, sender, action, code.empty() ? nullptr : code.c_str()))
+		//	_player->OnGossipSelect(_player, gossipListId);
+		//	sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Handling .... player menu 2");
+
+		_player->PlayerTalkClass->ClearMenus();
+		if (_player->M_Spare_Data1 == 1999)		//vip spell
+		{
+			if (const SpellEntry * spell_info = sSpellMgr.GetSpellEntry(30005))
+			{
+				if(SpellScript* pTempScript = sScriptMgr.GetSpellScript(spell_info))
+					pTempScript->OnGossipSelect(_player, (Creature *)_player, sender, action);
+			}
+		}
+		
+	}
 }
 
 void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recv_data)

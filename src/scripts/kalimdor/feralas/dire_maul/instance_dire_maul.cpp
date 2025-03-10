@@ -99,6 +99,11 @@ void instance_dire_maul::OnObjectCreate(GameObject* pGo)
 {
     switch (pGo->GetEntry())
     {
+		// qzqstar, 250105, disable the Mines
+		case 175404: //Thrium Veins
+		pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+		break;
+
         // DM East
         case GO_CRUMBLE_WALL:
             m_uiCrumbleWallGUID = pGo->GetObjectGuid();
@@ -205,7 +210,23 @@ void instance_dire_maul::OnCreatureDeath(Creature* pCreature)
                     pChorush->m_Events.AddLambdaEventAtOffset([pChorush]() { DoScriptText(SAY_KING_DEAD, pChorush); }, 5000);
                 }
             }
-                    
+			//qzqstar, 250105, set the Mine available 397160	175404
+			sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Instance of DM King is killed. remove the flags");
+			GameObject *pGO = instance->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, 175404, (uint32)397160));
+			if (pGO && pGO->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT)) pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+			pGO = instance->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, 175404, (uint32)397161));
+			if (pGO && pGO->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT)) pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+			pGO = instance->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, 175404, (uint32)18539));
+			if (pGO && pGO->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT)) pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+			pGO = instance->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, 175404, (uint32)18540));
+			if (pGO && pGO->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT)) pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+			pGO = instance->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, 175404, (uint32)18545));
+			if (pGO && pGO->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT)) pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+			pGO = instance->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, 175404, (uint32)18546));
+			if (pGO && pGO->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT)) pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+			pGO = instance->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, 175404, (uint32)18548));
+			if (pGO && pGO->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT)) pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+
             break;
     }
 }

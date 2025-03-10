@@ -177,7 +177,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectApplyAreaAura,                            //119 SPELL_EFFECT_APPLY_AREA_AURA_PET
     &Spell::EffectUnused,                                   //120 SPELL_EFFECT_TELEPORT_GRAVEYARD       one spell: Graveyard Teleport Test
     &Spell::EffectWeaponDmg,                                //121 SPELL_EFFECT_NORMALIZED_WEAPON_DMG
-    &Spell::EffectUnused,                                   //122 SPELL_EFFECT_122                      unused
+	&Spell::EffectEnchantItemDiamond,                       //122 SPELL_EFFECT_122                      qzqstar, 250214, ESS, used for diamond enchantment
     &Spell::EffectSendTaxi,                                 //123 SPELL_EFFECT_SEND_TAXI                taxi/flight related (misc value is taxi path id)
     &Spell::EffectPlayerPull,                               //124 SPELL_EFFECT_PLAYER_PULL              opposite of knockback effect (pulls player twoard caster)
     &Spell::EffectModifyThreatPercent,                      //125 SPELL_EFFECT_MODIFY_THREAT_PERCENT
@@ -278,7 +278,9 @@ void Spell::EffectInstaKill(SpellEffectIndex /*effIdx*/)
     m_caster->SendMessageToSet(&data, true);
 #endif
 
-    m_caster->DealDamage(unitTarget, unitTarget->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, m_spellInfo, false, this);
+	//qzqstar, todo 241218, ignore the kill target
+	if (m_casterUnit && !m_casterUnit->HasSpell(31159))
+		m_caster->DealDamage(unitTarget, unitTarget->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, m_spellInfo, false, this);
 }
 
 void Spell::EffectEnvironmentalDMG(SpellEffectIndex effIdx)
@@ -349,7 +351,12 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage += pPlayer->GetTotalAttackPowerValue(BASE_ATTACK) * combo * 0.03f;
 #endif
                     damage += pPlayer->GetPower(POWER_ENERGY) * m_spellInfo->DmgMultiplier[effect_idx];
-                    pPlayer->SetPower(POWER_ENERGY, 0);
+					//qzqstar: 241128, todo: fuwen, remove the energy power zero
+					//pPlayer->SetPower(POWER_ENERGY, 0);
+
+					//debug
+					//ChatHandler(pPlayer).PSendSysMessage(">>> Energy:%u dmage=%u", pPlayer->GetPower(POWER_ENERGY), damage);
+					pPlayer->SetPower(POWER_ENERGY, pPlayer->GetPower(POWER_ENERGY) * 0.8f);
                 }
                 break;
             }
@@ -399,10 +406,194 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
     }
 }
 
+
+//qzqstar add support for the one key pickall
+bool Spell::OneKeyPickall(Player* caster)
+{
+	if (!caster)
+		return false;
+
+	if (caster->IsNonMeleeSpellCasted(false))
+		caster->InterruptNonMeleeSpells(false);
+
+	if (!caster->IsAlive())
+		return false;
+
+
+	float max_range = 15.0f;
+	std::list<WorldObject*> ClusterList;
+	MaNGOS::AllWorldObjectsInRange objects(caster, max_range);
+	MaNGOS::WorldObjectListSearcher<MaNGOS::AllWorldObjectsInRange> searcher(ClusterList, objects);
+	Cell::VisitAllObjects(caster, searcher, max_range);
+	for (std::list<WorldObject*>::const_iterator itr = ClusterList.begin(); itr != ClusterList.end(); ++itr)
+	{
+		if (Creature* Looter = (*itr)->ToCreature())
+		{
+			if (Looter->IsAlive())
+				continue;
+
+			if (Looter->loot.empty())
+				continue;
+
+			caster->SetLootGuid(Looter->GetGUID());
+			ObjectGuid lguid = Looter->GetGUID();
+			Loot* loot = nullptr;
+			uint8 lootSlot = 0;
+
+			if (lguid.IsCorpse())
+			{
+				Corpse* bones = caster->GetMap()->GetCorpse(lguid);
+				if (!bones)
+					return false;
+				if (!bones)
+				{
+					caster->SendLootRelease(lguid);
+					return false;
+				}
+
+				loot = &bones->loot;
+			}
+			else
+			{
+				loot = &Looter->loot;
+				lootSlot = Looter->loot.GetMaxSlotInLootFor(caster->GetGUIDLow());
+			}
+
+
+			PermissionTypes permission = ALL_PERMISSION;
+			if (Looter->GetGroupLootRecipient())
+			{
+				Group* group = caster->GetGroup();
+				if (group == Looter->GetGroupLootRecipient())
+				{
+					switch (group->GetLootMethod())
+					{
+					case MASTER_LOOT:
+						permission = MASTER_PERMISSION;
+						break;
+					case FREE_FOR_ALL:
+						permission = ALL_PERMISSION;
+						break;
+					case ROUND_ROBIN:
+						permission = ROUND_ROBIN_PERMISSION;
+						break;
+					default:
+						permission = GROUP_PERMISSION;
+						break;
+					}
+				}
+				else
+					permission = NONE_PERMISSION;
+			}
+			else if (Looter->GetLootRecipient() == caster)
+				permission = OWNER_PERMISSION;
+			else
+				permission = NONE_PERMISSION;
+
+			if (permission == GROUP_PERMISSION || permission == ROUND_ROBIN_PERMISSION || permission == MASTER_PERMISSION)
+			{
+				ChatHandler(caster->GetSession()).PSendSysMessage("Cannot be in Party/Raid.");
+				return false;
+			}
+
+			caster->ModifyMoney(loot->gold);
+
+			WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
+			data << uint32(loot->gold);
+			caster->GetSession()->SendPacket(&data);
+
+			loot->gold = 0;
+			loot->NotifyMoneyRemoved();
+
+			QuestItem* qitem = nullptr;
+			QuestItem* ffaitem = nullptr;
+			QuestItem* conditem = nullptr;
+
+			for (uint32 i = 0; i < lootSlot; ++i)
+			{
+				LootItem* item = loot->LootItemInSlot(i, caster->GetGUIDLow(), &qitem, &ffaitem, &conditem);
+
+				if (!item)
+				{
+					caster->SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr);
+					continue;
+				}
+
+				if (!item->AllowedForPlayer(caster, loot->GetLootTarget()))
+				{
+					caster->SendLootRelease(lguid);
+					continue;
+				}
+
+				if (!qitem && item->is_blocked)
+				{
+					caster->SendLootRelease(lguid);
+					continue;
+				}
+
+
+				ItemPosCountVec dest;
+				InventoryResult msg = caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->itemid, item->count);
+				if (msg == EQUIP_ERR_OK)
+				{
+					Item * newitem = caster->StoreNewItem(dest, item->itemid, true, item->randomPropertyId);
+					if (!newitem)
+					{
+						continue;
+					}
+
+					if (qitem)
+					{
+						qitem->is_looted = true;
+						//freeforall is 1 if everyone's supposed to get the quest item.
+						if (item->freeforall || loot->GetPlayerQuestItems().size() == 1)
+							caster->SendNotifyLootItemRemoved(i);
+						else
+							loot->NotifyQuestItemRemoved(qitem->index);
+					}
+					else if (ffaitem)
+					{
+						//freeforall case, notify only one player of the removal
+						ffaitem->is_looted = true;
+						caster->SendNotifyLootItemRemoved(i);
+					}
+					else if (conditem)
+					{
+						//not freeforall, notify everyone
+						conditem->is_looted = true;
+						loot->NotifyItemRemoved(i);
+					}
+					else
+						loot->NotifyItemRemoved(i);
+
+					//if only one person is supposed to loot the item, then set it to looted
+					if (!item->freeforall)
+						item->is_looted = true;
+
+					--loot->unlootedCount;
+
+					caster->SendNewItem(newitem, uint32(item->count), false, false, true);
+					caster->OnReceivedItem(newitem);
+				}
+				else
+					caster->SendEquipError(msg, nullptr, nullptr, item->itemid);
+			}
+
+			// If player is removing the last LootItem, delete the empty container.
+			if (loot->isLooted() && lguid.IsCreature())
+				caster->GetSession()->DoLootRelease(lguid);
+		}
+	}
+
+	return true;
+}
+
+
 void Spell::EffectDummy(SpellEffectIndex effIdx)
 {
-    if (!unitTarget && !gameObjTarget && !itemTarget && !corpseTarget)
-        return;
+	//qzqstar skip the 32999
+	if (!unitTarget && !gameObjTarget && !itemTarget && !corpseTarget && (m_spellInfo->Id != 32999))
+		return;
 
     // selection by spell family
     switch (m_spellInfo->SpellFamilyName)
@@ -699,6 +890,566 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         m_caster->CastSpell(newTarget, spellId, true, m_CastItem);
                     return;
                 }
+
+
+				// qzqstar, 240131, auto cast spell every 1 second, need learn 31246
+				case 31245:
+				{
+					// not player 
+					if (!m_caster->IsPlayer()) return;
+
+					auto player = m_caster->ToPlayer();
+					auto pOffHandItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+
+					//Check warrior
+					if (player->GetClass() == CLASS_WARRIOR)
+					{
+						//1. check if Has spell 
+						if (player->HasSpell(31033) && !(player->HasAura(31034)))
+						{
+							//get offhand item
+							if (pOffHandItem && pOffHandItem->GetProto()->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
+								player->CastSpell(player, 31034, true, nullptr);
+						}
+						else if (player->HasAura(31034))
+						{
+							//remove if hasn't spell or not equiped a shield
+							if ((!player->HasSpell(31033)) || (!pOffHandItem) || (pOffHandItem && pOffHandItem->GetProto()->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD))
+								player->RemoveAurasDueToSpell(31034);
+						}
+					}
+
+					//Check Hunter
+					else if (player->GetClass() == CLASS_HUNTER)
+					{
+						//check if solo
+						if (player->HasSpell(31123) && (player->GetPet() == nullptr) && (!player->HasAura(31124)))
+						{
+							player->CastSpell(player, 31124, true, nullptr);
+						}
+						else if (player->HasAura(31124) && player->GetPet())
+						{
+							//remove if hasn't spell or has pet
+							player->RemoveAurasDueToSpell(31124);
+						}
+					}
+
+					//Check Mage
+					else if (player->GetClass() == CLASS_MAGE)
+					{
+						//check if has glass cannon
+						if (player->HasSpell(31051))
+						{
+							//int32 maxMana = player->GetMaxPower(POWER_MANA);
+							//int32 maxHealth = player->GetMaxHealth();
+							int32 curMana = player->GetMaxPower(POWER_MANA);
+							int32 curHealth = player->GetMaxHealth();
+
+							if (curHealth < 10) curHealth = 10;
+
+							int32 __points = 0;
+							if (curMana > curHealth) __points = curMana * 100 / curHealth - 100;
+
+							if (__points > 600) __points = 600;
+
+							//BASIC_LOG("Health:%d, MANA:%d, points=%d", maxHealth, maxMana, __points/3);
+
+							player->CastCustomSpell(player, 31052, __points / 3, {}, {}, true, nullptr);
+						}
+						else if (player->HasAura(31052) && (!player->HasSpell(31051)))
+						{
+							player->RemoveAurasDueToSpell(31052);
+						}
+					}
+
+					//Check Druid
+					else if (player->GetClass() == CLASS_DRUID)
+					{
+						//check if has transformers
+						if (player->HasSpell(31105))
+						{
+							int32 __points1 = 0, __points2 = 0, __points3 = 0;
+
+							switch (player->GetShapeshiftForm())
+							{
+							case FORM_BEAR:
+							case FORM_DIREBEAR:
+								__points1 = -11;
+								break;
+							case FORM_CAT:
+								__points2 = 19;
+								break;
+							case FORM_MOONKIN:
+								__points3 = 24;
+								break;
+							default:
+								break;
+							}
+
+							player->CastCustomSpell(player, 31106, __points1, __points2, __points3, true, nullptr);
+						}
+						else if (player->HasAura(31106))
+						{
+							player->RemoveAurasDueToSpell(31106);
+						}
+					}
+
+					// qzqstar, 250204, the bonding ralation system
+					do {
+						// each class add 1% all stat to self.
+						// 1. first get the player class
+						auto _auraID = 31244;
+						auto _checkClassMask = 0;
+						auto _apply = false;
+						auto _points1 = 0;
+
+						// 2. check the group
+						Group* pGroup = player->GetGroup();
+						if (pGroup)
+						{
+							// 1.2 Check the groups
+							uint8 subgroup = player->GetSubGroup();
+							for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+							{
+								Player* target = itr->getSource();
+
+								// Check the target members//  target->GetSubGroup() == subgroup && 
+								if (target && target->GetZoneId() == player->GetZoneId())
+								{
+									_checkClassMask |= target->GetClassMask();
+								}
+							}
+
+							_points1 = 0;
+							while (_checkClassMask) {
+								_checkClassMask &= _checkClassMask - 1;
+								_points1++;
+							}
+
+							if (_points1 <= 1)
+							{
+								_points1 = 0;
+								_apply = false;
+							}
+							else
+							{
+								_apply = true;
+								if (_points1 >= 9) _points1 = 10;
+							}
+						}
+
+						if (_apply)
+						{
+							if (!player->HasAura(_auraID))
+							{
+								player->CastCustomSpell(player, _auraID, _points1, 0, 0, true, nullptr);
+							}
+						}
+						else
+						{
+							// need remove aura if has
+							if (player->HasAura(_auraID))
+							{
+								player->RemoveAurasDueToSpell(_auraID);
+							}
+						}
+
+
+					} while (0);
+
+					return;
+				}
+
+				//qzqstar, 250309, add support for the prof boost up
+				case 30873:	//	采矿、锻造专业速升。10249	9786 // 164, 186
+				case 30874:	//	剥皮、制皮专业速升。10769	10663// 393 165
+				case 30875:	//	草药、炼金专业速升。11994	11612// 171 182
+				case 30876:	//	裁缝、附魔专业速升。12181	13921// 197 333
+				case 30877:	//	钓鱼、烹饪专业速升。18249	18261// 356, 185
+				case 30878:	//	急救、工程专业速升。12657	10847// 129, 202
+				{
+					if (m_caster && m_caster->IsPlayer())
+					{
+						auto pPlayer = m_caster->ToPlayer();
+
+						int32 spell_id1 = 0;
+						int32 spell_id2 = 0;
+						int32 skill_id1 = 0;
+						int32 skill_id2 = 0;
+
+						if (m_spellInfo->Id == 30873)	   { spell_id1 = 10249;  spell_id2 =  9786; skill_id1 = 164; skill_id2 = 186;}
+						else if (m_spellInfo->Id == 30874) { spell_id1 = 10769;  spell_id2 = 10663; skill_id1 = 393; skill_id2 = 165;}
+						else if (m_spellInfo->Id == 30875) { spell_id1 = 11994;  spell_id2 = 11612; skill_id1 = 171; skill_id2 = 182;}
+						else if (m_spellInfo->Id == 30876) { spell_id1 = 12181;  spell_id2 = 13921; skill_id1 = 197; skill_id2 = 333;}
+						else if (m_spellInfo->Id == 30877) { spell_id1 = 18249;  spell_id2 = 18261; skill_id1 = 356; skill_id2 = 185;}
+						else if (m_spellInfo->Id == 30878) { spell_id1 = 12657;  spell_id2 = 10847; skill_id1 = 129; skill_id2 = 202;}
+
+						sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Player:%s boost skill, origspell:%d, spell_id1=%d, spell_id2=%d, skill_id1=%d, skill_id2 = %d", 
+							pPlayer->GetName(), m_spellInfo->Id, spell_id1, spell_id2, skill_id1, skill_id2);
+
+						if (spell_id1 != 0 && spell_id2 != 0 && skill_id1 != 0 && skill_id2 != 0)
+						{
+							pPlayer->LearnSpell(spell_id1, false);
+							pPlayer->LearnSpell(spell_id2, false);
+
+							pPlayer->SetSkill(skill_id1, 300, 300, 4);
+							pPlayer->SetSkill(skill_id2, 300, 300, 4);
+						}
+					}
+					return;
+				}
+
+				case 32999:
+				{
+					//qzqstar, 250202, avoid pickall in map 0 or 1
+					if (m_caster && m_caster->IsPlayer())
+					{
+						auto pPlayer = m_caster->ToPlayer();
+
+						auto p = pPlayer->FindNearestPlayer(20);
+						if (p)
+						{
+							ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|周围有玩家一键拾取不能使用|!<<<")).c_str());
+							return;
+						}
+
+						//check the time?
+						auto _now = sWorld.GetGameTime();
+						struct tm* time_info = localtime(&_now);
+
+						//BASIC_LOG("Now %d-%d-%d", time_info->tm_hour, time_info->tm_min, time_info->tm_sec);
+						if (time_info->tm_hour <= 7)
+						{
+							ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|凌晨至早八点不能使用|!<<<")).c_str());
+							return;
+						}
+
+					}
+					//qzqstar, add for auto pick 
+					if (false == OneKeyPickall(m_caster->ToPlayer()))
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|一键拾取不能在组队中使用|!<<<")).c_str());
+					return;
+				}
+
+				case 32998:
+				{
+					//qzqstar, add for dungeons reset					
+					return;
+				}
+
+				case 32985:
+				{
+					//qzqstar, 250218, slot diamond
+					if (m_caster->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					itemTarget = m_targets.getItemTarget();
+					if (!itemTarget
+						|| itemTarget->GetProto()->Quality < 3
+						|| (itemTarget->GetProto()->Class != ITEM_CLASS_WEAPON && itemTarget->GetProto()->Class != ITEM_CLASS_ARMOR)
+						|| (itemTarget->GetProto()->ItemId >30400 && itemTarget->GetProto()->ItemId < 30519) /*ignore chenyi, zhanpao*/
+						)
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(">>>|只能对蓝色以上品质武器或者护甲使用|<<<!");
+						return;
+					}
+
+					if (itemTarget->IsEquipped())
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>请注意：装备必须放在背包中！只能给自己使用！<<<")).c_str());
+						return;
+					}
+
+					itemTarget->SetEnchantment(PROP_ENCHANTMENT_SLOT_1, 3000, 0, 0);
+					itemTarget->SetEnchantment(PROP_ENCHANTMENT_SLOT_2, 3500, 0, 0);
+
+					//set bind
+					itemTarget->SendForcedObjectUpdate();
+					itemTarget->SetBinding(true);
+					return;
+				}
+
+				case 32986:
+				case 32987:
+				case 32997:	//Scroll Targeting to the Cloths
+				case 32996: //Skill targetting to the Weapons
+				{
+					//BASIC_LOG("--- Entering the Rerandom.");
+					//qzqstar, add for the re random
+					//get the item_id, del it and send loot 
+					if (m_caster->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					itemTarget = m_targets.getItemTarget();
+					if (!itemTarget)
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage("Wrong Item!");
+						return;
+					}
+
+					if (itemTarget->IsEquipped())
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>请注意：装备必须放在背包中！只能给自己使用！<<<")).c_str());
+						return;
+					}
+
+					if (itemTarget->GetProto()->Quality == 3)
+					{
+						// blues quality
+					}
+					else if (itemTarget->GetProto()->Quality == 4)
+					{
+						// purple quality
+						// need extra Nexus Crystal 20725
+						/*
+						if ((m_caster->ToPlayer())->GetItemCount(20725) == 0)
+						{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage("Not enought materials!");
+						return;
+						}
+
+						//remove one Nexus Crystal
+						auto __item = (m_caster->ToPlayer())->GetItemByGuid()
+						(m_caster->ToPlayer())->RemoveItem()*/
+					}
+					else if (itemTarget->GetProto()->Quality == 5)
+					{
+						// yellow quality
+						// need extra Nexus Crystal 20725 and dq 30523
+					}
+					else
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>装备等级太低!<<<")).c_str());
+						return;
+					}
+
+
+
+					Player* pCaster = static_cast<Player*>(m_caster);
+
+					if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(itemTarget->GetProto()->ItemId))
+					{
+						//BASIC_LOG("Old ID: %d new ID:%d", itemTarget->GetItemRandomPropertyId(), randomPropertyId);
+						itemTarget->SetItemRandomProperties(randomPropertyId);
+						itemTarget->SendForcedObjectUpdate();
+
+						//set bind
+						itemTarget->SetBinding(true);
+					}
+
+
+					return;
+				}
+
+				case 32995:
+				{
+					//qzqstar games
+					//add for random spells
+					if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					Player* pPlayer = unitTarget->ToPlayer();
+					uint32 spellId = 16716; // Launch (60%)
+					switch (urand(1, 10))
+					{
+					case 1:	spellId = 16595; break;	// mini (20%)
+					case 2:	spellId = 22782; break; // Fury
+					case 3:	spellId = 325; break; // Fury
+					case 4:	spellId = 7302; break; // Fury
+					case 5:	spellId = 11735; break; // Fury
+					case 6:	spellId = 1006; break; // Fury
+					case 7:	spellId = 16713; break; // Fury
+					}
+
+					pPlayer->CastSpell(pPlayer, spellId, true, nullptr);
+
+					return;
+				}
+
+				case 32994:
+				{
+					//qzqstar games - killer spell - random level 2
+					/* Remove the spells, due to toomany spells
+					if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+					return;
+
+					Player* pPlayer = unitTarget->ToPlayer();
+
+					uint32 spellId = PickRandomValue(32311, 32316, 32321, 32326, 32331, 32336, 32341, 32308);
+					pPlayer->CastSpell(pPlayer, spellId, true, nullptr); */
+
+					return;
+				}
+
+				case 32993:
+				{
+					//qzqstar games - haste speed spell - rep 50%, speed 20%, spell haste 20%
+					if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					Player* pPlayer = unitTarget->ToPlayer();
+
+					uint32 spellId = PickRandomValue(32391, 32396, 32308);
+					pPlayer->CastSpell(pPlayer, spellId, true, nullptr);
+
+
+					return;
+				}
+
+				case 32992:
+				{
+					//qzqstar games - blasted land spell
+					if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					Player* pPlayer = unitTarget->ToPlayer();
+
+					uint32 spellId = PickRandomValue(10690, 10691, 10670, 10672);
+					pPlayer->CastSpell(pPlayer, spellId, true, nullptr);
+
+
+					return;
+				}
+
+				case 32991:
+				{
+					//qzqstar games - zanza spells 3
+					if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					Player* pPlayer = unitTarget->ToPlayer();
+
+					uint32 spellId = PickRandomValue(24382, 24383, 30003);
+					pPlayer->CastSpell(pPlayer, spellId, true, nullptr);
+
+
+					return;
+				}
+				case 32962:
+				{
+					// qzqstar, 241204, set the "Crafted by ..." property of the item
+					if (m_caster->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					itemTarget = m_targets.getItemTarget();
+					if (itemTarget->GetProto()->HasSignature())
+					{
+						itemTarget->SetGuidValue(ITEM_FIELD_CREATOR, (m_caster->ToPlayer())->GetObjectGuid());
+						itemTarget->SetBinding(true);
+					}
+					else
+					{
+						//restore one, refresh the cooldown
+					}
+
+					return;
+				}
+				case 32961:
+				{
+					//qzqstar, 241117, remove binding scrolls
+					if (m_caster->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					//scroll ID
+					auto _itemID = 39984;
+
+					itemTarget = m_targets.getItemTarget();
+					if (!itemTarget || ((itemTarget->GetProto()->Class != ITEM_CLASS_ARMOR) && (itemTarget->GetProto()->Class != ITEM_CLASS_WEAPON)))
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>目标物品不是装备!<<<")).c_str());
+
+						//restore one
+						(m_caster->ToPlayer())->AddItem(_itemID);
+						return;
+					}
+
+					if (itemTarget->IsEquipped())
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>请注意：装备必须放在背包中!<<<")).c_str());
+
+						//restore one
+						(m_caster->ToPlayer())->AddItem(_itemID);
+						return;
+					}
+
+					if ((itemTarget->GetProto()->Quality > 4) || (itemTarget->GetProto()->ItemId == 1728))
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>橙武、提布不可移除绑定!<<<")).c_str());
+
+						//restore one
+						(m_caster->ToPlayer())->AddItem(_itemID);
+						return;
+					}
+
+
+					//remove binding
+					itemTarget->SetBinding(false);
+					ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>装备已经移除绑定，请直接交易，不要挪动位置！<<<")).c_str());
+					return;
+				}
+
+
+				case 32951:
+				{
+					//qzqstar, 241114, extra xp to something nice
+					Player* _me = m_caster->ToPlayer();
+					uint32 __BOOST_XP = 1000000; //100w XP
+
+					if (_me->HasSpell(32988))
+						__BOOST_XP = __BOOST_XP / 2;
+
+					//level must be >= 60
+					if (_me->GetLevel() < 60)
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>60级以后才能使用此技能!<<<")).c_str());
+						return;
+					}
+
+					if (_me->MinusXP(__BOOST_XP))
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>成功获取一枚经验珠!<<<")).c_str());
+						_me->AddItem(30524);
+					}
+					else
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>经验不够，继续修炼！!<<<")).c_str());
+					}
+
+					return;
+				}
+
+				case 32864:
+				{
+					// qzqstar, 250120, beserker spell, vip!!!!
+					if (m_caster->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					Player* pCaster = static_cast<Player*>(m_caster);
+					//check if raid maps
+					switch (pCaster->GetMapId())
+					{
+					case 509:
+					case 309:
+					case 249:
+					case 409:
+					case 469:
+					case 531: //taq
+					{
+						pCaster->CastSpell(pCaster, 32863, true, nullptr);
+						return;
+					}
+					default:
+					{
+						ChatHandler(pCaster).PSendSysMessage(((std::string)(">>>只能在团本中单人使用！!<<<")).c_str());
+						return;
+					}
+					}
+
+					ChatHandler(pCaster).PSendSysMessage(((std::string)(">>>只能在团本中单人使用！!<<<")).c_str());
+					return;
+
+				}
+
                 case 17009:                                 // Voodoo
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
@@ -822,6 +1573,10 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell::EffectDummy: Spell %u not handled in DW", m_spellInfo->Id);
                             return;
                     };
+
+
+					//qzqstar, todo, 240131, deep wounds advanced by 2
+
 
                     int32 deepWoundsDotBasePoints0 = int32(damage / 4);
                     m_casterUnit->CastCustomSpell(unitTarget, 12721, deepWoundsDotBasePoints0, {}, {}, true, nullptr);
@@ -1482,17 +2237,27 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
             switch (m_spellInfo->SpellIconID)
             {
                 // Berserking (troll racial traits)
+				// qzqstar modify the troll haste
                 case 1661:
                 {
                     if (!m_casterUnit)
                         return;
 
                     uint32 healthPct = uint32(m_casterUnit->GetHealthPercent());
-                    int32 meleeMod = 10;
-                    if (healthPct <= 40)
-                        meleeMod = 30;
-                    if (healthPct < 100 && healthPct > 40)
-                        meleeMod = 10 + (100 - healthPct) / 3;
+
+
+					/*
+					int32 melee_mod = 10;
+					if (healthPerc <= 40)
+					melee_mod = 30;
+					if (healthPerc < 100 && healthPerc > 40)
+					melee_mod = 10 + (100 - healthPerc) / 3;
+					*/
+					int32 meleeMod = 20;
+					if (healthPct <= 40)
+						meleeMod = 40;
+					if (healthPct < 100 && healthPct > 40)
+						meleeMod = 20 + (100 - healthPct) / 3;
 
                     // FIXME: custom spell required this aura state by some unknown reason, we not need remove it anyway
                     m_casterUnit->ModifyAuraState(AURA_STATE_BERSERKING, true);
@@ -1523,6 +2288,27 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     static_cast<Player*>(m_caster)->RemoveSomeCooldown(cdCheck);
                     return;
                 }
+
+				//qzqstar, 241212, cool down the frost echo
+				case 31040:                                 // frost echo
+				{
+					if (m_caster->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					// immediately finishes the cooldown on frost nova
+					auto cdCheck = [](SpellEntry const & spellEntry) -> bool
+					{
+						if (spellEntry.SpellFamilyName != SPELLFAMILY_MAGE)
+							return false;
+						/*122, 865, 6131, 10230*/
+						if ((spellEntry.Id == 122 || spellEntry.Id == 865 || spellEntry.Id == 6131 || spellEntry.Id == 10230) && spellEntry.GetRecoveryTime() > 0)
+							return true;
+						return false;
+					};
+					static_cast<Player*>(m_caster)->RemoveSomeCooldown(cdCheck);
+					return;
+				}
+
             }
             break;
         }
@@ -1585,6 +2371,33 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 return;
             }
 #endif
+
+			//qzqstar, 241218, add support for the life blast
+			//id is 
+			if (m_spellInfo->Id == 31149)
+			{
+				if (!unitTarget)    return;
+				if (!m_casterUnit)  return;
+
+				auto _maxHealth = m_casterUnit->GetMaxHealth();
+				auto _curHealth = m_casterUnit->GetHealth();
+
+				auto dmg = 0;
+				if (_curHealth > _maxHealth / 2) { dmg = _maxHealth / 2; }
+				else { dmg = _curHealth - 1; }
+
+				m_casterUnit->SetHealth(_curHealth - dmg);
+
+				//boost the dmg
+				dmg *= 3;
+
+				//qzqstar, 241227, set to half if hit player
+				if (unitTarget->IsPlayer())
+					dmg /= 2.5;
+
+				m_casterUnit->CastCustomSpell(unitTarget, 31150, dmg, {}, {}, true);
+			}
+
             break;
         }
         case SPELLFAMILY_PRIEST:
@@ -1702,6 +2515,32 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
         }
         case SPELLFAMILY_PALADIN:
         {
+			//qzqstar, 241215, add custom paladin rune
+			switch (m_spellInfo->Id)
+			{
+				case 31076:                                 // art of war
+				{
+					if (m_caster->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					// immediately finishes the cooldown on art of war
+					auto cdCheck = [](SpellEntry const & spellEntry) -> bool
+					{
+						/*879,5614,5615,10312,10313,10314*/
+						if ((spellEntry.Id == 879 || spellEntry.Id == 5614 || spellEntry.Id == 5615 ||
+							spellEntry.Id == 10312 || spellEntry.Id == 10313 || spellEntry.Id == 10313) && spellEntry.GetRecoveryTime() > 0)
+							return true;
+						/*20473, 20929, 20930 */
+						if ((spellEntry.Id == 20473 || spellEntry.Id == 20929 || spellEntry.Id == 20930) && spellEntry.GetRecoveryTime() > 0)
+							return true;
+						return false;
+					};
+
+					static_cast<Player*>(m_caster)->RemoveSomeCooldown(cdCheck);
+					return;
+				}
+			}
+
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             switch (m_spellInfo->SpellIconID)
             {
@@ -2672,10 +3511,21 @@ void Spell::EffectOpenLock(SpellEffectIndex effIdx)
         {
             if (gameObjTarget)
             {
-                // Allow one skill-up until respawned
-                if (!gameObjTarget->IsInSkillupList(player) &&
-                        player->UpdateGatherSkill(skillId, pureSkillValue, reqSkillValue))
-                    gameObjTarget->AddToSkillupList(player);
+				// Allow one skill-up until respawned
+				// qzqstar fix the maxSKILL always give money
+				/* orig
+				if (!gameObjTarget->IsInSkillupList(player) &&
+				player->UpdateGatherSkill(skillId, pureSkillValue, reqSkillValue))
+				gameObjTarget->AddToSkillupList(player);
+				*/
+
+				// add to the skillup list regard less of gather skill successs/fail ...
+				/* qzqstar try to fix bug of SKILL gathering list.*/
+				if (!gameObjTarget->IsInSkillupList(player))
+				{
+					player->UpdateGatherSkill(skillId, pureSkillValue, reqSkillValue);
+					gameObjTarget->AddToSkillupList(player);
+				}
             }
             else if (itemTarget)
             {
@@ -2717,6 +3567,12 @@ void Spell::EffectSummonChangeItem(SpellEffectIndex effIdx)
         if (m_CastItem->GetEnchantmentId(EnchantmentSlot(j)))
             pNewItem->SetEnchantment(EnchantmentSlot(j), m_CastItem->GetEnchantmentId(EnchantmentSlot(j)), m_CastItem->GetEnchantmentDuration(EnchantmentSlot(j)), m_CastItem->GetEnchantmentCharges(EnchantmentSlot(j)));
     }
+
+	//qzqstar, 24.11.13, modify the switched weapon random properties
+	if (m_CastItem->GetItemRandomPropertyId())
+	{
+		pNewItem->SetItemRandomProperties(m_CastItem->GetItemRandomPropertyId());
+	}
 
     if (m_CastItem->GetUInt32Value(ITEM_FIELD_DURABILITY) < m_CastItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY))
     {
@@ -3683,6 +4539,57 @@ void Spell::EffectEnchantItemTmp(SpellEffectIndex effIdx)
 
     // add new enchanting if equipped
     pItemOwner->ApplyEnchantment(itemTarget, TEMP_ENCHANTMENT_SLOT, true);
+}
+
+
+
+// qzqstar, 250214, ESS, support for the diamond enchantment
+void Spell::EffectEnchantItemDiamond(SpellEffectIndex eff_idx)
+{
+	if (m_caster->GetTypeId() != TYPEID_PLAYER)
+		return;
+
+	Player* p_caster = (Player*)m_caster;
+
+	if (!itemTarget)
+		return;
+
+	//check if the target has enchant id
+	if (itemTarget->GetEnchantmentId(PROP_ENCHANTMENT_SLOT_1) < 3000)
+	{
+		ChatHandler(p_caster).PSendSysMessage(">>>请检查目标物品有【宝石槽】位，并且护甲或者武器品质为绿色及以上。<<<");
+		return;
+	}
+
+
+	uint32 enchant_id = m_spellInfo->EffectMiscValue[eff_idx];
+	uint32 charges = sSpellMgr.GetSpellEnchantCharges(m_spellInfo->Id);
+
+	if (!enchant_id)
+	{
+		//sLog.outError("Spell %u Effect %u (SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY) have 0 as enchanting id", m_spellInfo->Id, eff_idx);
+		return;
+	}
+
+	SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+	if (!pEnchant)
+	{
+		//sLog.outError("Spell %u Effect %u (SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY) have nonexistent enchanting id %u ", m_spellInfo->Id, eff_idx, enchant_id);
+		return;
+	}
+
+	// item can be in trade slot and have owner diff. from caster
+	Player* item_owner = itemTarget->GetOwner();
+	if (!item_owner)
+		return;
+
+	// remove old enchant before applying new
+	item_owner->ApplyEnchantment(itemTarget, PROP_ENCHANTMENT_SLOT_1, false);
+
+	itemTarget->SetEnchantment(PROP_ENCHANTMENT_SLOT_1, enchant_id, 0, 0, m_caster->GetObjectGuid());
+
+	// add new enchanting if equipped
+	item_owner->ApplyEnchantment(itemTarget, PROP_ENCHANTMENT_SLOT_1, true);
 }
 
 void Spell::EffectTameCreature(SpellEffectIndex /*effIdx*/)
@@ -5232,8 +6139,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     if (spellId2 <= 1)
                         continue;
 
-                    // found, remove seal
-                    m_casterUnit->RemoveAurasDueToSpellByCancel(aura->GetId());
+                    // found, remove seal                    
+					// qzqstar keep the seal after judgement
+                    // m_casterUnit->RemoveAurasDueToSpellByCancel(aura->GetId());
                     break;
                 }
 

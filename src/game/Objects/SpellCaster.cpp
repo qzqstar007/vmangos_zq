@@ -1277,7 +1277,9 @@ float SpellCaster:: SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
             {
                 // 1.12.* have only 1 stat type support
                 Stats usedStat = STAT_SPIRIT;
-                AdvertisedBenefit += pUnit->GetStat(usedStat) * i->GetModifier()->m_amount / 100.0f;
+
+				//qzqstar 0.1 AdvertisedBenefit += pUnit->GetStat(usedStat) * i->GetModifier()->m_amount / 100.0f;
+				AdvertisedBenefit += int32((pUnit->GetStat(usedStat) + pUnit->GetStat(STAT_INTELLECT)) * i->GetModifier()->m_amount / 100.0f);
             }
         }
     }
@@ -1397,14 +1399,33 @@ float SpellCaster::SpellDamageBonusDone(Unit const* pVictim, SpellEntry const* s
     {
         if (Pet* pet = ((Pet*)this))
         {
+			//qzqstar, 241218, spell dmg higher upon spells...
             switch (pet->GetHappinessState())
             {
-                case HAPPY:     DoneTotalMod *= 1.25; break;
+                case HAPPY:
+				{
+					DoneTotalMod *= 1.25;
+					if (pet->GetBonusDamage() > 0) DoneTotalMod *= 1.25;
+					break;
+				}
                 case CONTENT:   break;
                 case UNHAPPY:   DoneTotalMod *= 0.75; break;
             }
         }
     }
+
+	//qzqstar, 241218, increase the dmage of Summoned Pet
+	if (IsPet() && ((Pet*)this)->getPetType() == SUMMON_PET)
+	{
+		if (Pet* pet = ((Pet*)this))
+		{
+			if (pet->GetOwner() && pet->GetOwner()->IsPlayer() && pet->GetOwner()->HasSpell(31153))
+			{
+				DoneTotalMod *= 2;
+			}
+		}
+	}
+
 
     // Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit = SpellBaseDamageBonusDone(spellProto->GetSpellSchoolMask());
@@ -1457,7 +1478,9 @@ int32 SpellCaster::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
                 {
                     // stat used stored in miscValueB for this aura
                     Stats usedStat = STAT_SPIRIT;
-                    DoneAdvertisedBenefit += int32(pUnit->GetStat(usedStat) * i->GetModifier()->m_amount / 100.0f);
+
+					//qzqstar 0.2 DoneAdvertisedBenefit += int32(pUnit->GetStat(usedStat) * i->GetModifier()->m_amount / 100.0f);
+					DoneAdvertisedBenefit += int32((pUnit->GetStat(usedStat) + pUnit->GetStat(STAT_INTELLECT)) * i->GetModifier()->m_amount / 100.0f);
                 }
             }
         }

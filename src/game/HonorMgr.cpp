@@ -1054,6 +1054,10 @@ void HonorMgr::SendPVPCredit(Unit const* victim, float honor)
             // https://youtu.be/hef06Cs6Q34?t=191
             // New classic client does this on its own.
             int32 rank = ((Player const*)victim)->GetHonorMgr().GetRank().rank;
+
+			// qzqstar:  set lowerest
+			if (rank < 10) rank = 10;
+
             if (!rank)
                 rank = (HONOR_RANK_COUNT - POSITIVE_HONOR_RANK_COUNT) + 1;
             data << uint32(rank);
