@@ -1568,8 +1568,7 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint
 			{
 				if (__player->GetLevel() > _maxlevel) _maxlevel = __player->GetLevel();
 				if (__player->GetLevel() < _minlevel) _minlevel = __player->GetLevel();
-				if (__player->HasSpell(32990) //remove later
-					|| __player->HasSpell(__MODE_ONE_LIFE)
+				if ( __player->HasSpell(__MODE_ONE_LIFE)
 					|| __player->HasSpell(__MODE_ZQ)
 					)
 					__hasHC = true;

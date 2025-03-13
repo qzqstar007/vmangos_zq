@@ -200,6 +200,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Prevent connecting directly to mangosd by checking
     // that same ip connected to realmd previously.
+	// qzqstar, 250311, can i use ip directly?
+	/*
     if (strcmp(fields[3].GetString(), GetRemoteAddress().c_str()) &&
         serverAddressList.find(GetRemoteAddress()) == serverAddressList.end())
     {
@@ -209,7 +211,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "WorldSocket::HandleAuthSession: Sent Auth Response (Account IP differs).");
         return -1;
-    }
+    }*/
 
     id = fields[0].GetUInt32();
     security = fields[1].GetString() ? fields[1].GetUInt32() : SEC_PLAYER;

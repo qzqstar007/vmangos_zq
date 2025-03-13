@@ -130,7 +130,7 @@ struct CustomVipSpell : SpellScript
 
 	void OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action) const final
 	{
-		sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "test. %d %d", sender, action);
+		//sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "test. %d %d", sender, action);
 		SendDefaultMenu_TELEPORT(pPlayer, pCreature, action);
 	}
 };

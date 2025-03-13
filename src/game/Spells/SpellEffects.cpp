@@ -963,6 +963,30 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					return;
 				}
 
+
+				//qzqstar, 250312, auto buff depend on level
+				case 31256: 
+				{
+					if (m_caster && m_caster->IsPlayer())
+					{
+						if (!unitTarget) unitTarget = (Unit *)m_caster;
+
+						if (unitTarget->IsHostileTo(m_caster)) return;
+
+						//At least cast the dragon slayer 32068
+						m_caster->CastSpell(unitTarget, 32068, true, nullptr);
+
+						//further 32069
+						if (unitTarget->GetLevel() > 14)	m_caster->CastSpell(unitTarget, 32069, true, nullptr);
+						
+						//and 10%
+						if (unitTarget->GetLevel() > 24)	m_caster->CastSpell(unitTarget, 20217, true, nullptr);
+					}
+
+					return;
+				}
+
+
 				//qzqstar, 250309, add support for the prof boost up
 				case 30873:	//	采矿、锻造专业速升。10249	9786 // 164, 186
 				case 30874:	//	剥皮、制皮专业速升。10769	10663// 393 165
@@ -2292,11 +2316,11 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 				m_casterUnit->SetHealth(_curHealth - dmg);
 
 				//boost the dmg
-				dmg *= 3;
+				dmg *= 2;
 
 				//qzqstar, 241227, set to half if hit player
 				if (unitTarget->IsPlayer())
-					dmg /= 2.5;
+					dmg /= 3;
 
 				m_casterUnit->CastCustomSpell(unitTarget, 31150, dmg, {}, {}, true);
 			}

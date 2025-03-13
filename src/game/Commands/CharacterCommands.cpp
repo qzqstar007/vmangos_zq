@@ -3552,8 +3552,12 @@ bool ChatHandler::HandleAddItemSetCommand(char* args)
             InventoryResult msg = plTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itr.second.ItemId, 1);
             if (msg == EQUIP_ERR_OK)
             {
-                Item* item = plTarget->StoreNewItem(dest, itr.second.ItemId, true);
+				//old
+                //Item* item = plTarget->StoreNewItem(dest, itr.second.ItemId, true);
 
+				// qzqstar, 250311, set the random properties when giving itemset
+				Item* item = plTarget->StoreNewItem(dest, itr.second.ItemId, true, Item::GenerateItemRandomPropertyId(itr.second.ItemId));
+				
                 // remove binding (let GM give it to another player later)
                 if (pl == plTarget)
                     item->SetBinding(false);

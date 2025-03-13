@@ -3879,6 +3879,115 @@ void ObjectMgr::LoadItemPrototypes()
     }
     while (result->NextRow());
 
+
+	//qzqstar, 250311, add item_template_custom for extras.
+	//                                                                0        1        2           3       4              5                6          7        8            9            10            11                12                 13                14            15                16                17                     18                19                     20                    21                             22                          23           24           25                 26            27             28            29             30            31             32            33             34            35             36            37             38            39             40            41             42            43             44             45              46       47           48           49          50          51           52          53          54           55          56          57           58          59          60           61          62          63           64       65       66          67          68            69           70            71            72           73                74                75                76                 77                 78                         79           80                81                82                83                 84                 85                         86           87                88                89                90                 91                 92                         93           94                95                96                97                 98                 99                         100          101               102               103               104                105                106                        107        108          109              110              111            112        113         114       115                116       117               118           119          120         121           122              123          124               125               126            127                 128
+	std::unique_ptr<QueryResult> result_2(WorldDatabase.PQuery("SELECT `entry`, `class`, `subclass`, `name`, `description`, `display_id`, `quality`, `flags`, `buy_count`, `buy_price`, `sell_price`, `inventory_type`, `allowable_class`, `allowable_race`, `item_level`, `required_level`, `required_skill`, `required_skill_rank`, `required_spell`, `required_honor_rank`, `required_city_rank`, `required_reputation_faction`, `required_reputation_rank`, `max_count`, `stackable`, `container_slots`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `stat_type3`, `stat_value3`, `stat_type4`, `stat_value4`, `stat_type5`, `stat_value5`, `stat_type6`, `stat_value6`, `stat_type7`, `stat_value7`, `stat_type8`, `stat_value8`, `stat_type9`, `stat_value9`, `stat_type10`, `stat_value10`, `delay`, `range_mod`, `ammo_type`, `dmg_min1`, `dmg_max1`, `dmg_type1`, `dmg_min2`, `dmg_max2`, `dmg_type2`, `dmg_min3`, `dmg_max3`, `dmg_type3`, `dmg_min4`, `dmg_max4`, `dmg_type4`, `dmg_min5`, `dmg_max5`, `dmg_type5`, `block`, `armor`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spellid_1`, `spelltrigger_1`, `spellcharges_1`, `spellppmrate_1`, `spellcooldown_1`, `spellcategory_1`, `spellcategorycooldown_1`, `spellid_2`, `spelltrigger_2`, `spellcharges_2`, `spellppmrate_2`, `spellcooldown_2`, `spellcategory_2`, `spellcategorycooldown_2`, `spellid_3`, `spelltrigger_3`, `spellcharges_3`, `spellppmrate_3`, `spellcooldown_3`, `spellcategory_3`, `spellcategorycooldown_3`, `spellid_4`, `spelltrigger_4`, `spellcharges_4`, `spellppmrate_4`, `spellcooldown_4`, `spellcategory_4`, `spellcategorycooldown_4`, `spellid_5`, `spelltrigger_5`, `spellcharges_5`, `spellppmrate_5`, `spellcooldown_5`, `spellcategory_5`, `spellcategorycooldown_5`, `bonding`, `page_text`, `page_language`, `page_material`, `start_quest`, `lock_id`, `material`, `sheath`, `random_property`, `set_id`, `max_durability`, `area_bound`, `map_bound`, `duration`, `bag_family`, `disenchant_id`, `food_type`, `min_money_loot`, `max_money_loot`, `wrapped_gift`, `extra_flags`, `other_team_entry` "
+		" FROM `item_template_custom`") );
+	if (!result_2)
+	{
+		BarGoLink bar(1);
+		bar.step();
+
+		sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+		sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 item definitions");
+		sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`item_template` table is empty!");
+		return;
+	}
+
+	BarGoLink bar2(result_2->GetRowCount());
+
+	do
+	{
+		bar2.step();
+		Field* fields = result_2->Fetch();
+		uint32 entry = fields[0].GetUInt32();
+
+		if (__item_max_entry < entry) __item_max_entry = entry;
+
+		ItemPrototype& item = m_itemPrototypesMap[entry];
+		item.ItemId = entry;
+		item.Class = fields[1].GetUInt8();
+		item.SubClass = fields[2].GetUInt8();
+		item.Name1 = strdup(fields[3].GetString());
+		item.Description = strdup(fields[4].GetString());
+		item.DisplayInfoID = fields[5].GetUInt32();
+		item.Quality = fields[6].GetUInt8();
+		item.Flags = fields[7].GetUInt32();
+		item.BuyCount = fields[8].GetUInt8();
+		item.BuyPrice = fields[9].GetUInt32();
+		item.SellPrice = fields[10].GetUInt32();
+		item.InventoryType = fields[11].GetUInt8();
+		item.AllowableClass = fields[12].GetInt32();
+		item.AllowableRace = fields[13].GetInt32();
+		item.ItemLevel = fields[14].GetUInt8();
+		item.RequiredLevel = fields[15].GetUInt8();
+		item.RequiredSkill = fields[16].GetUInt16();
+		item.RequiredSkillRank = fields[17].GetUInt16();
+		item.RequiredSpell = fields[18].GetUInt32();
+		item.RequiredHonorRank = fields[19].GetUInt32();
+		item.RequiredCityRank = fields[20].GetUInt32();
+		item.RequiredReputationFaction = fields[21].GetUInt16();
+		item.RequiredReputationRank = fields[22].GetUInt16();
+		item.MaxCount = fields[23].GetUInt16();
+		item.Stackable = fields[24].GetUInt16();
+		item.ContainerSlots = fields[25].GetUInt8();
+		for (int i = 0; i < MAX_ITEM_PROTO_STATS; i++)
+		{
+			item.ItemStat[i].ItemStatType = fields[26 + i * 2].GetUInt8();
+			item.ItemStat[i].ItemStatValue = fields[27 + i * 2].GetInt16();
+		}
+		item.Delay = fields[46].GetUInt16();
+		item.RangedModRange = fields[47].GetFloat();
+		item.AmmoType = fields[48].GetUInt8();
+		for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; i++)
+		{
+			item.Damage[i].DamageMin = fields[49 + i * 3].GetFloat();
+			item.Damage[i].DamageMax = fields[50 + i * 3].GetFloat();
+			item.Damage[i].DamageType = fields[51 + i * 3].GetUInt8();
+		}
+		item.Block = fields[64].GetUInt32();
+		item.Armor = fields[65].GetInt16();
+		item.HolyRes = fields[66].GetInt16();
+		item.FireRes = fields[67].GetInt16();
+		item.NatureRes = fields[68].GetInt16();
+		item.FrostRes = fields[69].GetInt16();
+		item.ShadowRes = fields[70].GetInt16();
+		item.ArcaneRes = fields[71].GetInt16();
+		for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; i++)
+		{
+			item.Spells[i].SpellId = fields[72 + i * 7].GetUInt32();
+			item.Spells[i].SpellTrigger = fields[73 + i * 7].GetUInt8();
+			item.Spells[i].SpellCharges = fields[74 + i * 7].GetInt16();
+			item.Spells[i].SpellPPMRate = fields[75 + i * 7].GetFloat();
+			item.Spells[i].SpellCooldown = fields[76 + i * 7].GetInt32();
+			item.Spells[i].SpellCategory = fields[77 + i * 7].GetUInt16();
+			item.Spells[i].SpellCategoryCooldown = fields[78 + i * 7].GetInt32();
+		}
+		item.Bonding = fields[107].GetUInt8();
+		item.PageText = fields[108].GetUInt32();
+		item.LanguageID = fields[109].GetUInt8();
+		item.PageMaterial = fields[110].GetUInt8();
+		item.StartQuest = fields[111].GetUInt32();
+		item.LockID = fields[112].GetUInt32();
+		item.Material = fields[113].GetInt16();
+		item.Sheath = fields[114].GetUInt8();
+		item.RandomProperty = fields[115].GetUInt32();
+		item.ItemSet = fields[116].GetUInt32();
+		item.MaxDurability = fields[117].GetUInt32();
+		item.Area = fields[118].GetUInt32();
+		item.Map = fields[119].GetInt16();
+		item.Duration = fields[120].GetUInt32();
+		item.BagFamily = fields[121].GetInt32();
+		item.DisenchantID = fields[122].GetUInt32();
+		item.FoodType = fields[123].GetUInt8();
+		item.MinMoneyLoot = fields[124].GetUInt32();
+		item.MaxMoneyLoot = fields[125].GetUInt32();
+		item.WrappedGift = fields[126].GetUInt32();
+		item.ExtraFlags = fields[127].GetUInt8();
+		item.OtherTeamEntry = fields[128].GetUInt32();
+	} while (result_2->NextRow());
+
     m_QuestStartingItemsMap.clear();
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u item prototypes", (uint32)m_itemPrototypesMap.size());
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
@@ -4181,6 +4290,260 @@ void ObjectMgr::LoadItemPrototypes()
         }
     }
 }
+
+//qzqstar, 250311, add for dynamic object create
+ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::string customName, std::string Desc)
+{
+
+	//sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "custoname: %s  Desc:%s", customName.c_str(), Desc.c_str());
+
+	__item_max_entry++;
+
+	ItemPrototype& item = m_itemPrototypesMap[__item_max_entry];
+
+	auto item1_proto = pItem1->GetProto();
+	auto item2_proto = pItem2->GetProto();
+
+	//Now we need to think about which spells need to be placed in item
+	_ItemSpell _Spells[MAX_ITEM_PROTO_SPELLS] = {};
+	int j = 0;
+	for (size_t i = 0; (i < MAX_ITEM_PROTO_SPELLS) && (j<MAX_ITEM_PROTO_SPELLS); i++)
+	{
+		//Must have at least one spell
+		if ((i==0 || roll_chance_i(50)) && item1_proto->Spells[i].SpellId)
+		{
+			_Spells[j].SpellId	   = item1_proto->Spells[i].SpellId;
+			_Spells[j].SpellTrigger = item1_proto->Spells[i].SpellTrigger;
+			_Spells[j].SpellCharges = item1_proto->Spells[i].SpellCharges;
+			_Spells[j].SpellPPMRate = item1_proto->Spells[i].SpellPPMRate;
+			_Spells[j].SpellCooldown = item1_proto->Spells[i].SpellCooldown;
+			_Spells[j].SpellCategory = item1_proto->Spells[i].SpellCategory;
+			_Spells[j].SpellCategoryCooldown = item1_proto->Spells[i].SpellCategoryCooldown;
+			j++;
+		}
+
+		if (roll_chance_i(50) && item2_proto->Spells[i].SpellId)
+		{
+			_Spells[j].SpellId = item2_proto->Spells[i].SpellId;
+			_Spells[j].SpellTrigger = item2_proto->Spells[i].SpellTrigger;
+			_Spells[j].SpellCharges = item2_proto->Spells[i].SpellCharges;
+			_Spells[j].SpellPPMRate = item2_proto->Spells[i].SpellPPMRate;
+			_Spells[j].SpellCooldown = item2_proto->Spells[i].SpellCooldown;
+			_Spells[j].SpellCategory = item2_proto->Spells[i].SpellCategory;
+			_Spells[j].SpellCategoryCooldown = item2_proto->Spells[i].SpellCategoryCooldown;
+			j++;
+		}
+	}
+
+
+
+
+	float _dmg_mux = 1.0f;
+	float _prop_mux = 1.0f;
+	bool _applyDiv = false;
+
+	//Refix the calculate
+	auto _div_level_abs = std::abs((int)(item1_proto->ItemLevel - item2_proto->ItemLevel));
+
+	if (item1_proto->ItemLevel > item2_proto->ItemLevel)
+	{
+		if (_div_level_abs < 3) { _dmg_mux = 1.1f; _prop_mux = 1.2f; _applyDiv = true; }
+		else if (_div_level_abs < 6) { _dmg_mux = 1.05f; _prop_mux = 1.1f; _applyDiv = true; }
+		else if (_div_level_abs < 11) { _dmg_mux = 1.0f; _prop_mux = 1.0f; _applyDiv = false; }
+		else { _dmg_mux = 0.9f; _prop_mux = 0.9f; _applyDiv = false; }
+	}
+	else
+	{
+		//Same, or item2 is higher level.
+		_dmg_mux = 1.1f; _prop_mux = 1.2f; _applyDiv = true;
+	}
+
+	if (_applyDiv)
+	{
+		_dmg_mux = _dmg_mux * PickRandomValue(1.1f, 1.2f, 1.05f, 1.02f, 1.1f, 1.0f, 1.0f, 1.0f, 1.0f, 0.95f, 1.15f, 1.12f, 1.1f, 0.98f);
+		_prop_mux = _prop_mux * PickRandomValue(1.2f, 1.3f, 1.05f, 1.02f, 1.1f, 1.1f, 1.05f, 1.0f, 1.0f, 0.95f, 1.15f, 1.12f, 1.1f, 0.98f, 1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	//random choose the two item's 
+	bool _pick_strengh = false;	bool _pick_agi = false; bool _pick_stmina = false; bool _pick_intel = false; bool _pick_spirit = false;
+	for (int i = 0; i < MAX_ITEM_PROTO_STATS; i++)
+	{
+		switch (item1_proto->ItemStat[i].ItemStatType)
+		{
+		case 3:	_pick_agi = true;	break;
+		case 4:	_pick_strengh = true;	break;
+		case 7:	_pick_stmina = true;	break;
+		case 5:	_pick_intel = true;		break;
+		case 6:	_pick_spirit = true;	break;
+		default:break;
+		}
+	}
+
+
+
+
+
+	item.ItemId	= __item_max_entry;
+	item.Class	= item1_proto->Class;
+	item.SubClass = item1_proto->SubClass;
+	item.Name1 = strdup(customName.c_str()); // (char*)customName.c_str();
+	//item.Description = (strdup)(Desc.c_str());
+	item.DisplayInfoID = item1_proto->DisplayInfoID;
+	item.Quality = (_dmg_mux + _prop_mux < 2.6f) ? item1_proto->Quality : item1_proto->Quality + 1;
+	item.Flags = item1_proto->Flags;
+	item.BuyCount = item1_proto->BuyCount;
+	item.BuyPrice = item1_proto->BuyPrice;
+	item.SellPrice = item1_proto->SellPrice;
+	item.InventoryType = item1_proto->InventoryType;
+	item.AllowableClass = item1_proto->AllowableClass;
+	item.AllowableRace = item1_proto->AllowableRace;
+	item.ItemLevel = item1_proto->ItemLevel * (_dmg_mux + _prop_mux) / 2;
+
+	Desc.append(std::to_string(item.ItemLevel));
+	Desc.append(" ");
+	item.Description = (strdup)(Desc.c_str());
+
+	item.RequiredLevel = item1_proto->RequiredLevel;
+	item.RequiredSkill = item1_proto->RequiredSkill;
+	item.RequiredSkillRank = item1_proto->RequiredSkillRank;
+	item.RequiredSpell = item1_proto->RequiredSpell;
+	item.RequiredHonorRank = item1_proto->RequiredHonorRank;
+	item.RequiredCityRank = item1_proto->RequiredCityRank;
+	item.RequiredReputationFaction = item1_proto->RequiredReputationFaction;
+	item.RequiredReputationRank = item1_proto->RequiredReputationRank;
+	item.MaxCount = item1_proto->MaxCount;
+	item.Stackable = item1_proto->Stackable;
+	item.ContainerSlots = item1_proto->ContainerSlots;
+	/*for (int i = 0; i < MAX_ITEM_PROTO_STATS; i++)
+	{
+		
+		item.ItemStat[i].ItemStatType = item1_proto->ItemStat[i].ItemStatType;
+		if(item.ItemStat[i].ItemStatType < 5)
+			item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux;
+		else 
+			item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
+			
+	}*/
+
+	for (int i = 0; i < MAX_ITEM_PROTO_STATS; i++)
+	{
+		item.ItemStat[i].ItemStatType = item1_proto->ItemStat[i].ItemStatType;
+		if ((item.ItemStat[i].ItemStatType == 3) || (item.ItemStat[i].ItemStatType == 4))
+			item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux;
+		else if ((item.ItemStat[i].ItemStatType > 4) && (item.ItemStat[i].ItemStatType < 8))
+			item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
+		else
+		{
+			if (roll_chance_i(10))
+			{
+				if (_pick_strengh == false) { _pick_strengh = true; item.ItemStat[i].ItemStatType = 4; item.ItemStat[i].ItemStatValue = item1_proto->ItemLevel / 8; }
+				else if (_pick_agi == false) { _pick_agi = true; item.ItemStat[i].ItemStatType = 3; item.ItemStat[i].ItemStatValue = item1_proto->ItemLevel / 8; }
+				else if (_pick_stmina == false) { _pick_stmina = true; item.ItemStat[i].ItemStatType = 7; item.ItemStat[i].ItemStatValue = item1_proto->ItemLevel / 6; }
+				else if (_pick_intel == false) { _pick_intel = true; item.ItemStat[i].ItemStatType = 5; item.ItemStat[i].ItemStatValue = item1_proto->ItemLevel / 6; }
+				else if (_pick_spirit == false) { _pick_spirit = true; item.ItemStat[i].ItemStatType = 6; item.ItemStat[i].ItemStatValue = item1_proto->ItemLevel / 6; }
+			}
+		}
+	}
+	item.Delay = item1_proto->Delay;
+	item.RangedModRange = item1_proto->RangedModRange;
+	item.AmmoType = item1_proto->AmmoType;
+	for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; i++)
+	{
+		item.Damage[i].DamageMin = item1_proto->Damage[i].DamageMin * _dmg_mux;
+		item.Damage[i].DamageMax = item1_proto->Damage[i].DamageMax * _dmg_mux;
+		item.Damage[i].DamageType = item1_proto->Damage[i].DamageType;
+	}
+	item.Block = item1_proto->Block;
+	item.Armor = item1_proto->Armor * _prop_mux;
+	item.HolyRes = item1_proto->HolyRes;
+	item.FireRes = item1_proto->FireRes;
+	item.NatureRes = item1_proto->NatureRes;
+	item.FrostRes = item1_proto->FrostRes;
+	item.ShadowRes = item1_proto->ShadowRes;
+	item.ArcaneRes = item1_proto->ArcaneRes;
+	for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; i++)
+	{
+		item.Spells[i].SpellId = _Spells[i].SpellId;
+		item.Spells[i].SpellTrigger = _Spells[i].SpellTrigger;
+		item.Spells[i].SpellCharges = _Spells[i].SpellCharges;
+		item.Spells[i].SpellPPMRate = _Spells[i].SpellPPMRate;
+		item.Spells[i].SpellCooldown = _Spells[i].SpellCooldown;
+		item.Spells[i].SpellCategory = _Spells[i].SpellCategory;
+		item.Spells[i].SpellCategoryCooldown = _Spells[i].SpellCategoryCooldown;
+	}
+	item.Bonding = item1_proto->Bonding;
+	item.PageText = item1_proto->PageText;
+	item.LanguageID = item1_proto->LanguageID;
+	item.PageMaterial = item1_proto->PageMaterial;
+	item.StartQuest = 0;
+	item.LockID = 0;
+	item.Material = item1_proto->Material;
+	item.Sheath = item1_proto->Sheath;
+	item.RandomProperty = item1_proto->RandomProperty;
+	item.ItemSet = 0;
+	item.MaxDurability = item1_proto->MaxDurability;
+	item.Area = item1_proto->Area;
+	item.Map = item1_proto->Map;
+	item.Duration = item1_proto->Duration;
+	item.BagFamily = item1_proto->BagFamily;
+	item.DisenchantID = item1_proto->DisenchantID;
+	item.FoodType = item1_proto->FoodType;
+	item.MinMoneyLoot = item1_proto->MinMoneyLoot;
+	item.MaxMoneyLoot = item1_proto->MaxMoneyLoot;
+	item.WrappedGift = item1_proto->WrappedGift;
+	item.ExtraFlags = item1_proto->ExtraFlags;
+	item.OtherTeamEntry = item1_proto->OtherTeamEntry;
+
+	//add new item to the maps
+	m_itemPrototypesMap[__item_max_entry] = item;
+
+	//Save to db
+	WorldDatabase.PExecuteLog("\
+		INSERT INTO `mangos`.`item_template_custom` \
+		VALUES \
+		('%u',			'%u',			'%u', 			'%u',			'%s',				'%s',				'%u',				'%u',		'%u',			'%u',\
+		 '%u',			'%u',			'%u',			'%d',			'%d',				'%u',				'%u',				'%u',		'%u',			'%u',\
+		 '%u',			'%u',			'%u',			'%u',			'%u',				'%u',				'%u',				'%u',		'%d',			'%u',\
+		 '%d',			'%u',			'%d',			'%u',			'%d',				'%u',				'%d',				'%u',		'%d',			'%u',\
+		 '%d',			'%u',			'%d',			'%u',			'%d',				'%u',				'%d',				'%u',		'%d',			'%u',\
+		 '%d',			'%d',			'%u',			'%d',			'%d',				'%u',				'%d',				'%d',		'%u',			'%d',\
+		 '%d',			'%u',			'%d',			'%d',			'%u',				'%u',				'%d',				'%d',		'%d',			'%d',\
+		 '%d',			'%d',			'%d',			'%u',			'%u',				'%d',				'%f',				'%d',		'%u',			'%d',\
+		 '%u',			'%u',			'%d',			'%f',			'%d',				'%u',				'%d',				'%u',		'%u',			'%d',\
+		 '%f',			'%d',			'%u',			'%d',			'%u',				'%u',				'%d',				'%f',		'%d',			'%u',\
+		 '%d',			'%u',			'%u',			'%d',			'%f',				'%d',				'%u',				'%d',		'%u',			'%u',\
+		 '%u',			'%u',			'%u',			'%u',			'%d',				'%u',				'%u',				'%u',		'%u',			'%u',\
+		 '%d',			'%u',			'%d',			'%u',			'%u',				'%u',				'%u',				'%u',		'%u',			'%d')",
+		//1				2				3				4				5					6					7					8			9				10	
+		item.ItemId,	10,	item.Class,		item.SubClass,	item.Name1, item.Description,	item.DisplayInfoID, item.Quality,	item.Flags, item.BuyCount,	item.BuyPrice,	
+		//11				12						13					14				15					16				17						18						19				20
+		item.SellPrice,	item.InventoryType,	item.AllowableClass, item.AllowableRace, item.ItemLevel, item.RequiredLevel, item.RequiredSkill, item.RequiredSkillRank, item.RequiredSpell, item.RequiredHonorRank, 
+		//21								22						23							24				25					26							27						28									29									30
+		item.RequiredCityRank, item.RequiredReputationFaction, item.RequiredReputationRank, item.MaxCount, item.Stackable, item.ContainerSlots, item.ItemStat[0].ItemStatType, item.ItemStat[0].ItemStatValue, item.ItemStat[1].ItemStatType, item.ItemStat[1].ItemStatValue,
+		//31									32									33										34						35						36										37						38									39									40
+		item.ItemStat[2].ItemStatType, item.ItemStat[2].ItemStatValue, item.ItemStat[3].ItemStatType, item.ItemStat[3].ItemStatValue, item.ItemStat[4].ItemStatType, item.ItemStat[4].ItemStatValue, item.ItemStat[5].ItemStatType, item.ItemStat[5].ItemStatValue, item.ItemStat[6].ItemStatType, item.ItemStat[6].ItemStatValue,
+		//41									2									3										4						5						6										7						8									9									50
+		item.ItemStat[7].ItemStatType, item.ItemStat[7].ItemStatValue, item.ItemStat[8].ItemStatType, item.ItemStat[8].ItemStatValue, item.ItemStat[9].ItemStatType, item.ItemStat[9].ItemStatValue,	 item.Delay,		item.RangedModRange,
+		//51					2						3								4						5						6								7						8							9							60
+		item.AmmoType, (int)item.Damage[0].DamageMin, (int)item.Damage[0].DamageMax, (int)item.Damage[0].DamageType, (int)item.Damage[1].DamageMin, (int)item.Damage[1].DamageMax, (int)item.Damage[1].DamageType, (int)item.Damage[2].DamageMin, (int)item.Damage[2].DamageMax, (int)item.Damage[2].DamageType,
+		//61								2						3								4						5						6								7						8							9						70
+		(int)item.Damage[3].DamageMin, (int)item.Damage[3].DamageMax, (int)item.Damage[3].DamageType, (int)item.Damage[4].DamageMin, (int)item.Damage[4].DamageMax, (int)item.Damage[4].DamageType,		item.Block,					item.Armor,				item.HolyRes,				item.FireRes,
+		//71								2						3								4						5						6								7						8							9						80
+		item.NatureRes,				item.FrostRes,			 item.ShadowRes,					item.ArcaneRes,		item.Spells[0].SpellId, item.Spells[0].SpellTrigger, item.Spells[0].SpellCharges, item.Spells[0].SpellPPMRate, item.Spells[0].SpellCooldown, item.Spells[0].SpellCategory, 
+		//81										2						3								4						5									6								7											8							9						90
+		item.Spells[0].SpellCategoryCooldown, item.Spells[1].SpellId, item.Spells[1].SpellTrigger, item.Spells[1].SpellCharges, item.Spells[1].SpellPPMRate, item.Spells[1].SpellCooldown, item.Spells[1].SpellCategory, item.Spells[1].SpellCategoryCooldown, item.Spells[2].SpellId, item.Spells[2].SpellTrigger, 
+		//91										2						3								4						5									6								7											8							9						100
+		item.Spells[2].SpellCharges, item.Spells[2].SpellPPMRate, item.Spells[2].SpellCooldown, item.Spells[2].SpellCategory, item.Spells[2].SpellCategoryCooldown, item.Spells[3].SpellId, item.Spells[3].SpellTrigger, item.Spells[3].SpellCharges, item.Spells[3].SpellPPMRate, item.Spells[3].SpellCooldown, 
+		//101										2						3								4						5									6								7											8							(108)						
+		item.Spells[3].SpellCategory, item.Spells[3].SpellCategoryCooldown, item.Spells[4].SpellId, item.Spells[4].SpellTrigger, item.Spells[4].SpellCharges, item.Spells[4].SpellPPMRate, item.Spells[4].SpellCooldown, item.Spells[4].SpellCategory, item.Spells[4].SpellCategoryCooldown,
+		//109 - 130
+		item.Bonding, item.PageText, item.LanguageID, item.PageMaterial, item.StartQuest, item.LockID, item.Material, item.Sheath, item.RandomProperty, item.ItemSet, item.MaxDurability, item.Area, item.Map, item.Duration, item.BagFamily, item.DisenchantID, item.FoodType, item.MinMoneyLoot, item.MaxMoneyLoot, item.WrappedGift, item.ExtraFlags, item.OtherTeamEntry);
+
+
+	return &item;
+}
+
+
 
 void ObjectMgr::LoadItemLocales()
 {

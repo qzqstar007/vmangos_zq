@@ -4857,6 +4857,9 @@ void Player::KillPlayer()
 		//1.1 if has item - gold modal, remove it and escape the death. - item:39978
 		if (HasSpell(__MODE_ONE_LIFE))
 		{
+			//safe if full level
+			if (GetLevel() == sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))	return;
+
 			if (HasItemCount(39978, 1))
 			{
 				//delete the item count
@@ -4865,44 +4868,23 @@ void Player::KillPlayer()
 			else
 			{
 				RemoveSpell(__MODE_ONE_LIFE);
-
-				//Announce the online players
-				__looseMoney = __totalMoney / 2;
 			}
+
+			__looseMoney = __totalMoney / 2;
 		}
 
 		//2. killer mode, lost the money
 		if (HasSpell(__MODE_KILLER))
 		{
-			__looseMoney = __totalMoney / 2;
+			__looseMoney = __totalMoney / 3;
 
-			if (__totalMoney < __oldLevel * 10000)
+			if (__totalMoney < __oldLevel * 1000)
 			{
 				//Resurrection Sickness
 				CastSpell(this, 15007, true);
 			}
 		}
 
-		//Normal ZQ mode, leveling..... but not in pvp mode.
-		if (HasSpell(32990) && (GetLevel() > 20) && (GetLevel() < 60) && !wasInPvP)
-		{
-			__newLevel = __oldLevel - 2;
-			SetLevel(__newLevel);
-
-			__looseMoney = __totalMoney / 2;
-		}
-		//Continue ZQ mode, died.
-		else if (HasSpell(32988) && !wasInPvP)
-		{
-			__looseMoney = __totalMoney / 2;
-		}
-		//Pvp Mode died
-		else if (wasInPvP)
-		{
-			//PVP only lose 1g max
-			__looseMoney = __totalMoney / 100;
-			if (__looseMoney > 10000) __looseMoney = 10000;
-		}
 
 		if (__looseMoney > 0)
 		{
@@ -4936,7 +4918,7 @@ void Player::KillPlayer()
 					ChatHandler(player).PSendSysMessage(9030, GetName(), _monsterName, __oldLevel, __newLevel,
 						__looseMoney / 10000, (__looseMoney / 100) % 100, __looseMoney % 100);
 
-					if (HasSpell(32988) || (HasSpell(32990) && (GetLevel() > 10) && (GetLevel() < 60)))
+					if (player->GetLevel() > 10)
 					{
 						//give them to players online
 						player->ModifyMoney(_divMoney);
@@ -13502,7 +13484,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
     uint32 xp = uint32(pQuest->XPValue(this) * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST));
 
 	// qzqstar, 250228, modify the quest xp for task mode
-	if (HasSpell(__MODE_TASK)) xp = xp * 2;
+	if (HasSpell(__MODE_TASK)) xp = xp * 4;
 
     if (GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
         GiveXP(xp , nullptr);
@@ -14992,7 +14974,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 	//qzqstar, 250211, reset the counts;
 	M_Item_Counts = 0;
 
-	/*
     // check name limitations
     if (ObjectMgr::CheckPlayerName(m_name) != CHAR_NAME_SUCCESS ||
             (GetSession()->GetSecurity() == SEC_PLAYER && sObjectMgr.IsReservedName(m_name)))
@@ -15001,7 +14982,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
                                    uint32(AT_LOGIN_RENAME), guid.GetCounter());
         return false;
     }
-	*/
+
 
     // overwrite possible wrong/corrupted guid
     SetGuidValue(OBJECT_FIELD_GUID, guid);
@@ -15436,7 +15417,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
 
 	//qzqstar, 250227,  modify the 5 modes xp, thus exertnal xp gain can be set to 1.
-	auto __xpRate = 1.5f;
+	auto __xpRate = 0.5f;
+	if(GetLevel() > 1) __xpRate = 1.5f;
+
 	if (HasSpell(__MODE_KILLER))     __xpRate = 2.0f;
 	if (HasSpell(__MODE_ZQ))         __xpRate = 1.0f;
 	if (HasSpell(__MODE_ONE_LIFE))   __xpRate = 1.0f;
@@ -15448,9 +15431,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 	//qzqstar, 250227, change name if killer mode
 	if (HasSpell(__MODE_KILLER))
 	{
+		/*
 		std::string name = sObjectMgr.GeneratePetName(777);
 		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Killer Mode] Modify name %s -> %s", GetName(), name);
-		SetName(name);
+		SetName(name);*/
 
 		SetFFAPvP(true);
 
@@ -15464,7 +15448,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 				Player* _pl = session->GetPlayer();
 				if (_pl && _pl->IsInWorld())
 				{
-					ChatHandler(_pl).PSendSysMessage(9041, name, GetLevel());
+					ChatHandler(_pl).PSendSysMessage(9041, GetName(), GetLevel());
 				}
 			}
 		}
@@ -17698,11 +17682,11 @@ bool Player::CheckInstanceCount(uint32 instanceId) const
 {
 	//qzqstar, 250109, ignore instance count for VIP spell 32858
 	//32860, vc special
-	//if (HasSpell(32860)) return true;
+	if (HasSpell(32857)) return true;
 
 	//qzqstar, 250228, check if killer mode, MAX_INSTANCE_PER_ACCOUNT_PER_HOUR should be 1
 	if (HasSpell(__MODE_KILLER))
-		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 1);
+		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 2);
 	else
 		//old origs
 		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, sWorld.getConfig(CONFIG_UINT32_INSTANCE_PER_HOUR_LIMIT));
@@ -19758,6 +19742,10 @@ void Player::LearnQuestRewardedSpells(Quest const* quest)
     // skip quests without rewarded spell
     if (!spellId)
         return;
+
+	// qzqstar, 250313, skip the __mode__ spells
+	if ( (spellId >= 30841) && (spellId <= 30849) )
+		return;
 
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)
@@ -22984,6 +22972,8 @@ void Log::PlayerLogHeaderToFile(uint32 accountId, WorldSession const* session, L
     {
         if (auto const player = session->GetPlayer())
         {
+			//qzqstar, 250313, ignore the prefixes
+			/*
             fprintf(logFiles[logType], "(acc %u, ip %s, guid %u, name %s, map %u, pos %g %g %g) ",
                 accountId,
                 session->GetRemoteAddress().c_str(),
@@ -22992,7 +22982,9 @@ void Log::PlayerLogHeaderToFile(uint32 accountId, WorldSession const* session, L
                 player->GetMapId(),
                 player->GetPositionX(),
                 player->GetPositionY(),
-                player->GetPositionZ());
+                player->GetPositionZ());*/
+
+			fprintf(logFiles[logType], "name %s:", player->GetName());
         }
         else
         {
