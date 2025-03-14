@@ -4852,86 +4852,132 @@ void Player::KillPlayer()
 		auto __totalMoney = GetMoney();
 
 
+		auto const& sessions = sWorld.GetAllSessions();
+
 		//qzqstar, 250228, handle the death upon different player modes
 		//1. one-life, lose half of the money, exit the one-life mode 
 		//1.1 if has item - gold modal, remove it and escape the death. - item:39978
 		if (HasSpell(__MODE_ONE_LIFE))
 		{
 			//safe if full level
-			if (GetLevel() == sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))	return;
-
-			if (HasItemCount(39978, 1))
+			if ( (__oldLevel == sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+				|| (HasSpell(__MODE_COLLECT) && (__oldLevel%10 == 0))
+				|| (__oldLevel < 10)
+				)
+			{
+				__newLevel = __oldLevel;
+				__looseMoney = __totalMoney / 2;
+			}
+			else if (HasItemCount(39978, 1))
 			{
 				//delete the item count
 				DestroyItemCount(39978, 1, true);
 			}
 			else
 			{
-				RemoveSpell(__MODE_ONE_LIFE);
+				__newLevel = __oldLevel - 2;
+				__looseMoney = __totalMoney / 2;
 			}
 
-			__looseMoney = __totalMoney / 2;
+			if (__looseMoney > 0)
+			{
+				//set the victim money
+				ModifyMoney(0 - __looseMoney);
+				ChatHandler(this).PSendSysMessage("You died, lost %ug%us.", __looseMoney / 10000, (__looseMoney / 100) % 100);
+			}
+
+
+			//check the level
+			if(__newLevel != __oldLevel)	SetLevel(__newLevel);
+
+			//Announce
+			//calculate the money
+			uint32 _divMoney = (__looseMoney) / (sWorld.GetActiveSessionCount() < 5 ? 5 : sWorld.GetActiveSessionCount());
+			auto _monsterName = m_ConstName.empty() ? "Unknown" : m_ConstName.c_str();
+
+			for (const auto& itr : sessions)
+			{
+				if (WorldSession* session = itr.second)
+				{
+					Player* __player = session->GetPlayer();
+					if (__player && __player->IsInWorld() && __player->IsAlive())
+					{
+						ChatHandler(__player).PSendSysMessage(9030, GetName(), _monsterName, __oldLevel, __newLevel,
+							__looseMoney / 10000, (__looseMoney / 100) % 100, __looseMoney % 100);
+
+						if (__player->GetLevel() > 10)
+						{
+							//give them to players online
+							__player->ModifyMoney(_divMoney);
+
+							//notify that player
+							WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
+							data << uint32(_divMoney);
+							session->SendPacket(&data);
+						}
+
+					}
+				}
+			}
+
+
 		}
 
 		//2. killer mode, lost the money
 		if (HasSpell(__MODE_KILLER))
 		{
-			__looseMoney = __totalMoney / 3;
+			__looseMoney = __totalMoney / 6;
 
-			if (__totalMoney < __oldLevel * 1000)
+			//set the victim money
+			ModifyMoney(0 - __looseMoney);
+			ChatHandler(this).PSendSysMessage("You died, lost %ug%us.", __looseMoney / 10000, (__looseMoney / 100) % 100);
+
+			if (__looseMoney < __oldLevel * 1000)
 			{
 				//Resurrection Sickness
 				CastSpell(this, 15007, true);
 			}
-		}
 
+			//calculate the money
+			uint32 _divMoney = (__looseMoney) / (sWorld.GetActiveSessionCount() < 5 ? 5 : sWorld.GetActiveSessionCount());
+			auto _monsterName = m_ConstName.empty() ? "Unknown" : m_ConstName.c_str();
 
-		if (__looseMoney > 0)
-		{
-			//set the victim money
-			ModifyMoney(0 - __looseMoney);
-			ChatHandler(this).PSendSysMessage("You died, lost %ug%us.", __looseMoney / 10000, (__looseMoney / 100) % 100);
-		}
-
-		//make looemony larger to void zero
-		if (__looseMoney < 500)
-		{
-			__looseMoney = 500;
-		}
-		auto const& sessions = sWorld.GetAllSessions();
-
-		//BASIC_LOG => sLog.Out(LOG_BASIC, LOG_LVL_BASIC, 
-		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "PLAYER:[%u][%s] died...  From %u to %u . total sessions: %u",
-			GetGUID(), GetName(), __oldLevel, __newLevel, sWorld.GetActiveSessionCount());
-
-		//calculate the money
-		uint32 _divMoney = (__looseMoney) / (sWorld.GetActiveSessionCount() < 5 ? 5 : sWorld.GetActiveSessionCount());
-		auto _monsterName = m_ConstName.empty() ? "Unknown" : m_ConstName.c_str();
-
-		for (const auto& itr : sessions)
-		{
-			if (WorldSession* session = itr.second)
+			for (const auto& itr : sessions)
 			{
-				Player* player = session->GetPlayer();
-				if (player && player->IsInWorld() && player->IsAlive())
+				if (WorldSession* session = itr.second)
 				{
-					ChatHandler(player).PSendSysMessage(9030, GetName(), _monsterName, __oldLevel, __newLevel,
-						__looseMoney / 10000, (__looseMoney / 100) % 100, __looseMoney % 100);
-
-					if (player->GetLevel() > 10)
+					Player* player = session->GetPlayer();
+					if (player && player->IsInWorld() && player->IsAlive())
 					{
-						//give them to players online
-						player->ModifyMoney(_divMoney);
+						if (__looseMoney > __oldLevel * 1000)
+						{
+							ChatHandler(player).PSendSysMessage(9032, GetName(), _monsterName,
+								__looseMoney / 10000, (__looseMoney / 100) % 100, __looseMoney % 100);
+						}
+						else
+						{
+							//Not enought money
+							ChatHandler(player).PSendSysMessage(9033, GetName(), _monsterName);
+						}
 
-						//notify that player
-						WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
-						data << uint32(_divMoney);
-						session->SendPacket(&data);
+						if (player->GetLevel() > 10)
+						{
+							//give them to players online
+							player->ModifyMoney(_divMoney);
+
+							//notify that player
+							WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
+							data << uint32(_divMoney);
+							session->SendPacket(&data);
+						}
+
 					}
-
 				}
 			}
 		}
+		//BASIC_LOG => sLog.Out(LOG_BASIC, LOG_LVL_BASIC, 
+		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "PLAYER:[%u][%s] died...  From %u to %u . total sessions: %u",
+			GetGUID(), GetName(), __oldLevel, __newLevel, sWorld.GetActiveSessionCount());
 	}
 }
 
@@ -13484,7 +13530,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
     uint32 xp = uint32(pQuest->XPValue(this) * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST));
 
 	// qzqstar, 250228, modify the quest xp for task mode
-	if (HasSpell(__MODE_TASK)) xp = xp * 4;
+	if (HasSpell(__MODE_TASK)) xp = xp * 3;
 
     if (GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
         GiveXP(xp , nullptr);
@@ -19744,8 +19790,10 @@ void Player::LearnQuestRewardedSpells(Quest const* quest)
         return;
 
 	// qzqstar, 250313, skip the __mode__ spells
+	/*
 	if ( (spellId >= 30841) && (spellId <= 30849) )
 		return;
+	*/
 
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
  * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
@@ -4292,7 +4292,7 @@ void ObjectMgr::LoadItemPrototypes()
 }
 
 //qzqstar, 250311, add for dynamic object create
-ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::string customName, std::string Desc)
+ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::string _customName, std::string Desc)
 {
 
 	//sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "custoname: %s  Desc:%s", customName.c_str(), Desc.c_str());
@@ -4355,7 +4355,14 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	else
 	{
 		//Same, or item2 is higher level.
-		_dmg_mux = 1.1f; _prop_mux = 1.2f; _applyDiv = true;
+		if (item1_proto->Quality > item2_proto->Quality)
+		{
+			_dmg_mux = 1.05f; _prop_mux = 1.1f; _applyDiv = true;
+		}
+		else
+		{
+			_dmg_mux = 1.1f; _prop_mux = 1.2f; _applyDiv = true;
+		}
 	}
 
 	if (_applyDiv)
@@ -4366,7 +4373,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 
 	//random choose the two item's 
 	bool _pick_strengh = false;	bool _pick_agi = false; bool _pick_stmina = false; bool _pick_intel = false; bool _pick_spirit = false;
-	for (int i = 0; i < MAX_ITEM_PROTO_STATS; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		switch (item1_proto->ItemStat[i].ItemStatType)
 		{
@@ -4378,18 +4385,32 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		default:break;
 		}
 	}
-
-
-
-
+	
+	bool qPlus = false;
+	if (_dmg_mux + _prop_mux > 2.46f)	qPlus = true;
 
 	item.ItemId	= __item_max_entry;
 	item.Class	= item1_proto->Class;
 	item.SubClass = item1_proto->SubClass;
+
+
+	std::string customName="";
+	
+	if (qPlus)
+	{
+		_dmg_mux *= 1.05f;
+		_prop_mux *= 1.1f;
+		customName.append(_customName.c_str());
+	}
+	else
+	{
+		customName.append(_customName.substr(0, _customName.length() - 11));
+	}
+
 	item.Name1 = strdup(customName.c_str()); // (char*)customName.c_str();
 	//item.Description = (strdup)(Desc.c_str());
 	item.DisplayInfoID = item1_proto->DisplayInfoID;
-	item.Quality = (_dmg_mux + _prop_mux < 2.6f) ? item1_proto->Quality : item1_proto->Quality + 1;
+	item.Quality = (qPlus) ? item1_proto->Quality+1 : item1_proto->Quality;
 	item.Flags = item1_proto->Flags;
 	item.BuyCount = item1_proto->BuyCount;
 	item.BuyPrice = item1_proto->BuyPrice;
@@ -4424,23 +4445,33 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 			item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
 			
 	}*/
-
+	//Only support 5
 	for (int i = 0; i < MAX_ITEM_PROTO_STATS; i++)
 	{
-		item.ItemStat[i].ItemStatType = item1_proto->ItemStat[i].ItemStatType;
-		if ((item.ItemStat[i].ItemStatType == 3) || (item.ItemStat[i].ItemStatType == 4))
-			item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux;
-		else if ((item.ItemStat[i].ItemStatType > 4) && (item.ItemStat[i].ItemStatType < 8))
-			item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
+		if (i > 5)
+		{
+			item.ItemStat[i].ItemStatType = 0;
+			item.ItemStat[i].ItemStatValue = 0;
+		}
 		else
 		{
-			if (roll_chance_i(10))
+			item.ItemStat[i].ItemStatType = item1_proto->ItemStat[i].ItemStatType;
+			if ((item.ItemStat[i].ItemStatType == 3) || (item.ItemStat[i].ItemStatType == 4))
+				item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux;
+			else if ((item.ItemStat[i].ItemStatType > 4) && (item.ItemStat[i].ItemStatType < 8))
+				item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
+			else
 			{
-				if (_pick_strengh == false) { _pick_strengh = true; item.ItemStat[i].ItemStatType = 4; item.ItemStat[i].ItemStatValue = item1_proto->ItemLevel / 8; }
-				else if (_pick_agi == false) { _pick_agi = true; item.ItemStat[i].ItemStatType = 3; item.ItemStat[i].ItemStatValue = item1_proto->ItemLevel / 8; }
-				else if (_pick_stmina == false) { _pick_stmina = true; item.ItemStat[i].ItemStatType = 7; item.ItemStat[i].ItemStatValue = item1_proto->ItemLevel / 6; }
-				else if (_pick_intel == false) { _pick_intel = true; item.ItemStat[i].ItemStatType = 5; item.ItemStat[i].ItemStatValue = item1_proto->ItemLevel / 6; }
-				else if (_pick_spirit == false) { _pick_spirit = true; item.ItemStat[i].ItemStatType = 6; item.ItemStat[i].ItemStatValue = item1_proto->ItemLevel / 6; }
+				if (roll_chance_i(qPlus ? 50 : 10))
+				{
+					auto __rand = irand(0, 5);
+
+					if( (__rand==0) && (_pick_strengh == false)) { _pick_strengh = true; item.ItemStat[i].ItemStatType = 4; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 6 + 1) * _prop_mux; }
+					else if ((__rand == 1) && (_pick_agi == false)) { _pick_agi = true; item.ItemStat[i].ItemStatType = 3; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 6 + 1)* _prop_mux; }
+					else if ((__rand == 2) && (_pick_stmina == false)) { _pick_stmina = true; item.ItemStat[i].ItemStatType = 7; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 5 + 1)* _prop_mux; }
+					else if ((__rand == 3) && (_pick_intel == false)) { _pick_intel = true; item.ItemStat[i].ItemStatType = 5; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 5 + 1)* _prop_mux; }
+					else if ((__rand == 4) && (_pick_spirit == false)) { _pick_spirit = true; item.ItemStat[i].ItemStatType = 6; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 5 + 1)* _prop_mux; }
+				}
 			}
 		}
 	}
@@ -4505,7 +4536,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		 '%u',			'%u',			'%u',			'%d',			'%d',				'%u',				'%u',				'%u',		'%u',			'%u',\
 		 '%u',			'%u',			'%u',			'%u',			'%u',				'%u',				'%u',				'%u',		'%d',			'%u',\
 		 '%d',			'%u',			'%d',			'%u',			'%d',				'%u',				'%d',				'%u',		'%d',			'%u',\
-		 '%d',			'%u',			'%d',			'%u',			'%d',				'%u',				'%d',				'%u',		'%d',			'%u',\
+		 '%d',			'%u',			'%d',			'%u',			'%d',				'%u',				'%d',				'%u',		'%f',			'%u',\
 		 '%d',			'%d',			'%u',			'%d',			'%d',				'%u',				'%d',				'%d',		'%u',			'%d',\
 		 '%d',			'%u',			'%d',			'%d',			'%u',				'%u',				'%d',				'%d',		'%d',			'%d',\
 		 '%d',			'%d',			'%d',			'%u',			'%u',				'%d',				'%f',				'%d',		'%u',			'%d',\

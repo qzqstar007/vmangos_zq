@@ -2310,17 +2310,17 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 				auto _curHealth = m_casterUnit->GetHealth();
 
 				auto dmg = 0;
-				if (_curHealth > _maxHealth / 2) { dmg = _maxHealth / 2; }
+				if (_curHealth > _maxHealth / 3) { dmg = _maxHealth / 3; }
 				else { dmg = _curHealth - 1; }
 
 				m_casterUnit->SetHealth(_curHealth - dmg);
 
 				//boost the dmg
-				dmg *= 2;
+				dmg *= 3;
 
 				//qzqstar, 241227, set to half if hit player
 				if (unitTarget->IsPlayer())
-					dmg /= 3;
+					dmg /= 2.2;
 
 				m_casterUnit->CastCustomSpell(unitTarget, 31150, dmg, {}, {}, true);
 			}

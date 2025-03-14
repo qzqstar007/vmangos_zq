@@ -43,6 +43,7 @@
 #define	__ORANGE(x)		"|cffe85827"##x##"|r"
 #define __RED(x)		"|cfff00019"##x##"|r"
 #define __YELLOW(x)		"|cfff9dc24"##x##"|r"
+#define __PINK(x)		"|cff800080"##x##"|r"
 
 
 bool GossipHello_Rune(Player *player, Creature *_Creature)
@@ -1846,46 +1847,46 @@ std::string __get_Item_Name(uint32 Class, uint32 SubClass, uint32 Inv)
 	case ITEM_CLASS_WEAPON:
 		switch (SubClass)
 		{
-		case ITEM_SUBCLASS_WEAPON_AXE: 			return  std::string("单手斧　");
-		case ITEM_SUBCLASS_WEAPON_AXE2:			return  std::string("双手斧　");
-		case ITEM_SUBCLASS_WEAPON_BOW:			return  std::string("弓　");
-		case ITEM_SUBCLASS_WEAPON_GUN:			return  std::string("枪　");
-		case ITEM_SUBCLASS_WEAPON_MACE:			return  std::string("单手锤　");
-		case ITEM_SUBCLASS_WEAPON_MACE2:		return  std::string("双手锤　");
-		case ITEM_SUBCLASS_WEAPON_POLEARM:		return  std::string("长柄　");
-		case ITEM_SUBCLASS_WEAPON_SWORD:		return  std::string("单手剑　");
-		case ITEM_SUBCLASS_WEAPON_SWORD2:		return  std::string("双手剑　");
-		case ITEM_SUBCLASS_WEAPON_STAFF:		return  std::string("法杖　");
-		case ITEM_SUBCLASS_WEAPON_DAGGER:		return  std::string("匕首　");
-		case ITEM_SUBCLASS_WEAPON_THROWN:		return  std::string("飞刀　");
-		case ITEM_SUBCLASS_WEAPON_SPEAR:		return  std::string("长矛　");
-		case ITEM_SUBCLASS_WEAPON_CROSSBOW:		return  std::string("弩　");
-		case ITEM_SUBCLASS_WEAPON_WAND:			return  std::string("魔杖　");
+		case ITEM_SUBCLASS_WEAPON_AXE: 			return  __STR("创造的单手斧·升华　");
+		case ITEM_SUBCLASS_WEAPON_AXE2:			return  __STR("创造的双手斧·升华　");
+		case ITEM_SUBCLASS_WEAPON_BOW:			return  __STR("创造的弓·升华　");
+		case ITEM_SUBCLASS_WEAPON_GUN:			return  __STR("创造的枪·升华　");
+		case ITEM_SUBCLASS_WEAPON_MACE:			return  __STR("创造的单手锤·升华　");
+		case ITEM_SUBCLASS_WEAPON_MACE2:		return  __STR("创造的双手锤·升华　");
+		case ITEM_SUBCLASS_WEAPON_POLEARM:		return  __STR("创造的长柄·升华　");
+		case ITEM_SUBCLASS_WEAPON_SWORD:		return  __STR("创造的单手剑·升华　");
+		case ITEM_SUBCLASS_WEAPON_SWORD2:		return  __STR("创造的双手剑·升华　");
+		case ITEM_SUBCLASS_WEAPON_STAFF:		return  __STR("创造的法杖·升华　");
+		case ITEM_SUBCLASS_WEAPON_DAGGER:		return  __STR("创造的匕首·升华　");
+		case ITEM_SUBCLASS_WEAPON_THROWN:		return  __STR("创造的飞刀·升华　");
+		case ITEM_SUBCLASS_WEAPON_SPEAR:		return  __STR("创造的长矛·升华　");
+		case ITEM_SUBCLASS_WEAPON_CROSSBOW:		return  __STR("创造的弩·升华　");
+		case ITEM_SUBCLASS_WEAPON_WAND:			return  __STR("创造的魔杖·升华　");
 		}
-		return  std::string("未知武器　");
+		return  __STR("创造的未知武器·升华　");
 	case ITEM_CLASS_ARMOR:
 		switch (Inv)
 		{
-		case INVTYPE_HEAD:				return  std::string("头饰　");
-		case INVTYPE_NECK:				return  std::string("项链　");
-		case INVTYPE_SHOULDERS:			return  std::string("护肩　");
-		case INVTYPE_BODY:				return  std::string("衬衣　");
-		case INVTYPE_ROBE:				return  std::string("长袍　");
-		case INVTYPE_CHEST:				return  std::string("胸甲　");
-		case INVTYPE_WAIST:				return  std::string("腰带　");
-		case INVTYPE_LEGS:				return  std::string("护腿　");
-		case INVTYPE_FEET:				return  std::string("靴子　");
-		case INVTYPE_WRISTS:			return  std::string("护腕　");
-		case INVTYPE_HANDS:				return  std::string("护手　");
-		case INVTYPE_FINGER:			return  std::string("戒指　");
-		case INVTYPE_TRINKET:			return  std::string("饰品　");
-		case INVTYPE_SHIELD:			return  std::string("盾牌　");
-		case INVTYPE_CLOAK:				return  std::string("披风　");
-		case INVTYPE_HOLDABLE:			return  std::string("副手　");
-		case INVTYPE_RELIC:				return  std::string("圣物　");
+		case INVTYPE_HEAD:				return  __STR("创造的头饰·升华　");
+		case INVTYPE_NECK:				return  __STR("创造的项链·升华　");
+		case INVTYPE_SHOULDERS:			return  __STR("创造的护肩·升华　");
+		case INVTYPE_BODY:				return  __STR("创造的衬衣·升华　");
+		case INVTYPE_ROBE:				return  __STR("创造的长袍·升华　");
+		case INVTYPE_CHEST:				return  __STR("创造的胸甲·升华　");
+		case INVTYPE_WAIST:				return  __STR("创造的腰带·升华　");
+		case INVTYPE_LEGS:				return  __STR("创造的护腿·升华　");
+		case INVTYPE_FEET:				return  __STR("创造的靴子·升华　");
+		case INVTYPE_WRISTS:			return  __STR("创造的护腕·升华　");
+		case INVTYPE_HANDS:				return  __STR("创造的护手·升华　");
+		case INVTYPE_FINGER:			return  __STR("创造的戒指·升华　");
+		case INVTYPE_TRINKET:			return  __STR("创造的饰品·升华　");
+		case INVTYPE_SHIELD:			return  __STR("创造的盾牌·升华　");
+		case INVTYPE_CLOAK:				return  __STR("创造的披风·升华　");
+		case INVTYPE_HOLDABLE:			return  __STR("创造的副手·升华　");
+		case INVTYPE_RELIC:				return  __STR("创造的圣物·升华　");
 		}
 	}
-	return  std::string("未知装备　");
+	return  __STR("创造的未知装备·升华　");
 }
 
 void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action)
@@ -1946,7 +1947,7 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 
 	std::string item_new_text = "　";
 	item_new_text.append(__STR(player->GetName()));
-	item_new_text.append(__STR("创造的"));
+	//item_new_text.append(__STR("创造的"));
 	item_new_text.append(__get_Item_Name(pItem->GetProto()->Class, pItem->GetProto()->SubClass, pItem->GetProto()->InventoryType));
 
 	std::string item_desc = "原合成物品：①　";
@@ -1983,7 +1984,7 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 
 
 		text = __RED("[自制装备]==>  ");
-		text.append(item_new_text);
+		text.append(item_new_text.substr(0, item_new_text.length() - 11));
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN);
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, __STR(" ======= [确定] ======= "), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN + __MENU_SLOT_ACT_1);
@@ -2014,11 +2015,32 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 			player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + 1, true);
 
 			//remove money
-			player->SetMoney(player->GetMoney() - (_needGold * 10000));
+			player->ModifyMoney(0 - (_needGold * 10000));
 
 			//Set can be used by creator
 			Item *ppItem = player->AddItem(newItem->ItemId);
 			ppItem->SetGuidValue(ITEM_FIELD_CREATOR, player->GetObjectGuid());
+
+			//Annouce to players online
+			//【幸运者】
+			if (newItem->Quality > pItem->GetProto()->Quality)
+			{
+				auto const& sessions = sWorld.GetAllSessions();
+				for (const auto& itr : sessions)
+				{
+					if (WorldSession* session = itr.second)
+					{
+						Player* __player = session->GetPlayer();
+						if (__player && __player->IsInWorld() && __player->IsAlive())
+						{
+							//|cffD2691E[幸运公告]|r 幸运玩家：|cffD2691E[%s]|r  成功创造极品装备：%s，品质：%s，装等：%u，合成材料为：%s 、 %s。
+							ChatHandler(__player).PSendSysMessage(9037, player->GetName(), newItem->Name1,
+								newItem->Quality == 5 ? __ORANGE("传奇") : newItem->Quality == 4 ? __PINK("史诗") : __BLUE("精良"),
+								newItem->ItemLevel, item_1_text, item_2_text);
+						}
+					}
+				}
+			}
 
 			//add new item
 			player->ADD_GOSSIP_ITEM(5, __BLUE("<== |合成成功，请检查背包| ==="), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN);
