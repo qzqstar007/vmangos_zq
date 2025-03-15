@@ -2320,7 +2320,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 				//qzqstar, 241227, set to half if hit player
 				if (unitTarget->IsPlayer())
-					dmg /= 2.2;
+					dmg /= 2.3;
 
 				m_casterUnit->CastCustomSpell(unitTarget, 31150, dmg, {}, {}, true);
 			}

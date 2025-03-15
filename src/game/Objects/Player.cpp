@@ -4843,7 +4843,7 @@ void Player::KillPlayer()
     UpdateObjectVisibility();
 
 	// qzqstar, 250119, refine the challenging
-	if (!InBattleGround())
+	if ((!InBattleGround()) && (GetZoneId() != 1741))
 	{
 		//All must be outside of the battleground
 		auto __oldLevel = GetLevel();

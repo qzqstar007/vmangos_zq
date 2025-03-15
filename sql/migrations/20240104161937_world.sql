@@ -77,7 +77,7 @@ REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `
 UPDATE `creature_template` SET `spell_list_id`=39760, `ai_name`='EventAI', `script_name`='' WHERE `entry`=3976;
 
 -- 999:  Not (Source Is In Combat)
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (999, 43, 0, 0, 0, 0, 3);
+-- INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (999, 43, 0, 0, 0, 0, 3);
 
 -- Events list for High Inquisitor Whitemane
 DELETE FROM `creature_ai_events` WHERE `creature_id`=3977;

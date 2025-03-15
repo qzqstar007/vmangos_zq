@@ -4387,7 +4387,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	}
 	
 	bool qPlus = false;
-	if (_dmg_mux + _prop_mux > 2.46f)	qPlus = true;
+	if (_dmg_mux + _prop_mux > 2.6f)	qPlus = true;
 
 	item.ItemId	= __item_max_entry;
 	item.Class	= item1_proto->Class;
@@ -4457,9 +4457,9 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		{
 			item.ItemStat[i].ItemStatType = item1_proto->ItemStat[i].ItemStatType;
 			if ((item.ItemStat[i].ItemStatType == 3) || (item.ItemStat[i].ItemStatType == 4))
-				item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux;
+				item.ItemStat[i].ItemStatValue = qPlus ? item1_proto->ItemStat[i].ItemStatValue * _prop_mux * 1.1f : item1_proto->ItemStat[i].ItemStatValue * _prop_mux;
 			else if ((item.ItemStat[i].ItemStatType > 4) && (item.ItemStat[i].ItemStatType < 8))
-				item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
+				item.ItemStat[i].ItemStatValue = qPlus ? item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux * 1.1f : item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
 			else
 			{
 				if (roll_chance_i(qPlus ? 50 : 10))
