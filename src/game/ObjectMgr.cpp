@@ -4347,8 +4347,8 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 
 	if (item1_proto->ItemLevel > item2_proto->ItemLevel)
 	{
-		if (_div_level_abs < 3) { _dmg_mux = 1.1f; _prop_mux = 1.2f; _applyDiv = true; }
-		else if (_div_level_abs < 6) { _dmg_mux = 1.05f; _prop_mux = 1.1f; _applyDiv = true; }
+		if (_div_level_abs < 3) { _dmg_mux = 1.05f; _prop_mux = 1.1f; _applyDiv = true; }
+		else if (_div_level_abs < 6) { _dmg_mux = 1.02f; _prop_mux = 1.05f; _applyDiv = true; }
 		else if (_div_level_abs < 11) { _dmg_mux = 1.0f; _prop_mux = 1.0f; _applyDiv = false; }
 		else { _dmg_mux = 0.9f; _prop_mux = 0.9f; _applyDiv = false; }
 	}
@@ -4367,8 +4367,8 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 
 	if (_applyDiv)
 	{
-		_dmg_mux = _dmg_mux * PickRandomValue(1.1f, 1.2f, 1.05f, 1.02f, 1.1f, 1.0f, 1.0f, 1.0f, 1.0f, 0.95f, 1.15f, 1.12f, 1.1f, 0.98f);
-		_prop_mux = _prop_mux * PickRandomValue(1.2f, 1.3f, 1.05f, 1.02f, 1.1f, 1.1f, 1.05f, 1.0f, 1.0f, 0.95f, 1.15f, 1.12f, 1.1f, 0.98f, 1.0f, 1.0f, 1.0f, 1.0f);
+		_dmg_mux = _dmg_mux * PickRandomValue(1.1f, 1.2f, 1.05f, 1.02f, 1.1f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.95f, 1.15f, 1.12f, 1.1f, 0.98f);
+		_prop_mux = _prop_mux * PickRandomValue(1.2f, 1.3f, 1.05f, 1.02f, 1.1f, 1.1f, 1.05f, 1.0f, 1.0f, 0.95f, 1.15f, 1.12f, 1.1f, 0.98f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	//random choose the two item's 
@@ -4387,7 +4387,13 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	}
 	
 	bool qPlus = false;
-	if (_dmg_mux + _prop_mux > 2.6f)	qPlus = true;
+	float _exceedFloat = 3.0f;
+
+	//now we need to figure out qPlus
+	if (item1_proto->Quality == 2)  _exceedFloat = 2.5f;
+	else if (item1_proto->Quality == 3)  _exceedFloat = 2.54f;
+	else _exceedFloat = 2.58f;
+	if (_dmg_mux + _prop_mux > _exceedFloat)	qPlus = true;
 
 	item.ItemId	= __item_max_entry;
 	item.Class	= item1_proto->Class;
@@ -4398,7 +4404,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	
 	if (qPlus)
 	{
-		_dmg_mux *= 1.05f;
+		_dmg_mux *= 1.1f;
 		_prop_mux *= 1.1f;
 		customName.append(_customName.c_str());
 	}

@@ -1373,9 +1373,9 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 			player->ADD_GOSSIP_ITEM(5, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->ADD_GOSSIP_ITEM(5, __STR("=======模式功能========"), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			
-			if (player->HasSpell(__MENU_MODE_SUB_3_SPELL) && pLevel>15 && pLevel<60 && (pLevel % 10 == 0)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_31_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_31);
+			// change the player's level to 25/35/45/55 etc..
+			if (player->HasSpell(__MENU_MODE_SUB_3_SPELL) && pLevel>20 && pLevel<60 && ( (pLevel+5) % 10 == 0)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_31_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_31);
 			if (player->HasSpell(__MENU_MODE_SUB_5_SPELL) ) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_51_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_51);
-
 
 
 			player->ADD_GOSSIP_ITEM(5, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -1448,7 +1448,16 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 		case __MENU_MODE_SUB_31:
 		{	
 			//get the all levels, and expected level
-			int32 _needEQLevel = pLevel * 20 * (150 + pLevel) / 170;
+			//directly assign the eqlevel
+			const int _eqLevelEach[] = {25, 40, 55, 70};
+			auto __pick = pLevel < 26 ? 0 : pLevel < 36 ? 1 : pLevel < 46 ? 2 : 3;
+			int32 _needEQLevel = 20 * _eqLevelEach[__pick];
+
+			if ((player->GetLevel()) < 46 && (player->GetClass() == CLASS_DRUID || player->GetClass() == CLASS_PALADIN || player->GetClass() == CLASS_SHAMAN))
+			{
+				_needEQLevel = _needEQLevel * 19 / 20;
+			}
+
 			int32 _curEQLevel = 0;
 			for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
 				if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
@@ -1463,7 +1472,7 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 			text.append(" .");
 
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
-			if (_curEQLevel >= _needEQLevel)
+			if (_curEQLevel >= _needEQLevel && pLevel<60 )
 			{
 				player->GiveLevel(pLevel + 1);
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__GREEN("===|满足装等要求,, 已突破等级|===")), GOSSIP_SENDER_MAIN, __MENU_NONE);

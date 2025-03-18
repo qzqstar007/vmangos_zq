@@ -3111,15 +3111,15 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
 	if (newXP > 100000000) return;
 
 	//qzqstar, 250228, should not increase if task mode
-	if (HasSpell(__MODE_COLLECT) && (level>15) && (level<55) && (level % 10 == 0)) return;
+	if (HasSpell(__MODE_COLLECT) && (level>20) && (level<56) && ((level+5) % 10 == 0)) return;
 
 
     while (newXP >= nextLvlXP && level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
     {
         newXP -= nextLvlXP;
 
-        if (level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-            GiveLevel(level + 1);
+        //if (level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+        //    GiveLevel(level + 1);
 
         level = GetLevel();
 
@@ -4861,7 +4861,7 @@ void Player::KillPlayer()
 		{
 			//safe if full level
 			if ( (__oldLevel == sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-				|| (HasSpell(__MODE_COLLECT) && (__oldLevel%10 == 0))
+			//	|| (HasSpell(__MODE_COLLECT) && (__oldLevel%10 == 0))
 				|| (__oldLevel < 10)
 				)
 			{
@@ -4879,43 +4879,45 @@ void Player::KillPlayer()
 				__looseMoney = __totalMoney / 2;
 			}
 
-			if (__looseMoney > 0)
-			{
-				//set the victim money
-				ModifyMoney(0 - __looseMoney);
-				ChatHandler(this).PSendSysMessage("You died, lost %ug%us.", __looseMoney / 10000, (__looseMoney / 100) % 100);
-			}
-
-
 			//check the level
 			if(__newLevel != __oldLevel)	SetLevel(__newLevel);
 
 			//Announce
 			//calculate the money
-			uint32 _divMoney = (__looseMoney) / (sWorld.GetActiveSessionCount() < 5 ? 5 : sWorld.GetActiveSessionCount());
-			auto _monsterName = m_ConstName.empty() ? "Unknown" : m_ConstName.c_str();
-
-			for (const auto& itr : sessions)
+			if(__looseMoney > 0)
 			{
-				if (WorldSession* session = itr.second)
+
+				//set the victim money
+				ModifyMoney(0 - __looseMoney);
+				ChatHandler(this).PSendSysMessage("You died, lost %ug%us.", __looseMoney / 10000, (__looseMoney / 100) % 100);
+				
+				uint32 _divMoney = (__looseMoney) / (sWorld.GetActiveSessionCount() < 5 ? 5 : sWorld.GetActiveSessionCount());
+				auto _monsterName = m_ConstName.empty() ? "Unknown" : m_ConstName.c_str();
+
+				if (_divMoney < 1) _divMoney = 1;
+
+				for (const auto& itr : sessions)
 				{
-					Player* __player = session->GetPlayer();
-					if (__player && __player->IsInWorld() && __player->IsAlive())
+					if (WorldSession* session = itr.second)
 					{
-						ChatHandler(__player).PSendSysMessage(9030, GetName(), _monsterName, __oldLevel, __newLevel,
-							__looseMoney / 10000, (__looseMoney / 100) % 100, __looseMoney % 100);
-
-						if (__player->GetLevel() > 10)
+						Player* __player = session->GetPlayer();
+						if (__player && __player->IsInWorld() && __player->IsAlive())
 						{
-							//give them to players online
-							__player->ModifyMoney(_divMoney);
+							ChatHandler(__player).PSendSysMessage(9030, GetName(), _monsterName, __oldLevel, __newLevel,
+								__looseMoney / 10000, (__looseMoney / 100) % 100, __looseMoney % 100);
 
-							//notify that player
-							WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
-							data << uint32(_divMoney);
-							session->SendPacket(&data);
+							if (__player->GetLevel() > 10)
+							{
+								//give them to players online
+								__player->ModifyMoney(_divMoney);
+
+								//notify that player
+								WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
+								data << uint32(_divMoney);
+								session->SendPacket(&data);
+							}
+
 						}
-
 					}
 				}
 			}
@@ -10393,7 +10395,7 @@ InventoryResult Player::CanUseItem(Item const* pItem, bool not_loading) const
         {
 
 			// qzqstar, 250228, zq mode, cannot use the unbind items...
-			if (HasSpell(__MODE_ZQ) && (GetLevel() != (sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))))
+			if (HasSpell(__MODE_ZQ) && (GetLevel() < (sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))))
 			{
 				if (((pProto->Class == ITEM_CLASS_WEAPON) || (pProto->Class == ITEM_CLASS_ARMOR))
 					&& (pProto->Quality > 2)        //modify the quality.
@@ -17732,7 +17734,7 @@ bool Player::CheckInstanceCount(uint32 instanceId) const
 
 	//qzqstar, 250228, check if killer mode, MAX_INSTANCE_PER_ACCOUNT_PER_HOUR should be 1
 	if (HasSpell(__MODE_KILLER))
-		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 2);
+		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 4);
 	else
 		//old origs
 		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, sWorld.getConfig(CONFIG_UINT32_INSTANCE_PER_HOUR_LIMIT));
@@ -19790,10 +19792,9 @@ void Player::LearnQuestRewardedSpells(Quest const* quest)
         return;
 
 	// qzqstar, 250313, skip the __mode__ spells
-	/*
 	if ( (spellId >= 30841) && (spellId <= 30849) )
 		return;
-	*/
+	
 
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)

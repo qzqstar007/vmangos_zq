@@ -777,12 +777,14 @@ bool HonorMgr::Add(float cp, uint8 type, Unit const* source)
 
     bool plr = source->GetTypeId() == TYPEID_PLAYER;
 
+	/*
     if (m_owner->GetMap()->IsBattleGround())
         sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[BATTLEGROUND]: Player %s (account: %u) got %f honor for type %u, source %s %s (IP: %s)",
             m_owner->GetSession()->GetPlayerName(), m_owner->GetSession()->GetAccountId(), honor, type, plr ? "player" : "unit", source->GetName(), ip.c_str());
     else
         sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[OPEN WORLD]: Player %s (account: %u) got %f honor for type %u, source %s %s (IP: %s)",
             m_owner->GetSession()->GetPlayerName(), m_owner->GetSession()->GetAccountId(), honor, type, plr ? "player" : "unit", source->GetName(), ip.c_str());
+	*/
 
     if (type == DISHONORABLE)
     {

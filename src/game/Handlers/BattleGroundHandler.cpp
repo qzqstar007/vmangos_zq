@@ -139,8 +139,14 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
     {
         if (!_player->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_BATTLEMASTER))
         {
-            ProcessAnticheatAction("PassiveAnticheat", "Attempt to queue for BG through invalid creature", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
-            return;
+			//qzqstar, 250316, ignore the guid of 320050 (custom)
+			Creature* pCreature = _player->GetMap()->GetAnyTypeCreature(guid);
+			if (!pCreature || pCreature->GetEntry() != 20050)
+			{
+				//Old statements
+				ProcessAnticheatAction("PassiveAnticheat", "Attempt to queue for BG through invalid creature", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
+				return;
+			}
         }
     }
 #else

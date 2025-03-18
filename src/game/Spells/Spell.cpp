@@ -7069,10 +7069,12 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 if (Creature* pTarget = ToCreature(m_targets.getUnitTarget()))
                 {
+					/* qzqstar, 250318, should can use the disarm for the counterback of rogues.
                     if (!pTarget->CanUseEquippedWeapon(BASE_ATTACK) ||
                         !pTarget->GetVirtualItemDisplayId(BASE_ATTACK) ||
                         pTarget->GetVirtualItemClass(BASE_ATTACK) != ITEM_CLASS_WEAPON)
                         return SPELL_FAILED_TARGET_NO_WEAPONS;
+					*/
                 }
                 else if (Player* pTarget = ToPlayer(m_targets.getUnitTarget()))
                 {
