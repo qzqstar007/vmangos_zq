@@ -3118,8 +3118,8 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
     {
         newXP -= nextLvlXP;
 
-        //if (level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        //    GiveLevel(level + 1);
+        if (level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+            GiveLevel(level + 1);
 
         level = GetLevel();
 

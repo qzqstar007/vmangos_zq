@@ -1375,7 +1375,7 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 			
 			// change the player's level to 25/35/45/55 etc..
 			if (player->HasSpell(__MENU_MODE_SUB_3_SPELL) && pLevel>20 && pLevel<60 && ( (pLevel+5) % 10 == 0)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_31_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_31);
-			if (player->HasSpell(__MENU_MODE_SUB_5_SPELL) ) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_51_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_51);
+			//if (player->HasSpell(__MENU_MODE_SUB_5_SPELL) ) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_51_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_51);
 
 
 			player->ADD_GOSSIP_ITEM(5, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -1756,9 +1756,9 @@ void SendDefaultMenu_Social(Player *player, Creature *_Creature, uint32 action)
 		{
 
 			auto __canSeeRange = 3;
-			if (_socialPoints < 3000 || player->GetLevel() < 30) __canSeeRange = _ITEM_BUY_RANGE_1;
-			else if (_socialPoints <  8000 || player->GetLevel() < 50) __canSeeRange = _ITEM_BUY_RANGE_2;
-			else if (_socialPoints < 15000 || player->GetLevel() < 52) __canSeeRange = _ITEM_BUY_RANGE_3;
+			if (_socialPoints < 5000 || player->GetLevel() < 42) __canSeeRange = _ITEM_BUY_RANGE_1;
+			else if (_socialPoints < 10000 || player->GetLevel() < 50) __canSeeRange = _ITEM_BUY_RANGE_2;
+			else if (_socialPoints < 15000 || player->GetLevel() < 58) __canSeeRange = _ITEM_BUY_RANGE_3;
 			else if (_socialPoints < 20000) __canSeeRange = _ITEM_BUY_RANGE_4;
 			else if (_socialPoints < 30000)  __canSeeRange = _ITEM_BUY_RANGE_5;
 			else __canSeeRange = _ITEM_BUY_RANGE_6;

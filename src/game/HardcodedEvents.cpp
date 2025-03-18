@@ -1687,6 +1687,9 @@ void WarEffortEvent::UpdateHiveColossusEvents()
 
 bool ChatHandler::HandleWarEffortInfoCommand(char* args)
 {
+	//qzqstar, 250318, fix the crash of HEV
+	return false;
+
     sGameEventMgr.Update();
 
     uint32 stage = sObjectMgr.GetSavedVariable(VAR_WE_STAGE, WAR_EFFORT_STAGE_COLLECTION);
@@ -1802,6 +1805,9 @@ bool ChatHandler::HandleWarEffortInfoCommand(char* args)
 
 bool ChatHandler::HandleWarEffortSetGongTimeCommand(char* args)
 {
+	//qzqstar, 250318, fix the crash of HEV
+	return false;
+
     uint32 gongTime;
     if (!ExtractUInt32(&args, gongTime))
         return false;
@@ -1815,6 +1821,9 @@ bool ChatHandler::HandleWarEffortSetGongTimeCommand(char* args)
 
 bool ChatHandler::HandleWarEffortSetStageCommand(char* args)
 {
+	//qzqstar, 250318, fix the crash of HEV
+	return false;
+
     uint32 stage;
     if (!ExtractUInt32(&args, stage))
         return false;
@@ -1829,6 +1838,9 @@ bool ChatHandler::HandleWarEffortSetStageCommand(char* args)
 
 bool ChatHandler::HandleWarEffortGetResource(char* args)
 {
+	//qzqstar, 250318, fix the crash of HEV
+	return false;
+
     uint32 resourceId = 0;
     uint32 team;
 
@@ -1861,6 +1873,9 @@ bool ChatHandler::HandleWarEffortGetResource(char* args)
 
 bool ChatHandler::HandleWarEffortSetResource(char* args)
 {
+	//qzqstar, 250318, fix the crash of HEV
+	return false;
+
     uint32 resourceId = 0;
     uint32 resourceAmount = 0;
     uint32 team = 0;
