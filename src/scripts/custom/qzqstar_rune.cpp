@@ -21,6 +21,8 @@
 
 #include "qzqstar_rune_str.h"
 
+#include "chat.h"
+
 
 // RUNE NPC
 #define	__MENU_NONE					0

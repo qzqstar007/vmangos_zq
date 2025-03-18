@@ -1045,11 +1045,11 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						struct tm* time_info = localtime(&_now);
 
 						//BASIC_LOG("Now %d-%d-%d", time_info->tm_hour, time_info->tm_min, time_info->tm_sec);
-						if (time_info->tm_hour <= 7)
-						{
-							ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|凌晨至早八点不能使用|!<<<")).c_str());
-							return;
-						}
+						//if (time_info->tm_hour <= 7)
+						//{
+						//	ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|凌晨至早八点不能使用|!<<<")).c_str());
+						//	return;
+						//}
 
 					}
 					//qzqstar, add for auto pick 

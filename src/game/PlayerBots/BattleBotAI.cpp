@@ -960,6 +960,8 @@ void BattleBotAI::UpdateBattleGroundAI()
         case BATTLEGROUND_WS:
         {
             // Pick up dropped flags.
+            // qzqstar, 250318, ignore the flag
+            /*
             if (GameObject* pGo = me->FindNearestGameObject(GO_WSG_DROPPED_SILVERWING_FLAG, INTERACTION_DISTANCE))
                 pGo->Use(me);
             if (GameObject* pGo = me->FindNearestGameObject(GO_WSG_DROPPED_WARSONG_FLAG, INTERACTION_DISTANCE))
@@ -975,7 +977,7 @@ void BattleBotAI::UpdateBattleGroundAI()
             {
                 if (GameObject* pGo = me->FindNearestGameObject(GO_WSG_WARSONG_FLAG, INTERACTION_DISTANCE))
                     pGo->Use(me);
-            }
+            }*/
             break;
         }
     }

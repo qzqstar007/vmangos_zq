@@ -4860,7 +4860,7 @@ void Player::KillPlayer()
 		if (HasSpell(__MODE_ONE_LIFE))
 		{
 			//safe if full level
-			if ( (__oldLevel == sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+			if ( (__oldLevel >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
 			//	|| (HasSpell(__MODE_COLLECT) && (__oldLevel%10 == 0))
 				|| (__oldLevel < 10)
 				)

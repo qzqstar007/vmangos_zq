@@ -2018,12 +2018,8 @@ dtStatus dtNavMeshQuery::moveAlongSurface(dtPolyRef startRef, const float* start
 										  const dtQueryFilter* filter,
 										  float* resultPos, dtPolyRef* visited, int* visitedCount, const int maxVisitedSize) const
 {
-	//dtAssert(m_nav);
-	//dtAssert(m_tinyNodePool);
-
-
-	if(!m_nav || !m_tinyNodePool)
-		return DT_FAILURE | DT_INVALID_PARAM;
+	dtAssert(m_nav);
+	dtAssert(m_tinyNodePool);
 
 	if (!visitedCount)
 		return DT_FAILURE | DT_INVALID_PARAM;
@@ -2048,13 +2044,6 @@ dtStatus dtNavMeshQuery::moveAlongSurface(dtPolyRef startRef, const float* start
 	m_tinyNodePool->clear();
 	
 	dtNode* startNode = m_tinyNodePool->getNode(startRef);
-
-	// qzqstar, check if startNode is valid
-	if (!startNode)
-	{
-		return DT_FAILURE | DT_OUT_OF_NODES;
-	}
-
 	startNode->pidx = 0;
 	startNode->cost = 0;
 	startNode->total = 0;
@@ -2089,10 +2078,6 @@ dtStatus dtNavMeshQuery::moveAlongSurface(dtPolyRef startRef, const float* start
 		const dtPoly* curPoly = 0;
 		m_nav->getTileAndPolyByRefUnsafe(curRef, &curTile, &curPoly);			
 		
-		// qzqstar,
-		if(!curPoly || !curTile)
-			return DT_FAILURE | DT_INVALID_PARAM;
-
 		// Collect vertices.
 		const int nverts = curPoly->vertCount;
 		for (int i = 0; i < nverts; ++i)
