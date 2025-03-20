@@ -1008,6 +1008,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     triggered_spell_id = 28810;
                     break;
                 }
+                // todo,qzqstar, 250320, priest, divine shield
             }
             break;
         }

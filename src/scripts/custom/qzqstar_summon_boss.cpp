@@ -104,6 +104,8 @@ void SendDefaultMenu_BOSS(Player *player, Creature *_Creature, uint32 action)
 					//call the boss
 					auto _creatureID = PickRandomValue(_boss_picks[i].boss_id[0], _boss_picks[i].boss_id[1], _boss_picks[i].boss_id[2], _boss_picks[i].boss_id[3]);
 					auto _boss = _Creature->SummonCreature(_creatureID, -13201.0f, 296.0f, 21.9f, 4.5f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3600000);
+					
+					//auto _boss = _Creature->SummonCreature(_creatureID, -13201.0f, 296.0f, 21.9f, 4.5f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
 
 					//Save
 					sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player:[%s] summoned the creature:%s. LEVEL:%d", player->GetName(), _boss->GetName(), _boss_picks[i].action_id / 10);

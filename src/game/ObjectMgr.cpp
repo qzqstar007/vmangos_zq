@@ -4304,40 +4304,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	auto item1_proto = pItem1->GetProto();
 	auto item2_proto = pItem2->GetProto();
 
-	//Now we need to think about which spells need to be placed in item
-	_ItemSpell _Spells[MAX_ITEM_PROTO_SPELLS] = {};
-	int j = 0;
-	for (size_t i = 0; (i < MAX_ITEM_PROTO_SPELLS) && (j<MAX_ITEM_PROTO_SPELLS); i++)
-	{
-		//Must have at least one spell
-		if ((i==0 || roll_chance_i(50)) && item1_proto->Spells[i].SpellId)
-		{
-			_Spells[j].SpellId	   = item1_proto->Spells[i].SpellId;
-			_Spells[j].SpellTrigger = item1_proto->Spells[i].SpellTrigger;
-			_Spells[j].SpellCharges = item1_proto->Spells[i].SpellCharges;
-			_Spells[j].SpellPPMRate = item1_proto->Spells[i].SpellPPMRate;
-			_Spells[j].SpellCooldown = item1_proto->Spells[i].SpellCooldown;
-			_Spells[j].SpellCategory = item1_proto->Spells[i].SpellCategory;
-			_Spells[j].SpellCategoryCooldown = item1_proto->Spells[i].SpellCategoryCooldown;
-			j++;
-		}
-
-		if (roll_chance_i(50) && item2_proto->Spells[i].SpellId)
-		{
-			_Spells[j].SpellId = item2_proto->Spells[i].SpellId;
-			_Spells[j].SpellTrigger = item2_proto->Spells[i].SpellTrigger;
-			_Spells[j].SpellCharges = item2_proto->Spells[i].SpellCharges;
-			_Spells[j].SpellPPMRate = item2_proto->Spells[i].SpellPPMRate;
-			_Spells[j].SpellCooldown = item2_proto->Spells[i].SpellCooldown;
-			_Spells[j].SpellCategory = item2_proto->Spells[i].SpellCategory;
-			_Spells[j].SpellCategoryCooldown = item2_proto->Spells[i].SpellCategoryCooldown;
-			j++;
-		}
-	}
-
-
-
-
+	
 	float _dmg_mux = 1.0f;
 	float _prop_mux = 1.0f;
 	bool _applyDiv = false;
@@ -4399,7 +4366,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	item.Class	= item1_proto->Class;
 	item.SubClass = item1_proto->SubClass;
 
-
+	//make the item name
 	std::string customName="";
 	
 	if (qPlus)
@@ -4411,6 +4378,38 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	else
 	{
 		customName.append(_customName.substr(0, _customName.length() - 11));
+	}
+
+	//Make the items Spells...
+	//Now we need to think about which spells need to be placed in item
+	_ItemSpell _Spells[MAX_ITEM_PROTO_SPELLS] = {};
+	int j = 0;
+	for (size_t i = 0; (i < MAX_ITEM_PROTO_SPELLS) && (j<MAX_ITEM_PROTO_SPELLS); i++)
+	{
+		//Must have at least one spell
+		if ((i == 0 || roll_chance_i(qPlus? 60: 30)) && item1_proto->Spells[i].SpellId)
+		{
+			_Spells[j].SpellId = item1_proto->Spells[i].SpellId;
+			_Spells[j].SpellTrigger = item1_proto->Spells[i].SpellTrigger;
+			_Spells[j].SpellCharges = item1_proto->Spells[i].SpellCharges;
+			_Spells[j].SpellPPMRate = item1_proto->Spells[i].SpellPPMRate;
+			_Spells[j].SpellCooldown = item1_proto->Spells[i].SpellCooldown;
+			_Spells[j].SpellCategory = item1_proto->Spells[i].SpellCategory;
+			_Spells[j].SpellCategoryCooldown = item1_proto->Spells[i].SpellCategoryCooldown;
+			j++;
+		}
+
+		if (roll_chance_i(qPlus ? 70 : 30) && item2_proto->Spells[i].SpellId)
+		{
+			_Spells[j].SpellId = item2_proto->Spells[i].SpellId;
+			_Spells[j].SpellTrigger = item2_proto->Spells[i].SpellTrigger;
+			_Spells[j].SpellCharges = item2_proto->Spells[i].SpellCharges;
+			_Spells[j].SpellPPMRate = item2_proto->Spells[i].SpellPPMRate;
+			_Spells[j].SpellCooldown = item2_proto->Spells[i].SpellCooldown;
+			_Spells[j].SpellCategory = item2_proto->Spells[i].SpellCategory;
+			_Spells[j].SpellCategoryCooldown = item2_proto->Spells[i].SpellCategoryCooldown;
+			j++;
+		}
 	}
 
 	item.Name1 = strdup(customName.c_str()); // (char*)customName.c_str();

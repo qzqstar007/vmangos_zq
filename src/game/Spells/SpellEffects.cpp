@@ -895,6 +895,19 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						{
 							player->RemoveAurasDueToSpell(31106);
 						}
+
+						//check if has armor blade
+						if (player->HasSpell(31107))
+						{
+							int32 __points1 = 0, __points2 = 0, __points3 = 0;
+							int32 armor_points = player->GetArmor();
+							__points1 = armor_points / 1000;
+							player->CastCustomSpell(player, 31108, __points1, __points2, __points3, true, nullptr);
+						}
+						else if (player->HasAura(31108))
+						{
+							player->RemoveAurasDueToSpell(31108);
+						}
 					}
 
 					// qzqstar, 250204, the bonding ralation system
@@ -1500,10 +1513,9 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell::EffectDummy: Spell %u not handled in DW", m_spellInfo->Id);
                             return;
                     };
-
-
-					//qzqstar, todo, 240131, deep wounds advanced by 2
-
+                    
+					//qzqstar, 250319, deep wounds advanced by 2
+                    if(m_casterUnit->IsPlayer() && m_casterUnit->HasSpell(31035)) damage *= 3;
 
                     int32 deepWoundsDotBasePoints0 = int32(damage / 4);
                     m_casterUnit->CastCustomSpell(unitTarget, 12721, deepWoundsDotBasePoints0, {}, {}, true, nullptr);

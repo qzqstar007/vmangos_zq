@@ -603,6 +603,12 @@ dtStatus dtNavMeshQuery::getPolyHeight(dtPolyRef ref, const float* pos, float* h
 	if (!pos || !dtVisfinite2D(pos))
 		return DT_FAILURE | DT_INVALID_PARAM;
 
+	// qzqstar, 250320, check the tile and poly
+	if (!m_nav || !tile || !poly)
+	{
+		return DT_FAILURE | DT_INVALID_PARAM;
+	}
+
 	// We used to return success for offmesh connections, but the
 	// getPolyHeight in DetourNavMesh does not do this, so special
 	// case it here.
@@ -2242,11 +2248,19 @@ dtStatus dtNavMeshQuery::getPortalPoints(dtPolyRef from, dtPolyRef to, float* le
 	const dtPoly* fromPoly = 0;
 	if (dtStatusFailed(m_nav->getTileAndPolyByRef(from, &fromTile, &fromPoly)))
 		return DT_FAILURE | DT_INVALID_PARAM;
+
+	// qzqstar, 250320, check the fromPoly
+	if (!fromPoly || !fromTile)
+		return DT_FAILURE | DT_INVALID_PARAM;
 	fromType = fromPoly->getType();
 
 	const dtMeshTile* toTile = 0;
 	const dtPoly* toPoly = 0;
 	if (dtStatusFailed(m_nav->getTileAndPolyByRef(to, &toTile, &toPoly)))
+		return DT_FAILURE | DT_INVALID_PARAM;
+
+	// qzqstar, 250320, check the toPoly
+	if (!toPoly || !toTile)
 		return DT_FAILURE | DT_INVALID_PARAM;
 	toType = toPoly->getType();
 		
@@ -2258,6 +2272,14 @@ dtStatus dtNavMeshQuery::getPortalPoints(dtPolyRef from, const dtPoly* fromPoly,
 										 dtPolyRef to, const dtPoly* toPoly, const dtMeshTile* toTile,
 										 float* left, float* right) const
 {
+	// qzqstar, 250320, check the fromPoly and fromTile
+	if (!fromPoly || !fromTile)
+		return DT_FAILURE | DT_INVALID_PARAM;
+
+	// qzqstar, 250320, check the toPoly and toTile
+	if (!toPoly || !toTile)
+		return DT_FAILURE | DT_INVALID_PARAM;
+		
 	// Find the link that points to the 'to' polygon.
 	const dtLink* link = 0;
 	for (unsigned int i = fromPoly->firstLink; i != DT_NULL_LINK; i = fromTile->links[i].next)

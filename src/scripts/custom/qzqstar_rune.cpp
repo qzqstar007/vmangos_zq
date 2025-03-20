@@ -1451,7 +1451,10 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 		{	
 			//get the all levels, and expected level
 			//directly assign the eqlevel
-			const int _eqLevelEach[] = {25, 40, 55, 70};
+			//const int _eqLevelEach[] = {25, 40, 55, 70}; - First stage
+			const int _eqLevelEach[] = { 20, 40, 55, 70 };	//Second Stage
+
+
 			auto __pick = pLevel < 26 ? 0 : pLevel < 36 ? 1 : pLevel < 46 ? 2 : 3;
 			int32 _needEQLevel = 20 * _eqLevelEach[__pick];
 
@@ -1953,7 +1956,7 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 	auto item_2_local = sObjectMgr.GetItemLocale(pItem2->GetProto()->ItemId);
 	auto item_2_text = (item_2_local == nullptr ? pItem2->GetProto()->Name1 : item_2_local->Name[localIdx]);
 
-	auto _needGold = pItem->GetProto()->ItemLevel * pItem2->GetProto()->ItemLevel / 150;
+	auto _needGold = pItem->GetProto()->ItemLevel * pItem2->GetProto()->ItemLevel / 300;
 	if (_needGold < 1)  _needGold = 1;
 
 	std::string item_new_text = "　";

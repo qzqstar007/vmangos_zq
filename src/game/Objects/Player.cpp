@@ -17730,7 +17730,11 @@ bool Player::CheckInstanceCount(uint32 instanceId) const
 {
 	//qzqstar, 250109, ignore instance count for VIP spell 32858
 	//32860, vc special
-	if (HasSpell(32857)) return true;
+	if (HasSpell(32857)) 
+		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 20);
+
+	if (HasSpell(30005))
+		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 10);
 
 	//qzqstar, 250228, check if killer mode, MAX_INSTANCE_PER_ACCOUNT_PER_HOUR should be 1
 	if (HasSpell(__MODE_KILLER))
@@ -22671,7 +22675,8 @@ void Player::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* item
         auto& cdData = cdDataItr->second;
         if (!cdData->IsPermanent() && (!cdData->IsSpellCDExpired(sWorld.GetCurrentClockTime()) || !cdData->IsCatCDExpired(sWorld.GetCurrentClockTime())))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Player::AddCooldown> Spell(%u) try to add and already existing cooldown?", spellEntry.Id);
+            // qzqstar, 250319, clean the log
+            // sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Player::AddCooldown> Spell(%u) try to add and already existing cooldown?", spellEntry.Id);
             return;
         }
         wasPermanent = cdData->IsPermanent();

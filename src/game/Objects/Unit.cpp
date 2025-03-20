@@ -697,10 +697,8 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 	//qzqstar, 250207, reduce the damage for pvp
 	if (this->IsPlayer() && pVictim->IsPlayer())
 	{
-		damage /= 3;
+		damage /= 2;
 	}
-
-
 
     if (!damage)
     {

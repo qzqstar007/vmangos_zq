@@ -29,6 +29,8 @@ struct MeteorScript : public SpellScript
                 if (ihit.effectMask & (1 << effIdx))
                     ++count;
 
+            if(count < 1) count = 1;
+            
             spell->damage /= count; // divide to all targets
         }
     }
