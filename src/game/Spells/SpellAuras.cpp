@@ -6156,8 +6156,9 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             pdamage = (pdamage <= malus ? 0 : (pdamage - malus));
 
 			//qzqstar, 241218, dot crit for the spells if has spell 31151
+            //qzqstar, 250321, dot crit for the spells if has spell 31143
 			bool __iscrit = false;
-			if (pCaster->HasSpell(31151))
+			if (pCaster->HasSpell(31151) || pCaster->HasSpell(31143))
 			{
 				__iscrit = pCaster->IsSpellCrit(target, spellProto, spellProto->GetSpellSchoolMask());
 				if (__iscrit) pdamage *= 2;

@@ -29,7 +29,7 @@ typedef struct __rune_spell_menu {
 	std::string		desc;
 }Rune_Spell_Menu_t;
 
-#define	RUNE_SPELLS_NUM				(7)
+#define	RUNE_SPELLS_NUM				(8)
 //#define	__XSTR(x)		((std::string)(x)).c_str()
 #define	__XSTR(x)		(x)
 //Should not modify by users.
@@ -37,11 +37,12 @@ const Rune_Spell_Menu_t _Spells_Menu_Warrior[RUNE_SPELLS_NUM] = 	//Warrior
 {
 	/* 0 */{ 0, 31021, __XSTR("无畏冲锋"), __XSTR("冲锋伤害+.") },
 	/* 1 */{ 0, 31023, __XSTR("乘胜追击"), __XSTR("击杀回血.") },
-	/* 2 */{ 0, 31025,__XSTR("狂暴怒火"), __XSTR("狂暴提升伤.") },
+	/* 2 */{ 0, 31025, __XSTR("狂暴怒火"), __XSTR("狂暴提升伤.") },
 	/* 3 */{ 0, 31027, __XSTR("武器专家"), __XSTR("双手爆伤+.") },
 	/* 4 */{ 0, 31029, __XSTR("狂暴回复"), __XSTR("怒气转生命.") },
 	/* 5 */{ 0, 31031, __XSTR("致命猛击"), __XSTR("几率瞬猛击.") },
-	/* 6 */{ 0, 31033, __XSTR("坚不可摧"), __XSTR("盾牌免伤.") }
+	/* 6 */{ 0, 31033, __XSTR("坚不可摧"), __XSTR("盾牌免伤.") },
+	/* 7 */{ 0, 31035, __XSTR("致命重伤"), __XSTR("致命重伤.") }
 };
 
 const Rune_Spell_Menu_t _Spells_Menu_Mage[RUNE_SPELLS_NUM] = 	//Mage
@@ -52,7 +53,8 @@ const Rune_Spell_Menu_t _Spells_Menu_Mage[RUNE_SPELLS_NUM] = 	//Mage
 	/* 3 */{ 0, 31045, __XSTR("奥术唤醒"), __XSTR("唤醒回血+.") },
 	/* 4 */{ 0, 31047, __XSTR("寒冰破碎"), __XSTR("破盾冰环.") },
 	/* 5 */{ 0, 31049, __XSTR("火焰连击"), __XSTR("火冲瞬炎爆.") },
-	/* 6 */{ 0, 31051, __XSTR("玻璃大炮"), __XSTR("提升伤害.") }
+	/* 6 */{ 0, 31051, __XSTR("玻璃大炮"), __XSTR("提升伤害.") },
+	/* 7 */{ 0, 31053, __XSTR("冰冷血脉|"), __XSTR("冰冷血脉.") }
 };
 
 const Rune_Spell_Menu_t _Spells_Menu_Rogue[RUNE_SPELLS_NUM] = 	//Rogue
@@ -63,7 +65,8 @@ const Rune_Spell_Menu_t _Spells_Menu_Rogue[RUNE_SPELLS_NUM] = 	//Rogue
 	/* 3 */{ 0, 31063, __XSTR("敏锐大师"), __XSTR("破隐增伤.") },
 	/* 4 */{ 0, 31065, __XSTR("刀扇利刃|"), __XSTR("刀扇利刃.") },
 	/* 5 */{ 0, 31067, __XSTR("暗影斗篷"), __XSTR("去除负面.") },
-	/* 6 */{ 0, 31069, __XSTR("持久战意"), __XSTR("提升伤害.") }
+	/* 6 */{ 0, 31069, __XSTR("持久战意"), __XSTR("提升伤害.") },
+	/* 7 */{ 0, 31071, __XSTR("嗜血成性|"), __XSTR("嗜血成性.") }
 };
 
 const Rune_Spell_Menu_t _Spells_Menu_Paladin[RUNE_SPELLS_NUM] = 	//Paladin
@@ -74,7 +77,8 @@ const Rune_Spell_Menu_t _Spells_Menu_Paladin[RUNE_SPELLS_NUM] = 	//Paladin
 	/* 3 */{ 0, 31081, __XSTR("正义盾击"), __XSTR("嘲讽免伤") },
 	/* 4 */{ 0, 31083, __XSTR("圣光宠爱"), __XSTR("延长保护.") },
 	/* 5 */{ 0, 28789, __XSTR("我来助你!"), __XSTR("额外效果.") },
-	/* 6 */{ 0, 31087, __XSTR("圣光背弃"), __XSTR("提伤降疗.") }
+	/* 6 */{ 0, 31087, __XSTR("圣光背弃"), __XSTR("提伤降疗.") },
+	/* 7 */{ 0, 31089, __XSTR("殉难打击"), __XSTR("殉难打击.") }
 };
 
 const Rune_Spell_Menu_t _Spells_Menu_Druid[RUNE_SPELLS_NUM] = 	//Druid
@@ -85,7 +89,8 @@ const Rune_Spell_Menu_t _Spells_Menu_Druid[RUNE_SPELLS_NUM] = 	//Druid
 	/* 3 */{ 0, 31099, __XSTR("丛林之王"), __XSTR("猛虎提升") },
 	/* 4 */{ 0, 31101, __XSTR("日月之蚀"), __XSTR("月火星火.") },
 	/* 5 */{ 0, 31103, __XSTR("生命之树"), __XSTR("治疗形态.") },
-	/* 6 */{ 0, 31105, __XSTR("变形金刚"), __XSTR("百变形态.") }
+	/* 6 */{ 0, 31105, __XSTR("变形金刚"), __XSTR("百变形态.") },
+	/* 7 */{ 0, 31107, __XSTR("刀锋护甲|"), __XSTR("刀锋护甲.") }
 };
 
 const Rune_Spell_Menu_t _Spells_Menu_Hunter[RUNE_SPELLS_NUM] = 	//Hunter
@@ -96,7 +101,8 @@ const Rune_Spell_Menu_t _Spells_Menu_Hunter[RUNE_SPELLS_NUM] = 	//Hunter
 	/* 3 */{ 0, 31117, __XSTR("爆头狙击"), __XSTR("一击必杀") },
 	/* 4 */{ 0, 31119, __XSTR("疾速杀戮|"), __XSTR("增加攻速.") },
 	/* 5 */{ 0, 31121, __XSTR("逃脱专家"), __XSTR("往后跳跃.") },
-	/* 6 */{ 0, 31123, __XSTR("独来独往"), __XSTR("单体提升.") }
+	/* 6 */{ 0, 31123, __XSTR("独来独往"), __XSTR("单体提升.") },
+	/* 7 */{ 0, 31125, __XSTR("野兽鼓舞"), __XSTR("野兽鼓舞.") }
 };
 
 const Rune_Spell_Menu_t _Spells_Menu_Priest[RUNE_SPELLS_NUM] = 	//Priest
@@ -107,7 +113,8 @@ const Rune_Spell_Menu_t _Spells_Menu_Priest[RUNE_SPELLS_NUM] = 	//Priest
 	/* 3 */{ 0, 31135, __XSTR("神火连击"), __XSTR("神火瞬发") },
 	/* 4 */{ 0, 31137, __XSTR("起死复生"), __XSTR("避免死亡.") },
 	/* 5 */{ 0, 31139, __XSTR("精神引导"), __XSTR("精神分流.") },
-	/* 6 */{ 0, 31141, __XSTR("坚定信仰"), __XSTR("抵抗恐惧.") }
+	/* 6 */{ 0, 31141, __XSTR("坚定信仰"), __XSTR("抵抗恐惧.") },
+	/* 7 */{ 0, 31143, __XSTR("暗影绝望"), __XSTR("暗影绝望.") }
 };
 
 
@@ -119,7 +126,8 @@ const Rune_Spell_Menu_t _Spells_Menu_Warlock[RUNE_SPELLS_NUM] = 	//Warlock
 	/* 3 */{ 0, 31153, __XSTR("恶魔知识"), __XSTR("恶魔增强") },
 	/* 4 */{ 0, 31155, __XSTR("生命掌控"), __XSTR("吸血提升.") },
 	/* 5 */{ 0, 31157, __XSTR("献祭灵魂"), __XSTR("火毁春天.") },
-	/* 6 */{ 0, 31159, __XSTR("怜悯之心"), __XSTR("不必牺牲.") }
+	/* 6 */{ 0, 31159, __XSTR("怜悯之心"), __XSTR("不必牺牲.") },
+	/* 7 */{ 0, 31161, __XSTR("恶魔形态|"), __XSTR("恶魔形态.") }
 };
 
 const Rune_Spell_Menu_t _Spells_Menu_Shaman[RUNE_SPELLS_NUM] = 	//Shaman
@@ -130,7 +138,8 @@ const Rune_Spell_Menu_t _Spells_Menu_Shaman[RUNE_SPELLS_NUM] = 	//Shaman
 	/* 3 */{ 0, 31171, __XSTR("双持武器"), __XSTR("双持武器") },
 	/* 4 */{ 0, 31173, __XSTR("闪电过载"), __XSTR("额外触发.") },
 	/* 5 */{ 0, 31175, __XSTR("图腾艺术"), __XSTR("效果提升.") },
-	/* 6 */{ 0, 31177, __XSTR("漩涡武器"), __XSTR("几率瞬发.") }
+	/* 6 */{ 0, 31177, __XSTR("漩涡武器"), __XSTR("几率瞬发.") },
+	/* 7 */{ 0, 31179, __XSTR("电荷感应"), __XSTR("电荷感应.") }
 };
 
 //Copy the content of const menus to player specific 

@@ -1278,8 +1278,20 @@ float SpellCaster:: SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
                 // 1.12.* have only 1 stat type support
                 Stats usedStat = STAT_SPIRIT;
 
+                //qzqstar, 250321, add stamina to the spell healing bonus for warlock
+                if (pUnit->IsPlayer() && pUnit->HasAura(31161))
+                {
+                    //just use the stamina ( 2 times for warlock)
+                    AdvertisedBenefit += int32(pUnit->GetStat(STAT_STAMINA) * 2 * i->GetModifier()->m_amount / 100.0f);
+                }  
+                else
+                {
+                    //qzqstar, 250321, add intellect to the spell healing bonus
+                    //qzqstar 0.2 DoneAdvertisedBenefit += int32(pUnit->GetStat(usedStat) * i->GetModifier()->m_amount / 100.0f);
+                    AdvertisedBenefit += int32((pUnit->GetStat(usedStat) + pUnit->GetStat(STAT_INTELLECT)) * i->GetModifier()->m_amount / 100.0f);
+                }
 				//qzqstar 0.1 AdvertisedBenefit += pUnit->GetStat(usedStat) * i->GetModifier()->m_amount / 100.0f;
-				AdvertisedBenefit += int32((pUnit->GetStat(usedStat) + pUnit->GetStat(STAT_INTELLECT)) * i->GetModifier()->m_amount / 100.0f);
+				//AdvertisedBenefit += int32((pUnit->GetStat(usedStat) + pUnit->GetStat(STAT_INTELLECT)) * i->GetModifier()->m_amount / 100.0f);
             }
         }
     }
@@ -1478,9 +1490,19 @@ int32 SpellCaster::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
                 {
                     // stat used stored in miscValueB for this aura
                     Stats usedStat = STAT_SPIRIT;
-
-					//qzqstar 0.2 DoneAdvertisedBenefit += int32(pUnit->GetStat(usedStat) * i->GetModifier()->m_amount / 100.0f);
-					DoneAdvertisedBenefit += int32((pUnit->GetStat(usedStat) + pUnit->GetStat(STAT_INTELLECT)) * i->GetModifier()->m_amount / 100.0f);
+                    
+                    //qzqstar, 250321, add stamina to the spell damage bonus for warlock
+                    if (pUnit->IsPlayer() && pUnit->HasAura(31161))
+                    {
+                        //just use the stamina ( 2 times for warlock)
+                        DoneAdvertisedBenefit += int32(pUnit->GetStat(STAT_STAMINA) * 2 * i->GetModifier()->m_amount / 100.0f);
+                    }  
+                    else
+                    {
+                        //qzqstar, 250321, add intellect to the spell damage bonus
+                        //qzqstar 0.2 DoneAdvertisedBenefit += int32(pUnit->GetStat(usedStat) * i->GetModifier()->m_amount / 100.0f);
+                        DoneAdvertisedBenefit += int32((pUnit->GetStat(usedStat) + pUnit->GetStat(STAT_INTELLECT)) * i->GetModifier()->m_amount / 100.0f);
+                    }
                 }
             }
         }

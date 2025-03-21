@@ -2242,6 +2242,9 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						/*122, 865, 6131, 10230*/
 						if ((spellEntry.Id == 122 || spellEntry.Id == 865 || spellEntry.Id == 6131 || spellEntry.Id == 10230) && spellEntry.GetRecoveryTime() > 0)
 							return true;
+                        //qzqstar, 250321, cool down the ice bearer
+                        if ( (spellEntry.Id == 11426 || spellEntry.Id == 13031 || spellEntry.Id == 13032 || spellEntry.Id == 13033) && spellEntry.GetRecoveryTime() > 0)
+                            return true;   
 						return false;
 					};
 					static_cast<Player*>(m_caster)->RemoveSomeCooldown(cdCheck);

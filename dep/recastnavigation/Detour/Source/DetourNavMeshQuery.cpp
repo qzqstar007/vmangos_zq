@@ -2279,7 +2279,7 @@ dtStatus dtNavMeshQuery::getPortalPoints(dtPolyRef from, const dtPoly* fromPoly,
 	// qzqstar, 250320, check the toPoly and toTile
 	if (!toPoly || !toTile)
 		return DT_FAILURE | DT_INVALID_PARAM;
-		
+
 	// Find the link that points to the 'to' polygon.
 	const dtLink* link = 0;
 	for (unsigned int i = fromPoly->firstLink; i != DT_NULL_LINK; i = fromTile->links[i].next)
@@ -2553,9 +2553,13 @@ dtStatus dtNavMeshQuery::raycast(dtPolyRef startRef, const float* startPos, cons
 		// Store visited polygons.
 		if (n < hit->maxPath)
 			hit->path[n++] = curRef;
+		// IN THE NAME OF HOLY GIPERION DO NOT DELETE THIS OR I WILL FIND YOU AND HURT YOU.
 		else
+		{
 			status |= DT_BUFFER_TOO_SMALL;
-
+			hit->pathCount = n;
+			return status;
+		}
 		// Ray end is completely inside the polygon.
 		if (segMax == -1)
 		{

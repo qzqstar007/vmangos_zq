@@ -1452,7 +1452,8 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 			//get the all levels, and expected level
 			//directly assign the eqlevel
 			//const int _eqLevelEach[] = {25, 40, 55, 70}; - First stage
-			const int _eqLevelEach[] = { 20, 40, 55, 70 };	//Second Stage
+			//const int _eqLevelEach[] = { 20, 40, 55, 70 };	//Second Stage
+			const int _eqLevelEach[] = { 18, 35, 60, 70 };	//3rd Stage
 
 
 			auto __pick = pLevel < 26 ? 0 : pLevel < 36 ? 1 : pLevel < 46 ? 2 : 3;
