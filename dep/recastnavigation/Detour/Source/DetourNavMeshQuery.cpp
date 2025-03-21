@@ -2095,7 +2095,7 @@ dtStatus dtNavMeshQuery::moveAlongSurface(dtPolyRef startRef, const float* start
 		const dtPoly* curPoly = 0;
 		m_nav->getTileAndPolyByRefUnsafe(curRef, &curTile, &curPoly);			
 		
-		// qzqstar,
+		// qzqstar, 250321, check the curPoly and curTile
 		if(!curPoly || !curTile)
 			return DT_FAILURE | DT_INVALID_PARAM;
 

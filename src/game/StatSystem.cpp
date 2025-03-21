@@ -243,9 +243,6 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                 break;
             case CLASS_SHAMAN:
                 val2 = level * 2.0f + strength * 2.0f    - 20.0f;
-
-				//qzqstar, todo, rune increase the strength/agi mult
-
                 break;
             case CLASS_DRUID:
             {
