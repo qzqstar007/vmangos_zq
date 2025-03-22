@@ -4292,7 +4292,7 @@ void ObjectMgr::LoadItemPrototypes()
 }
 
 //qzqstar, 250311, add for dynamic object create
-ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::string _customName, std::string Desc)
+ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::string _customName, std::string Desc, uint32 luckydraw)
 {
 
 	//sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "custoname: %s  Desc:%s", customName.c_str(), Desc.c_str());
@@ -4360,6 +4360,13 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	if (item1_proto->Quality == 2)  _exceedFloat = 2.5f;
 	else if (item1_proto->Quality == 3)  _exceedFloat = 2.54f;
 	else _exceedFloat = 2.58f;
+
+	//now check the luckdraw, should around 0-100
+	if (luckydraw > 30)	luckydraw = 30;
+	_exceedFloat = _exceedFloat - (float)(luckydraw / 200.0f);
+
+	if (_exceedFloat < 2.43f) _exceedFloat = 2.43f;
+
 	if (_dmg_mux + _prop_mux > _exceedFloat)	qPlus = true;
 
 	item.ItemId	= __item_max_entry;
@@ -4522,7 +4529,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	item.Map = item1_proto->Map;
 	item.Duration = item1_proto->Duration;
 	item.BagFamily = item1_proto->BagFamily;
-	item.DisenchantID = item1_proto->DisenchantID;
+	item.DisenchantID = item.Quality>4? 0 : item1_proto->DisenchantID;
 	item.FoodType = item1_proto->FoodType;
 	item.MinMoneyLoot = item1_proto->MinMoneyLoot;
 	item.MaxMoneyLoot = item1_proto->MaxMoneyLoot;

@@ -15476,6 +15476,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
 	SetPersonalXpRate(__xpRate);
 
+    // reset the M_Spare_Data2, as lucky draws
+    M_Spare_Data2 = 0;
+
 	//qzqstar, 250227, change name if killer mode
 	if (HasSpell(__MODE_KILLER))
 	{

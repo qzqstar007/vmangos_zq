@@ -863,7 +863,7 @@ class ObjectMgr
         void LoadGameobjects(bool reload = false);
         void LoadItemPrototypes();
 		uint32 __item_max_entry;
-		ItemPrototype * DynamicGenerateItem(Item *, Item *, std::string, std::string); //qzqstar, 250311, add for dynamic object create
+		ItemPrototype * DynamicGenerateItem(Item *, Item *, std::string, std::string, uint32 luckydraw); //qzqstar, 250311, add for dynamic object create
         void FillObtainedItemsList(std::set<uint32>&);
         void CorrectItemEffects(uint32, _ItemSpell&);
         void CorrectItemDisplayIds(uint32, uint32&);

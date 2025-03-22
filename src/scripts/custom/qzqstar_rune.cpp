@@ -1196,7 +1196,7 @@ void SendDefaultMenu_Slot(Player *player, Creature *_Creature, uint32 action)
 	auto item_equipped_local = sObjectMgr.GetItemLocale(pEquippedItem->GetProto()->ItemId);
 	auto item_equipped_text = (item_equipped_local == nullptr ? pEquippedItem->GetProto()->Name1 : item_equipped_local->Name[localIdx]);
 
-	auto _needGold = pEquippedItem->GetProto()->ItemLevel * pEquippedItem->GetProto()->ItemLevel * pEquippedItem->GetProto()->ItemLevel / 1500 + 1;
+	auto _needGold = pEquippedItem->GetProto()->ItemLevel * pEquippedItem->GetProto()->ItemLevel / 100 + 1;
 
 	//should declare the 3 spell id
 	uint32 spell_id[3];
@@ -2022,8 +2022,9 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 		}
 		else
 		{
-			//
-			auto newItem = sObjectMgr.DynamicGenerateItem(pItem, pItem2, item_new_text, item_desc);
+			//should apply the chance?
+
+			auto newItem = sObjectMgr.DynamicGenerateItem(pItem, pItem2, item_new_text, item_desc, player->M_Spare_Data2);
 
 			//remove the item
 			player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
@@ -2040,6 +2041,9 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 			//【幸运者】
 			if (newItem->Quality > pItem->GetProto()->Quality)
 			{
+				//reset the luck draw
+				player->M_Spare_Data2 = 0;
+
 				auto const& sessions = sWorld.GetAllSessions();
 				for (const auto& itr : sessions)
 				{
@@ -2055,6 +2059,10 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 						}
 					}
 				}
+			}
+			//not lucky
+			else {
+				player->M_Spare_Data2++;
 			}
 
 			//add new item
