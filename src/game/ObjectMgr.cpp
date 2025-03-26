@@ -4309,9 +4309,10 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	float _prop_mux = 1.0f;
 	bool _applyDiv = false;
 
-	//Refix the calculate
+	//get the level diff of two items
 	auto _div_level_abs = std::abs((int)(item1_proto->ItemLevel - item2_proto->ItemLevel));
 
+	//if item1 level higher than item2, then check the level diff
 	if (item1_proto->ItemLevel > item2_proto->ItemLevel)
 	{
 		if (_div_level_abs < 3) { _dmg_mux = 1.05f; _prop_mux = 1.1f; _applyDiv = true; }
@@ -4328,10 +4329,12 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		}
 		else
 		{
+			//item2 quality is better than item1
 			_dmg_mux = 1.1f; _prop_mux = 1.2f; _applyDiv = true;
 		}
 	}
 
+	//random apply factor on the muxplier
 	if (_applyDiv)
 	{
 		_dmg_mux = _dmg_mux * PickRandomValue(1.1f, 1.2f, 1.05f, 1.02f, 1.1f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.95f, 1.15f, 1.12f, 1.1f, 0.98f);
@@ -4394,7 +4397,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	for (size_t i = 0; (i < MAX_ITEM_PROTO_SPELLS) && (j<MAX_ITEM_PROTO_SPELLS); i++)
 	{
 		//Must have at least one spell
-		if ((i == 0 || roll_chance_i(qPlus? 60: 30)) && item1_proto->Spells[i].SpellId)
+		if ((i == 0 || roll_chance_i(qPlus? 70: 30)) && item1_proto->Spells[i].SpellId)
 		{
 			_Spells[j].SpellId = item1_proto->Spells[i].SpellId;
 			_Spells[j].SpellTrigger = item1_proto->Spells[i].SpellTrigger;

@@ -1365,6 +1365,13 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						return;
 
 					Player* pCaster = static_cast<Player*>(m_caster);
+
+                    auto p = pCaster->FindNearestPlayer(30);
+                    if (p)
+                    {
+                        ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>|跟玩家组队不能使用团本技能。|!<<<")).c_str());
+                        return;
+                    }
 					//check if raid maps
 					switch (pCaster->GetMapId())
 					{
@@ -2335,7 +2342,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 				//qzqstar, 241227, set to half if hit player
 				if (unitTarget->IsPlayer())
-					dmg /= 2.3;
+					dmg /= 1.3;
 
 				m_casterUnit->CastCustomSpell(unitTarget, 31150, dmg, {}, {}, true);
 			}

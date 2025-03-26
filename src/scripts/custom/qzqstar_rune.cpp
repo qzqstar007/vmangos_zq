@@ -1936,16 +1936,27 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 		return;
 	}
 
-	if (   pItem2->GetProto()->InventoryType != pItem->GetProto()->InventoryType
-		//|| pItem2->GetProto()->SubClass != pItem->GetProto()->SubClass
-		|| pItem2->GetProto()->Class != pItem->GetProto()->Class
-		)
+	//fix the gun, crossbow and bow together， 15,26,26
+	if(  ( (pItem2->GetProto()->InventoryType == 26) || (pItem2->GetProto()->InventoryType == 15) )
+		&&
+		((pItem->GetProto()->InventoryType == 26) || (pItem->GetProto()->InventoryType == 15))
+	   )
 	{
-		std::string text = __BLUE("[|待合成装备类型必须一致，可以跨甲！|]");
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_SLOT_MAIN);
-		player->SEND_GOSSIP_MENU(__GOSSIP_EQCREATE_DESC, _Creature->GetGUID());
+		//can combine
+	}
+	else
+	{
+		if (   pItem2->GetProto()->InventoryType != pItem->GetProto()->InventoryType
+			//|| pItem2->GetProto()->SubClass != pItem->GetProto()->SubClass
+			|| pItem2->GetProto()->Class != pItem->GetProto()->Class
+			)
+		{
+			std::string text = __BLUE("[|待合成装备类型必须一致，可以跨甲！|]");
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_SLOT_MAIN);
+			player->SEND_GOSSIP_MENU(__GOSSIP_EQCREATE_DESC, _Creature->GetGUID());
 
-		return;
+			return;
+		}
 	}
 
 	//now get the proto spell of old item (to be destroyed)

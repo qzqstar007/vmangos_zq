@@ -15562,6 +15562,14 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 	if (GetAreaId() != 976)
 		CastSpell(this, 13874, true);
 
+    // qzqstar, todo, 250325, add rank spell upon RANKS
+    // spell start from what?
+    int32 _pRank = GetHonorMgr().GetRank().visualRank;
+    if(_pRank > 5)
+    {
+
+    }
+
 	//qzqstar, 250306, apply the spell upon social points. start from spell 30931
 	auto _socialPoints = GetReputationMgr().GetReputation(967);
 	if (_socialPoints > 1000)
@@ -19799,7 +19807,7 @@ void Player::LearnQuestRewardedSpells(Quest const* quest)
         return;
 
 	// qzqstar, 250313, skip the __mode__ spells
-	if ( (spellId >= 30841) && (spellId <= 30849) )
+	if ( (spellId >= 30841) && (spellId <= 30850) )
 		return;
 	
 
@@ -20995,7 +21003,7 @@ uint32 Player::CalculateTalentsPoints() const
 
 	//#define  __SPELL_VIP        (32858)
 	//if (HasSpell(__SPELL_VIP))   talentPointsForLevel += 5;
-	//if (HasSpell(32860))         talentPointsForLevel += 5;
+	if (HasSpell(30010))         talentPointsForLevel += 5; //shanshan special
 
 	return talentPointsForLevel;
 }
