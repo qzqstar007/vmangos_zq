@@ -4481,11 +4481,11 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 				{
 					auto __rand = irand(0, 5);
 
-					if( (__rand==0) && (_pick_strengh == false)) { _pick_strengh = true; item.ItemStat[i].ItemStatType = 4; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 6 + 1) * _prop_mux; }
-					else if ((__rand == 1) && (_pick_agi == false)) { _pick_agi = true; item.ItemStat[i].ItemStatType = 3; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 6 + 1)* _prop_mux; }
-					else if ((__rand == 2) && (_pick_stmina == false)) { _pick_stmina = true; item.ItemStat[i].ItemStatType = 7; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 5 + 1)* _prop_mux; }
-					else if ((__rand == 3) && (_pick_intel == false)) { _pick_intel = true; item.ItemStat[i].ItemStatType = 5; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 5 + 1)* _prop_mux; }
-					else if ((__rand == 4) && (_pick_spirit == false)) { _pick_spirit = true; item.ItemStat[i].ItemStatType = 6; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 5 + 1)* _prop_mux; }
+					if( (__rand==0) && (_pick_strengh == false)) { _pick_strengh = true; item.ItemStat[i].ItemStatType = 4; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 3 + 1) * _prop_mux; }
+					else if ((__rand == 1) && (_pick_agi == false)) { _pick_agi = true; item.ItemStat[i].ItemStatType = 3; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 3 + 1)* _prop_mux; }
+					else if ((__rand == 2) && (_pick_stmina == false)) { _pick_stmina = true; item.ItemStat[i].ItemStatType = 7; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 2 + 1)* _prop_mux; }
+					else if ((__rand == 3) && (_pick_intel == false)) { _pick_intel = true; item.ItemStat[i].ItemStatType = 5; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 2 + 1)* _prop_mux; }
+					else if ((__rand == 4) && (_pick_spirit == false)) { _pick_spirit = true; item.ItemStat[i].ItemStatType = 6; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 2 + 1)* _prop_mux; }
 				}
 			}
 		}

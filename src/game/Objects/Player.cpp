@@ -2801,6 +2801,30 @@ void Player::SetGMVisible(bool on, bool notify)
 
 void Player::SetCheatFly(bool on, bool notify)
 {
+    if(HasCheatOption(PLAYER_CHEAT_FLY) == on)
+    {
+        //do nothing
+    }
+    else
+    {
+        
+        SetCheatOption(PLAYER_CHEAT_FLY, on);
+        SetFly(on);
+
+		UpdateSpeed(MOVE_SWIM, false, on ? 4.5f : 1.0f);
+
+        if (notify && on)
+        {
+            //GetSession()->SendNotification(on ? LANG_CHEAT_FLY_ON : LANG_CHEAT_FLY_OFF);
+			ChatHandler(this).PSendSysMessage(((std::string)(">>>|使用飞行坐骑时，请用鼠标控制方向，不要按空格|!<<<")).c_str());
+        }
+    }
+}
+
+// old cheat fly
+/*
+void Player::SetCheatFly(bool on, bool notify)
+{
     SetCheatOption(PLAYER_CHEAT_FLY, on);
     SetFly(on);
 
@@ -2808,7 +2832,7 @@ void Player::SetCheatFly(bool on, bool notify)
     {
         GetSession()->SendNotification(on ? LANG_CHEAT_FLY_ON : LANG_CHEAT_FLY_OFF);
     }
-}
+}*/
 
 void Player::SetCheatFixedZ(bool on, bool notify)
 {

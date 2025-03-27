@@ -134,6 +134,9 @@ class ChatHandler
 
         void SendBanResult(BanMode mode, BanReturn result, std::string& banTarget, uint32 duration_secs, std::string& reason);
 
+        //qzqstar, 250326, make the handler seeable
+        void HandleInstanceUnbindHelper(Player* player, bool got_map, uint32 mapid);
+
         /**
         * \brief Prepare SMSG_GM_MESSAGECHAT/SMSG_MESSAGECHAT
         *
@@ -577,7 +580,7 @@ class ChatHandler
         bool HandleInstanceListBindsCommand(char* args);
         bool HandleInstanceUnbindCommand(char* args);
         bool HandleInstanceGroupUnbindCommand(char* args);
-        void HandleInstanceUnbindHelper(Player* player, bool got_map, uint32 mapid);
+        //void HandleInstanceUnbindHelper(Player* player, bool got_map, uint32 mapid);
         bool HandleInstanceStatsCommand(char* args);
         bool HandleInstanceSaveDataCommand(char* args);
         bool HandleInstanceSwitchCommand(char* args);

@@ -973,6 +973,26 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 					} while (0);
 
+
+                    //qzqstar, the fly mount
+                    do{
+                        //three flies
+						auto _mapid = player->GetMapId();
+
+						if (_mapid == 0 || _mapid == 1)
+						{
+							if (player->HasAura(32095))
+							{
+								player->SetCheatFly(true, true);
+							}
+							else
+							{
+								player->SetCheatFly(false, true);
+							}
+						}
+
+                    }while (0);
+
 					return;
 				}
 
@@ -1073,7 +1093,14 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 				case 32998:
 				{
-					//qzqstar, add for dungeons reset					
+					//qzqstar, add for dungeons reset				
+					//qzqstar, 250318, 
+					if (m_caster->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+
+                    ChatHandler(m_caster->ToPlayer()).HandleInstanceUnbindHelper(m_caster->ToPlayer(), false, 0);
+                    	
 					return;
 				}
 

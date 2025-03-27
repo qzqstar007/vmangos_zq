@@ -326,6 +326,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         }
     }
 
+    //qzqstar, 250326, ignore the jump op code
+    if(pPlayerMover->HasCheatOption(PLAYER_CHEAT_FLY) && (movementInfo.HasMovementFlag(MOVEFLAG_JUMPING))) return;
+
     // This is required for proper movement extrapolation
     if (opcode == MSG_MOVE_JUMP)
         pMover->SetJumpInitialSpeed(7.95797334f);
