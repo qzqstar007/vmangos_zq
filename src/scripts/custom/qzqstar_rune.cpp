@@ -20,6 +20,7 @@
 #include <ctime>
 
 #include "qzqstar_rune_str.h"
+#include "qzqstar_helper.h"
 
 #include "chat.h"
 
@@ -1349,10 +1350,20 @@ void SendDefaultMenu_Slot(Player *player, Creature *_Creature, uint32 action)
 #define	__MENU_MODE_SUB_31_NAME					"[收藏模式：查看装等，突破等级]"
 #define __MENU_MODE_SUB_31_ACT_1				(__MENU_MODE_SUB_31 + 1)
 
-#define __MENU_MODE_SUB_51						(__MENU_MODE_MAIN + 110)
+#define __MENU_MODE_SUB_32						(__MENU_MODE_MAIN + 110)
+#define	__MENU_MODE_SUB_32_NAME					"[装等巅峰：查看装等，获取ＢＵＦＦ|]"
+#define __MENU_MODE_SUB_32_ACT_1				(__MENU_MODE_SUB_32 + 1)
+
+#define __MENU_MODE_SUB_51						(__MENU_MODE_MAIN + 150)
 #define	__MENU_MODE_SUB_51_NAME					"[杀手模式：隐姓埋名，更改名字]"
 #define __MENU_MODE_SUB_51_ACT_1				(__MENU_MODE_SUB_51 + 1)
 
+
+#define __MENU_MODE_BREAK_THROUGH_DUMMY_SPELL		(31290)	//Dummy indicators
+#define __MENU_MODE_BREAK_THROUGH_CAST_SPELL		(31295)	//Really Apply Auras
+
+
+static Top10Ranking	__Rankings;
 
 void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 {
@@ -1363,7 +1374,7 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 	{
 		case __MENU_MODE_MAIN:
 		{
-			player->ADD_GOSSIP_ITEM(5, __STR("=======|满级可以退出挑战，领取奖励|========"), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(5, __STR("==|满级可以退出挑战，领取奖励|=="), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			//Five Modes Exit
 			if (player->GetLevel() == 60 && player->HasSpell(__MENU_MODE_SUB_1_SPELL)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_1_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_1);
 			if (player->GetLevel() == 60 && player->HasSpell(__MENU_MODE_SUB_2_SPELL)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_2_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_2);
@@ -1376,7 +1387,9 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 			player->ADD_GOSSIP_ITEM(5, __STR("=======模式功能========"), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			
 			// change the player's level to 25/35/45/55 etc..
-			if (player->HasSpell(__MENU_MODE_SUB_3_SPELL) && pLevel>20 && pLevel<60 && ( (pLevel+5) % 10 == 0)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_31_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_31);
+			if (player->HasSpell(__MENU_MODE_SUB_3_SPELL) && (pLevel==25 || pLevel == 35 || pLevel == 45 || pLevel == 58)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_31_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_31);
+			if (pLevel > 58) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_32_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_32);
+
 			//if (player->HasSpell(__MENU_MODE_SUB_5_SPELL) ) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_51_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_51);
 
 
@@ -1453,29 +1466,60 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 			//directly assign the eqlevel
 			//const int _eqLevelEach[] = {25, 40, 55, 70}; - First stage
 			//const int _eqLevelEach[] = { 20, 40, 55, 70 };	//Second Stage
-			const int _eqLevelEach[] = { 18, 35, 60, 70 };	//3rd Stage
-
+			//const int _eqLevelEach[] = { 18, 35, 60, 70 };	//3rd Stage
+			const int _eqLevelEach[] = { 15, 30, 52, 80 };		//4th Stage
 
 			auto __pick = pLevel < 26 ? 0 : pLevel < 36 ? 1 : pLevel < 46 ? 2 : 3;
 			int32 _needEQLevel = 20 * _eqLevelEach[__pick];
 
-			if ((player->GetLevel()) < 46 && (player->GetClass() == CLASS_DRUID || player->GetClass() == CLASS_PALADIN || player->GetClass() == CLASS_SHAMAN))
+			if ((pLevel < 46) && (player->GetClass() == CLASS_DRUID || player->GetClass() == CLASS_PALADIN || player->GetClass() == CLASS_SHAMAN))
 			{
 				_needEQLevel = _needEQLevel * 19 / 20;
 			}
 
 			int32 _curEQLevel = 0;
 			for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+			{
 				if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
 				{
 					_curEQLevel += pItem->GetProto()->ItemLevel;
 					if(pItem->GetProto()->InventoryType == INVTYPE_2HWEAPON) _curEQLevel += pItem->GetProto()->ItemLevel;
 				}
+			}
+
+			// ----- region -------------- display the rankings
+			//Add self rankings
+			__Rankings.addOrUpdate(_curEQLevel, player->GetName());
+
+			//Display the Rankings
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("　　＝＝装等排行榜＝＝　　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			for (size_t i = 0; i < 5; i++)
+			{
+				text = (i==0 ? "玩家①： |cff0829C9 "
+					: i == 1 ? "玩家②： |cff0829C9 "
+					: i == 2 ? "玩家③： |cff0829C9 "
+					: i == 3 ? "玩家④： |cff0829C9 "
+					:"玩家⑤： |cff0829C9 "
+					);
+				auto entry = __Rankings.getEntryByRank(i + 1);
+				text.append(entry.second);
+				text.append("|r, 总装等： |cff0829C9 ");
+				text.append(__NSTR(entry.first));
+				text.append("|r ");
+
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			}
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			//--------end of display rankings
+
 			text = "|需要装等: ";
 			text.append(__NSTR(_needEQLevel));
 			text.append(" , 当前装等:");
 			text.append(__NSTR(_curEQLevel));
 			text.append(" .");
+
+			sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[COLLECT] player:%s, level:%d, EQ Total:%d, need EQ:%d", player->GetName(), pLevel, _curEQLevel, _needEQLevel);
 
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			if (_curEQLevel >= _needEQLevel && pLevel<60 )
@@ -1504,6 +1548,117 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 			break;
 		}
+
+		//BreakThrough Top ranking
+		case __MENU_MODE_SUB_32:
+		{
+
+			#define _BREAK_THROUGH_RANKING_SCORE_	(1700)		//+100 each
+
+			//1. check the spells that player owned
+			auto _Ranks_Now = 0;
+			for (size_t i = 0; i < 5; i++)
+			{
+				if (player->HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + i))	_Ranks_Now++;
+			}
+
+			int32 _needEQLevel = _BREAK_THROUGH_RANKING_SCORE_ + _Ranks_Now * 100;
+			int32 _curEQLevel = 0;
+			for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+			{
+				if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+				{
+					_curEQLevel += pItem->GetProto()->ItemLevel;
+					if (pItem->GetProto()->InventoryType == INVTYPE_2HWEAPON) _curEQLevel += pItem->GetProto()->ItemLevel;
+				}
+			}
+			
+			// ----- region -------------- display the rankings
+			//Add self rankings
+			__Rankings.addOrUpdate(_curEQLevel, player->GetName());
+
+			//Display the Rankings
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("　　＝＝装等排行榜＝＝　　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			for (size_t i = 0; i < 5; i++)
+			{
+				text = (i == 0 ? "玩家①： |cff0829C9 "
+					: i == 1 ? "玩家②： |cff0829C9 "
+					: i == 2 ? "玩家③： |cff0829C9 "
+					: i == 3 ? "玩家④： |cff0829C9 "
+					: "玩家⑤： |cff0829C9 "
+					);
+				auto entry = __Rankings.getEntryByRank(i + 1);
+				text.append(entry.second);
+				text.append("|r, 总装等： |cff0829C9 ");
+				text.append(__NSTR(entry.first));
+				text.append("|r ");
+
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			}
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			//--------end of display rankings
+
+			text = "当前装等巅峰： |cffff0000 ";
+			text.append(_Ranks_Now == 0? " ０－无称号 |r"
+				: _Ranks_Now == 1 ? " １－青铜 |r"
+				: _Ranks_Now == 2 ? " ２－白银 |r"
+				: _Ranks_Now == 3 ? " ３－黄金 |r"
+				: _Ranks_Now == 4 ? " ４－钻石 |r"
+				: " ５－王者 |r"
+			);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+			text = "";
+			if (_Ranks_Now < 5)
+			{
+				text = "|下阶段需要装等: ";
+				text.append(__NSTR(_needEQLevel));
+			}
+			text.append(" , 当前装等:");
+			text.append(__NSTR(_curEQLevel));
+			text.append(" .");
+			 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+			sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[COLLECT] player:%s, BT Ranks:%d, EQ Total:%d, need EQ:%d", player->GetName(), _Ranks_Now, _curEQLevel, _needEQLevel);
+			
+			if (_Ranks_Now < 5 && _curEQLevel >= _needEQLevel && pLevel>58)
+			{
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__GREEN("===|满足装等要求，已提升至新等级，小退生效。|===")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+				//learn spell
+				player->LearnSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + _Ranks_Now, false);
+
+				_Ranks_Now++;
+				//Announce the player
+				auto const& sessions = sWorld.GetAllSessions();
+				for (const auto& itr : sessions)
+				{
+					if (WorldSession* session = itr.second)
+					{
+						Player* _onlineplayer = session->GetPlayer();
+						if (_onlineplayer && _onlineplayer->IsInWorld() && player->IsAlive())
+						{
+							//|cff0000bb[装备巅峰]|r 恭喜玩家：|cff0000bb[%s]|r  成功装备突破新等级，总装等：%u，称号：%s。
+							ChatHandler(_onlineplayer).PSendSysMessage(9052, player->GetName(), _curEQLevel, 
+								_Ranks_Now == 0 ? __STR(" １－青铜 ")
+								: _Ranks_Now == 1 ? __STR(" ２－白银 ")
+								: _Ranks_Now == 2 ? __STR(" ３－黄金 ")
+								: _Ranks_Now == 3 ? __STR(" ４－钻石 ")
+								: __STR(" ５－王者 ")
+								);
+						}
+					}
+				}
+
+			}
+			else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__RED("==装等不够，等会再来===")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+			player->ADD_GOSSIP_ITEM(5, "<==返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN);
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+			break;
+		}
+
 
 		case __MENU_MODE_SUB_51:
 		{
@@ -1764,7 +1919,7 @@ void SendDefaultMenu_Social(Player *player, Creature *_Creature, uint32 action)
 			auto __canSeeRange = 3;
 			if (_socialPoints < 5000 || player->GetLevel() < 42) __canSeeRange = _ITEM_BUY_RANGE_1;
 			else if (_socialPoints < 10000 || player->GetLevel() < 50) __canSeeRange = _ITEM_BUY_RANGE_2;
-			else if (_socialPoints < 15000 || player->GetLevel() < 58) __canSeeRange = _ITEM_BUY_RANGE_3;
+			else if (_socialPoints < 15000 || player->GetLevel() < 60) __canSeeRange = _ITEM_BUY_RANGE_3;
 			else if (_socialPoints < 20000) __canSeeRange = _ITEM_BUY_RANGE_4;
 			else if (_socialPoints < 30000)  __canSeeRange = _ITEM_BUY_RANGE_5;
 			else __canSeeRange = _ITEM_BUY_RANGE_6;

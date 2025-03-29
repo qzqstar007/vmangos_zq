@@ -3135,8 +3135,7 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
 	if (newXP > 100000000) return;
 
 	//qzqstar, 250228, should not increase if task mode
-	if (HasSpell(__MODE_COLLECT) && (level>20) && (level<56) && ((level+5) % 10 == 0)) return;
-
+	if (HasSpell(__MODE_COLLECT) && (level==25 || level==35 || level==45 || level==58)) return;
 
     while (newXP >= nextLvlXP && level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
     {
@@ -15588,12 +15587,35 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     // qzqstar, todo, 250325, add rank spell upon RANKS
     // spell start from what?
+    // special bonus:
+    // 1. apply the largest 
     int32 _pRank = GetHonorMgr().GetRank().visualRank;
     if(_pRank > 5)
     {
-
+        
     }
 
+    // qzqstar, 250328, add aura upon different break-through spells
+    // break-through points: 1700, 1800, 1900, 2000, 2100, 2200
+    // critical damage bonus: 3%, 6% ... 15% 
+    // armor bonus: 300, 600, 900, 1200, 1500
+    //
+    // dummpy learnt spells:
+    // 31290, ...
+    // cast spells:
+    // 31295, ....
+    //
+    // five differnet break-through?
+#define	__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL (31290)
+	if (GetLevel() > 58)
+	{
+		if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 4))		CastSpell(this, 31295 + 4, true);
+		else if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 3))		CastSpell(this, 31295 + 3, true);
+		else if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 2))		CastSpell(this, 31295 + 2, true);
+		else if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 1))		CastSpell(this, 31295 + 1, true);
+		else if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 0))		CastSpell(this, 31295 + 0, true);
+	}
+    
 	//qzqstar, 250306, apply the spell upon social points. start from spell 30931
 	auto _socialPoints = GetReputationMgr().GetReputation(967);
 	if (_socialPoints > 1000)

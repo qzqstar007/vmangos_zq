@@ -987,6 +987,18 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 							}
 							else
 							{
+								//cannot fly
+								player->SetCheatFly(false, true);
+							}
+						}
+
+						//remove if not in mapid
+						else
+						{
+							//should not swim be in dungeons
+							if (player->HasCheatOption(PLAYER_CHEAT_FLY))
+							{
+								//cannot fly
 								player->SetCheatFly(false, true);
 							}
 						}
@@ -1008,12 +1020,15 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 						//At least cast the dragon slayer 32068
 						m_caster->CastSpell(unitTarget, 32068, true, nullptr);
+		
+						//and 10%
+						if (m_caster->GetLevel() > 24 && unitTarget->GetLevel() > 24)	m_caster->CastSpell(unitTarget, 20217, true, nullptr);
 
 						//further 32069
-						if (unitTarget->GetLevel() > 14)	m_caster->CastSpell(unitTarget, 32069, true, nullptr);
-						
-						//and 10%
-						if (unitTarget->GetLevel() > 24)	m_caster->CastSpell(unitTarget, 20217, true, nullptr);
+						if (m_caster->GetLevel() > 34 && unitTarget->GetLevel() > 34)	m_caster->CastSpell(unitTarget, 32069, true, nullptr);
+
+						//55 using the zandalar
+						if (m_caster->GetLevel() > 54 && unitTarget->GetLevel() > 54)	m_caster->CastSpell(unitTarget, 32067, true, nullptr);
 					}
 
 					return;
