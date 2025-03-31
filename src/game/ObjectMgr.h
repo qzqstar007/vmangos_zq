@@ -705,6 +705,7 @@ class ObjectMgr
             return itr != m_QuestTemplatesMap.end() ? itr->second.get() : nullptr;
         }
         QuestMap const& GetQuestTemplates() const { return m_QuestTemplatesMap; }
+		QuestMap& GetQuestTemplatesZQ() { return m_QuestTemplatesMap; } // qzqstar, 250329, unsafe use only!
 
         // Return the ID of the item that starts a quest.
         // Return 0 if no such item exists.

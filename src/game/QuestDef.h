@@ -318,7 +318,7 @@ class Quest
         bool m_isActive;
 
         // table data
-    protected:
+    public:
         uint32 QuestId;
         uint32 QuestMethod;
         int32  ZoneOrSort;

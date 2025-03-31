@@ -1553,7 +1553,7 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 		case __MENU_MODE_SUB_32:
 		{
 
-			#define _BREAK_THROUGH_RANKING_SCORE_	(1700)		//+100 each
+			#define _BREAK_THROUGH_RANKING_SCORE_	(1600)		//+100 each
 
 			//1. check the spells that player owned
 			auto _Ranks_Now = 0;
@@ -1641,10 +1641,10 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 						{
 							//|cff0000bb[装备巅峰]|r 恭喜玩家：|cff0000bb[%s]|r  成功装备突破新等级，总装等：%u，称号：%s。
 							ChatHandler(_onlineplayer).PSendSysMessage(9052, player->GetName(), _curEQLevel, 
-								_Ranks_Now == 0 ? __STR(" １－青铜 ")
-								: _Ranks_Now == 1 ? __STR(" ２－白银 ")
-								: _Ranks_Now == 2 ? __STR(" ３－黄金 ")
-								: _Ranks_Now == 3 ? __STR(" ４－钻石 ")
+								_Ranks_Now == 1 ? __STR(" １－青铜 ")
+								: _Ranks_Now == 2 ? __STR(" ２－白银 ")
+								: _Ranks_Now == 3 ? __STR(" ３－黄金 ")
+								: _Ranks_Now == 4 ? __STR(" ４－钻石 ")
 								: __STR(" ５－王者 ")
 								);
 						}
@@ -2126,6 +2126,13 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 	auto _needGold = pItem->GetProto()->ItemLevel * pItem2->GetProto()->ItemLevel / 300;
 	if (_needGold < 1)  _needGold = 1;
 
+	/*
+	auto _needSuiliNum = 9999;
+	if (pItem->GetProto()->Quality == 4 && pItem->GetProto()->ItemLevel > 60)
+		_needSuiliNum = (pItem->GetProto()->ItemLevel - 55) *  (pItem->GetProto()->ItemLevel - 55) / 5;
+	if (_needSuiliNum < 1) _needSuiliNum = 1;
+	*/
+
 	std::string item_new_text = "　";
 	item_new_text.append(__STR(player->GetName()));
 	//item_new_text.append(__STR("创造的"));
@@ -2167,8 +2174,17 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 		text = __RED("[自制装备]==>  ");
 		text.append(item_new_text.substr(0, item_new_text.length() - 11));
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, __STR(__BLUE(" ===== [确定合成] ===== ")), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN + __MENU_SLOT_ACT_1);
 
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, __STR(" ======= [确定] ======= "), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN + __MENU_SLOT_ACT_1);
+		/*
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, __STR(" === [普通合成，确定] ===== "), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN + __MENU_SLOT_ACT_1);
+		text = __STR(" === [必定升华，消耗【橙武碎粒】数量： |cffdd2200 ");
+		
+		text.append(__NSTR(_needSuiliNum));
+		text.append(" |r ] =="); */
+		//if(player->HasItemCount(30320)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, __STR(__BLUE(" === [SVIP, 消耗一枚标记必定升华] === ")), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN + __MENU_SLOT_ACT_2);
+		if (player->HasItemCount(30320)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK,  __STR(__BLUE(" == [使用垫刀石，失败不消耗装备] == ")), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN + __MENU_SLOT_ACT_2);
+
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, __STR(" ======= [返回] ======= "), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN);
 
 
@@ -2186,18 +2202,49 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 		{
 			player->ADD_GOSSIP_ITEM(5, __RED("<== |金币不够或者武器错误，返回首页| ==="), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN);
 		}
+		//check if has enough suilis
+		else if (action ==  (__MENU_CREATE_MAIN + __MENU_SLOT_ACT_2) && (!player->HasItemCount(30320)) )
+		{
+			player->ADD_GOSSIP_ITEM(5, __RED("<== |垫刀石不够或者武器错误，返回首页| ==="), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN);
+		}
 		else
 		{
 			//should apply the chance?
-
-			auto newItem = sObjectMgr.DynamicGenerateItem(pItem, pItem2, item_new_text, item_desc, player->M_Spare_Data2);
-
-			//remove the item
-			player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
-			player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + 1, true);
+			auto _mustHit = false;
 
 			//remove money
 			player->ModifyMoney(0 - (_needGold * 10000));
+
+			//must remove the second slot
+			player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + 1, true);
+
+			//if weapon must up
+			if (action == (__MENU_CREATE_MAIN + __MENU_SLOT_ACT_2) && player->HasItemCount(30320))
+			{
+				player->DestroyItemCount(30320, 1, true);
+
+				player->M_Spare_Data2++;
+
+				//roll chance
+				if (roll_chance_i(15))
+				{
+					_mustHit = true;
+				}
+				else
+				{
+					player->ADD_GOSSIP_ITEM(5, __BLUE("<== |升华失败，不消耗装备。| ==="), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN);
+					player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+					return;
+				}
+				
+			}
+
+			//remove the item, remains if not success
+			player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
+
+			//create the new item
+			if (_mustHit) player->M_Spare_Data2 = 9999;
+			auto newItem = sObjectMgr.DynamicGenerateItem(pItem, pItem2, item_new_text, item_desc, player->M_Spare_Data2);
 
 			//Set can be used by creator
 			Item *ppItem = player->AddItem(newItem->ItemId);

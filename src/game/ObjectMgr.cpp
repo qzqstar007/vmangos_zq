@@ -4291,6 +4291,95 @@ void ObjectMgr::LoadItemPrototypes()
     }
 }
 
+//qzqstar, 250331, get the spell id for qPlus 
+const std::vector<int> _spell_ids = {
+	9392,9393,9394,9395,9396,9397,9398,9415,9416,9417,9342,9343,9344,9345,25110,
+	9346,14254,14799,14248,15714,14047,24595,25111,15715,18049,14054,14127,13881,
+	14798,17367,18050,18052,14055,18053,18054,18055,18056,18057,18058,17280,17493,
+	28264,24196,28360,28767,26142,23732,23213,26155,26158,23730,26227,23929,26460,
+	26459,23728,28687,28693,22747,28841,28792,
+	28530,28530,	
+	31474,31474,31474,31474,	
+	31930,31930
+};
+
+const std::vector<int> _spell_hit_ids = {
+	23727, 23727,23727,23729,23729,	23729,23729,23729,23729,23729,23729
+};
+
+const std::vector<int> _spell_crit_ids = {
+	18384, 18384, 18384, 18382, 18382,	18382,18382,18382,18382,18382
+};
+
+const std::vector<int> _ap_ids = {
+	9136,9137,9138,9139,9140,9141,9142,20732,9329,9330,9331,9332,14027,9334,9335,
+	9336,15807,15806,14089,15808,14049,15809,15810,15811,9333,14056,15812,15813,
+	15814,15815,14052,15816,15817,15818,15819,15820,15821,15823,15824,15825,15826,
+	15827,15828,15829,15830,
+	15831,15831,
+	15832,15832,15832,15832,
+	18060,18060
+};
+
+const std::vector<int> _ap_hit_ids = {
+	15464, 15464, 15464,	15465,15465,15465,		15466, 15466, 15466, 15466, 15466, 15466
+
+};
+
+const std::vector<int> _ap_crit_ids = {
+	7597, 7597, 7597,		7598, 7598,7598,		7599,7599,7599,7599,7599,7599,7599,
+};
+
+const std::vector<int> _defense_ids = {
+	7511,7514,7515,7516,7517,7518,13383,13384,13385,13386,13387,13388,18369,13390,
+	18185,21407,21408,14249,21409,21410,18196,21411,21412,13389,21424,21413,21414,
+	21415,17513,21417,21418,21419,
+	21420,21420,21420,
+	21421,21421,21421,
+	21423,21423,21423,21423,21423,21423
+};
+
+uint32 __get_random_id_from_list_ifexist(const std::vector<int>& arr, uint32 __spellid)
+{
+	uint32 result = __spellid;
+	for (size_t i = 0; i < arr.size(); i++)
+	{
+		if (result == arr[i])
+		{
+			//make five numbers
+			uint32 _candidate[5];
+			for (size_t j = 0; j < 5; j++)
+			{
+				if ((i + j) < arr.size())
+					_candidate[j] = arr[i + j];
+				else
+					_candidate[j] = arr[i];
+			}
+
+			//return one of them
+			return( PickRandomValue(_candidate[0], _candidate[1], _candidate[2], _candidate[3], _candidate[4]) );
+		}
+	}
+
+	return result;
+}
+
+uint32 _PickRandomSpellId_qPlus(uint32 __spellid)
+{
+	uint32 __newSpellID;
+	__newSpellID = __get_random_id_from_list_ifexist(_spell_ids, __spellid); if (__newSpellID != __spellid) return __newSpellID;
+	__newSpellID = __get_random_id_from_list_ifexist(_spell_hit_ids, __spellid); if (__newSpellID != __spellid) return __newSpellID;
+	__newSpellID = __get_random_id_from_list_ifexist(_spell_crit_ids, __spellid); if (__newSpellID != __spellid) return __newSpellID;
+	__newSpellID = __get_random_id_from_list_ifexist(_ap_ids, __spellid); if (__newSpellID != __spellid) return __newSpellID;
+	__newSpellID = __get_random_id_from_list_ifexist(_ap_hit_ids, __spellid); if (__newSpellID != __spellid) return __newSpellID;
+	__newSpellID = __get_random_id_from_list_ifexist(_ap_crit_ids, __spellid); if (__newSpellID != __spellid) return __newSpellID;
+	__newSpellID = __get_random_id_from_list_ifexist(_defense_ids, __spellid); if (__newSpellID != __spellid) return __newSpellID;
+
+	return __spellid;
+}
+
+
+
 //qzqstar, 250311, add for dynamic object create
 ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::string _customName, std::string Desc, uint32 luckydraw)
 {
@@ -4364,6 +4453,9 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	else if (item1_proto->Quality == 3)  _exceedFloat = 2.54f;
 	else _exceedFloat = 2.58f;
 
+	//luckdraw injection
+	if (luckydraw > 9000) qPlus = true;
+
 	//now check the luckdraw, should around 0-100
 	if (luckydraw > 30)	luckydraw = 30;
 	_exceedFloat = _exceedFloat - (float)(luckydraw / 200.0f);
@@ -4397,9 +4489,9 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	for (size_t i = 0; (i < MAX_ITEM_PROTO_SPELLS) && (j<MAX_ITEM_PROTO_SPELLS); i++)
 	{
 		//Must have at least one spell
-		if ((i == 0 || roll_chance_i(qPlus? 70: 30)) && item1_proto->Spells[i].SpellId)
+		if ((i == 0 || roll_chance_i(qPlus? 80: 30)) && item1_proto->Spells[i].SpellId)
 		{
-			_Spells[j].SpellId = item1_proto->Spells[i].SpellId;
+			_Spells[j].SpellId = (qPlus && item1_proto->Spells[i].SpellTrigger  == 1 )? _PickRandomSpellId_qPlus(item1_proto->Spells[i].SpellId) : item1_proto->Spells[i].SpellId;
 			_Spells[j].SpellTrigger = item1_proto->Spells[i].SpellTrigger;
 			_Spells[j].SpellCharges = item1_proto->Spells[i].SpellCharges;
 			_Spells[j].SpellPPMRate = item1_proto->Spells[i].SpellPPMRate;
@@ -4409,9 +4501,9 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 			j++;
 		}
 
-		if (roll_chance_i(qPlus ? 70 : 30) && item2_proto->Spells[i].SpellId)
+		if (roll_chance_i(qPlus ? 80 : 30) && item2_proto->Spells[i].SpellId)
 		{
-			_Spells[j].SpellId = item2_proto->Spells[i].SpellId;
+			_Spells[j].SpellId = (qPlus && item2_proto->Spells[i].SpellTrigger == 1) ? _PickRandomSpellId_qPlus(item2_proto->Spells[i].SpellId) : item2_proto->Spells[i].SpellId;
 			_Spells[j].SpellTrigger = item2_proto->Spells[i].SpellTrigger;
 			_Spells[j].SpellCharges = item2_proto->Spells[i].SpellCharges;
 			_Spells[j].SpellPPMRate = item2_proto->Spells[i].SpellPPMRate;
@@ -4477,7 +4569,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 				item.ItemStat[i].ItemStatValue = qPlus ? item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux * 1.1f : item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
 			else
 			{
-				if (roll_chance_i(qPlus ? 50 : 10))
+				if (roll_chance_i(qPlus ? 60 : 10))
 				{
 					auto __rand = irand(0, 5);
 
@@ -4491,6 +4583,27 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		}
 	}
 	item.Delay = item1_proto->Delay;
+	if (qPlus)
+	{
+		auto __randDelay = PickRandomValue(0, 0, 0, 0, 0, 0, 0, 100, 100, 100, 100, 100, 100, 200, 200, 300);
+		if (item.InventoryType == INVTYPE_WEAPON)
+		{
+			if (item.Delay > 2000)  item.Delay += __randDelay;
+			else item.Delay -= __randDelay;
+		}
+		else if (item.InventoryType == INVTYPE_2HWEAPON)
+		{
+			if (item.Delay > 3400)  item.Delay += __randDelay;
+			else item.Delay -= __randDelay;
+		}
+		/*
+		else if (item.InventoryType == INVTYPE_RANGED)
+		{
+			if (item.Delay > 3400)  item.Delay += __randDelay;
+			else item.Delay -= __randDelay;
+		}*/
+	}
+
 	item.RangedModRange = item1_proto->RangedModRange;
 	item.AmmoType = item1_proto->AmmoType;
 	for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; i++)
@@ -4499,7 +4612,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		item.Damage[i].DamageMax = item1_proto->Damage[i].DamageMax * _dmg_mux;
 		item.Damage[i].DamageType = item1_proto->Damage[i].DamageType;
 	}
-	item.Block = item1_proto->Block;
+	item.Block = item1_proto->Block * _prop_mux;
 	item.Armor = item1_proto->Armor * _prop_mux;
 	item.HolyRes = item1_proto->HolyRes;
 	item.FireRes = item1_proto->FireRes;
@@ -4525,7 +4638,10 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	item.LockID = 0;
 	item.Material = item1_proto->Material;
 	item.Sheath = item1_proto->Sheath;
-	item.RandomProperty = item1_proto->RandomProperty;
+	item.RandomProperty = item.ItemLevel>78? 13070		//should extend the random to advanced levels..
+		: item.ItemLevel>65 ? 13060
+		: item.ItemLevel>50 ? 13055 : item1_proto->RandomProperty;
+
 	item.ItemSet = 0;
 	item.MaxDurability = item1_proto->MaxDurability;
 	item.Area = item1_proto->Area;
@@ -5704,6 +5820,10 @@ void ObjectMgr::LoadQuests()
     m_QuestTemplatesMap.clear();
 
     m_ExclusiveQuestGroups.clear();
+
+	//qzqstar, 250329, remove the quests that larger than some ID
+#define __USER_CUSTOM_QUEST_ID	(12000)
+	CharacterDatabase.PExecute("DELETE FROM `character_queststatus` WHERE `quest` > '%u'", __USER_CUSTOM_QUEST_ID);
 
     //                                                                0        1         2             3           4             5       6                  7                8                9
     std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `Method`, `ZoneOrSort`, `MinLevel`, `QuestLevel`, `Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`,"
