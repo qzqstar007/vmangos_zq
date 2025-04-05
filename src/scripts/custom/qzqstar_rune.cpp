@@ -149,6 +149,7 @@ void SendDefaultMenu_ZQ(Player *player, Creature *_Creature, uint32 action)
 #define	__MENU_RUNE_TEST_MENU		(__MENU_RUNE_MAIN + 999)
 
 #define __MODE_KILLER       (30849)
+#define __MODE_KILLER_REWARD       (30852)
 uint32 __rune_slot_numbers(Player *player)
 {
 	//will have one slot every level/15
@@ -157,7 +158,7 @@ uint32 __rune_slot_numbers(Player *player)
 	_nums += player->GetLevel() / 15;
 
 	//check if has the __MODE_KILLER
-	if (player->HasSpell(__MODE_KILLER)) _nums += 1;
+	if (player->HasSpell(__MODE_KILLER) || player->HasSpell(__MODE_KILLER_REWARD)) _nums += 1;
 
 	//extra slots
 
@@ -168,7 +169,7 @@ uint32 __rune_need_num(Player *player, uint32 curslots)
 {
 	auto needNum = 0;
 	auto freeNum = 1;
-	if (player->HasSpell(__MODE_KILLER)) freeNum += 1;
+	if (player->HasSpell(__MODE_KILLER) || player->HasSpell(__MODE_KILLER_REWARD)) freeNum += 1;
 
 	if (curslots < freeNum) needNum = 0;
 	else
@@ -1351,7 +1352,7 @@ void SendDefaultMenu_Slot(Player *player, Creature *_Creature, uint32 action)
 #define __MENU_MODE_SUB_31_ACT_1				(__MENU_MODE_SUB_31 + 1)
 
 #define __MENU_MODE_SUB_32						(__MENU_MODE_MAIN + 110)
-#define	__MENU_MODE_SUB_32_NAME					"[装等巅峰：查看装等，获取ＢＵＦＦ|]"
+#define	__MENU_MODE_SUB_32_NAME					"[装等巅峰：查看装等，获取突破装等巅峰|]"
 #define __MENU_MODE_SUB_32_ACT_1				(__MENU_MODE_SUB_32 + 1)
 
 #define __MENU_MODE_SUB_51						(__MENU_MODE_MAIN + 150)
@@ -1406,7 +1407,13 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 			/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==取消===", GOSSIP_SENDER_MAIN, __MENU_NONE); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
 		}
 		case __MENU_MODE_SUB_1 + 1:
-		{	if(player->HasSpell(__MENU_MODE_SUB_1_SPELL)) player->RemoveSpell(__MENU_MODE_SUB_1_SPELL, false, false);
+		{	if (player->HasSpell(__MENU_MODE_SUB_1_SPELL))
+			{
+				//One Life mode
+				player->AddItem(30106);
+				player->AddItem(30523, 600);
+				player->RemoveSpell(__MENU_MODE_SUB_1_SPELL, false, false);
+			}
 			/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
 		}
 
@@ -1416,8 +1423,14 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==取消===", GOSSIP_SENDER_MAIN, __MENU_NONE); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
 		}
 		case __MENU_MODE_SUB_2 + 1:
-		{	if (player->HasSpell(__MENU_MODE_SUB_2_SPELL)) player->RemoveSpell(__MENU_MODE_SUB_2_SPELL, false, false);
-		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
+		{	if (player->HasSpell(__MENU_MODE_SUB_2_SPELL))
+			{
+				//ZQ mode, 5 talents
+				player->LearnSpell(30851, false);
+				player->AddItem(30523, 300);
+				player->RemoveSpell(__MENU_MODE_SUB_2_SPELL, false, false);
+			}
+		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，小退生效，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
 		}
 
 		case __MENU_MODE_SUB_3:
@@ -1426,7 +1439,14 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==取消===", GOSSIP_SENDER_MAIN, __MENU_NONE); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
 		}
 		case __MENU_MODE_SUB_3 + 1:
-		{	if (player->HasSpell(__MENU_MODE_SUB_3_SPELL)) player->RemoveSpell(__MENU_MODE_SUB_3_SPELL, false, false);
+		{	
+			if (player->HasSpell(__MENU_MODE_SUB_3_SPELL))
+			{
+				//ZQ mode, 5 talents
+				player->LearnSpell(30853, false);
+				player->AddItem(30523, 300);
+				player->RemoveSpell(__MENU_MODE_SUB_3_SPELL, false, false);
+			}
 		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
 		}
 
@@ -1436,27 +1456,31 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==取消===", GOSSIP_SENDER_MAIN, __MENU_NONE); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
 		}
 		case __MENU_MODE_SUB_4 + 1:
-		{	if (player->HasSpell(__MENU_MODE_SUB_4_SPELL)) player->RemoveSpell(__MENU_MODE_SUB_4_SPELL, false, false);
+		{	//if (player->HasSpell(__MENU_MODE_SUB_4_SPELL)) player->RemoveSpell(__MENU_MODE_SUB_4_SPELL, false, false);
+			if (player->HasSpell(__MENU_MODE_SUB_4_SPELL))
+			{
+				//ZQ mode, 5 talents
+				player->AddItem(30522, 10);
+				player->AddItem(30523, 300);
+				player->RemoveSpell(__MENU_MODE_SUB_4_SPELL, false, false);
+			}
 		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
 		}
 		
 		case __MENU_MODE_SUB_5:
 		{	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_5_NAME)), GOSSIP_SENDER_MAIN, __MENU_NONE);
-		player->ADD_GOSSIP_ITEM(5, __STR(__RED("==|确定退出，需要花费１０个符文石|===")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_5 + 1);
+		player->ADD_GOSSIP_ITEM(5, __STR(__RED("==|确定退出|===")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_5 + 1);
 		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==取消===", GOSSIP_SENDER_MAIN, __MENU_NONE); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
 		}
 		case __MENU_MODE_SUB_5 + 1:
-		{	if( (player->HasSpell(__MENU_MODE_SUB_5_SPELL))&&(player->HasItemCount(__RUNE_UPGRADE_ITEM_ALL, 10)) )
+		{	if (player->HasSpell(__MENU_MODE_SUB_5_SPELL))
 			{
-					player->DestroyItemCount(__RUNE_UPGRADE_ITEM_ALL, 10, true);
-					player->RemoveSpell(__MENU_MODE_SUB_5_SPELL, false, false);
+				//Killer mode, free run slots
+				player->LearnSpell(30852, false);
+				player->AddItem(30523, 300);
+				player->RemoveSpell(__MENU_MODE_SUB_5_SPELL, false, false);
+			}
 			/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
-			}
-			else
-			{
-				player->ADD_GOSSIP_ITEM(5, "<==符文石数量不够，不能退出===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
-
-			}
 		}
 
 		//Advanced the level
@@ -1467,8 +1491,9 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 			//const int _eqLevelEach[] = {25, 40, 55, 70}; - First stage
 			//const int _eqLevelEach[] = { 20, 40, 55, 70 };	//Second Stage
 			//const int _eqLevelEach[] = { 18, 35, 60, 70 };	//3rd Stage
-			const int _eqLevelEach[] = { 15, 30, 52, 80 };		//4th Stage
-
+			//const int _eqLevelEach[] = { 15, 30, 52, 80 };		//4th Stage
+			const int _eqLevelEach[] = { 10, 20, 40, 75 };		//4th Stage
+			
 			auto __pick = pLevel < 26 ? 0 : pLevel < 36 ? 1 : pLevel < 46 ? 2 : 3;
 			int32 _needEQLevel = 20 * _eqLevelEach[__pick];
 
@@ -1924,6 +1949,13 @@ void SendDefaultMenu_Social(Player *player, Creature *_Creature, uint32 action)
 			else if (_socialPoints < 30000)  __canSeeRange = _ITEM_BUY_RANGE_5;
 			else __canSeeRange = _ITEM_BUY_RANGE_6;
 
+			//add constrains for level 60
+			//ZUG
+			if (__canSeeRange >= _ITEM_BUY_RANGE_4) __canSeeRange = _ITEM_BUY_RANGE_3;
+
+			//MC Range
+			//if (__canSeeRange >= _ITEM_BUY_RANGE_5) __canSeeRange = _ITEM_BUY_RANGE_4;
+
 			//check the actions
 			if (action == __MENU_SOCIAL_BUY)
 			{
@@ -2092,9 +2124,10 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 	}
 
 	//fix the gun, crossbow and bow together， 15,26,26
-	if(  ( (pItem2->GetProto()->InventoryType == 26) || (pItem2->GetProto()->InventoryType == 15) )
+	//relic 28
+	if(  ( (pItem2->GetProto()->InventoryType == 26) || (pItem2->GetProto()->InventoryType == 15) || (pItem2->GetProto()->InventoryType == 28))
 		&&
-		((pItem->GetProto()->InventoryType == 26) || (pItem->GetProto()->InventoryType == 15))
+		((pItem->GetProto()->InventoryType == 26) || (pItem->GetProto()->InventoryType == 15) || (pItem->GetProto()->InventoryType == 28) )
 	   )
 	{
 		//can combine
@@ -2142,7 +2175,7 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 	item_desc.append(__STR(item_1_text));
 	item_desc.append(__STR("、　②　"));
 	item_desc.append(__STR(item_2_text));
-	item_desc.append(__STR("。　"));
+	item_desc.append(__STR("。　\r\n"));
 	item_desc.append(__STR(__GREEN("装备等级：　")));
 	//item_desc.append(__STR(player->GetName()));
 

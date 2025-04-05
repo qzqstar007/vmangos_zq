@@ -128,6 +128,30 @@ SpellScript* GetScript_WarriorWrath(SpellEntry const*)
     return new WarriorWrathScript();
 }
 
+
+// qzqstar, 250403, rune of rend trigger overpower
+struct WarriorRendTriggerOverPower : SpellScript
+{
+	void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+	{
+		if (effIdx == EFFECT_INDEX_0)
+		{
+			if (!spell->GetUnitTarget())
+				return;
+
+			auto _ptarget = spell->GetUnitTarget();
+			static_cast<Player*>(spell->m_casterUnit)->AddComboPoints(_ptarget, 1);
+			static_cast<Player*>(spell->m_casterUnit)->StartReactiveTimer(REACTIVE_OVERPOWER, _ptarget->GetObjectGuid());
+		}
+	}
+};
+
+SpellScript* GetScript_WarriorRendTriggerOverPower(SpellEntry const*)
+{
+	return new WarriorRendTriggerOverPower();
+}
+
+
 void AddSC_warrior_spell_scripts()
 {
     Script* newscript;
@@ -161,4 +185,9 @@ void AddSC_warrior_spell_scripts()
     newscript->Name = "spell_warrior_wrath";
     newscript->GetSpellScript = &GetScript_WarriorWrath;
     newscript->RegisterSelf();
+
+	newscript = new Script;
+	newscript->Name = "spell_rend_overpower";
+	newscript->GetSpellScript = &GetScript_WarriorRendTriggerOverPower;
+	newscript->RegisterSelf();
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
  * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
@@ -4304,11 +4304,11 @@ const std::vector<int> _spell_ids = {
 };
 
 const std::vector<int> _spell_hit_ids = {
-	23727, 23727,23727,23729,23729,	23729,23729,23729,23729,23729,23729
+	23727, 23727,23727,	23729,23729,	23729,	31401,31401,31401,31401,31401,31401		//newly added hit 3
 };
 
 const std::vector<int> _spell_crit_ids = {
-	18384, 18384, 18384, 18382, 18382,	18382,18382,18382,18382,18382
+	18384, 18384, 18384, 18382, 18382,	18382,	31402,31402,31402,31402,31402,31402
 };
 
 const std::vector<int> _ap_ids = {
@@ -4458,9 +4458,9 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 
 	//now check the luckdraw, should around 0-100
 	if (luckydraw > 30)	luckydraw = 30;
-	_exceedFloat = _exceedFloat - (float)(luckydraw / 200.0f);
+	_exceedFloat = _exceedFloat - (float)(luckydraw / 150.0f);
 
-	if (_exceedFloat < 2.43f) _exceedFloat = 2.43f;
+	if (_exceedFloat < 2.35f) _exceedFloat = 2.35f;
 
 	if (_dmg_mux + _prop_mux > _exceedFloat)	qPlus = true;
 
@@ -4481,6 +4481,12 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	{
 		customName.append(_customName.substr(0, _customName.length() - 11));
 	}
+
+	//set the quality
+	item.Quality = (qPlus) ? item1_proto->Quality + 1 : item1_proto->Quality;
+
+	//set the isLegend
+	auto _isLegend = item.Quality > 4 ? true : false;
 
 	//Make the items Spells...
 	//Now we need to think about which spells need to be placed in item
@@ -4517,7 +4523,6 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	item.Name1 = strdup(customName.c_str()); // (char*)customName.c_str();
 	//item.Description = (strdup)(Desc.c_str());
 	item.DisplayInfoID = item1_proto->DisplayInfoID;
-	item.Quality = (qPlus) ? item1_proto->Quality+1 : item1_proto->Quality;
 	item.Flags = item1_proto->Flags;
 	item.BuyCount = item1_proto->BuyCount;
 	item.BuyPrice = item1_proto->BuyPrice;
@@ -4525,10 +4530,20 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	item.InventoryType = item1_proto->InventoryType;
 	item.AllowableClass = item1_proto->AllowableClass;
 	item.AllowableRace = item1_proto->AllowableRace;
-	item.ItemLevel = item1_proto->ItemLevel * (_dmg_mux + _prop_mux) / 2;
+	item.ItemLevel = item1_proto->ItemLevel * (_dmg_mux + _prop_mux) / 2 * (_isLegend ? 1.2 : 1);
 
 	Desc.append(std::to_string(item.ItemLevel));
+	Desc.append("  \r\n");
+	Desc.append (std::string("|cff00b72f创造时间：　|r").c_str());
+	//append time　
+	auto _now = sWorld.GetGameTime();
+	struct tm* time_info = localtime(&_now);
+
+	Desc.append(std::to_string(time_info->tm_year + 1900));
+	Desc.append("-" + std::to_string(time_info->tm_mon + 1));
+	Desc.append("-" + std::to_string(time_info->tm_mday));
 	Desc.append(" ");
+
 	item.Description = (strdup)(Desc.c_str());
 
 	item.RequiredLevel = item1_proto->RequiredLevel;
@@ -4564,20 +4579,20 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		{
 			item.ItemStat[i].ItemStatType = item1_proto->ItemStat[i].ItemStatType;
 			if ((item.ItemStat[i].ItemStatType == 3) || (item.ItemStat[i].ItemStatType == 4))
-				item.ItemStat[i].ItemStatValue = qPlus ? item1_proto->ItemStat[i].ItemStatValue * _prop_mux * 1.1f : item1_proto->ItemStat[i].ItemStatValue * _prop_mux;
+				item.ItemStat[i].ItemStatValue = qPlus ? (item1_proto->ItemStat[i].ItemStatValue + (_isLegend ? 12 : 0)) * _prop_mux * 1.1f : item1_proto->ItemStat[i].ItemStatValue * _prop_mux;
 			else if ((item.ItemStat[i].ItemStatType > 4) && (item.ItemStat[i].ItemStatType < 8))
-				item.ItemStat[i].ItemStatValue = qPlus ? item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux * 1.1f : item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
+				item.ItemStat[i].ItemStatValue = qPlus ? (item1_proto->ItemStat[i].ItemStatValue + (_isLegend ? 12 : 0)) * _prop_mux * _prop_mux * 1.1f : item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
 			else
 			{
 				if (roll_chance_i(qPlus ? 60 : 10))
 				{
 					auto __rand = irand(0, 5);
 
-					if( (__rand==0) && (_pick_strengh == false)) { _pick_strengh = true; item.ItemStat[i].ItemStatType = 4; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 3 + 1) * _prop_mux; }
-					else if ((__rand == 1) && (_pick_agi == false)) { _pick_agi = true; item.ItemStat[i].ItemStatType = 3; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 3 + 1)* _prop_mux; }
-					else if ((__rand == 2) && (_pick_stmina == false)) { _pick_stmina = true; item.ItemStat[i].ItemStatType = 7; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 2 + 1)* _prop_mux; }
-					else if ((__rand == 3) && (_pick_intel == false)) { _pick_intel = true; item.ItemStat[i].ItemStatType = 5; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 2 + 1)* _prop_mux; }
-					else if ((__rand == 4) && (_pick_spirit == false)) { _pick_spirit = true; item.ItemStat[i].ItemStatType = 6; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 2 + 1)* _prop_mux; }
+					if( (__rand==0) && (_pick_strengh == false)) { _pick_strengh = true; item.ItemStat[i].ItemStatType = 4; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 5 + 1 + (_isLegend? 5: 0)) * _prop_mux; }
+					else if ((__rand == 1) && (_pick_agi == false)) { _pick_agi = true; item.ItemStat[i].ItemStatType = 3; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 5 + 1+(_isLegend ? 5 : 0))* _prop_mux; }
+					else if ((__rand == 2) && (_pick_stmina == false)) { _pick_stmina = true; item.ItemStat[i].ItemStatType = 7; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 3 + 1 + (_isLegend ? 8 : 0))* _prop_mux; }
+					else if ((__rand == 3) && (_pick_intel == false)) { _pick_intel = true; item.ItemStat[i].ItemStatType = 5; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 3 + 1 + (_isLegend ? 8 : 0))* _prop_mux; }
+					else if ((__rand == 4) && (_pick_spirit == false)) { _pick_spirit = true; item.ItemStat[i].ItemStatType = 6; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 3 + 1 + (_isLegend ? 8 : 0))* _prop_mux; }
 				}
 			}
 		}
@@ -4588,12 +4603,12 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		auto __randDelay = PickRandomValue(0, 0, 0, 0, 0, 0, 0, 100, 100, 100, 100, 100, 100, 200, 200, 300);
 		if (item.InventoryType == INVTYPE_WEAPON)
 		{
-			if (item.Delay > 2000)  item.Delay += __randDelay;
+			if (item.Delay > 1600)  item.Delay += __randDelay;
 			else item.Delay -= __randDelay;
 		}
 		else if (item.InventoryType == INVTYPE_2HWEAPON)
 		{
-			if (item.Delay > 3400)  item.Delay += __randDelay;
+			if (item.Delay > 3100)  item.Delay += __randDelay;
 			else item.Delay -= __randDelay;
 		}
 		/*

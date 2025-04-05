@@ -865,6 +865,30 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						}
 					}
 
+					//Check Mage
+					else if (player->GetClass() == CLASS_ROGUE)
+					{
+						//check if has dynamic fuel
+						if (player->HasSpell(31073))
+						{
+							int32 maxHealth = player->GetMaxHealth();
+							int32 curHealth = player->GetHealth();
+
+							int32 ratio = curHealth * 100 / maxHealth;
+
+							if (ratio < 30) ratio = 30;
+							else if (ratio > 100) ratio = 100;
+
+							ratio = (ratio - 29) * 2 - 1;
+
+							player->CastCustomSpell(player, 31074, ratio, ratio/2, {}, true, nullptr);
+						}
+						else if (player->HasAura(31074) && (!player->HasSpell(31073)))
+						{
+							player->RemoveAurasDueToSpell(31074);
+						}
+					}
+
 					//Check Druid
 					else if (player->GetClass() == CLASS_DRUID)
 					{
@@ -981,9 +1005,13 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 						if (_mapid == 0 || _mapid == 1)
 						{
-							if (player->HasAura(32095))
+							if (player->HasAura(32095) || player->HasAura(32084) || player->HasAura(32088) || player->HasAura(32080))
 							{
 								player->SetCheatFly(true, true);
+							}
+							else if (player->HasAura(32053)) //32053, the ghost grython
+							{
+								player->SetCheatFly(true, false);	//false means swift rider!
 							}
 							else
 							{
@@ -1028,7 +1056,16 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						if (m_caster->GetLevel() > 34 && unitTarget->GetLevel() > 34)	m_caster->CastSpell(unitTarget, 32069, true, nullptr);
 
 						//55 using the zandalar
-						if (m_caster->GetLevel() > 54 && unitTarget->GetLevel() > 54)	m_caster->CastSpell(unitTarget, 32067, true, nullptr);
+						if (m_caster->GetLevel() > 54 && unitTarget->GetLevel() > 54)	m_caster->CastSpell(unitTarget, 32067, true, nullptr);						
+						
+						//60 using the diremaul
+						if (m_caster->GetLevel() > 59 && unitTarget->GetLevel() > 59)
+						{
+							if(unitTarget->IsPlayer())
+								m_caster->CastSpell(unitTarget, unitTarget->ToPlayer()->GetClass() == CLASS_MAGE ? 22820 : 22818, true, nullptr);
+							else
+								m_caster->CastSpell(unitTarget, 22818, true, nullptr);
+						}
 					}
 
 					return;

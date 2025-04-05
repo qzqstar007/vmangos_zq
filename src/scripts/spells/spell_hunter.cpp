@@ -97,6 +97,33 @@ SpellScript* GetScript_HunterRefocus(SpellEntry const*)
     return new HunterRefocusScript();
 }
 
+
+//qzqstar, 250404, hunter far shot
+struct HunterFarShot : SpellScript
+{
+	void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+	{
+		if (effIdx == EFFECT_INDEX_0)
+		{
+			Player* pPlayer = spell->m_caster->ToPlayer();
+			Unit * target = spell->m_targets.getUnitTarget();
+
+			if ( (pPlayer) && (target) )
+			{
+				auto _yard = pPlayer->GetDistance2d(target);
+
+				spell->damage = pPlayer->GetTotalAttackPowerValue(RANGED_ATTACK) * _yard / 10;
+			}
+		}
+	}
+};
+
+SpellScript* GetScript_HunterFarShot(SpellEntry const*)
+{
+	return new HunterFarShot();
+}
+
+
 void AddSC_hunter_spell_scripts()
 {
     Script* newscript;
@@ -115,4 +142,9 @@ void AddSC_hunter_spell_scripts()
     newscript->Name = "spell_hunter_refocus";
     newscript->GetSpellScript = &GetScript_HunterRefocus;
     newscript->RegisterSelf();
+
+	newscript = new Script;
+	newscript->Name = "spell_hunter_farshot";
+	newscript->GetSpellScript = &GetScript_HunterFarShot;
+	newscript->RegisterSelf();
 }

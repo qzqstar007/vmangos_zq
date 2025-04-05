@@ -156,6 +156,45 @@ SpellScript* GetScript_PaladinArtOfWar(SpellEntry const*)
 }
 
 
+
+
+struct PaladinMartyrStrikeScript : SpellScript
+{
+	void OnAfterHit(Spell* spell) const final
+	{
+		if (spell->GetUnitTarget())
+		{
+			if (spell->m_caster->GetTypeId() != TYPEID_PLAYER)
+				return;
+
+			auto pPlayer = static_cast<Player*>(spell->m_caster);
+
+			int32 _dmgSelfo = pPlayer->GetTotalAttackPowerValue(BASE_ATTACK)/2;
+
+			if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+			{
+				if (pItem->GetProto()->InventoryType == INVTYPE_2HWEAPON) _dmgSelfo *=2;
+			}
+
+			if (_dmgSelfo < 20) _dmgSelfo = 20;
+
+			int32 _dmgSelf = urand(_dmgSelfo / 20, _dmgSelfo/10);
+			
+			if (pPlayer->GetHealth() < _dmgSelf) _dmgSelf = pPlayer->GetHealth() - 1;
+
+			pPlayer->SetHealth(pPlayer->GetHealth() - _dmgSelf);
+
+			return;
+		}
+	}
+};
+
+SpellScript* GetScript_PaladinMartyrStrike(SpellEntry const*)
+{
+	return new PaladinMartyrStrikeScript();
+}
+
+
 void AddSC_paladin_spell_scripts()
 {
     Script* newscript;
@@ -185,4 +224,8 @@ void AddSC_paladin_spell_scripts()
 	newscript->GetSpellScript = &GetScript_PaladinArtOfWar;
 	newscript->RegisterSelf();
 
+	newscript = new Script;
+	newscript->Name = "spell_paladin_martyr_strike";
+	newscript->GetSpellScript = &GetScript_PaladinMartyrStrike;
+	newscript->RegisterSelf();
 }

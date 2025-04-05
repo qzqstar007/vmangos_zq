@@ -41,6 +41,55 @@ SpellScript* GetScript_Meteor(SpellEntry const*)
     return new MeteorScript();
 }
 
+
+// 31055 - mage, - Meteor
+struct MageMeteorScript : public SpellScript
+{
+    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            uint32 count = 0;
+            for (const auto& ihit : spell->m_UniqueTargetInfo)
+                if (ihit.effectMask & (1 << effIdx))
+                    ++count;
+
+            if(count < 1) count = 1;
+
+            //mcaster unit
+            auto _player = static_cast<Player*>(spell->m_casterUnit);
+            
+            //get the mana points
+            auto _mana = _player->GetPower(POWER_MANA);
+            
+            //check mana
+            if(_mana < 100) _mana = 100;
+
+            //set the spell damage to be half of mana
+            spell->damage = _mana / count; // divide to all targets
+        }
+    }
+
+    void OnSuccessfulFinish(Spell* spell) const final  
+    {
+        //mcaster unit
+        auto _player = static_cast<Player*>(spell->m_casterUnit);
+        
+        //get the mana points
+        auto _mana = _player->GetPower(POWER_MANA) ;
+
+        //set half of mana to be mana points
+        _player->SetPower(POWER_MANA, _mana / 2);
+    }
+};
+
+SpellScript* GetScript_MageMeteor(SpellEntry const*)
+{
+    return new MageMeteorScript();
+}
+
+
+
 // 24933 - Cannon (Darkmoon Steam Tonk)
 struct DarkmoonSteamTonkCannonScript : public SpellScript
 {
@@ -71,4 +120,10 @@ void AddSC_special_spell_scripts()
     newscript->Name = "spell_darkmoon_steam_tonk_cannon";
     newscript->GetSpellScript = &GetScript_DarkmoonSteamTonkCannon;
     newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_mage_meteor";
+    newscript->GetSpellScript = &GetScript_MageMeteor;
+    newscript->RegisterSelf();
+
 }

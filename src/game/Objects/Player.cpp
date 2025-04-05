@@ -2811,9 +2811,10 @@ void Player::SetCheatFly(bool on, bool notify)
         SetCheatOption(PLAYER_CHEAT_FLY, on);
         SetFly(on);
 
-		UpdateSpeed(MOVE_SWIM, false, on ? 4.5f : 1.0f);
+		UpdateSpeed(MOVE_SWIM, false, on ? ( notify? 4.5f : 8.0f) : 1.0f);
 
-        if (notify && on)
+        //if (notify && on) //notify = false, trick, means swimming very fast!
+		if (on)
         {
             //GetSession()->SendNotification(on ? LANG_CHEAT_FLY_ON : LANG_CHEAT_FLY_OFF);
 			ChatHandler(this).PSendSysMessage(((std::string)(">>>|使用飞行坐骑时，请用鼠标控制方向，不要按空格|!<<<")).c_str());
@@ -7391,6 +7392,13 @@ void Player::_ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool appl
             m_weaponDamageCount[attType] = 1;
 
         if (!CanUseEquippedWeapon(attType))
+            return;
+
+        //qzqstar, 250405, ignore the weapon delay if shapeshifed
+        if (GetShapeshiftForm() == FORM_BEAR
+            || GetShapeshiftForm() == FORM_CAT
+            || GetShapeshiftForm() == FORM_DIREBEAR
+            )
             return;
 
         if (proto->Delay)
@@ -18858,18 +18866,19 @@ void Player::InitDataForForm(bool reapplyMods)
 		//qzqstar, todo 250207, modify the attack speed upon the weapon speed....
 		case FORM_CAT:
 		{
-			//qzqstar, get the 2H hand?
+			//qzqstar, 250404, get the 2H hand?
 			auto __attackTime = 1000; //set to default
-			/*
-			Item *item = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-			if (item && item->GetProto()->InventoryType == INVTYPE_2HWEAPON)
-			{
-			//Has Spell
-			__attackTime = item->GetProto()->
-			}*/
-
-			SetAttackTime(BASE_ATTACK, 1900, false);               //Speed 1
-			SetAttackTime(OFF_ATTACK, 1900, false);                //Speed 1
+			
+            if(HasSpell(31109))
+            {
+                Item *item = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+                if (item && item->GetProto()->InventoryType == INVTYPE_2HWEAPON)
+                {
+                    __attackTime = item->GetProto()->Delay / 2;
+                }
+            }
+			SetAttackTime(BASE_ATTACK, __attackTime, false);               //Speed 1
+			SetAttackTime(OFF_ATTACK, __attackTime, false);                //Speed 1
 
             if (GetPowerType() != POWER_ENERGY)
                 SetPowerType(POWER_ENERGY);
@@ -18878,8 +18887,22 @@ void Player::InitDataForForm(bool reapplyMods)
         case FORM_BEAR:
         case FORM_DIREBEAR:
         {
-            SetAttackTime(BASE_ATTACK, 3800, false);               //Speed 2.5
-            SetAttackTime(OFF_ATTACK, 3800, false);                //Speed 2.5
+            //qzqstar, 250404, get the 2H hand?
+			auto __attackTime = 3000; //set to default
+			
+            if(HasSpell(31109))
+            {
+                Item *item = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+                if (item && item->GetProto()->InventoryType == INVTYPE_2HWEAPON)
+                {
+                    __attackTime = item->GetProto()->Delay;
+                }
+            }
+			SetAttackTime(BASE_ATTACK, __attackTime, false);               //Speed 3.0 or weapons
+			SetAttackTime(OFF_ATTACK, __attackTime, false);                //Speed 1
+
+            //SetAttackTime(BASE_ATTACK, 3800, false);               //Speed 2.5
+            //SetAttackTime(OFF_ATTACK, 3800, false);                //Speed 2.5
 
             if (GetPowerType() != POWER_RAGE)
                 SetPowerType(POWER_RAGE);
@@ -21050,7 +21073,7 @@ uint32 Player::CalculateTalentsPoints() const
 	//#define  __SPELL_VIP        (32858)
 	//if (HasSpell(__SPELL_VIP))   talentPointsForLevel += 5;
 	if (HasSpell(30010))         talentPointsForLevel += 5; //shanshan special
-
+    if (HasSpell(30851))         talentPointsForLevel += 5; //collect bonus
 	return talentPointsForLevel;
 }
 

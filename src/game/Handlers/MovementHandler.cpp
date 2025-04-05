@@ -308,6 +308,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (pPlayerMover && pPlayerMover->IsBeingTeleported())
         return;
 
+
     /* extract packet */
     MovementInfo movementInfo = pPlayerMover ? pPlayerMover->m_movementInfo : MovementInfo();
     recvData >> movementInfo;
@@ -316,10 +317,24 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (!VerifyMovementInfo(movementInfo))
         return;
-        
-    //qzqstar, 250326, ignore the jump op code
-    if(pPlayerMover && pPlayerMover->HasCheatOption(PLAYER_CHEAT_FLY) && ( (opcode == MSG_MOVE_JUMP) || (movementInfo.HasMovementFlag(MOVEFLAG_JUMPING)) ) ) return;
+/*
+    // display debug info if enabled in config
+    if (pPlayerMover)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR,"[[[MOVE Test]]]: Player:%s, Received opcode %u with movement info: %u",
+            pPlayerMover->GetName(), opcode, movementInfo.GetMovementFlags());
+    }
 
+    //qzqstar, 250326, ignore the jump op code || (movementInfo.HasMovementFlag(MOVEFLAG_JUMPING)) )
+    
+    if( pPlayerMover && pPlayerMover->HasCheatOption(PLAYER_CHEAT_FLY) ) 
+    {
+        movementInfo.SetMovementFlags(MOVEFLAG_SWIMMING);
+        movementInfo.RemoveMovementFlag(MOVEFLAG_JUMPING);
+
+        if(opcode == MSG_MOVE_JUMP)  opcode = MSG_MOVE_START_FORWARD;
+    }*/
+        
     if (pPlayerMover)
     {
         if ((m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode)) ||
@@ -328,7 +343,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             return;
         }
     }
-  
+
     // This is required for proper movement extrapolation
     if (opcode == MSG_MOVE_JUMP)
         pMover->SetJumpInitialSpeed(7.95797334f);

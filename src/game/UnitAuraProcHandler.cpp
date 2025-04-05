@@ -1008,7 +1008,20 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     triggered_spell_id = 28810;
                     break;
                 }
-                // todo,qzqstar, 250320, priest, divine shield
+                // qzqstar, 250404, priest, healing self
+                // proc=16384, means healing only
+                case 31145:
+                {
+                    // heal amount
+                    basepoints[0] = int32(amount * 0.3f);
+                    if (!basepoints[0])
+                        return SPELL_AURA_PROC_FAILED;
+
+                    target = this;
+                    triggered_spell_id = 26170;
+                    break;
+                }
+
             }
             break;
         }
@@ -1298,6 +1311,17 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
 					basepoints[0] = procSpell->EffectBasePoints[0] / 2;
 					break;
 				}
+
+                // qzqstar, 250404, shaman, leading of the ancester
+                // proc=dmg, means mellen dmg only
+                case 31181:
+                {
+                    // heal amount
+                    basepoints[0] = 10 + int32(amount * 0.2f);
+                    target = this;
+                    triggered_spell_id = 23544;
+                    break;
+                }
             }
             break;
         }

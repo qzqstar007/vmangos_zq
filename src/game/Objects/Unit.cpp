@@ -6149,6 +6149,9 @@ bool Unit::IsNoWeaponShapeShift() const
 
 bool Unit::IsAttackSpeedOverridenShapeShift() const
 {
+	//qzqstar, check the druid spell nature weapons
+	if (IsPlayer() && this->ToPlayer()->HasSpell(31109)) return false;
+
     return IsAttackSpeedOverridenForm(GetShapeshiftForm());
 }
 
