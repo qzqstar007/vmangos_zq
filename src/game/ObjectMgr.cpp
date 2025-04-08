@@ -4381,7 +4381,7 @@ uint32 _PickRandomSpellId_qPlus(uint32 __spellid)
 
 
 //qzqstar, 250311, add for dynamic object create
-ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::string _customName, std::string Desc, uint32 luckydraw)
+ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::string _customName, std::string Desc, uint32 luckydraw, Classes _playerclass)
 {
 
 	//sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "custoname: %s  Desc:%s", customName.c_str(), Desc.c_str());
@@ -4430,20 +4430,69 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		_prop_mux = _prop_mux * PickRandomValue(1.2f, 1.3f, 1.05f, 1.02f, 1.1f, 1.1f, 1.05f, 1.0f, 1.0f, 0.95f, 1.15f, 1.12f, 1.1f, 0.98f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
-	//random choose the two item's 
-	bool _pick_strengh = false;	bool _pick_agi = false; bool _pick_stmina = false; bool _pick_intel = false; bool _pick_spirit = false;
+	//get the max value of two items
+	int32 _val_agi = 0; int32 _val_strengh = 0; int32 _val_stamina = 0; int32 _val_intel = 0; int32 _val_spirit = 0;
+	int32 _cnt_agi = 0; int32 _cnt_strengh = 0; int32 _cnt_stamina = 0; int32 _cnt_intel = 0; int32 _cnt_spirit = 0;
+
+	//init some values
+	_val_agi = roll_chance_i(70) ? urand(item1_proto->ItemLevel / 20, item1_proto->ItemLevel / 10) : 0;
+	_val_strengh = roll_chance_i(70) ? urand(item1_proto->ItemLevel / 20, item1_proto->ItemLevel / 10) : 0;
+	_val_stamina = roll_chance_i(70) ? urand(item1_proto->ItemLevel / 12, item1_proto->ItemLevel / 6) : 0;
+	_val_intel = roll_chance_i(70) ? urand(item1_proto->ItemLevel / 12, item1_proto->ItemLevel / 6) : 0;
+	_val_spirit = roll_chance_i(70) ? urand(item1_proto->ItemLevel / 12, item1_proto->ItemLevel / 6) : 0;
+
+	//check the player class and do some init
+	switch (_playerclass)
+	{
+	case CLASS_WARRIOR:	
+		_val_stamina *= frand(1.1f, 1.5f);
+	case CLASS_ROGUE:
+		_val_agi *= frand(1.1f, 1.4f); _val_strengh *= frand(1.1f, 1.4f);
+		_val_intel = 0; _val_spirit = 0; break;
+
+	case CLASS_HUNTER:
+		_val_strengh = 0;
+		_val_agi *= frand(1.5f, 2.1f);
+	case CLASS_PALADIN:	
+	case CLASS_SHAMAN:
+	case CLASS_DRUID:		
+		_val_agi /= frand(1.1f, 1.3f); _val_strengh /= frand(1.1f, 1.3f); _val_stamina *= frand(0.9f, 1.5f); _val_intel /= 1.1f; _val_spirit /= 1.1f; break;
+
+	case CLASS_MAGE:
+		_val_stamina = 0;
+		_val_intel *= frand(1.1f, 1.3f);
+	case CLASS_WARLOCK:
+		_val_stamina *= frand(1.1f, 1.3f);
+	case CLASS_PRIEST:
+		 _val_spirit *= frand(1.1f, 1.6f);
+		 _val_intel *= frand(1.1f, 1.3f);
+		 _val_agi = 0; _val_strengh = 0; break;
+	}
+
+
 	for (int i = 0; i < 5; i++)
 	{
 		switch (item1_proto->ItemStat[i].ItemStatType)
 		{
-		case 3:	_pick_agi = true;	break;
-		case 4:	_pick_strengh = true;	break;
-		case 7:	_pick_stmina = true;	break;
-		case 5:	_pick_intel = true;		break;
-		case 6:	_pick_spirit = true;	break;
+		case 3:	if (item1_proto->ItemStat[i].ItemStatValue) _val_agi += item1_proto->ItemStat[i].ItemStatValue ;		_cnt_agi++;  break;
+		case 4:	if (item1_proto->ItemStat[i].ItemStatValue) _val_strengh += item1_proto->ItemStat[i].ItemStatValue;	_cnt_strengh++;	break;
+		case 7:	if (item1_proto->ItemStat[i].ItemStatValue) _val_stamina += item1_proto->ItemStat[i].ItemStatValue;	_cnt_stamina++;	break;
+		case 5:	if (item1_proto->ItemStat[i].ItemStatValue) _val_intel += item1_proto->ItemStat[i].ItemStatValue;	_cnt_intel++;	break;
+		case 6:	if (item1_proto->ItemStat[i].ItemStatValue) _val_spirit += item1_proto->ItemStat[i].ItemStatValue;	_cnt_spirit++;	break;
+			default:break;
+		}
+
+		switch (item2_proto->ItemStat[i].ItemStatType)
+		{
+		case 3:	if (item2_proto->ItemStat[i].ItemStatValue) _val_agi += item2_proto->ItemStat[i].ItemStatValue * 0.3;		_cnt_agi++;		break;
+		case 4:	if (item2_proto->ItemStat[i].ItemStatValue) _val_strengh += item2_proto->ItemStat[i].ItemStatValue* 0.3;	_cnt_strengh++; break;
+		case 7:	if (item2_proto->ItemStat[i].ItemStatValue) _val_stamina += item2_proto->ItemStat[i].ItemStatValue* 0.3;	_cnt_stamina++; break;
+		case 5:	if (item2_proto->ItemStat[i].ItemStatValue) _val_intel += item2_proto->ItemStat[i].ItemStatValue* 0.3;		_cnt_intel++;	break;
+		case 6:	if (item2_proto->ItemStat[i].ItemStatValue) _val_spirit += item2_proto->ItemStat[i].ItemStatValue* 0.3;		_cnt_spirit++;	break;
 		default:break;
 		}
 	}
+
 	
 	bool qPlus = false;
 	float _exceedFloat = 3.0f;
@@ -4577,26 +4626,46 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		}
 		else
 		{
-			item.ItemStat[i].ItemStatType = item1_proto->ItemStat[i].ItemStatType;
-			if ((item.ItemStat[i].ItemStatType == 3) || (item.ItemStat[i].ItemStatType == 4))
-				item.ItemStat[i].ItemStatValue = qPlus ? (item1_proto->ItemStat[i].ItemStatValue + (_isLegend ? 12 : 0)) * _prop_mux * 1.1f : item1_proto->ItemStat[i].ItemStatValue * _prop_mux;
-			else if ((item.ItemStat[i].ItemStatType > 4) && (item.ItemStat[i].ItemStatType < 8))
-				item.ItemStat[i].ItemStatValue = qPlus ? (item1_proto->ItemStat[i].ItemStatValue + (_isLegend ? 12 : 0)) * _prop_mux * _prop_mux * 1.1f : item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
-			else
+			//i=0--4
+			if (_val_agi)
 			{
-				if (roll_chance_i(qPlus ? 60 : 10))
-				{
-					auto __rand = irand(0, 5);
-
-					if( (__rand==0) && (_pick_strengh == false)) { _pick_strengh = true; item.ItemStat[i].ItemStatType = 4; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 5 + 1 + (_isLegend? 5: 0)) * _prop_mux; }
-					else if ((__rand == 1) && (_pick_agi == false)) { _pick_agi = true; item.ItemStat[i].ItemStatType = 3; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 15 + 1, item1_proto->ItemLevel / 5 + 1+(_isLegend ? 5 : 0))* _prop_mux; }
-					else if ((__rand == 2) && (_pick_stmina == false)) { _pick_stmina = true; item.ItemStat[i].ItemStatType = 7; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 3 + 1 + (_isLegend ? 8 : 0))* _prop_mux; }
-					else if ((__rand == 3) && (_pick_intel == false)) { _pick_intel = true; item.ItemStat[i].ItemStatType = 5; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 3 + 1 + (_isLegend ? 8 : 0))* _prop_mux; }
-					else if ((__rand == 4) && (_pick_spirit == false)) { _pick_spirit = true; item.ItemStat[i].ItemStatType = 6; item.ItemStat[i].ItemStatValue = irand(item1_proto->ItemLevel / 12 + 1, item1_proto->ItemLevel / 3 + 1 + (_isLegend ? 8 : 0))* _prop_mux; }
-				}
+				item.ItemStat[i].ItemStatType = 3;
+				item.ItemStat[i].ItemStatValue = qPlus ? (_val_agi + irand(1, (2 + 5 * (_isLegend? 3:1) ) ) ) * _prop_mux * 1.05f : _val_agi * _prop_mux;
+				if (_cnt_agi > 1) item.ItemStat[i].ItemStatValue *= 0.9f;
+				_val_agi = 0;
+			}
+			else if (_val_strengh)
+			{
+				item.ItemStat[i].ItemStatType = 4;
+				item.ItemStat[i].ItemStatValue = qPlus ? (_val_strengh + irand(1, (2 + 5 * (_isLegend ? 3 : 1)))) * _prop_mux * 1.05f : _val_strengh * _prop_mux;
+				if (_cnt_strengh > 1) item.ItemStat[i].ItemStatValue *= 0.9f;
+				_val_strengh = 0;
+			}
+			else if (_val_stamina)
+			{
+				item.ItemStat[i].ItemStatType = 7;
+				item.ItemStat[i].ItemStatValue = qPlus ? (_val_stamina + irand(1, (2 + 9 * (_isLegend ? 3 : 1)))) * _prop_mux * 1.05f : _val_stamina * _prop_mux;
+				if (_cnt_stamina > 1) item.ItemStat[i].ItemStatValue *= 0.9f;
+				_val_stamina = 0;
+			}
+			else if (_val_intel)
+			{
+				item.ItemStat[i].ItemStatType = 5;
+				item.ItemStat[i].ItemStatValue = qPlus ? (_val_intel + irand(1, (2 + 9 * (_isLegend ? 3 : 1)))) * _prop_mux * 1.05f : _val_intel * _prop_mux;
+				if (_cnt_intel > 1) item.ItemStat[i].ItemStatValue *= 0.9f;
+				_val_intel = 0;
+			}
+			else if (_val_spirit)
+			{
+				item.ItemStat[i].ItemStatType = 6;
+				item.ItemStat[i].ItemStatValue = qPlus ? (_val_spirit + irand(1, (2 + 9 * (_isLegend ? 3 : 1)))) * _prop_mux * 1.05f : _val_spirit * _prop_mux;
+				if (_cnt_spirit > 1) item.ItemStat[i].ItemStatValue *= 0.9f;
+				_val_spirit = 0;
 			}
 		}
 	}
+
+
 	item.Delay = item1_proto->Delay;
 	if (qPlus)
 	{

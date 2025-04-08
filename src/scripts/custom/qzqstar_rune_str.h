@@ -36,14 +36,14 @@ typedef struct __rune_spell_menu {
 const Rune_Spell_Menu_t _Spells_Menu_Warrior[RUNE_SPELLS_NUM] = 	//Warrior
 {
 	/* 0 */{ 0, 31021, __XSTR("无畏冲锋"), __XSTR("冲锋伤害+.") },
-	/* 1 */{ 0, 31023, __XSTR("乘胜追击"), __XSTR("击杀回血.") },
+	/* 1 */{ 0, 31023, __XSTR("破坏能手"), __XSTR("暴击伤害+") },
 	/* 2 */{ 0, 31025, __XSTR("狂暴怒火"), __XSTR("狂暴提升伤.") },
-	/* 3 */{ 0, 31027, __XSTR("武器专家"), __XSTR("双手爆伤+.") },
+	/* 3 */{ 0, 31027, __XSTR("陷阵之志"), __XSTR("血低增伤.") },
 	/* 4 */{ 0, 31029, __XSTR("狂暴回复"), __XSTR("怒气转生命.") },
 	/* 5 */{ 0, 31031, __XSTR("致命猛击"), __XSTR("几率瞬猛击.") },
 	/* 6 */{ 0, 31033, __XSTR("坚不可摧"), __XSTR("盾牌免伤.") },
 	/* 7 */{ 0, 31035, __XSTR("致命重伤"), __XSTR("致命重伤.") },
-	/* 8 */{ 0, 31037, __XSTR("血之气息|"), __XSTR("血之气息|") }
+	/* 8 */{ 0, 31037, __XSTR("血之气息|"), __XSTR("撕裂压制|") }
 };
 
 const Rune_Spell_Menu_t _Spells_Menu_Mage[RUNE_SPELLS_NUM] = 	//Mage

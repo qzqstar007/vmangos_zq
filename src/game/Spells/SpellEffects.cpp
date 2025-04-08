@@ -807,7 +807,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					//Check warrior
 					if (player->GetClass() == CLASS_WARRIOR)
 					{
-						//1. check if Has spell 
+						//1. check if Has spell - defense
 						if (player->HasSpell(31033) && !(player->HasAura(31034)))
 						{
 							//get offhand item
@@ -819,6 +819,28 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 							//remove if hasn't spell or not equiped a shield
 							if ((!player->HasSpell(31033)) || (!pOffHandItem) || (pOffHandItem && pOffHandItem->GetProto()->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD))
 								player->RemoveAurasDueToSpell(31034);
+						}
+
+						//2. check the aspiration of battle
+						// 31027, 31028
+						// less health, more damage, max damage 33%, -16% void damage
+						if (player->HasSpell(31027))
+						{
+							int32 maxHealth = player->GetMaxHealth();
+							int32 curHealth = player->GetHealth();
+
+							int32 ratio = curHealth * 100 / maxHealth;
+
+							if (ratio > 100) ratio = 100;
+
+							//set to real
+							ratio = (100 - ratio) / 3;
+
+							player->CastCustomSpell(player, 31028, ratio, 0 - ratio, 0, true, nullptr);
+						}
+						else if (player->HasAura(31028) && (!player->HasSpell(31027)))
+						{
+							player->RemoveAurasDueToSpell(31028);
 						}
 					}
 

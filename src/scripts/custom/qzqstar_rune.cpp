@@ -1492,7 +1492,7 @@ void SendDefaultMenu_Mode(Player *player, Creature *_Creature, uint32 action)
 			//const int _eqLevelEach[] = { 20, 40, 55, 70 };	//Second Stage
 			//const int _eqLevelEach[] = { 18, 35, 60, 70 };	//3rd Stage
 			//const int _eqLevelEach[] = { 15, 30, 52, 80 };		//4th Stage
-			const int _eqLevelEach[] = { 10, 20, 40, 75 };		//4th Stage
+			const int _eqLevelEach[] = { 10, 20, 40, 65 };		//4th Stage
 			
 			auto __pick = pLevel < 26 ? 0 : pLevel < 36 ? 1 : pLevel < 46 ? 2 : 3;
 			int32 _needEQLevel = 20 * _eqLevelEach[__pick];
@@ -2277,7 +2277,7 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 
 			//create the new item
 			if (_mustHit) player->M_Spare_Data2 = 9999;
-			auto newItem = sObjectMgr.DynamicGenerateItem(pItem, pItem2, item_new_text, item_desc, player->M_Spare_Data2);
+			auto newItem = sObjectMgr.DynamicGenerateItem(pItem, pItem2, item_new_text, item_desc, player->M_Spare_Data2, (Classes)player->GetClass());
 
 			//Set can be used by creator
 			Item *ppItem = player->AddItem(newItem->ItemId);

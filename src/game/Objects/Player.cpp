@@ -15497,7 +15497,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
 	//qzqstar, 250227,  modify the 5 modes xp, thus exertnal xp gain can be set to 1.
 	auto __xpRate = 0.5f;
-	if(GetLevel() > 1) __xpRate = 1.5f;
+	//if(GetLevel() > 1) __xpRate = 1.5f; startup server begins
+	if (GetLevel() > 1) __xpRate = 3.5f;
 
 	if (HasSpell(__MODE_KILLER))     __xpRate = 2.0f;
 	if (HasSpell(__MODE_ZQ))         __xpRate = 1.0f;
@@ -16285,6 +16286,9 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
 
     uint32 slot = 0;
 
+    //qzqstar, 250405, calculate the quest counts of rewarded.
+    uint32 __quest_count = 0;
+
     ////                                                                     0      1       2         3         4      5           6           7           8           9            10           11           12           13
     //std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT quest, status, rewarded, explored, timer, mob_count1, mob_count2, mob_count3, mob_count4, item_count1, item_count2, item_count3, item_count4, reward_choice FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
 
@@ -16366,6 +16370,9 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
 
                 if (questStatusData.m_rewarded)
                 {
+                    //qzqstar, 250405, calculate the quest counts of rewarded.
+                    if (!pQuest->IsRepeatable())
+                        __quest_count++;
                     questStatusData.m_reward_choice = fields[13].GetUInt32();
                     LearnQuestRewardedSpells(pQuest); // learn rewarded spell if unknown
                 }
@@ -16374,6 +16381,16 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
             }
         }
         while (result->NextRow());
+    }
+
+    //console log out using sLog
+    if (__quest_count > 0)
+    {
+        std::stringstream ss;
+        ss << "[Quest Counter] Player " << GetName() << " has finished " << __quest_count << " Quests.";
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, ss.str().c_str());
+
+        //todo, add to achievements
     }
 
     // clear quest log tail
