@@ -19,14 +19,38 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef _QZQSTAR_CUSTOM_H
-#define _QZQSTAR_CUSTOM_H
+#ifndef _QZQSTAR_DB_H
+#define _QZQSTAR_DB_H
 
 
-#define	__STR(x)		((std::string)(x)).c_str()
+typedef struct _level_QuestID {
+	int32 reqLevel;
+	int32 questID;
+	//std::string questTitle;
+}Level_QuestID_t;
+
+Level_QuestID_t DBHelper_GetQuestByLevel(Player *);
+
+
+typedef struct _level_ItemMatsID {
+	int32 reqLevel;
+	int32 itemID;
+	//std::string itemName;
+}Level_ItemMatsID_t;
+
+Level_ItemMatsID_t DBHelper_GetItemMatsByLevel(Player *, int32);
+
+
+typedef struct _level_ItemEqID {
+	int32 reqLevel;
+	int32 itemID;
+	//std::string itemName;
+}Level_ItemEqID_t;
+
+Level_ItemEqID_t DBHelper_GetItemEqByLevel(Player *, int32);
 
 
 
 
-#endif	//_QZQSTAR_CUSTOM_H
+#endif	//_QZQSTAR_DB_H
 

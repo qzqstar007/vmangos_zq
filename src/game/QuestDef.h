@@ -206,12 +206,14 @@ class Quest
     friend class ObjectMgr;
     public:
         Quest(Field* questRecord);
+		Quest(const Quest& pQuest);
         uint32 XPValue(Player* pPlayer) const;
 
         uint32 GetQuestFlags() const { return m_QuestFlags; }
         bool HasQuestFlag(QuestFlags flag) const { return (m_QuestFlags & flag) != 0; }
         bool HasSpecialFlag(QuestSpecialFlags flag) const { return (m_SpecialFlags & flag) != 0; }
         void SetSpecialFlag(QuestSpecialFlags flag) { m_SpecialFlags |= flag; }
+		QuestSpecialFlags GetSpecialFlag() const { return (QuestSpecialFlags)m_SpecialFlags; }
 
         // table data accessors:
         uint32 GetQuestId() const { return QuestId; }

@@ -173,6 +173,135 @@ Quest::Quest(Field* questRecord)
     }
 }
 
+Quest::Quest(const Quest& pQuest)
+{
+	QuestId = pQuest.QuestId;
+	QuestMethod = pQuest.QuestMethod;
+	ZoneOrSort = pQuest.ZoneOrSort;
+	MinLevel = pQuest.MinLevel;
+	MaxLevel = pQuest.MaxLevel;
+	QuestLevel = pQuest.QuestLevel;
+	Type = pQuest.Type;
+	RequiredClasses = pQuest.RequiredClasses;
+	RequiredRaces = pQuest.RequiredRaces;
+	RequiredSkill = pQuest.RequiredSkill;
+	RequiredSkillValue = pQuest.RequiredSkillValue;
+	RequiredCondition = pQuest.RequiredCondition;
+	RepObjectiveFaction = pQuest.RepObjectiveFaction;
+	RepObjectiveValue = pQuest.RepObjectiveValue;
+	RequiredMinRepFaction = pQuest.RequiredMinRepFaction;
+	RequiredMinRepValue = pQuest.RequiredMinRepValue;
+	RequiredMaxRepFaction = pQuest.RequiredMaxRepFaction;
+	RequiredMaxRepValue = pQuest.RequiredMaxRepValue;
+	SuggestedPlayers = pQuest.SuggestedPlayers;
+	LimitTime = pQuest.LimitTime;
+	m_QuestFlags = pQuest.m_QuestFlags;
+	m_SpecialFlags = pQuest.m_SpecialFlags;
+	PrevQuestId = pQuest.PrevQuestId;
+	NextQuestId = pQuest.NextQuestId;
+	ExclusiveGroup = pQuest.ExclusiveGroup;
+	BreadcrumbForQuestId = pQuest.BreadcrumbForQuestId;
+	NextQuestInChain = pQuest.NextQuestInChain;
+	SrcItemId = pQuest.SrcItemId;
+	SrcItemCount = pQuest.SrcItemCount;
+	SrcSpell = pQuest.SrcSpell;
+	Title = pQuest.Title;
+	Details = pQuest.Details;
+	Objectives = pQuest.Objectives;
+	OfferRewardText = pQuest.OfferRewardText;
+	RequestItemsText = pQuest.RequestItemsText;
+	EndText = pQuest.EndText;
+
+	for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+		ObjectiveText[i] = pQuest.ObjectiveText[i];
+
+	for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+		ReqItemId[i] = pQuest.ReqItemId[i];
+
+	for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+		ReqItemCount[i] = pQuest.ReqItemCount[i];
+
+	for (int i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
+		ReqSourceId[i] = pQuest.ReqSourceId[i];
+
+	for (int i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
+		ReqSourceCount[i] = pQuest.ReqSourceCount[i];
+
+	for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+		ReqCreatureOrGOId[i] = pQuest.ReqCreatureOrGOId[i];
+
+	for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+		ReqCreatureOrGOCount[i] = pQuest.ReqCreatureOrGOCount[i];
+
+	for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+		ReqSpell[i] = pQuest.ReqSpell[i];
+
+	for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+		RewChoiceItemId[i] = pQuest.RewChoiceItemId[i];
+
+	for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+		RewChoiceItemCount[i] = pQuest.RewChoiceItemCount[i];
+
+	for (int i = 0; i < QUEST_REWARDS_COUNT; ++i)
+		RewItemId[i] = pQuest.RewItemId[i];
+
+	for (int i = 0; i < QUEST_REWARDS_COUNT; ++i)
+		RewItemCount[i] = pQuest.RewItemCount[i];
+
+	for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
+		RewRepFaction[i] = pQuest.RewRepFaction[i];
+
+	for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
+		RewRepValue[i] = pQuest.RewRepValue[i];
+
+	RewRepSpilloverMask = pQuest.RewRepSpilloverMask;
+	RewXP = pQuest.RewXP;
+	RewOrReqMoney = pQuest.RewOrReqMoney;
+	RewMoneyMaxLevel = pQuest.RewMoneyMaxLevel;
+	RewSpell = pQuest.RewSpell;
+	RewSpellCast = pQuest.RewSpellCast;
+	RewMailTemplateId = pQuest.RewMailTemplateId;
+	RewMailDelaySecs = pQuest.RewMailDelaySecs;
+	RewMailMoney = pQuest.RewMailMoney;
+	PointMapId = pQuest.PointMapId;
+	PointX = pQuest.PointX;
+	PointY = pQuest.PointY;
+	PointOpt = pQuest.PointOpt;
+
+	for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
+		DetailsEmote[i] = pQuest.DetailsEmote[i];
+
+	for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
+		DetailsEmoteDelay[i] = pQuest.DetailsEmoteDelay[i];
+
+	IncompleteEmote = pQuest.IncompleteEmote;
+	CompleteEmote = pQuest.CompleteEmote;
+
+	for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
+		OfferRewardEmote[i] = pQuest.OfferRewardEmote[i];
+
+	for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
+		OfferRewardEmoteDelay[i] = pQuest.OfferRewardEmoteDelay[i];
+
+	QuestStartScript = pQuest.QuestStartScript;
+	QuestCompleteScript = pQuest.QuestCompleteScript;
+
+	m_isActive = pQuest.m_isActive;
+
+	if (QuestMethod & QUEST_METHOD_DISABLED)
+	{
+		// Leave invalid entries to be caught by ObjectMgr
+		if (QuestMethod <= QUEST_METHOD_LIMIT)
+			QuestMethod = QUEST_METHOD_DISABLED;
+		m_isActive = false;
+	}
+
+	m_reqitemscount = pQuest.m_reqitemscount;
+	m_reqCreatureOrGOcount = pQuest.m_reqCreatureOrGOcount;
+	m_rewitemscount = pQuest.m_rewitemscount;
+	m_rewchoiceitemscount = pQuest.m_rewchoiceitemscount;
+}
+
 uint32 Quest::XPValue(Player* pPlayer) const
 {
     if (pPlayer)

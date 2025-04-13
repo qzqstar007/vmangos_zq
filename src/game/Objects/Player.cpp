@@ -86,6 +86,8 @@
 
 #include "Chat.h"
 
+#include "QzqstarAchievements.h"
+
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
@@ -13499,8 +13501,9 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
         if ((bg->GetTypeID() == BATTLEGROUND_AV) && (questEnder->GetTypeId() == TYPEID_UNIT))
             ((BattleGroundAV*)bg)->HandleQuestComplete(questEnder->ToUnit(), pQuest->GetQuestId(), this);
 
-    if (pQuest->GetRewChoiceItemsCount() > 0)
+	if (true)
     {
+		/*
         if (uint32 itemId = pQuest->RewChoiceItemId[reward])
         {
             ItemPosCountVec dest;
@@ -13520,12 +13523,41 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
 						item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
 				}
             }
-        }
+        }*/
+
+		//qzqstar, 240413, fix the RewItems counts = 4
+		for (size_t i = 0; i < 4; i++)
+		{
+			if (uint32 itemId = pQuest->RewChoiceItemId[i])
+			{
+				ItemPosCountVec dest;
+				if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewChoiceItemCount[i]) == EQUIP_ERR_OK)
+				{
+					Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+
+					//qzqstar, 241208, try fix errors..
+					if (item && (item->GetProto()))
+					{
+						//old statements
+						SendNewItem(item, pQuest->RewChoiceItemCount[i], true, false, false, false);
+
+						//qzqstar, 241205, zq mode, make the task item suitable for you
+						// set the "Crafted by ..." property of the item
+						if (HasSpell(__MODE_ZQ) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
+							item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
+					}
+				}
+			}
+		}
     }
 
-    if (pQuest->GetRewItemsCount() > 0)
+	//qzqstar, set to true always
+    //if (pQuest->GetRewItemsCount() > 0)
+    if (true)
     {
-        for (uint32 i = 0; i < pQuest->GetRewItemsCount(); ++i)
+		//qzqstar, 240413, fix the RewItems counts = 4
+        //for (uint32 i = 0; i < pQuest->GetRewItemsCount(); ++i)
+        for (uint32 i = 0; i < 4; ++i)
         {
             if (uint32 itemId = pQuest->RewItemId[i])
             {
@@ -15638,6 +15670,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 			, true);
 	}
 
+    //qzqstar, 250411, load from achievements
+    uint32 __count = sQZAchievements.Load(this);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Player:%s Loaded %u Achievements records.", GetName(), __count);
+
 
     // restore remembered power/health values (but not more max values)
     uint32 savedhealth = fields[50].GetUInt32();
@@ -17120,6 +17156,9 @@ void Player::SaveToDB(bool online, bool force)
     GetSession()->SaveTutorialsData();                      // changed only while character in game
 
     CharacterDatabase.CommitTransaction();
+
+	//qzqstar, 250411, save the achievements as well
+	sQZAchievements.Save(this);
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
