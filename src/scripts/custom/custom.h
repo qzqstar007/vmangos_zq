@@ -15,12 +15,14 @@
  */ 
 
 void AddSC_custom_creatures();
-//void AddSC_zero_creatures();
 
 // used to call all scripts
 void AddSC_zero_scripts();
+<<<<<<< HEAD
 
 
 void AddSC_qzqstar_rune_creatures();
 void AddSC_qzqstar_vip_creatures();
 void AddSC_qzqstar_summon_boss();
+=======
+>>>>>>> d7ac87225b87d0748a818fb6dfbea5d41feec910

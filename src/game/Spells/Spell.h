@@ -389,6 +389,7 @@ class Spell
 
         bool CheckTarget(Unit* target, SpellEffectIndex eff);
         bool CanAutoCast(Unit* target);
+        PetTameFailureReason CheckTamingSpell(Player* caster, bool gm);
 
         static void SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result);
         void SendCastResult(SpellCastResult result);
@@ -668,7 +669,9 @@ class Spell
 
         uint32 m_spellState = SPELL_STATE_NULL;
         uint32 m_timer = 0;
+    public:
         uint32 m_triggeredByAuraBasePoints = 0;
+    protected:
 
         Position m_castPosition;
         bool m_IsTriggeredSpell = false;
@@ -676,7 +679,9 @@ class Spell
         // if need this can be replaced by Aura copy
         // we can't store original aura link to prevent access to deleted auras
         // and in same time need aura data and after aura deleting.
+    public:
         SpellEntry const* m_triggeredByAuraSpell = nullptr;
+    protected:
 
         struct ExecuteLogInfo
         {
