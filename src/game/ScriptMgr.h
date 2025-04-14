@@ -165,14 +165,12 @@ struct SpellScript
     virtual void OnSummon(Spell* /*spell*/, Creature* /*summon*/) const {}
     // called after summoning a gameobject
     virtual void OnSummon(Spell* /*spell*/, GameObject* /*summon*/) const {}
-<<<<<<< HEAD
-
 	// qzqstar, 250308, gossip for spell... called when by dummy gossip etc...
 	virtual void OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action) const {}
-=======
+
     // called from dispel effect handler if we successfully remove a debuff
     virtual void OnSuccessfulDispel(Spell* /*spell*/, SpellEffectIndex /*effIdx*/) const {}
->>>>>>> d7ac87225b87d0748a818fb6dfbea5d41feec910
+
 };
 
 struct AuraScript
