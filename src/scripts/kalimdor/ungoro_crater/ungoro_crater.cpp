@@ -212,22 +212,8 @@ struct npc_ringoAI : public FollowerAI
         if (!HasFollowState(STATE_FOLLOW_POSTEVENT))
         {
             SetFollowPaused(true);
-
-            switch (urand(0, 3))
-            {
-                case 0:
-                    DoScriptText(SAY_FAINT_1, m_creature);
-                    break;
-                case 1:
-                    DoScriptText(SAY_FAINT_2, m_creature);
-                    break;
-                case 2:
-                    DoScriptText(SAY_FAINT_3, m_creature);
-                    break;
-                case 3:
-                    DoScriptText(SAY_FAINT_4, m_creature);
-                    break;
-            }
+            uint32 randomText = PickRandomValue(SAY_FAINT_1, SAY_FAINT_2, SAY_FAINT_3, SAY_FAINT_4);
+            DoScriptText(randomText, m_creature);
         }
 
         //what does actually happen here? Emote? Aura?
@@ -241,21 +227,8 @@ struct npc_ringoAI : public FollowerAI
         if (HasFollowState(STATE_FOLLOW_POSTEVENT))
             return;
 
-        switch (urand(0, 3))
-        {
-            case 0:
-                DoScriptText(SAY_WAKE_1, m_creature);
-                break;
-            case 1:
-                DoScriptText(SAY_WAKE_2, m_creature);
-                break;
-            case 2:
-                DoScriptText(SAY_WAKE_3, m_creature);
-                break;
-            case 3:
-                DoScriptText(SAY_WAKE_4, m_creature);
-                break;
-        }
+        uint32 randomText = PickRandomValue(SAY_WAKE_1, SAY_WAKE_2, SAY_WAKE_3, SAY_WAKE_4);
+        DoScriptText(randomText, m_creature);
 
         SetFollowPaused(false);
     }
@@ -429,7 +402,7 @@ struct mob_captured_felwood_oozeAI : public ScriptedAI
         if (type == FOLLOW_MOTION_TYPE && !mergeDone)
         {
             if (Creature* primalOoze = m_creature->FindNearestCreature(NPC_PRIMAL_OOZE, 5.0f))
-                if (DoCastSpellIfCan(primalOoze, SPELL_MERGING_OOZES))
+                if (DoCastSpellIfCan(primalOoze, SPELL_MERGING_OOZES) == CAST_OK)
                     mergeDone = true;
         }
     }
@@ -942,7 +915,7 @@ CreatureAI* GetAI_npc_simone_the_inconspicuous(Creature* pCreature)
 // 23206 - Chain Lightning (Simone the Seductress)
 struct SimoneSeductressChainLightningScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -950,6 +923,7 @@ struct SimoneSeductressChainLightningScript : public SpellScript
             if (spell->GetUnitTarget()->HasAura(20190))
                 spell->damage *= 0.25;
         }
+        return true;
     }
 };
 

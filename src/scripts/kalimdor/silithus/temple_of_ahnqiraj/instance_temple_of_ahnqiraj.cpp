@@ -427,6 +427,13 @@ void instance_temple_of_ahnqiraj::Load(char const* chrIn)
     if (m_auiEncounter[TYPE_TWINS] == DONE) {
         m_twinsIntroDialogue.SetDone();
     }
+
+    // Fix Ouro after sever crash / restart
+    if (m_auiEncounter[TYPE_OURO] != DONE)
+    {
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "AQ40: Ouro spawn trigger will be restored in 3 seconds!");
+        m_uiRestoreOuroSpawnTriggerTimer = 3000;
+    }
     
     OUT_LOAD_INST_DATA_COMPLETE;
 }
@@ -462,8 +469,7 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     if (!pCthun)
         return;
 
-    std::list<Player*> candidates;
-    std::list<Player*>::iterator j;
+    std::vector<Player*> candidates;
     Map::PlayerList const& PlayerList = GetMap()->GetPlayers();
     if (PlayerList.isEmpty())
         return;
@@ -472,10 +478,12 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     {
         if (Player* player = itr.getSource())
         {
-            if (!player->IsDead()) {
+            if (!player->IsDead())
+            {
                 auto find_it = std::find_if(cthunWhisperMutes.begin(), cthunWhisperMutes.end(), 
                     [player](std::pair<ObjectGuid, uint32> const& e) {return e.first == player->GetObjectGuid(); });
-                if (find_it == cthunWhisperMutes.end()) {
+                if (find_it == cthunWhisperMutes.end())
+                {
                     candidates.push_back(player);
                 }
             }
@@ -485,13 +493,12 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     if (candidates.empty())
         return;
 
-    j = candidates.begin();
-    std::advance(j, urand(0, candidates.size() - 1));
-    Player* targetPlayer = *j;
+    Player* targetPlayer = SelectRandomContainerElement(candidates);
+
     // ToDo: also cast the C'thun Whispering charm spell - requires additional research
     DoScriptText(irand(SAY_CTHUN_WHISPER_8, SAY_CTHUN_WHISPER_1), pCthun, targetPlayer);
 
-    cthunWhisperMutes.push_back(std::make_pair(targetPlayer->GetGUID(), CTHUN_WHISPER_MUTE_DURATION));
+    cthunWhisperMutes.emplace_back(targetPlayer->GetGUID(), CTHUN_WHISPER_MUTE_DURATION);
 }
 
 void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
@@ -502,6 +509,19 @@ void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
     UpdateCThunWhisper(uiDiff);
 
     UpdateStomachOfCthun(uiDiff);
+
+    // Fix Ouro after sever crash / restart
+    if (m_uiRestoreOuroSpawnTriggerTimer)
+    {
+        if (m_uiRestoreOuroSpawnTriggerTimer < uiDiff)
+        {
+            RestoreOuroSpawnTrigger();
+        }
+        else
+        {
+            m_uiRestoreOuroSpawnTriggerTimer -= uiDiff;
+        }
+    }
 }
 
 bool instance_temple_of_ahnqiraj::TwinsDialogueStartedOrDone()
@@ -542,7 +562,7 @@ void instance_temple_of_ahnqiraj::AddPlayerToStomach(Unit * p)
 {
     if (Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN))
         pCthun->CastSpell(p, SPELL_DIGESTIVE_ACID, true);
-    playersInStomach.push_back(std::make_pair(p->GetGUID(), StomachTimers()));
+    playersInStomach.emplace_back(p->GetGUID(), StomachTimers());
 }
 
 instance_temple_of_ahnqiraj::CThunStomachList::iterator instance_temple_of_ahnqiraj::PlayerInStomachIter(Unit * unit)
@@ -761,6 +781,17 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
         
         ++it;
     }
+}
+
+void instance_temple_of_ahnqiraj::RestoreOuroSpawnTrigger()
+{
+    if (Creature* pOuroSpawnTrigger = GetSingleCreatureFromStorage(NPC_OURO_SPAWNER))
+    {
+        // restore home coordinates from db spawn
+        pOuroSpawnTrigger->SetHomePosition(-9188.45f, 2091.56f, -64.17f, 6.01f);
+        pOuroSpawnTrigger->Respawn();
+    }
+    m_uiRestoreOuroSpawnTriggerTimer = 0;
 }
 
 struct AI_QirajiMindslayer : public ScriptedAI {

@@ -19,8 +19,8 @@
 
 void AddSC_zero_scripts()
 {
-    //AddSC_zero_creatures();
     AddSC_custom_creatures();
+<<<<<<< HEAD
 
 
 	AddSC_qzqstar_rune_creatures();
@@ -29,3 +29,6 @@ void AddSC_zero_scripts()
 	AddSC_qzqstar_custom();
 
 }
+=======
+}
+>>>>>>> d7ac87225b87d0748a818fb6dfbea5d41feec910
