@@ -103,7 +103,7 @@ SpellScript* GetScript_HunterRefocus(SpellEntry const*)
 //qzqstar, 250404, hunter far shot
 struct HunterFarShot : SpellScript
 {
-	void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+	bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
 	{
 		if (effIdx == EFFECT_INDEX_0)
 		{
@@ -117,6 +117,8 @@ struct HunterFarShot : SpellScript
 				spell->damage = pPlayer->GetTotalAttackPowerValue(RANGED_ATTACK) * _yard / 10;
 			}
 		}
+
+		return true;
 	}
 };
 

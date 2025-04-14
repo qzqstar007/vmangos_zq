@@ -128,12 +128,12 @@ SpellScript* GetScript_PaladinHolyShock(SpellEntry const*)
 // 20473, 20929, 20930 - Holy Shock
 struct PaladinArtOfWarScript : SpellScript
 {
-	void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+	bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
 	{
 		if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
 		{
 			if (spell->m_caster->GetTypeId() != TYPEID_PLAYER)
-				return;
+				return false;
 
 			// immediately finishes the cooldown on art of war
 			auto cdCheck = [](SpellEntry const & spellEntry) -> bool
@@ -149,8 +149,9 @@ struct PaladinArtOfWarScript : SpellScript
 			};
 
 			static_cast<Player*>(spell->m_caster)->RemoveSomeCooldown(cdCheck);
-			return;
 		}
+
+		return true;
 	}
 };
 

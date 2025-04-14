@@ -224,6 +224,46 @@ SpellScript* GetScript_WarlockInferno(SpellEntry const*)
     return new WarlockInfernoScript();
 }
 
+
+//qzqstar, 241218, add support for the life blast
+struct WarlockLifeBlastScript : SpellScript
+{
+	bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+	{
+		if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
+		{
+            if (!spell->GetUnitTarget())    return false;
+            if (!spell->m_casterUnit)  return false;
+
+            auto _maxHealth = spell->m_casterUnit->GetMaxHealth();
+            auto _curHealth = spell->m_casterUnit->GetHealth();
+
+            auto dmg = 0;
+            if (_curHealth > _maxHealth / 2) { dmg = _maxHealth / 2; }
+            else { dmg = _curHealth - 1; }
+
+            spell->m_casterUnit->SetHealth(_curHealth - dmg);
+
+            //boost the dmg
+            dmg *= 3;
+
+            //qzqstar, 241227, set to half if hit player
+            if (spell->GetUnitTarget()->IsPlayer())
+                dmg /= 2.5;
+
+            spell->m_casterUnit->CastCustomSpell(spell->GetUnitTarget(), 31150, dmg, {}, {}, true);
+		}		
+
+		return true;
+	}		
+};
+
+SpellScript* GetScript_WarlockLifeBlast(SpellEntry const*)
+{
+	return new WarlockLifeBlastScript();
+}
+
+
 void AddSC_warlock_spell_scripts()
 {
     Script* newscript;
@@ -256,5 +296,10 @@ void AddSC_warlock_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_warlock_inferno";
     newscript->GetSpellScript = &GetScript_WarlockInferno;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warlock_life_blast";
+    newscript->GetSpellScript = &GetScript_WarlockLifeBlast;
     newscript->RegisterSelf();
 }

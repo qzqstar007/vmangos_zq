@@ -18,8 +18,6 @@ void AddSC_custom_creatures();
 
 // used to call all scripts
 void AddSC_zero_scripts();
-<<<<<<< HEAD
-
 
 void AddSC_qzqstar_rune_creatures();
 void AddSC_qzqstar_vip_creatures();
