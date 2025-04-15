@@ -1951,10 +1951,10 @@ void SendDefaultMenu_Social(Player *player, Creature *_Creature, uint32 action)
 
 			//add constrains for level 60
 			//ZUG
-			if (__canSeeRange >= _ITEM_BUY_RANGE_4) __canSeeRange = _ITEM_BUY_RANGE_3;
+			//if (__canSeeRange >= _ITEM_BUY_RANGE_4) __canSeeRange = _ITEM_BUY_RANGE_3;
 
 			//MC Range
-			//if (__canSeeRange >= _ITEM_BUY_RANGE_5) __canSeeRange = _ITEM_BUY_RANGE_4;
+			if (__canSeeRange >= _ITEM_BUY_RANGE_5) __canSeeRange = _ITEM_BUY_RANGE_4;
 
 			//check the actions
 			if (action == __MENU_SOCIAL_BUY)
@@ -2259,7 +2259,7 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 				player->M_Spare_Data2++;
 
 				//roll chance
-				if (roll_chance_i(15))
+				if (roll_chance_i(20))
 				{
 					_mustHit = true;
 				}
