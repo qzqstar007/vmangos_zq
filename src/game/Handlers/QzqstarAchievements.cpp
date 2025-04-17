@@ -20,47 +20,13 @@ QzqstarAchievements::~QzqstarAchievements()
 	entries.clear();
 }
 
-void QzqstarAchievements::Load()
+void QzqstarAchievements::Init()
 {
 	entries.clear();												//1			2		3			 4		5		6		7		 8		9
-	std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `guid`,  `type`, `subType`,`data1`,`data2`,`data3`,`data4`, `note`, FROM `a_achivements`"));
-
-	if (!result)
-	{
-		BarGoLink bar(1);
-		bar.step();
-
-		sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-		sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 Achievements records.");
-		return;
-	}
-
-	uint32 count = 0;
-	BarGoLink bar(result->GetRowCount());
-
-	Field* fields;
-	do
-	{
-		bar.step();
-		AchievementsEntry e;
-		fields = result->Fetch();
-
-		e.entry = fields[0].GetInt32();
-		e.guid = fields[1].GetInt32();
-		e.type = fields[2].GetInt32();
-		e.subType = fields[3].GetInt32();
-		e.data1 = fields[4].GetInt32();
-		e.data2 = fields[5].GetInt32();
-		e.data3 = fields[6].GetInt32();
-		e.data4 = fields[7].GetInt32();
-		e.note = fields[8].GetCppString();
-
-		entries.push_back(e);
-		++count;
-	} while (result->NextRow());
-
+	CharacterDatabase.PExecute("update `a_achievements` set data1=0, data2=0 where type=100");
+	
 	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u Achievements records.", count);
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Reset a_achievements records.");
 
 }
 

@@ -6106,6 +6106,11 @@ SpellCastResult Spell::CheckCast(bool strict)
 			{
 				//has the 31061 spell
 			}
+            //qzqstar, 250415, skip the check for druid cat - king of forest.
+            else if (m_caster->IsPlayer() && ((Player*)m_caster)->HasSpell(31099))
+			{
+				//has the 31061 spell
+			}
 			else
 			{
 				SendInterrupted(2);

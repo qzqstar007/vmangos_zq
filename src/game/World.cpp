@@ -85,6 +85,8 @@
 #include "RealmZone.h"
 #include <chrono>
 
+#include "QzqstarAchievements.h"
+
 INSTANTIATE_SINGLETON_1(World);
 
 volatile bool World::m_stopEvent = false;
@@ -1821,6 +1823,10 @@ void World::SetInitialWorldSettings()
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading auto broadcast");
     sAutoBroadCastMgr.Load();
+
+    //qzqstar, 240416, Load the Achievement Data
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading sQZAchievements Data...");
+    sQZAchievements.Init();
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading AH bot");
     sAuctionHouseBotMgr.Load();

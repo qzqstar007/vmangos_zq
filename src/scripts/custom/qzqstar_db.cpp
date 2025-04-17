@@ -8658,7 +8658,7 @@ const std::vector<Level_ItemEqID_t> _Items_Eq_Rank3 =
 	{ 65,19927}, //玛尔里之触|") },
 	{ 65,19903}, //温诺希斯之牙|") },
 	{ 65,19944}, //纳特·帕格的鱼类终结者|") },
-	{ 65,1728}, //提布的炽炎长剑|") },
+	//{ 65,1728}, //提布的炽炎长剑|") },
 	{ 65,19909}, //娅尔罗的意志|") },
 	{ 65,18878}, //巫术匕首|") },
 	{ 65,19910}, //娅尔罗之握|") },
@@ -8848,7 +8848,13 @@ Level_ItemMatsID_t DBHelper_GetItemMatsByLevel(Player *p, int32 rank)
 };
 
 //MC = 10
-#define	CURRENT_PHASE	(0)
+#define	PHASE_3DA		(3)
+#define	PHASE_ZG		(5)
+#define	PHASE_MC		(8)
+#define	PHASE_BWL		(16)
+#define	PHASE_TAQ		(20)
+#define	PHASE_NAXX		(30)
+#define	CURRENT_PHASE	(PHASE_3DA)
 //Get the Item Reward Equipments by level
 Level_ItemEqID_t DBHelper_GetItemEqByLevel(Player *p, int32 rank)
 {

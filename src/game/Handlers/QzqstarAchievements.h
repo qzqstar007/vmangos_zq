@@ -42,7 +42,7 @@ public:
 	QzqstarAchievements();
 	~QzqstarAchievements();
 
-	void Load();
+	void Init();
 	void Update(uint32 diff);
 
 	//SQL helper to save player's status

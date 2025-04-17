@@ -2259,7 +2259,7 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 				player->M_Spare_Data2++;
 
 				//roll chance
-				if (roll_chance_i(20))
+				if (roll_chance_i(15 + player->M_Spare_Data2))
 				{
 					_mustHit = true;
 				}

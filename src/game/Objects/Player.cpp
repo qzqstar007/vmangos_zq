@@ -13503,52 +13503,58 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
 
 	if (true)
     {
-		/*
-        if (uint32 itemId = pQuest->RewChoiceItemId[reward])
+        //old traditional quests
+        if(quest_id < 12000)
         {
-            ItemPosCountVec dest;
-            if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewChoiceItemCount[reward]) == EQUIP_ERR_OK)
+            if (uint32 itemId = pQuest->RewChoiceItemId[reward])
             {
-                Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+                ItemPosCountVec dest;
+                if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewChoiceItemCount[reward]) == EQUIP_ERR_OK)
+                {
+                    Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
 
-				//qzqstar, 241208, try fix errors..
-				if (item && (item->GetProto()))
-				{
-					//old statements
-					SendNewItem(item, pQuest->RewChoiceItemCount[reward], true, false, false, false);
+                    //qzqstar, 241208, try fix errors..
+                    if (item && (item->GetProto()))
+                    {
+                        //old statements
+                        SendNewItem(item, pQuest->RewChoiceItemCount[reward], true, false, false, false);
 
-					//qzqstar, 241205, zq mode, make the task item suitable for you
-					// set the "Crafted by ..." property of the item
-					if (HasSpell(__MODE_ZQ) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
-						item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
-				}
+                        //qzqstar, 241205, zq mode, make the task item suitable for you
+                        // set the "Crafted by ..." property of the item
+                        if (HasSpell(__MODE_ZQ) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
+                            item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
+                    }
+                }
             }
-        }*/
+        }
+        else
+        // custome quests larger than 12000 id..
+		// qzqstar, 240413, fix the RewItems counts = 4
+        {
+            for (size_t i = 0; i < 4; i++)
+            {
+                if (uint32 itemId = pQuest->RewChoiceItemId[i])
+                {
+                    ItemPosCountVec dest;
+                    if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewChoiceItemCount[i]) == EQUIP_ERR_OK)
+                    {
+                        Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
 
-		//qzqstar, 240413, fix the RewItems counts = 4
-		for (size_t i = 0; i < 4; i++)
-		{
-			if (uint32 itemId = pQuest->RewChoiceItemId[i])
-			{
-				ItemPosCountVec dest;
-				if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewChoiceItemCount[i]) == EQUIP_ERR_OK)
-				{
-					Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+                        //qzqstar, 241208, try fix errors..
+                        if (item && (item->GetProto()))
+                        {
+                            //old statements
+                            SendNewItem(item, pQuest->RewChoiceItemCount[i], true, false, false, false);
 
-					//qzqstar, 241208, try fix errors..
-					if (item && (item->GetProto()))
-					{
-						//old statements
-						SendNewItem(item, pQuest->RewChoiceItemCount[i], true, false, false, false);
-
-						//qzqstar, 241205, zq mode, make the task item suitable for you
-						// set the "Crafted by ..." property of the item
-						if (HasSpell(__MODE_ZQ) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
-							item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
-					}
-				}
-			}
-		}
+                            //qzqstar, 241205, zq mode, make the task item suitable for you
+                            // set the "Crafted by ..." property of the item
+                            if (HasSpell(__MODE_ZQ) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
+                                item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
+                        }
+                    }
+                }
+            }
+        }
     }
 
 	//qzqstar, set to true always
