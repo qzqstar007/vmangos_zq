@@ -21,8 +21,10 @@ struct AchievementsEntry
 
 enum Achievement_t
 {
-	ACHIEVEMENT_CUSTOM_QUEST = 100,
-	ACHIEVEMENT_SOCIAL_POINTS = 200,
+	ACHIEVEMENT_VIP 		  	= 66,
+	ACHIEVEMENT_CUSTOM_QUEST 	= 100,
+	ACHIEVEMENT_SOCIAL_POINTS 	= 200,
+	ACHIEVEMENT_PETS = 300,
 	ACHIEVEMENT_COUNTERS	=	1000,	//For combine and refreshing...
 };
 
@@ -61,6 +63,24 @@ public:
 
 	/*****************************************************
 	 *
+	 *		VIP Systems Functions
+	 *
+	 *****************************************************/
+	// note on data arrays
+	// data1: vip level
+	// data2: vip points
+	// data3: vip max points
+
+	// Get the player's VIP level
+	uint32 GetVIPLevel(Player *player);
+
+	// Set the player's VIP level and add the VIP level to the player's achievements vector
+	bool SetVIPLevel(Player *player, uint32 level);
+
+
+
+	/*****************************************************
+	 *
 	 *		Custom Quests Functions
 	 *
 	 *****************************************************/
@@ -82,6 +102,28 @@ public:
 	//get the quest done counters
 	uint32 GetQuestDoneCounters(Player * _player);
 	
+
+	/*****************************************************
+	 *
+	 *		Pet Systems Functions
+	 *
+	 *****************************************************/
+	// note on data arrays
+	// subtype: pet type, active pet
+	// data1: pet level
+	// data2: happiness points
+	// data3: relationship points (determined the trigger chance of the pet)
+	// data4: current relation points
+
+	//get the player's pet information, return a vector of AchievementsEntry
+	AchievementsEntry* LoadPetInfo(Player *player);
+
+	//set the player's pet information, add the pet to the player's achievements vector
+	void SetPetInfo(Player *player, AchievementsEntry* entry);
+
+
+
+
 protected:
 	std::vector<AchievementsEntry> entries;
 	time_t _constInterval;

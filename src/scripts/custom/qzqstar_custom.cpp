@@ -365,6 +365,90 @@ bool Task_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 actio
 #pragma endregion
 
 
+
+#pragma region Pet development system
+
+#define __MENU_PET_MAIN					(1000)
+#define	__MENU_PET_ACT_FEED				(100)
+#define	__MENU_PET_ACT_UPGRADE			(200)
+#define	__MENU_PET_ACT_CHANGE			(300)
+
+/**** Pet Development System 
+ *
+ * Pet using the table sAchievements to store information.
+ * type:
+ * subType:
+ * value:
+
+ * 1. Pet can be feed by meat, and the meat will be consumed.
+ * 2. Pet can be upgrade by gold, and the gold will be consumed.
+ * 3. Pet can be change by gold, and the gold will be consumed.
+ *
+ */
+
+bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
+{
+	std::string text = "";
+	uint32 __menu_nums = 0;
+
+	//check if the player is the owner of the pet
+	if(_Creature->GetOwnerGuid() != player->GetObjectGuid())
+	{
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("　　你不是我的主人！　　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+		return true;
+	}
+
+	//get the player's pet information from the database
+	//auto _petInfo = sA(player);
+	//if (_petInfo.petID == 0)
+
+	if (action == __MENU_PET_MAIN)
+	{
+		//display the pet information
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝宠物养成系统＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("丨　系　列：　"), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("丨　等　级：　"), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("丨　快乐度：　"), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("丨　亲密度：　"), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(""), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(""), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+
+		//can only use meat etc..
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR("＝＝喂　养＝＝ "), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR("＝＝升　级＝＝ "), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(""), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR("＝＝更　换＝＝ "), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+		return true;
+	}
+	else if (action > __MENU_BG_MAIN && action<__MENU_BG_MAIN + __MENU_BG_RW_OFFSET)
+	{
+		auto bgType = action == __MENU_BG_MAIN_WS ? BATTLEGROUND_WS : action == __MENU_BG_MAIN_AB ? BATTLEGROUND_AB : BATTLEGROUND_AV;
+
+		player->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+		player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+		player->GetSession()->SendBattleGroundList(_Creature->GetGUID(), bgType);
+	}
+	else if (action > __MENU_BG_MAIN + __MENU_BG_RW_OFFSET)
+	{
+		action -= __MENU_BG_RW_OFFSET;
+		auto bgType = action == __MENU_BG_MAIN_WS ? BATTLEGROUND_WS : action == __MENU_BG_MAIN_AB ? BATTLEGROUND_AB : BATTLEGROUND_AV;
+
+		//if (player);
+	}
+
+	return true;
+}
+
+#pragma endregion
+
+
 void AddSC_qzqstar_custom()
 {
 	Script* newscript;
@@ -377,13 +461,20 @@ void AddSC_qzqstar_custom()
 	newscript->RegisterSelf(false);
 
 
-	//Add battle ground npc
+	//Add Dynanic quest script
 	newscript = new Script;
 	newscript->Name = "qzqstar_dynamictask";
 	newscript->pGossipHello = [](Player *p, Creature *c) -> bool { return Task_Menus(p, c, 0, __MENU_TASK_MAIN); };
 	newscript->pGossipSelect = &Task_Menus;
 	newscript->RegisterSelf(false);
 
+
+	//Add Pet Development script
+	newscript = new Script;
+	newscript->Name = "qzqstar_pet_system";
+	newscript->pGossipHello = [](Player *p, Creature *c) -> bool { return Pet_Menus(p, c, 0, __MENU_BG_MAIN); };
+	newscript->pGossipSelect = &Pet_Menus;
+	newscript->RegisterSelf(false);
 }
 
 

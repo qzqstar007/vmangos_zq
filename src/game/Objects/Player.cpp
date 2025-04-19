@@ -10577,12 +10577,13 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
 
 
 		// qzqstar, 250213, ESS, equipment slot system
-		if (randomPropertyId > 3000)
+        // we don't need to do this for items with random properties, because they are replaced by random enchants.
+		/*if (randomPropertyId > 3000)
 		{
 			// so, we can curve the slots
-			pItem->SetEnchantment(PROP_ENCHANTMENT_SLOT_1, 3000, 0, 0);
-			if (pItem->GetProto()->Quality > 2)	pItem->SetEnchantment(PROP_ENCHANTMENT_SLOT_2, 3500, 0, 0);
-		}
+			//pItem->SetEnchantment(PROP_ENCHANTMENT_SLOT_1, 3000, 0, 0);
+			//if (pItem->GetProto()->Quality > 2)	pItem->SetEnchantment(PROP_ENCHANTMENT_SLOT_3, 3500, 0, 0);
+        }*/
 
 
         pItem = StoreItem(dest, pItem, update);
@@ -10930,8 +10931,9 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                     RemoveItemDependentAurasAndCasts(pItem);
 
                     // remove held enchantments
-                    if (slot == EQUIPMENT_SLOT_MAINHAND)
-                        pItem->ClearEnchantment(PROP_ENCHANTMENT_SLOT_3);
+                    //qzqstar, 250418, don't know what it is .
+                    //if (slot == EQUIPMENT_SLOT_MAINHAND)
+                    //    pItem->ClearEnchantment(PROP_ENCHANTMENT_SLOT_3);
 
                     // reset extraAttacks counter
                     if (slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND || slot == EQUIPMENT_SLOT_RANGED)

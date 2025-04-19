@@ -235,6 +235,38 @@ uint32 QzqstarAchievements::GetQuestDoneCounters(Player * _player)
 }
 
 
+/* ================================================================================================================== */
+/* ========================= Pet system  ============================================================================ */
+/* ================================================================================================================== */
+//get the player's pet information, return a vector of AchievementsEntry
+AchievementsEntry* QzqstarAchievements::LoadPetInfo(Player * _player)
+{
+	//check _player if none
+	if (!_player)
+		return nullptr;
 
+	//iterate the _playerAchievements vector map of this player to find the pet information
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_PETS)
+		{
+			return &e;
+		}
+	}
 
+	//if not found, create one and return it
+	AchievementsEntry e;
+	e.guid = _player->GetGUID();
+	e.type = ACHIEVEMENT_PETS;
+	e.subType = 0;
+	e.data1 = 0;	//pet level
+	e.data2 = 0;	//pet happiness level
+	e.data3 = 0;	//pet max level
+	e.data4 = 0;	//pet type, active pet
+	e.note = "";
+	_playerAchievements[_player->GetGUID()].push_back(e);
+
+	return &e;
+}
 

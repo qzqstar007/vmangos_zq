@@ -1177,7 +1177,7 @@ void SendDefaultMenu_Slot(Player *player, Creature *_Creature, uint32 action)
 	uint8 slots[4];
 	pItem->GetProto()->GetAllowedEquipSlots(slots, player->GetClass(), false);
 	auto pEquippedItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slots[0]);
-	if (!pEquippedItem || pEquippedItem->GetProto()->InventoryType != pItem->GetProto()->InventoryType || pEquippedItem->GetEnchantmentId(PROP_ENCHANTMENT_SLOT_2)<3000
+	if (!pEquippedItem || pEquippedItem->GetProto()->InventoryType != pItem->GetProto()->InventoryType || pEquippedItem->GetEnchantmentId(PROP_ENCHANTMENT_SLOT_3)<3000
 		|| pEquippedItem->GetProto()->SubClass != pItem->GetProto()->SubClass
 		|| pEquippedItem->GetProto()->Class != pItem->GetProto()->Class		
 		)
@@ -1283,7 +1283,7 @@ void SendDefaultMenu_Slot(Player *player, Creature *_Creature, uint32 action)
 				if (((player->GetMoney()) >(uint32)_needGold * 10000) && (_spellId > 0 && _dbcId > 0) )
 				{
 					//set the target 
-					pEquippedItem->SetEnchantment(PROP_ENCHANTMENT_SLOT_2, _dbcId, 0, 0);
+					pEquippedItem->SetEnchantment(PROP_ENCHANTMENT_SLOT_3, _dbcId, 0, 0);
 
 					//remove the item
 					player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);

@@ -806,6 +806,21 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     return 0;
 }
 
+
+static const int32 __Random_EnchantIDs[] =
+{
+    3036,3046,3056,3066,3076,3086,
+    3037,3047,3057,3067,3077,3087,  //25, 12
+    3038,3048,3058,3068,3078,3088,
+    3039,3049,3059,3069,3079,3089,  //45, 24
+    3040,3050,3060,3070,3080,3090,
+    3041,3051,3061,3071,3081,3091,  //55, 36
+    3042,3052,3062,3072,3082,3092,
+    3043,3053,3063,3073,3083,3093,  //60, 48
+    3044,3054,3064,3074,3084,3094,
+    3045,3055,3065,3075,3085,3095, 3095   //70, 60
+};
+
 void Item::SetItemRandomProperties(int32 randomPropId)
 {
     if (!randomPropId)
@@ -820,20 +835,68 @@ void Item::SetItemRandomProperties(int32 randomPropId)
             {
                 SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, item_rand->ID);
                 SetState(ITEM_CHANGED);
+           
+                //qzqstar, 250213, reuse the enchant slots 1--3
+                if (randomPropId < 3000)
+                {
+                    //old settings
+                    for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < PROP_ENCHANTMENT_SLOT_0 + 3; ++i)
+                        SetEnchantment(EnchantmentSlot(i), item_rand->enchant_id[i - PROP_ENCHANTMENT_SLOT_0], 0, 0);
+                }
+                else
+                {
+                    //new enchantments, only set the enchant_id[0] to PROP_ENCHANTMENT_SLOT_0
+                    //PROP_ENCHANTMENT_SLOT_1, reused for the 
+                    SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_0), item_rand->enchant_id[0], 0, 0);
+                
+                
+                    // the PROP_ENCHANTMENT_SLOT_1 and PROP_ENCHANTMENT_SLOT_2 is used as dynamic generate enchanting
+                    auto itemLevel = GetProto()->ItemLevel;
+                    auto itemQuality = GetProto()->Quality;
+                    auto _slot1 = false;
+                    auto _slot2 = false;
+                    auto _slot3 = false;
+
+                    _slot1 = roll_chance_i(30) ? true : false;
+                    if(itemQuality > 2) 
+                    {
+                        _slot1 = true;
+                        _slot2 = roll_chance_i(20)? true : false;
+                    }
+
+                    if(itemQuality > 3)
+                    {
+                        _slot1 = true;
+                        _slot2 = true;
+                        _slot3 = roll_chance_i(30)? true : false;
+                    }
+
+                    auto __itemEchantRange = itemLevel<30? 12:
+                        itemLevel<50 ? 24:
+                        itemLevel<60 ? 36:
+                        itemLevel<70 ? 48: 60;
+                    if(_slot1)
+                    {
+                        auto _enchantId = __Random_EnchantIDs[urand(0, __itemEchantRange -1)];
+                        SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_1), _enchantId, 0, 0);
+                    }
+
+                    if(_slot2)
+                    {
+                        auto _enchantId = __Random_EnchantIDs[urand(0, __itemEchantRange -1)];
+                        SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_2), _enchantId, 0, 0);
+                    }
+
+                    //set the slot3 if slot3 is true and the slot3 is not a 3500 enchantment number
+                    //3500 is the max enchantment number for the item level 70
+                    if(_slot3 && GetEnchantmentId(PROP_ENCHANTMENT_SLOT_3)<3500)
+                    {
+                        auto _enchantId = __Random_EnchantIDs[urand(0, __itemEchantRange -1)];
+                        SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_3), _enchantId, 0, 0);
+                    }
+                }
+
             }
-			//qzqstar, 250213, reuse the enchant slots 1--3
-			if (randomPropId < 3000)
-			{
-				//old settings
-				for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < PROP_ENCHANTMENT_SLOT_0 + 3; ++i)
-					SetEnchantment(EnchantmentSlot(i), item_rand->enchant_id[i - PROP_ENCHANTMENT_SLOT_0], 0, 0);
-			}
-			else
-			{
-				//new enchantments, only set the enchant_id[0] to PROP_ENCHANTMENT_SLOT_0
-				//PROP_ENCHANTMENT_SLOT_1, reused for the 
-				SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_0), item_rand->enchant_id[0], 0, 0);
-			}
 			//end of 250213
         }
     }

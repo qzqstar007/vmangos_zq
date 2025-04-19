@@ -4727,7 +4727,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		item.Spells[i].SpellCategory = _Spells[i].SpellCategory;
 		item.Spells[i].SpellCategoryCooldown = _Spells[i].SpellCategoryCooldown;
 	}
-	item.Bonding = item1_proto->Bonding;
+	item.Bonding = 0 ; //item1_proto->Bonding;
 	item.PageText = item1_proto->PageText;
 	item.LanguageID = item1_proto->LanguageID;
 	item.PageMaterial = item1_proto->PageMaterial;

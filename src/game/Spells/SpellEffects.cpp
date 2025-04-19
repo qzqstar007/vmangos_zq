@@ -1201,8 +1201,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						return;
 					}
 
-					itemTarget->SetEnchantment(PROP_ENCHANTMENT_SLOT_1, 3000, 0, 0);
-					itemTarget->SetEnchantment(PROP_ENCHANTMENT_SLOT_2, 3500, 0, 0);
+					itemTarget->SetEnchantment(PROP_ENCHANTMENT_SLOT_3, 3500, 0, 0);
 
 					//set bind
 					itemTarget->SendForcedObjectUpdate();
@@ -6412,6 +6411,25 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
     if (!petEntry)
         return;
 
+
+    //qzqstar, 250418, random summon pet for a special petEntry == 99999
+    if (petEntry == 99999)
+    {
+        //1. get pet type from player's achivement tables
+        uint32 petType = 0;
+
+        //2. one to one mapping between petType and petEntry, if petType is not found, use petEntry as petType
+        switch (petType)
+        {
+            case 1: petEntry = 11111; break;
+            case 2: petEntry = 22222; break;
+            case 3: petEntry = 33333; break;
+            case 4: petEntry = 44444; break;
+        }
+        //3. if petEntry is not found, set defualt petEntry to 11111
+        if (!petEntry) petEntry = 11111;
+    }
+
     CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(petEntry);
     if (!cInfo)
     {
@@ -6451,6 +6469,9 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
 
     if (m_duration > 0)
         critter->SetDuration(m_duration);
+
+    //qzqstar, 250419, set the pet size according to the pet relationship
+    if(player->GetLevel() > 50) critter->SetTransformScale(2.00f);
 
     critter->SetOwnerGuid(m_caster->GetObjectGuid());
     critter->SetCreatorGuid(m_caster->GetObjectGuid());
