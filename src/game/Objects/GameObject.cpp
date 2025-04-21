@@ -49,6 +49,8 @@
 #include <G3D/Quat.h>
 #include "Geometry.h"
 
+#include "QzqstarAchievements.h"
+
 bool QuaternionData::isUnit() const
 {
     return fabs(x * x + y * y + z * z + w * w - 1.0f) < 1e-5f;
@@ -1249,6 +1251,7 @@ bool GameObject::ActivateToQuest(Player const* pTarget) const
         {
             if (GetGOInfo()->goober.questId == -1 || pTarget->GetQuestStatus(GetGOInfo()->goober.questId) == QUEST_STATUS_INCOMPLETE)
                 return true;
+
             break;
         }
         default:
@@ -1582,6 +1585,19 @@ void GameObject::Use(Unit* user)
                 // possible quest objective for active quests
                 if (info->goober.questId > 0 && sObjectMgr.GetQuestTemplate(info->goober.questId))
                 {
+					//qzqstar, 250420, finish the quest for larger that 12000
+					auto _curDynQuestID = sQZAchievements.GetCustomQuestID((Player *)player);
+					if (
+						_curDynQuestID && sObjectMgr.GetQuestTemplate(_curDynQuestID) && 
+						((sObjectMgr.GetQuestTemplate(_curDynQuestID)->PrevQuestId == GetGOInfo()->_generic.questID)
+							|| (sObjectMgr.GetQuestTemplate(_curDynQuestID)->PrevQuestId == info->goober.questId)
+						)
+						)
+					{
+						player->RewardPlayerAndGroupAtCast(this);
+						break;
+					}
+
                     //Quest require to be active for GO using
                     if (player->GetQuestStatus(info->goober.questId) != QUEST_STATUS_INCOMPLETE)
                         break;
@@ -1600,7 +1616,7 @@ void GameObject::Use(Unit* user)
                 // possible quest objective for active quests
                 if (info->goober.questId > 0 && sObjectMgr.GetQuestTemplate(info->goober.questId))
                 {
-                    //Quest require to be active for GO using
+	                //Quest require to be active for GO using
                     if (player->GetQuestStatus(info->goober.questId) != QUEST_STATUS_INCOMPLETE)
                         break;
                 }

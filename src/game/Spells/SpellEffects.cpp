@@ -6471,7 +6471,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
         critter->SetDuration(m_duration);
 
     //qzqstar, 250419, set the pet size according to the pet relationship
-    if(player->GetLevel() > 50) critter->SetTransformScale(2.00f);
+    //if(player->GetLevel() > 50) critter->SetTransformScale(2.00f);
 
     critter->SetOwnerGuid(m_caster->GetObjectGuid());
     critter->SetCreatorGuid(m_caster->GetObjectGuid());

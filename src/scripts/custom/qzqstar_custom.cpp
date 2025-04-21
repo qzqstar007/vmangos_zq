@@ -114,7 +114,7 @@ bool Task_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 actio
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
 
 	auto	_currentQuestID = sQZAchievements.GetCustomQuestID(player);
-	uint32	__reset_gold = player->GetLevel() * player->GetLevel() / 61 + 1;
+	uint32	__reset_gold = player->GetLevel() * player->GetLevel() / 610 + 1;		//TODO NEXT SEASON
 
 	if (action == __MENU_TASK_MAIN)
 	{
@@ -167,15 +167,21 @@ bool Task_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 actio
 		int32 _qRank = 1;
 		
 		_qRank = urand(0, 100);
-		if (_qRank > 95 && player->GetLevel() >= 45) _qRank = 3;
-		else if (_qRank > 75 && player->GetLevel() >= 25) _qRank = 2;
+		if (_qRank > 90 && player->GetLevel() >= 45) _qRank = 3;
+		else if (_qRank > 70 && player->GetLevel() >= 25) _qRank = 2;
 		else _qRank = 1;
-				
+
 		auto _qEntity = DBHelper_GetQuestByLevel(player);
 
 		//test stub
 		//__qIDBegin = 6502;
 		_origQuestID = _qEntity.questID;
+
+		if (player->IsGameMaster())
+		{
+			_origQuestID = player->GetReputationMgr().GetReputation(967);
+			if(_origQuestID > 9300) _origQuestID = 5083;
+		}
 
 		ObjectMgr::QuestMap const& qTemplates = sObjectMgr.GetQuestTemplates();
 
@@ -229,7 +235,7 @@ bool Task_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 actio
 			if(__item.itemID != 0)
 			{
 				newQuest->ReqItemId[1] = __item.itemID;
-				newQuest->ReqItemCount[1] = 20;
+				newQuest->ReqItemCount[1] = 5;
 			}
 		}
 
@@ -240,7 +246,7 @@ bool Task_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 actio
 			if (__item.itemID != 0)
 			{
 				newQuest->ReqItemId[2] = __item.itemID;
-				newQuest->ReqItemCount[2] = 6;
+				newQuest->ReqItemCount[2] = 3;
 			}
 		}
 		
@@ -279,11 +285,30 @@ bool Task_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 actio
 			}
 		}
 
-		//sObjectMgr.GetCreatureQuestRelationsMap().insert(QuestRelationsMap::value_type(30003, _Quest_Counter));
-		sObjectMgr.GetCreatureInvolvedRelationsMap().insert(QuestRelationsMap::value_type(30003, _Quest_Counter));
 
-		auto _orig_quest = sObjectMgr.GetQuestTemplate(_origQuestID);
-		if(_orig_quest)	newQuest->SetSpecialFlag(_orig_quest->GetSpecialFlag());
+		for (int j = 0; j < QUEST_ITEM_OBJECTIVES_COUNT; ++j)
+		{
+			if (uint32 id = newQuest->ReqItemId[j])
+			{
+				newQuest->SetSpecialFlag(QUEST_SPECIAL_FLAG_DELIVER);
+			}
+		}
+
+
+		for (int j = 0; j < QUEST_OBJECTIVES_COUNT; ++j)
+		{
+			if (newQuest->ReqCreatureOrGOId[j] != 0)
+			{
+				newQuest->SetSpecialFlag(QuestSpecialFlags(QUEST_SPECIAL_FLAG_KILL_OR_CAST));
+			}
+		}
+
+
+#define _QUEST_NPC_ID (30005)
+		sObjectMgr.GetCreatureInvolvedRelationsMap().insert(QuestRelationsMap::value_type(_QUEST_NPC_ID, _Quest_Counter));
+
+		//auto _orig_quest = sObjectMgr.GetQuestTemplate(_origQuestID);
+		//if(_orig_quest)	newQuest->SetSpecialFlag(_orig_quest->GetSpecialFlag());
 		sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Task System] player:%s create questID:%u", player->GetName(), _Quest_Counter);
 
 		auto& questMap = sObjectMgr.GetQuestTemplatesZQ();
@@ -318,7 +343,7 @@ bool Task_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 actio
 			Quest const* pQuest = sObjectMgr.GetQuestTemplate(_currentQuestID);
 
 			// 删除并获取下一个迭代器
-			auto _kpair = sObjectMgr.GetCreatureInvolvedRelationsMap().equal_range(30003);
+			auto _kpair = sObjectMgr.GetCreatureInvolvedRelationsMap().equal_range(_QUEST_NPC_ID);
 			for (auto it = _kpair.first; it != _kpair.second; ) {
 				if (it->second == _currentQuestID) {
 					it = sObjectMgr.GetCreatureInvolvedRelationsMap().erase(it);  

@@ -274,6 +274,8 @@ const std::vector<Level_QuestID_t> _Quest_Horde_10 =
 	{ 12,854}, // 十字路口之旅 |") }
 };
 
+
+
 const std::vector<Level_QuestID_t> _Quest_All =
 {
 	{ 8,357}, // 巫妖的身份 |") },
@@ -8854,7 +8856,7 @@ Level_ItemMatsID_t DBHelper_GetItemMatsByLevel(Player *p, int32 rank)
 #define	PHASE_BWL		(16)
 #define	PHASE_TAQ		(20)
 #define	PHASE_NAXX		(30)
-#define	CURRENT_PHASE	(PHASE_3DA)
+#define	CURRENT_PHASE	(PHASE_BWL)
 //Get the Item Reward Equipments by level
 Level_ItemEqID_t DBHelper_GetItemEqByLevel(Player *p, int32 rank)
 {

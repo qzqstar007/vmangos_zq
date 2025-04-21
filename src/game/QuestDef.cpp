@@ -182,29 +182,29 @@ Quest::Quest(const Quest& pQuest)
 	MaxLevel = pQuest.MaxLevel;
 	QuestLevel = pQuest.QuestLevel;
 	Type = pQuest.Type;
-	RequiredClasses = pQuest.RequiredClasses;
-	RequiredRaces = pQuest.RequiredRaces;
-	RequiredSkill = pQuest.RequiredSkill;
-	RequiredSkillValue = pQuest.RequiredSkillValue;
-	RequiredCondition = pQuest.RequiredCondition;
-	RepObjectiveFaction = pQuest.RepObjectiveFaction;
-	RepObjectiveValue = pQuest.RepObjectiveValue;
-	RequiredMinRepFaction = pQuest.RequiredMinRepFaction;
-	RequiredMinRepValue = pQuest.RequiredMinRepValue;
-	RequiredMaxRepFaction = pQuest.RequiredMaxRepFaction;
-	RequiredMaxRepValue = pQuest.RequiredMaxRepValue;
-	SuggestedPlayers = pQuest.SuggestedPlayers;
-	LimitTime = pQuest.LimitTime;
-	m_QuestFlags = pQuest.m_QuestFlags;
-	m_SpecialFlags = pQuest.m_SpecialFlags;
-	PrevQuestId = pQuest.PrevQuestId;
-	NextQuestId = pQuest.NextQuestId;
-	ExclusiveGroup = pQuest.ExclusiveGroup;
-	BreadcrumbForQuestId = pQuest.BreadcrumbForQuestId;
-	NextQuestInChain = pQuest.NextQuestInChain;
+	RequiredClasses = 0;
+	RequiredRaces = 0;
+	RequiredSkill = 0;
+	RequiredSkillValue = 0;
+	RequiredCondition = 0;
+	RepObjectiveFaction = 0;
+	RepObjectiveValue = 0;
+	RequiredMinRepFaction = 0;
+	RequiredMinRepValue = 0;
+	RequiredMaxRepFaction = 0;
+	RequiredMaxRepValue = 0;
+	SuggestedPlayers = 0;
+	LimitTime = 0;
+	m_QuestFlags = 0;
+	m_SpecialFlags = 0;
+	PrevQuestId = pQuest.QuestId;
+	NextQuestId = 0;
+	ExclusiveGroup = 0;
+	BreadcrumbForQuestId = 0;
+	NextQuestInChain = 0;
 	SrcItemId = pQuest.SrcItemId;
 	SrcItemCount = pQuest.SrcItemCount;
-	SrcSpell = pQuest.SrcSpell;
+	SrcSpell = 0;
 	Title = pQuest.Title;
 	Details = pQuest.Details;
 	Objectives = pQuest.Objectives;
@@ -234,7 +234,7 @@ Quest::Quest(const Quest& pQuest)
 		ReqCreatureOrGOCount[i] = pQuest.ReqCreatureOrGOCount[i];
 
 	for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
-		ReqSpell[i] = pQuest.ReqSpell[i];
+		ReqSpell[i] = 0;
 
 	for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
 		RewChoiceItemId[i] = pQuest.RewChoiceItemId[i];
@@ -249,42 +249,42 @@ Quest::Quest(const Quest& pQuest)
 		RewItemCount[i] = pQuest.RewItemCount[i];
 
 	for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
-		RewRepFaction[i] = pQuest.RewRepFaction[i];
+		RewRepFaction[i] = 0;
 
 	for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
-		RewRepValue[i] = pQuest.RewRepValue[i];
+		RewRepValue[i] = 0;
 
-	RewRepSpilloverMask = pQuest.RewRepSpilloverMask;
+	RewRepSpilloverMask = 0;
 	RewXP = pQuest.RewXP;
 	RewOrReqMoney = pQuest.RewOrReqMoney;
 	RewMoneyMaxLevel = pQuest.RewMoneyMaxLevel;
-	RewSpell = pQuest.RewSpell;
-	RewSpellCast = pQuest.RewSpellCast;
-	RewMailTemplateId = pQuest.RewMailTemplateId;
-	RewMailDelaySecs = pQuest.RewMailDelaySecs;
-	RewMailMoney = pQuest.RewMailMoney;
+	RewSpell = 0;
+	RewSpellCast = 0;
+	RewMailTemplateId = 0;
+	RewMailDelaySecs = 0;
+	RewMailMoney = 0;
 	PointMapId = pQuest.PointMapId;
 	PointX = pQuest.PointX;
 	PointY = pQuest.PointY;
 	PointOpt = pQuest.PointOpt;
 
 	for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
-		DetailsEmote[i] = pQuest.DetailsEmote[i];
+		DetailsEmote[i] = 0;
 
 	for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
-		DetailsEmoteDelay[i] = pQuest.DetailsEmoteDelay[i];
+		DetailsEmoteDelay[i] = 0;
 
-	IncompleteEmote = pQuest.IncompleteEmote;
-	CompleteEmote = pQuest.CompleteEmote;
-
-	for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
-		OfferRewardEmote[i] = pQuest.OfferRewardEmote[i];
+	IncompleteEmote = 0;
+	CompleteEmote = 0;
 
 	for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
-		OfferRewardEmoteDelay[i] = pQuest.OfferRewardEmoteDelay[i];
+		OfferRewardEmote[i] = 0;
 
-	QuestStartScript = pQuest.QuestStartScript;
-	QuestCompleteScript = pQuest.QuestCompleteScript;
+	for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
+		OfferRewardEmoteDelay[i] = 0;
+
+	QuestStartScript = 0;
+	QuestCompleteScript = 0;
 
 	m_isActive = pQuest.m_isActive;
 
