@@ -109,20 +109,21 @@ public:
 	 *
 	 *****************************************************/
 	// note on data arrays
-	// subtype: pet type, active pet
-	// data1: pet level
-	// data2: happiness points
-	// data3: relationship points (determined the trigger chance of the pet)
-	// data4: current relation points
+	// subtype: active pet id, 1 - 7 means data1 to data4(types);
+	// each data holds 10 digits
+	// ----------------
+	// A-BC-DE-F-GH-IJ
+	// 0-12-23-5-67-89
+	// ----------------
+	// A/F -means pet level, from 1 to 9
+	// BC.GH - means happiness points, from 0 to 99
+	// DE.IJ - means relationship points, from 0 to 99
 
 	//get the player's pet information, return a vector of AchievementsEntry
 	AchievementsEntry* LoadPetInfo(Player *player);
 
 	//set the player's pet information, add the pet to the player's achievements vector
 	void SetPetInfo(Player *player, AchievementsEntry* entry);
-
-
-
 
 protected:
 	std::vector<AchievementsEntry> entries;

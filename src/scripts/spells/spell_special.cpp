@@ -80,6 +80,47 @@ SpellScript* GetScript_DarkmoonSteamTonkCannon(SpellEntry const*)
     return new DarkmoonSteamTonkCannonScript();
 }
 
+
+//add custom spell script for the pet system
+struct PetTrigSpellScript : public SpellScript
+{
+    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            int32 _bp0  = 10;
+            //get the player's info from sQZAchievementMgr
+            Player* player = spell->GetCaster()->ToPlayer();
+            if (player)
+            {
+               auto pEntry = sQZAchievements.LoadPetInfo(Player *player);
+
+               if(pEntry)
+               {
+                    // subtype: pet type, ( active pet should be saved in table)
+                    // data1: pet level
+                    // data2: happiness points
+                    // data3: relationship points (determined the trigger chance of the pet)
+                    float _multiple = pEntry->pet_level * 0.1f; // 10% of the pet level
+               }
+               //1. check the current pet level
+               //2. check pet happiness level
+               //3. check pet loyalty level
+
+            }
+
+            spell->damage = _bp0;
+        } 
+        return true;
+    }
+}
+
+SpellScript* GetScript_PetTrigSpell(SpellEntry const*)
+{
+    return new PetTrigSpellScript(); 
+}
+
+
 void AddSC_special_spell_scripts()
 {
     Script* newscript;
@@ -99,4 +140,8 @@ void AddSC_special_spell_scripts()
     newscript->GetSpellScript = &GetScript_DarkmoonSteamTonkCannon;
     newscript->RegisterSelf();
 
+    //add custom spell script for the pet system
+    newscript = new Script;
+    newscript->Name = "spell_pet_trig_spell";
+    newscript->GetSpellScript = &GetScript_PetTrigSpell;
 }

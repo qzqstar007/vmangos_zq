@@ -6421,13 +6421,15 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
         //2. one to one mapping between petType and petEntry, if petType is not found, use petEntry as petType
         switch (petType)
         {
-            case 1: petEntry = 11111; break;
-            case 2: petEntry = 22222; break;
-            case 3: petEntry = 33333; break;
-            case 4: petEntry = 44444; break;
+            case 0: petEntry = 30151; break;
+            case 1: petEntry = 30152; break;
+            case 2: petEntry = 30153; break;
+            case 3: petEntry = 30154; break;
+            case 4: petEntry = 30155; break;
         }
+        
         //3. if petEntry is not found, set defualt petEntry to 11111
-        if (!petEntry) petEntry = 11111;
+        if (!petEntry) petEntry = 30151;
     }
 
     CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(petEntry);

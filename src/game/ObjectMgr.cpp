@@ -4516,7 +4516,7 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 	else _exceedFloat = 2.58f;
 
 	//luckdraw injection
-	if (luckydraw > 9000) { _dmg_mux = 1.2f; _prop_mux = 1.33f; qPlus = true; }
+	if (luckydraw > 9000) { _dmg_mux = 1.22f; _prop_mux = 1.38f; qPlus = true; }
 
 	//now check the luckdraw, should around 0-100
 	if (luckydraw > 30)	luckydraw = 30;

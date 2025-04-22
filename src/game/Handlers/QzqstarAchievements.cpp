@@ -259,14 +259,15 @@ AchievementsEntry* QzqstarAchievements::LoadPetInfo(Player * _player)
 	AchievementsEntry e;
 	e.guid = _player->GetGUID();
 	e.type = ACHIEVEMENT_PETS;
-	e.subType = 0;
-	e.data1 = 0;	//pet level
-	e.data2 = 0;	//pet happiness level
-	e.data3 = 0;	//pet max level
-	e.data4 = 0;	//pet type, active pet
+	e.subType = 1;
+	e.data1 = 1000010000;	//pet level, happiness level, relationship level
+	e.data2 = 1000010000;	//pet happiness level
+	e.data3 = 1000010000;	//pet max level
+	e.data4 = 1000010000;	//pet type, active pet
 	e.note = "";
 	_playerAchievements[_player->GetGUID()].push_back(e);
 
 	return &e;
 }
+
 
