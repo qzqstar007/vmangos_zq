@@ -17,6 +17,10 @@ struct AchievementsEntry
 	int32 data3;
 	int32 data4;
 	std::string note;
+	int32 data5;
+	int32 data6;
+	int32 data7;
+	int32 data8;
 };
 
 enum Achievement_t
@@ -116,14 +120,17 @@ public:
 	// 0-12-23-5-67-89
 	// ----------------
 	// A/F -means pet level, from 1 to 9
-	// BC.GH - means happiness points, from 0 to 99
+	// BC.GH - means happiness points, from 0 to 99, interval can be 10minutes
 	// DE.IJ - means relationship points, from 0 to 99
 
 	//get the player's pet information, return a vector of AchievementsEntry
-	AchievementsEntry* LoadPetInfo(Player *player);
+	int32 GetActivePetInfo(Player *player);
 
 	//set the player's pet information, add the pet to the player's achievements vector
-	void SetPetInfo(Player *player, AchievementsEntry* entry);
+	void SetActivePetInfo(Player *player, int32 miscValue);
+
+	//change active pet, range 1-7
+	void ChangeActivePet(Player *player, int32 petType);
 
 protected:
 	std::vector<AchievementsEntry> entries;

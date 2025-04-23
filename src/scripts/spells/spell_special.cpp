@@ -16,6 +16,8 @@
 
 #include "scriptPCH.h"
 
+#include "QzqstarAchievements.h"
+
 // 24340, 26558, 28884 - Meteor
 // 26789 - Shard of the Fallen Star
 struct MeteorScript : public SpellScript
@@ -84,41 +86,99 @@ SpellScript* GetScript_DarkmoonSteamTonkCannon(SpellEntry const*)
 //add custom spell script for the pet system
 struct PetTrigSpellScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0)
         {
-            int32 _bp0  = 10;
+            int32 basePoints0 = spell->m_currentBasePoints[0];
+            float _multiple = 1.0f;
             //get the player's info from sQZAchievementMgr
             Player* player = spell->GetCaster()->ToPlayer();
             if (player)
             {
-               auto pEntry = sQZAchievements.LoadPetInfo(Player *player);
+               auto petValues = sQZAchievements.GetActivePetInfo(player);
 
-               if(pEntry)
+               if(petValues)
                {
-                    // subtype: pet type, ( active pet should be saved in table)
-                    // data1: pet level
-                    // data2: happiness points
-                    // data3: relationship points (determined the trigger chance of the pet)
-                    float _multiple = pEntry->pet_level * 0.1f; // 10% of the pet level
+                    // A-B-CD-EF
+                    // A - Pet Type
+                    // B - Pet Level (1-9)
+                    // CD - Happiness Points (0-99)
+                    // EF - Relationship Points (0-99)
+                    // get the pet level and set the multiple
+                    int _petLevel = (petValues % 100000) / 10000; // -B----
+                    int _petHappiness = (petValues % 10000) / 100; // --CD--
+                    int _petRelationship = (petValues % 100); // ----EF
+
+                    _multiple = _petLevel * 2 * ( 1.0f + _petHappiness/100.0f) ; // 10% of the pet level
                }
-               //1. check the current pet level
-               //2. check pet happiness level
-               //3. check pet loyalty level
-
             }
+			
+            spell->damage = basePoints0 * _multiple;
 
-            spell->damage = _bp0;
+			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s bp0:%u _multiple: %f, olddamage = %u",
+				player->GetName(), basePoints0, _multiple, spell->damage);
         } 
         return true;
     }
-}
+};
 
 SpellScript* GetScript_PetTrigSpell(SpellEntry const*)
 {
     return new PetTrigSpellScript(); 
 }
+
+
+//add pet aura to the player when the pet is summoned
+struct PetAuraScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Apply Aura: %u", aura->GetSpellProto()->Id);
+
+        if (apply && aura->GetEffIndex() == EFFECT_INDEX_1)
+        {
+			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Apply Aura1111: %u", aura->GetSpellProto()->Id);
+            if (Player* player = aura->GetTarget()->ToPlayer())
+            {
+               //get the player's pet information from sQZAchievementMgr
+               auto petValues = sQZAchievements.GetActivePetInfo(player);
+               if(petValues) 
+               {
+                    // A-B-CD-EF
+                    // A - Pet Type
+                    // B - Pet Level (1-9)
+                    // CD - Happiness Points (0-99)
+                    // EF - Relationship Points (0-99)
+                    // get the pet level
+                    int _petLevel = (petValues % 100000) / 10000; // -B----
+                    // get the pet relation points and set the values
+                    int _petRelationship = (petValues % 100); // ----EF
+                    
+                    auto _modifier = aura->GetModifier();
+
+                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Apply aura:%u, amount: %u", _modifier->m_auraname, _modifier->m_amount);
+
+					sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Pet Values:%u Level:%u, RL: %u", petValues, _petLevel, _petRelationship);
+                    if(_modifier)
+                    {
+						//max is 9 * 99 / 20 about 45 attributes
+						//least should be 
+						_modifier->m_amount = _petLevel * (_petRelationship/20 + 1);
+                    }
+               }
+            }
+        }
+    }
+};
+
+
+AuraScript* GetScript_PetTrigAura(SpellEntry const*)
+{
+    return new PetAuraScript(); 
+}
+
+
 
 
 void AddSC_special_spell_scripts()
@@ -142,6 +202,13 @@ void AddSC_special_spell_scripts()
 
     //add custom spell script for the pet system
     newscript = new Script;
-    newscript->Name = "spell_pet_trig_spell";
+    newscript->Name = "qzqstar_pet_spell";
     newscript->GetSpellScript = &GetScript_PetTrigSpell;
+    newscript->RegisterSelf();
+
+    //add pet aura to the player when the pet is summoned
+    newscript = new Script;
+    newscript->Name = "qzqstar_pet_aura";
+    newscript->GetAuraScript = &GetScript_PetTrigAura;
+    newscript->RegisterSelf();
 }

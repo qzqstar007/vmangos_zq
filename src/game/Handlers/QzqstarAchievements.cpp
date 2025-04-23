@@ -48,7 +48,7 @@ void QzqstarAchievements::Update(uint32 diff)
 //load player's achievements from database a_achievements
 int32 QzqstarAchievements::Load(Player * _player)
 {
-	std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT `guid`, `type`, `subType`,`data1`,`data2`,`data3`,`data4`, `note` FROM `a_achievements` WHERE `guid` = '%u'", _player->GetGUID()));
+	std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT `guid`, `type`, `subType`,`data1`,`data2`,`data3`,`data4`, `note`, `data5`, `data6`, `data7`, `data8` FROM `a_achievements` WHERE `guid` = '%u'", _player->GetGUID()));
 	if (!result)
 	{
 		return 0;
@@ -75,6 +75,10 @@ int32 QzqstarAchievements::Load(Player * _player)
 		e.data3 = fields[5].GetInt32();
 		e.data4 = fields[6].GetInt32();
 		e.note = fields[7].GetCppString();
+		e.data5 = fields[8].GetInt32();
+		e.data6 = fields[9].GetInt32();
+		e.data7 = fields[10].GetInt32();
+		e.data8 = fields[11].GetInt32();
 		//save to vector maps _playerAchievements regardless of type
 		_playerAchievements[_player->GetGUID()].push_back(e);
 		
@@ -95,7 +99,7 @@ void QzqstarAchievements::Save(Player * _player)
 	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it != _playerAchievements[_player->GetGUID()].end(); ++it)
 	{
 		AchievementsEntry e = *it;
-		CharacterDatabase.PExecute("Replace into `a_achievements` (`guid`, `type`, `subType`,`data1`,`data2`,`data3`,`data4`, `note`) VALUES('%u', '%u', '%u', '%u', '%u', '%u', '%u', '%s')",
+		CharacterDatabase.PExecute("Replace into `a_achievements` (`guid`, `type`, `subType`,`data1`,`data2`,`data3`,`data4`, `note`, `data5`, `data6`, `data7`, `data8`) VALUES('%u', '%u', '%u', '%u', '%u', '%u', '%u', '%s', '%u', '%u', '%u', '%u')",
 			e.guid,
 			e.type,
 			e.subType,
@@ -103,7 +107,11 @@ void QzqstarAchievements::Save(Player * _player)
 			e.data2,
 			e.data3,
 			e.data4,
-			e.note.c_str()
+			e.note.c_str(),
+			e.data5,
+			e.data6,
+			e.data7,
+			e.data8
 			);
 	}
 }
@@ -129,7 +137,7 @@ int32 QzqstarAchievements::GetCustomQuestID(Player * _player)
 		AchievementsEntry e = *it;
 		if (e.type == ACHIEVEMENT_CUSTOM_QUEST)
 		{
-			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "GetCustomQuestID: %u", e.data1);
+			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s GetCustomQuestID: %u", _player->GetName(), e.data1);
 
 			found = true;
 			return e.data1;
@@ -239,11 +247,11 @@ uint32 QzqstarAchievements::GetQuestDoneCounters(Player * _player)
 /* ========================= Pet system  ============================================================================ */
 /* ================================================================================================================== */
 //get the player's pet information, return a vector of AchievementsEntry
-AchievementsEntry* QzqstarAchievements::LoadPetInfo(Player * _player)
+int32 QzqstarAchievements::GetActivePetInfo(Player * _player)
 {
 	//check _player if none
 	if (!_player)
-		return nullptr;
+		return 0;
 
 	//iterate the _playerAchievements vector map of this player to find the pet information
 	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
@@ -251,7 +259,20 @@ AchievementsEntry* QzqstarAchievements::LoadPetInfo(Player * _player)
 		AchievementsEntry& e = *it;
 		if (e.type == ACHIEVEMENT_PETS)
 		{
-			return &e;
+			//if found, return the miscValue data
+			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Loaded Pet: %u", _player->GetName(), e.subType);
+
+			switch(e.subType)
+			{	
+				case 1: return (e.data1) + e.subType * 100000;
+				case 2: return (e.data2) + e.subType * 100000;
+				case 3: return (e.data3) + e.subType * 100000;
+				case 4: return (e.data4) + e.subType * 100000;
+				case 5: return (e.data5) + e.subType * 100000;
+				case 6: return (e.data6) + e.subType * 100000;
+				case 7: return (e.data7) + e.subType * 100000;
+				case 8: return (e.data8) + e.subType * 100000;
+			}
 		}
 	}
 
@@ -260,14 +281,77 @@ AchievementsEntry* QzqstarAchievements::LoadPetInfo(Player * _player)
 	e.guid = _player->GetGUID();
 	e.type = ACHIEVEMENT_PETS;
 	e.subType = 1;
-	e.data1 = 1000010000;	//pet level, happiness level, relationship level
-	e.data2 = 1000010000;	//pet happiness level
-	e.data3 = 1000010000;	//pet max level
-	e.data4 = 1000010000;	//pet type, active pet
+	e.data1 = 10000;	//pet level, happiness level, relationship level
+	e.data2 = 10000;	//pet happiness level
+	e.data3 = 10000;	//pet max level
+	e.data4 = 10000;	//pet type, active pet
 	e.note = "";
+	e.data5 = 10000;	
+	e.data6 = 10000;
+	e.data7 = 10000;
+	e.data8 = 10000;
 	_playerAchievements[_player->GetGUID()].push_back(e);
 
-	return &e;
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Pet: %u", _player->GetName(), e.subType);
+
+	//default return code, means level=1, happy and relation to be zero.
+	return 110000;
 }
 
+void QzqstarAchievements::SetActivePetInfo(Player *player, int32 miscValue)
+{
+	//check _player if none
+	if (!player)
+		return;
+
+	if(miscValue > 100000)
+	{
+		//get the real pet info
+		miscValue = miscValue % 100000;
+	}
+	//iterate the _playerAchievements vector map of this player to find the pet information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it != _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_PETS)
+		{
+			//if found, set the miscValue data
+			switch(e.subType)
+			{
+				case 1: e.data1 = miscValue; break;
+				case 2: e.data2 = miscValue; break;
+				case 3: e.data3 = miscValue; break;
+				case 4: e.data4 = miscValue; break;
+				case 5: e.data5 = miscValue; break;
+				case 6: e.data6 = miscValue; break;
+				case 7: e.data7 = miscValue; break;
+				case 8: e.data8 = miscValue; break;
+			}
+		}
+	}
+}
+
+//change active pet, range 1-7
+void QzqstarAchievements::ChangeActivePet(Player *player, int32 petType)
+{
+	//check _player if none
+	if (!player)
+		return;
+
+	//iterate the _playerAchievements vector map of this player to find the pet information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_PETS)
+		{
+			if(e.subType != petType) 
+			{
+				e.subType=petType;
+				// despawn old pet before summon new
+				if (player->GetMiniPet())
+					player->RemoveMiniPet();
+			}
+		}
+	}
+}
 

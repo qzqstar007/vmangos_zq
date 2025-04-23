@@ -51,6 +51,8 @@
 #include "SocialMgr.h"
 #include "scriptPCH.h"
 
+#include "QzqstarAchievements.h"
+
 using namespace Spells;
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
@@ -6416,18 +6418,20 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
     if (petEntry == 99999)
     {
         //1. get pet type from player's achivement tables
-        uint32 petType = 0;
+        uint32 _petInfo = sQZAchievements.GetActivePetInfo(player);
 
         //2. one to one mapping between petType and petEntry, if petType is not found, use petEntry as petType
-        switch (petType)
+        switch (_petInfo / 100000)
         {
-            case 0: petEntry = 30151; break;
-            case 1: petEntry = 30152; break;
-            case 2: petEntry = 30153; break;
-            case 3: petEntry = 30154; break;
-            case 4: petEntry = 30155; break;
+            case 1: petEntry = 30151; break;
+            case 2: petEntry = 30152; break;
+            case 3: petEntry = 30153; break;
+            case 4: petEntry = 30154; break;
+            case 5: petEntry = 30155; break;
+            case 6: petEntry = 30156; break;
+            case 7: petEntry = 30157; break;
         }
-        
+
         //3. if petEntry is not found, set defualt petEntry to 11111
         if (!petEntry) petEntry = 30151;
     }
