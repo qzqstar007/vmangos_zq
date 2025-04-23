@@ -32,6 +32,8 @@
 #define __RED(x)		"|cfff00019"##x##"|r"
 #define __YELLOW(x)		"|cfff9dc24"##x##"|r"
 
+#define	__MENU_NONE					0
+
 
 #pragma region __BattleGround___
 
@@ -459,14 +461,14 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 	if (action == __MENU_PET_MAIN)
 	{
 		//display the pet information
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝宠物养成系统＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝宠物养成系统＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 		//set the pet information
 		text = "";
 		text.append(__STR("丨　等　级：　"));
 		text.append(__NSTR(_nowPetLevel));
 		text.append(__STR("　"));
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 		text = "";
 		text.append(__STR("丨　快乐度：　"));
@@ -474,7 +476,7 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 					: _nowPetHappy > 35? __ORANGE("0_0") 
 					: __RED(">_<")));
 		text.append(__STR("　"));
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		
 		text = "";
 		text.append(__STR("丨　忠诚度：　"));
@@ -483,16 +485,16 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 					: _nowPetRelation > 40? __ORANGE("★★★　 ")
 					: _nowPetRelation > 20? __ORANGE("★★　 ")
 					: __RED("★　 ")));
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 		//can only use meat etc..
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝　喂　养　＝＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_FEED);
 		if(_nowPetLevel < 9) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝　升　级　＝＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_UPGRADE);
-		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝　宠物已满级　＝＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝　宠物已满级　＝＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("＝＝　更换宠物类型　＝＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE);
@@ -533,8 +535,8 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 		auto localIdx = player->GetSession()->GetSessionDbLocaleIndex();
 
 		//feed the pet, display the new menu, can only feed meat or fish
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("　　请将食物（肉类、鱼类）放在行囊中　　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("　请将食物（肉类、鱼类）放在行囊中　　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		
 		//check if the player has the meat or fish in the bag
 		//find in the bag, from slot0 to slot12
@@ -550,13 +552,15 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 				text = "";
 				text.append(item_destroy_text);
 				text.append(__STR(" ==> 增加快乐点数：|cffee0000 "));
-				text.append(std::to_string(__getHappinessPoints(pItem, (_petInfo % 100000 / 10000),  pItem->GetCount())));
+				text.append(std::to_string(__getHappinessPoints(pItem, _nowPetLevel,  pItem->GetCount())));
 				text.append(" |r");
 
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(text), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_FEED + i);
 			}
 		}
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝【返回】＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
 
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 	}
@@ -567,7 +571,8 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 		// here, upgrade the pet, remove the MATs from the bag, and add the level
 		if (action > __MENU_PET_MAIN + __MENU_PET_ACT_UPGRADE)
 		{
-			if ((player->HasItemCount(__PET_UPGRADE_ITEM, _needShardNumber))) {
+			if ((player->HasItemCount(__PET_UPGRADE_ITEM, _needShardNumber))) 
+			{
 				player->DestroyItemCount(__PET_UPGRADE_ITEM, _needShardNumber, true);
 
 				//level up the pet, and reset the happiness points to 0
@@ -575,69 +580,69 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 
 				//ChatHandler(player).PSendSysMessage(9038, _petInfo / 10000 , _nowHappiness, _petInfo % 100);
 			}
-			auto localIdx = player->GetSession()->GetSessionDbLocaleIndex();
-
-			//feed the pet, display the new menu, can only feed meat or fish
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-
-			//concate the text with _currentPetLevel
-			text = "";
-			text.append(__STR("　　当前等级：　"));
-			text.append(__NSTR(_nowPetLevel));
-			text.append(__STR("级　"));
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-
-
-			//show next petleve
-			text = "";
-			text.append(__STR("　　升级后：　"));
-			text.append(__NSTR(_nowPetLevel + 1));
-			text.append(__STR("级　"));
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-
-			//show need shard numbers
-			text = "";
-			text.append(__STR("　　需要碎片：|cffbb1122　"));
-			text.append(__NSTR(_needShardNumber));
-			text.append(__STR("个　|r"));
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-
-
-			if ((player->HasItemCount(__PET_UPGRADE_ITEM, _needShardNumber)))
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＝＝＝【确定升级】＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-			else
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("＝＝＝＝＝＝【碎片不足】＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-
-			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 		}
-		else if (action >= __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE)
-		{
-			if (action > __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE)
-			{
-				//confirm to change the pet type,
-				int32 _newPetType = action - __MENU_PET_MAIN - __MENU_PET_ACT_CHANGE;
-				if (_newPetType >= 1 && _newPetType <= 7)
-				{
-					//change the pet type
-					sQZAchievements.ChangeActivePet(player, _newPetType);
-				}
-			}
+			
+		auto localIdx = player->GetSession()->GetSessionDbLocaleIndex();
 
-			//show the pet type, and the cost to change the pet type
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("　　更改宠物类型：　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　①：寒冰系-寒冰箭　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 1);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　②：火焰系-火球术　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 2);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　③：暗影系-暗影箭　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 3);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　④：自然系-闪电链　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 4);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　⑤：奥术系-星火术　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 5);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　⑥：神圣系-治疗术　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 6);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　⑦：物理系-顺劈斩　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 7);
+		//feed the pet, display the new menu, can only feed meat or fish
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
 
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
-		}
+		//concate the text with _currentPetLevel
+		text = "";
+		text.append(__STR("　　当前等级：　"));
+		text.append(__NSTR(_nowPetLevel));
+		text.append(__STR("级　"));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+
+
+		//show next petleve
+		text = "";
+		text.append(__STR("　　升级后：　"));
+		text.append(__NSTR(_nowPetLevel + 1));
+		text.append(__STR("级　"));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+
+		//show need shard numbers
+		text = "";
+		text.append(__STR("　　需要碎片：|cffbb1122　"));
+		text.append(__NSTR(_needShardNumber));
+		text.append(__STR("个　|r"));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+
+
+		if ((player->HasItemCount(__PET_UPGRADE_ITEM, _needShardNumber)))
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＝＝＝【确定升级】＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		else
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("＝＝＝＝＝＝【碎片不足】＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 	}
+	else if (action >= __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE)
+	{
+		if (action > __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE)
+		{
+			//confirm to change the pet type,
+			int32 _newPetType = action - __MENU_PET_MAIN - __MENU_PET_ACT_CHANGE;
+			if (_newPetType >= 1 && _newPetType <= 7)
+			{
+				//change the pet type
+				sQZAchievements.ChangeActivePet(player, _newPetType);
+			}
+		}
 
+		//show the pet type, and the cost to change the pet type
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("　　更改宠物类型：　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　①：寒冰系-寒冰箭　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 1);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　②：火焰系-火球术　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 2);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　③：暗影系-暗影箭　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 3);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　④：自然系-闪电链　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 4);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　⑤：奥术系-星火术　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 5);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　⑥：神圣系-治疗术　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 6);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　⑦：物理系-顺劈斩　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 7);
+
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+	}
 	return true;
 }
 
