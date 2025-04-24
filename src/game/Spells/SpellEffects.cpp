@@ -6478,6 +6478,14 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
 
     //qzqstar, 250419, set the pet size according to the pet relationship
     //if(player->GetLevel() > 50) critter->SetTransformScale(2.00f);
+    //get summoned critter, and check the pet level
+    //if pet level is higher than 50, set the pet size to 2.00f
+    if(petEntry >= 30151 && petEntry<= 30157)
+    {
+        int32 _critterInfo = sQZAchievements.GetActivePetInfo(player);
+        int32 _critterLevel = _critterInfo % 100000 / 10000;
+        critter->SetTransformScale( 0.3f + _critterLevel * 0.08f);
+    }
 
     critter->SetOwnerGuid(m_caster->GetObjectGuid());
     critter->SetCreatorGuid(m_caster->GetObjectGuid());

@@ -355,3 +355,40 @@ void QzqstarAchievements::ChangeActivePet(Player *player, int32 petType)
 	}
 }
 
+//update pet points every some time
+void QzqstarAchievements::UpdatePetPoints(Player *player)
+{
+	//check _player if none
+	if (!player)
+		return;
+
+	//iterate the _playerAchievements vector map of this player to find the pet information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_PETS)
+		{
+			//decrease the relation ship for all
+			if(e.data1%100 > 0) e.data1 = e.data1 - 1;	//relation level for pet 1
+			if(e.data2%100 > 0) e.data2 = e.data2 - 1;	//relation level for pet 2
+			if(e.data3%100 > 0) e.data3 = e.data3 - 1;	//relation level for pet 3
+			if(e.data4%100 > 0) e.data4 = e.data4 - 1;	//relation level for pet 4
+			if(e.data5%100 > 0) e.data5 = e.data5 - 1;	//relation level for pet 5
+			if(e.data6%100 > 0) e.data6 = e.data6 - 1;	//relation level for pet 6
+			if(e.data7%100 > 0) e.data7 = e.data7 - 1;	//relation level for pet 7
+			if(e.data8%100 > 0) e.data8 = e.data8 - 1;	//relation level for pet 8
+			
+			switch(e.subType)
+			{
+				case 1: if(e.data1%100<98) e.data1 += 2; if(e.data1%10000 > 100) e.data1 -= 100; break;	//happy and relation for pet 1
+				case 2: if(e.data2%100<98) e.data2 += 2; if(e.data2%10000 > 100) e.data2 -= 100; break;	//happy and relation for pet 2
+				case 3: if(e.data3%100<98) e.data3 += 2; if(e.data3%10000 > 100) e.data3 -= 100; break;	//happy and relation for pet 3
+				case 4: if(e.data4%100<98) e.data4 += 2; if(e.data4%10000 > 100) e.data4 -= 100; break;	//happy and relation for pet 4
+				case 5: if(e.data5%100<98) e.data5 += 2; if(e.data5%10000 > 100) e.data5 -= 100; break;	//happy and relation for pet 5
+				case 6: if(e.data6%100<98) e.data6 += 2; if(e.data6%10000 > 100) e.data6 -= 100; break;	//happy and relation for pet 6
+				case 7: if(e.data7%100<98) e.data7 += 2; if(e.data7%10000 > 100) e.data7 -= 100; break;	//happy and relation for pet 7
+				case 8: if(e.data8%100<98) e.data8 += 2; if(e.data8%10000 > 100) e.data8 -= 100; break;	//happy and relation for pet 8
+			}
+		}	
+	}
+}

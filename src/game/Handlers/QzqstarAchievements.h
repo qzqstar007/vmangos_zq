@@ -132,6 +132,10 @@ public:
 	//change active pet, range 1-7
 	void ChangeActivePet(Player *player, int32 petType);
 
+	//every 10 minutes, minus 1 happiness points for all players online
+	//add 10 points to pet's relationship points if active
+	void UpdatePetPoints(Player *player);
+
 protected:
 	std::vector<AchievementsEntry> entries;
 	time_t _constInterval;

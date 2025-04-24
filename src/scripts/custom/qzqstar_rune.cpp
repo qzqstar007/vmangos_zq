@@ -1956,6 +1956,9 @@ void SendDefaultMenu_Social(Player *player, Creature *_Creature, uint32 action)
 			//MC Range
 			if (__canSeeRange >= _ITEM_BUY_RANGE_5) __canSeeRange = _ITEM_BUY_RANGE_4;
 
+			//BWL&TAQ Range
+			//if (__canSeeRange >= _ITEM_BUY_RANGE_6) __canSeeRange = _ITEM_BUY_RANGE_5;
+
 			//check the actions
 			if (action == __MENU_SOCIAL_BUY)
 			{
