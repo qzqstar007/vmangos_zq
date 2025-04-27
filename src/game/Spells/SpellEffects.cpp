@@ -6484,7 +6484,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
     {
         int32 _critterInfo = sQZAchievements.GetActivePetInfo(player);
         int32 _critterLevel = _critterInfo % 100000 / 10000;
-        critter->SetTransformScale( 0.3f + _critterLevel * 0.08f);
+        critter->SetTransformScale( 0.4f + _critterLevel * 0.05f);
     }
 
     critter->SetOwnerGuid(m_caster->GetObjectGuid());

@@ -117,6 +117,89 @@ void QzqstarAchievements::Save(Player * _player)
 }
 
 
+
+/* ================================================================================================================== */
+/* ========================= VIP system  ============================================================================ */
+/* ================================================================================================================== */
+#pragma region  VIP system
+/**
+ * @brief get the player's VIP level, if the player has not got any VIP level, return 1.
+ * @param _player the player to check
+ * @return the player's VIP level, if the player has not got any VIP level, return 1.
+ */
+uint32 QzqstarAchievements::GetVIPLevel(Player * _player)
+{
+	//check _player if none
+	if (!_player)
+		return 0;
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry e = *it;
+		if (e.type == ACHIEVEMENT_VIP)
+		{
+			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::GetVIPLevel] Player:%s GetVIPLevel: %u", _player->GetName(), e.data1);
+			return e.data1;
+		}	
+	}
+
+	//add one VIP level to the _playerAchievements vector map of this player if not found
+	AchievementsEntry e;
+	e.guid = _player->GetGUID();
+	e.type = ACHIEVEMENT_VIP;
+	e.subType = 0;
+	e.data1 = 1;
+	e.data2 = 0;
+	e.data3 = 0;
+	e.data4 = 0;
+	e.note = "";
+	_playerAchievements[_player->GetGUID()].push_back(e);
+
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::GetVIPLevel] Not found but init one VIP Entry: %u", _player->GetGUID());
+	return 1;
+}
+
+/**
+ * @brief set the player's VIP level and add the VIP level to the player's achievements vector
+ * @param _player the player to check
+ * @param level the VIP level to set, if the level is 0, the VIP level will be set to 1.
+ * @return true if the VIP level is set successfully, false if the VIP level is not set successfully.
+ */
+bool QzqstarAchievements::SetVIPLevel(Player * _player, uint32 level)
+{
+	//check _player if none
+	if (!_player)
+		return false;
+
+	//check if the level is 0, if so, set it to 1
+	if (level == 0)
+		level = 1;
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)	
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_VIP)
+		{
+			//slog out with player info
+			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::SetVIPLevel] Player:%s SetVIPLevel: %u", _player->GetName(), level);
+			e.data1 = level;
+			break;
+		}	
+	}
+
+	return true;
+}
+
+#pragma endregion
+
+
+/* ================================================================================================================== */
+/* ======================= Quest system  ============================================================================ */
+/* ================================================================================================================== */
+
+#pragma region  Quest system
 /**
  * @brief get the custom quest id the player has accepted 
  * @param _player the player to check
@@ -242,10 +325,50 @@ uint32 QzqstarAchievements::GetQuestDoneCounters(Player * _player)
 	return 0;
 }
 
+#pragma endregion
 
 /* ================================================================================================================== */
 /* ========================= Pet system  ============================================================================ */
 /* ================================================================================================================== */
+
+#pragma region  Pet system
+
+//get the pet entry
+AchievementsEntry QzqstarAchievements::GetPetEntry(Player * _player)
+{
+	//check _player if none
+	if (!_player)
+		return AchievementsEntry();
+
+	//iterate the _playerAchievements vector map of this player to find the pet information
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_PETS)
+		{
+			return e;
+		}	
+	}
+	//add one pet to the _playerAchievements vector map of this player if not found
+	AchievementsEntry e;
+	e.guid = _player->GetGUID();
+	e.type = ACHIEVEMENT_PETS;
+	e.subType = 1;
+	e.data1 = 10000;	//pet level, happiness level, relationship level
+	e.data2 = 0;
+	e.data3 = 0;
+	e.data4 = 0;
+	e.note = "";
+	e.data5 = 0;	//pet level, happiness level, relationship level
+	e.data6 = 0;
+	e.data7 = 0;
+	e.data8 = 0;
+	_playerAchievements[_player->GetGUID()].push_back(e);
+
+	// sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Not found but init one Pet Entry: %u", _player->GetGUID());
+	return e;
+}
+
 //get the player's pet information, return a vector of AchievementsEntry
 int32 QzqstarAchievements::GetActivePetInfo(Player * _player)
 {
@@ -282,14 +405,14 @@ int32 QzqstarAchievements::GetActivePetInfo(Player * _player)
 	e.type = ACHIEVEMENT_PETS;
 	e.subType = 1;
 	e.data1 = 10000;	//pet level, happiness level, relationship level
-	e.data2 = 10000;	//pet happiness level
-	e.data3 = 10000;	//pet max level
-	e.data4 = 10000;	//pet type, active pet
+	e.data2 = 0;	
+	e.data3 = 0;
+	e.data4 = 0;	
 	e.note = "";
-	e.data5 = 10000;	
-	e.data6 = 10000;
-	e.data7 = 10000;
-	e.data8 = 10000;
+	e.data5 = 0;	
+	e.data6 = 0;
+	e.data7 = 0;
+	e.data8 = 0;
 	_playerAchievements[_player->GetGUID()].push_back(e);
 
 	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Pet: %u", _player->GetName(), e.subType);
@@ -347,6 +470,19 @@ void QzqstarAchievements::ChangeActivePet(Player *player, int32 petType)
 			if(e.subType != petType) 
 			{
 				e.subType=petType;
+
+				//summon new pet, and enable the pet if not enabled yet
+				switch(petType)
+				{
+					case 1: if(e.data1 < 10000) e.data1=10000; break;	//summon pet 1	
+					case 2: if(e.data2 < 10000) e.data2=10000; break;	//summon pet 2
+					case 3: if(e.data3 < 10000) e.data3=10000; break;	//summon pet 3
+					case 4: if(e.data4 < 10000) e.data4=10000; break;	//summon pet 4
+					case 5: if(e.data5 < 10000) e.data5=10000; break;	//summon pet 5
+					case 6: if(e.data6 < 10000) e.data6=10000; break;	//summon pet 6
+					case 7: if(e.data7 < 10000) e.data7=10000; break;	//summon pet 7
+				}
+
 				// despawn old pet before summon new
 				if (player->GetMiniPet())
 					player->RemoveMiniPet();
@@ -392,3 +528,4 @@ void QzqstarAchievements::UpdatePetPoints(Player *player)
 		}	
 	}
 }
+#pragma endregion

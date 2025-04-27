@@ -2619,6 +2619,124 @@ bool GossipSelect_Rune(Player *player, Creature *_Creature, uint32 sender, uint3
 	return true;
 }
 
+
+
+
+
+/*****************************************************************************************
+ *  Equip system Menus for the game object.
+ *  @param player: The player who interact with the game object.
+ *  @param _go: The game object.
+ *  @param sender: The sender of the menu.
+ *  @param action: The action of the menu.
+ ******************************************************************************************/
+ #define __MENU_EQUIP_MAIN 				1000
+ #define __MENU_EQUIP_SUB_CREATE 		2000
+ #define __MENU_EQUIP_SUB_UPGRADE 		3000
+ #define __MENU_EQUIP_SUB_MOD	 		4000
+ #define __MENU_EQUIP_SUB_DISENCHANT 	5000
+ #define __MENU_SIZE					 999 //Each SubMenu holds 999 items.
+bool Menus_Equip_Main(Player *player, GameObject *_go, uint32 sender, uint32 action)
+{
+	//check if player is null and go is null
+	if (!player || !_go) return false;
+
+	// Main menu
+	// Several Features:
+	// 1. Equipment Creation: Create the equipment with the player's items.
+	// 2. Equipment Upgrade: Upgrade the equipment with the player's items.
+	// 3. Equipment Disenchant : Disenchant the equipment with the player's items.
+	
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Creation", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);	
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Upgrade", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_UPGRADE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Disenchant", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
+
+	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
+	return true;
+}
+
+//Menus for Equip Creation
+bool Menus_Equip_Sub_Create(Player *player, GameObject *_go, uint32 sender, uint32 action)
+{
+	/*
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Creation", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+
+	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
+	*/
+	SendDefaultMenu_EQCreate(player, (Creature *)player, __MENU_CREATE_MAIN);
+	return true;
+}
+
+//Menus for Equip Upgrade
+bool Menus_Equip_Sub_Upgrade(Player *player, GameObject *_go, uint32 sender, uint32 action)
+{
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Upgrade", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_UPGRADE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_UPGRADE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_UPGRADE);
+	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
+	return true;	
+}
+
+//Menus for Equip Display Modify
+bool Menus_Equip_Sub_DispMod(Player *player, GameObject *_go, uint32 sender, uint32 action)
+{
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Display Modify", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
+	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());		
+	return true;
+
+}
+
+//Menus for Equip Disenchant
+bool Menus_Equip_Sub_Disenchant(Player *player, GameObject *_go, uint32 sender, uint32 action)
+{
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Disenchant", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
+	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
+	return true;	
+}
+
+
+
+
+//define a wrapper function for the equip system menus
+bool Equip_Menus(Player *player, GameObject *_go, uint32 sender, uint32 action)
+{
+	//check if player is null and go is null
+	if (!player ||!_go) return false;
+
+	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Equip_Menus] PLAYER:[%u][%s] === action: %d", player->GetGUID(), player->GetName(), action);
+
+	// Main menu
+	if (action >= __MENU_EQUIP_MAIN && action <= __MENU_EQUIP_MAIN + __MENU_SIZE)
+	{
+		return Menus_Equip_Main(player, _go, sender, action);	
+	}
+	else if (action >= __MENU_EQUIP_SUB_CREATE && action <= __MENU_EQUIP_SUB_CREATE + __MENU_SIZE)
+	{
+		return Menus_Equip_Sub_Create(player, _go, sender, action);
+	}
+	else if (action >= __MENU_EQUIP_SUB_UPGRADE && action <= __MENU_EQUIP_SUB_UPGRADE + __MENU_SIZE)
+	{
+		return Menus_Equip_Sub_Upgrade(player, _go, sender, action);
+	}
+	else if (action >= __MENU_EQUIP_SUB_MOD && action <= __MENU_EQUIP_SUB_MOD + __MENU_SIZE)
+	{
+		return Menus_Equip_Sub_DispMod(player, _go, sender, action);
+	}
+	else if (action >= __MENU_EQUIP_SUB_DISENCHANT && action <= __MENU_EQUIP_SUB_DISENCHANT + __MENU_SIZE)
+	{
+		return Menus_Equip_Sub_Disenchant(player, _go, sender, action);
+	}
+
+	return false;
+}
+
+
 void AddSC_qzqstar_rune_creatures()
 {
 	Script* newscript;
@@ -2627,6 +2745,15 @@ void AddSC_qzqstar_rune_creatures()
 	newscript->Name = "qzqstar_rune_npc";
 	newscript->pGossipHello = &GossipHello_Rune;
 	newscript->pGossipSelect = &GossipSelect_Rune;
+	newscript->RegisterSelf(false);
+
+
+	//split the rune code to seprate scripte
+	//equip system
+	newscript = new Script;
+	newscript->Name = "qzqstar_equip_system";
+	newscript->pGOGossipHello = [](Player *p, GameObject *g) -> bool { return Equip_Menus(p, g, 0, __MENU_EQUIP_MAIN); };
+	newscript->pGOGossipSelect = &Equip_Menus;
 	newscript->RegisterSelf(false);
 }
 

@@ -122,7 +122,8 @@ public:
 	// A/F -means pet level, from 1 to 9
 	// BC.GH - means happiness points, from 0 to 99, interval can be 10minutes
 	// DE.IJ - means relationship points, from 0 to 99
-
+	AchievementsEntry QzqstarAchievements::GetPetEntry(Player * _player);
+	
 	//get the player's pet information, return a vector of AchievementsEntry
 	int32 GetActivePetInfo(Player *player);
 

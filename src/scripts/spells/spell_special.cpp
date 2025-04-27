@@ -110,14 +110,22 @@ struct PetTrigSpellScript : public SpellScript
                     int _petHappiness = (petValues % 10000) / 100; // --CD--
                     int _petRelationship = (petValues % 100); // ----EF
 
-                    _multiple = _petLevel * 2 * ( 1.0f + _petHappiness/100.0f) ; // 10% of the pet level
+                    if(spell->m_spellInfo->Id == 31717) // Weapon Damage
+                    {
+						//weapon damage
+                        _multiple = (_petLevel / 4.0f) * ( 1.0f + _petHappiness/200.0f) ; // 10% of the pet level
+						spell->m_currentBasePoints[0] = spell->m_currentBasePoints[0] * _multiple * frand(0.9, 1.15);
+                    }
+                    else {
+                        //magic damage
+                        _multiple = _petLevel * 7 * ( 1.0f + _petHappiness/100.0f) + _petLevel * _petLevel ; // 10% of the pet level
+						spell->damage = basePoints0 * _multiple * frand(0.9, 1.15);
+                    }
                }
             }
 			
-            spell->damage = basePoints0 * _multiple;
 
-			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s bp0:%u _multiple: %f, olddamage = %u",
-				player->GetName(), basePoints0, _multiple, spell->damage);
+			//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s bp0:%u _multiple: %f, olddamage = %f", player->GetName(), basePoints0, _multiple, spell->damage);
         } 
         return true;
     }
@@ -134,7 +142,7 @@ struct PetAuraScript : public AuraScript
 {
     void OnBeforeApply(Aura* aura, bool apply) final
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Apply Aura: %u", aura->GetSpellProto()->Id);
+        //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Apply Aura: %u", aura->GetSpellProto()->Id);
 
         if (apply && aura->GetEffIndex() == EFFECT_INDEX_1)
         {
@@ -157,9 +165,9 @@ struct PetAuraScript : public AuraScript
                     
                     auto _modifier = aura->GetModifier();
 
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Apply aura:%u, amount: %u", _modifier->m_auraname, _modifier->m_amount);
+                    //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Apply aura:%u, amount: %u", _modifier->m_auraname, _modifier->m_amount);
 
-					sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Pet Values:%u Level:%u, RL: %u", petValues, _petLevel, _petRelationship);
+					//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Pet Values:%u Level:%u, RL: %u", petValues, _petLevel, _petRelationship);
                     if(_modifier)
                     {
 						//max is 9 * 99 / 20 about 45 attributes
