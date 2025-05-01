@@ -26,6 +26,7 @@ struct AchievementsEntry
 enum Achievement_t
 {
 	ACHIEVEMENT_VIP 		  	= 66,
+	ACHIEVEMENT_RUNE 		  	= 88,
 	ACHIEVEMENT_CUSTOM_QUEST 	= 100,
 	ACHIEVEMENT_SOCIAL_POINTS 	= 200,
 	ACHIEVEMENT_PETS = 300,
@@ -72,8 +73,6 @@ public:
 	 *****************************************************/
 	// note on data arrays
 	// data1: vip level
-	// data2: vip points
-	// data3: vip max points
 
 	// Get the player's VIP level
 	uint32 GetVIPLevel(Player *player);
@@ -82,6 +81,19 @@ public:
 	bool SetVIPLevel(Player *player, uint32 level);
 
 
+	/*****************************************************
+	 *
+	 *		Rune Systems Functions
+	 *
+	 *****************************************************/
+	// note on data arrays
+	// data1: rune slots
+
+	// Get the player's rune slots
+	uint32 GetRuneSlots(Player *player);
+
+	// Set the player's rune slots and add the rune slots to the player's achievements vector
+	bool SetRuneSlots(Player *player, uint32 slots);
 
 	/*****************************************************
 	 *

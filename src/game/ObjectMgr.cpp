@@ -4391,8 +4391,7 @@ uint32 _PickRandomSpellId_qPlus(uint32 __spellid)
 	return __spellid;
 }
 
-
-
+#if false
 //qzqstar, 250311, add for dynamic object create
 ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::string _customName, std::string Desc, uint32 luckydraw, Classes _playerclass)
 {
@@ -4740,6 +4739,439 @@ ItemPrototype * ObjectMgr::DynamicGenerateItem(Item *pItem1, Item *pItem2, std::
 		: item.ItemLevel>50 ? 13055 : item1_proto->RandomProperty;
 
 	item.ItemSet = 0;
+	item.MaxDurability = item1_proto->MaxDurability;
+	item.Area = item1_proto->Area;
+	item.Map = item1_proto->Map;
+	item.Duration = item1_proto->Duration;
+	item.BagFamily = item1_proto->BagFamily;
+	item.DisenchantID = item.Quality>4? 0 : item1_proto->DisenchantID;
+	item.FoodType = item1_proto->FoodType;
+	item.MinMoneyLoot = item1_proto->MinMoneyLoot;
+	item.MaxMoneyLoot = item1_proto->MaxMoneyLoot;
+	item.WrappedGift = item1_proto->WrappedGift;
+	item.ExtraFlags = item1_proto->ExtraFlags;
+	item.OtherTeamEntry = item1_proto->OtherTeamEntry;
+
+	//add new item to the maps
+	m_itemPrototypesMap[__item_max_entry] = item;
+
+	//Save to db
+	WorldDatabase.PExecuteLog("\
+		INSERT INTO `mangos`.`item_template_custom` \
+		VALUES \
+		('%u',			'%u',			'%u', 			'%u',			'%s',				'%s',				'%u',				'%u',		'%u',			'%u',\
+		 '%u',			'%u',			'%u',			'%d',			'%d',				'%u',				'%u',				'%u',		'%u',			'%u',\
+		 '%u',			'%u',			'%u',			'%u',			'%u',				'%u',				'%u',				'%u',		'%d',			'%u',\
+		 '%d',			'%u',			'%d',			'%u',			'%d',				'%u',				'%d',				'%u',		'%d',			'%u',\
+		 '%d',			'%u',			'%d',			'%u',			'%d',				'%u',				'%d',				'%u',		'%f',			'%u',\
+		 '%d',			'%d',			'%u',			'%d',			'%d',				'%u',				'%d',				'%d',		'%u',			'%d',\
+		 '%d',			'%u',			'%d',			'%d',			'%u',				'%u',				'%d',				'%d',		'%d',			'%d',\
+		 '%d',			'%d',			'%d',			'%u',			'%u',				'%d',				'%f',				'%d',		'%u',			'%d',\
+		 '%u',			'%u',			'%d',			'%f',			'%d',				'%u',				'%d',				'%u',		'%u',			'%d',\
+		 '%f',			'%d',			'%u',			'%d',			'%u',				'%u',				'%d',				'%f',		'%d',			'%u',\
+		 '%d',			'%u',			'%u',			'%d',			'%f',				'%d',				'%u',				'%d',		'%u',			'%u',\
+		 '%u',			'%u',			'%u',			'%u',			'%d',				'%u',				'%u',				'%u',		'%u',			'%u',\
+		 '%d',			'%u',			'%d',			'%u',			'%u',				'%u',				'%u',				'%u',		'%u',			'%d')",
+		//1				2				3				4				5					6					7					8			9				10	
+		item.ItemId,	10,	item.Class,		item.SubClass,	item.Name1, item.Description,	item.DisplayInfoID, item.Quality,	item.Flags, item.BuyCount,	item.BuyPrice,	
+		//11				12						13					14				15					16				17						18						19				20
+		item.SellPrice,	item.InventoryType,	item.AllowableClass, item.AllowableRace, item.ItemLevel, item.RequiredLevel, item.RequiredSkill, item.RequiredSkillRank, item.RequiredSpell, item.RequiredHonorRank, 
+		//21								22						23							24				25					26							27						28									29									30
+		item.RequiredCityRank, item.RequiredReputationFaction, item.RequiredReputationRank, item.MaxCount, item.Stackable, item.ContainerSlots, item.ItemStat[0].ItemStatType, item.ItemStat[0].ItemStatValue, item.ItemStat[1].ItemStatType, item.ItemStat[1].ItemStatValue,
+		//31									32									33										34						35						36										37						38									39									40
+		item.ItemStat[2].ItemStatType, item.ItemStat[2].ItemStatValue, item.ItemStat[3].ItemStatType, item.ItemStat[3].ItemStatValue, item.ItemStat[4].ItemStatType, item.ItemStat[4].ItemStatValue, item.ItemStat[5].ItemStatType, item.ItemStat[5].ItemStatValue, item.ItemStat[6].ItemStatType, item.ItemStat[6].ItemStatValue,
+		//41									2									3										4						5						6										7						8									9									50
+		item.ItemStat[7].ItemStatType, item.ItemStat[7].ItemStatValue, item.ItemStat[8].ItemStatType, item.ItemStat[8].ItemStatValue, item.ItemStat[9].ItemStatType, item.ItemStat[9].ItemStatValue,	 item.Delay,		item.RangedModRange,
+		//51					2						3								4						5						6								7						8							9							60
+		item.AmmoType, (int)item.Damage[0].DamageMin, (int)item.Damage[0].DamageMax, (int)item.Damage[0].DamageType, (int)item.Damage[1].DamageMin, (int)item.Damage[1].DamageMax, (int)item.Damage[1].DamageType, (int)item.Damage[2].DamageMin, (int)item.Damage[2].DamageMax, (int)item.Damage[2].DamageType,
+		//61								2						3								4						5						6								7						8							9						70
+		(int)item.Damage[3].DamageMin, (int)item.Damage[3].DamageMax, (int)item.Damage[3].DamageType, (int)item.Damage[4].DamageMin, (int)item.Damage[4].DamageMax, (int)item.Damage[4].DamageType,		item.Block,					item.Armor,				item.HolyRes,				item.FireRes,
+		//71								2						3								4						5						6								7						8							9						80
+		item.NatureRes,				item.FrostRes,			 item.ShadowRes,					item.ArcaneRes,		item.Spells[0].SpellId, item.Spells[0].SpellTrigger, item.Spells[0].SpellCharges, item.Spells[0].SpellPPMRate, item.Spells[0].SpellCooldown, item.Spells[0].SpellCategory, 
+		//81										2						3								4						5									6								7											8							9						90
+		item.Spells[0].SpellCategoryCooldown, item.Spells[1].SpellId, item.Spells[1].SpellTrigger, item.Spells[1].SpellCharges, item.Spells[1].SpellPPMRate, item.Spells[1].SpellCooldown, item.Spells[1].SpellCategory, item.Spells[1].SpellCategoryCooldown, item.Spells[2].SpellId, item.Spells[2].SpellTrigger, 
+		//91										2						3								4						5									6								7											8							9						100
+		item.Spells[2].SpellCharges, item.Spells[2].SpellPPMRate, item.Spells[2].SpellCooldown, item.Spells[2].SpellCategory, item.Spells[2].SpellCategoryCooldown, item.Spells[3].SpellId, item.Spells[3].SpellTrigger, item.Spells[3].SpellCharges, item.Spells[3].SpellPPMRate, item.Spells[3].SpellCooldown, 
+		//101										2						3								4						5									6								7											8							(108)						
+		item.Spells[3].SpellCategory, item.Spells[3].SpellCategoryCooldown, item.Spells[4].SpellId, item.Spells[4].SpellTrigger, item.Spells[4].SpellCharges, item.Spells[4].SpellPPMRate, item.Spells[4].SpellCooldown, item.Spells[4].SpellCategory, item.Spells[4].SpellCategoryCooldown,
+		//109 - 130
+		item.Bonding, item.PageText, item.LanguageID, item.PageMaterial, item.StartQuest, item.LockID, item.Material, item.Sheath, item.RandomProperty, item.ItemSet, item.MaxDurability, item.Area, item.Map, item.Duration, item.BagFamily, item.DisenchantID, item.FoodType, item.MinMoneyLoot, item.MaxMoneyLoot, item.WrappedGift, item.ExtraFlags, item.OtherTeamEntry);
+
+
+	return &item;
+}
+#endif
+
+
+//qzqstar, 250311, add for dynamic object create
+//qzqstar, 250430, update for dynamic object create
+ItemPrototype * ObjectMgr::DynamicGenerateItem(const ItemPrototype *pItem1Proto, const ItemPrototype *pItem2Proto, std::string _customName, std::string Desc, uint32 luckydraw, Classes _playerclass)
+{
+
+	//sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "custoname: %s  Desc:%s", customName.c_str(), Desc.c_str());
+
+	__item_max_entry++;
+
+	ItemPrototype& item = m_itemPrototypesMap[__item_max_entry];
+
+	auto item1_proto = pItem1Proto;
+	auto item2_proto = pItem2Proto;
+
+	
+	float _dmg_mux = 1.0f;
+	float _prop_mux = 1.0f;
+	bool _applyDiv = false;
+
+	//get the level diff of two items
+	auto _div_level_abs = std::abs((int)(item1_proto->ItemLevel - item2_proto->ItemLevel));
+
+	//if item1 level higher than item2, then check the level diff
+	if (item1_proto->ItemLevel > item2_proto->ItemLevel)
+	{
+		if (_div_level_abs < 3) { _dmg_mux = 1.05f; _prop_mux = 1.1f; _applyDiv = true; }
+		else if (_div_level_abs < 6) { _dmg_mux = 1.02f; _prop_mux = 1.05f; _applyDiv = true; }
+		else if (_div_level_abs < 11) { _dmg_mux = 1.0f; _prop_mux = 1.0f; _applyDiv = false; }
+		else { _dmg_mux = 0.9f; _prop_mux = 0.9f; _applyDiv = false; }
+	}
+	else
+	{
+		//Same, or item2 is higher level.
+		if (item1_proto->Quality > item2_proto->Quality)
+		{
+			_dmg_mux = 1.05f; _prop_mux = 1.1f; _applyDiv = true;
+		}
+		else
+		{
+			//item2 quality is better than item1
+			_dmg_mux = 1.08f; _prop_mux = 1.15f; _applyDiv = true;
+		}
+	}
+
+	//random apply factor on the muxplier
+	if (_applyDiv)
+	{
+		_dmg_mux = _dmg_mux * PickRandomValue(1.1f, 1.2f, 1.05f, 1.02f, 1.1f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.95f, 1.15f, 1.12f, 1.1f, 0.98f);
+		_prop_mux = _prop_mux * PickRandomValue(1.2f, 1.3f, 1.05f, 1.02f, 1.1f, 1.1f, 1.05f, 1.0f, 1.0f, 0.95f, 1.15f, 1.12f, 1.1f, 0.98f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	//get the max value of two items
+	int32 _val_agi = 0; int32 _val_strengh = 0; int32 _val_stamina = 0; int32 _val_intel = 0; int32 _val_spirit = 0;
+	int32 _cnt_agi = 0; int32 _cnt_strengh = 0; int32 _cnt_stamina = 0; int32 _cnt_intel = 0; int32 _cnt_spirit = 0;
+
+	//init some values
+	_val_agi = roll_chance_i(70) ? urand(item1_proto->ItemLevel / 20, item1_proto->ItemLevel / 10) : 0;
+	_val_strengh = roll_chance_i(70) ? urand(item1_proto->ItemLevel / 20, item1_proto->ItemLevel / 10) : 0;
+	_val_stamina = roll_chance_i(70) ? urand(item1_proto->ItemLevel / 12, item1_proto->ItemLevel / 6) : 0;
+	_val_intel = roll_chance_i(70) ? urand(item1_proto->ItemLevel / 12, item1_proto->ItemLevel / 6) : 0;
+	_val_spirit = roll_chance_i(70) ? urand(item1_proto->ItemLevel / 12, item1_proto->ItemLevel / 6) : 0;
+
+	//check the player class and do some init
+	switch (_playerclass)
+	{
+	case CLASS_WARRIOR:	
+		_val_stamina *= frand(1.1f, 1.3f);
+        _val_agi /= frand(1.1f, 1.3f);
+	case CLASS_ROGUE:
+		_val_agi *= frand(1.05f, 1.2f); 
+        _val_strengh *= frand(1.05f, 1.2f);
+		_val_intel = 0; _val_spirit = 0; break;
+
+	case CLASS_HUNTER:
+		_val_strengh = 0;
+		_val_agi *= frand(1.5f, 1.9f);
+	case CLASS_PALADIN:	
+	case CLASS_SHAMAN:
+	case CLASS_DRUID:		
+		_val_agi /= frand(1.1f, 1.3f); _val_strengh /= frand(1.1f, 1.3f); _val_stamina *= frand(1.1f, 1.5f); _val_intel /= 1.1f; _val_spirit /= 1.1f; break;
+
+	case CLASS_MAGE:
+		_val_stamina = 0;
+		_val_intel *= frand(1.1f, 1.3f);
+	case CLASS_WARLOCK:
+		_val_stamina *= frand(1.1f, 1.3f);
+	case CLASS_PRIEST:
+		 _val_spirit *= frand(1.1f, 1.6f);
+		 _val_intel *= frand(1.1f, 1.3f);
+		 _val_agi = 0; _val_strengh = 0; break;
+	}
+
+
+	for (int i = 0; i < 5; i++)
+	{
+		switch (item1_proto->ItemStat[i].ItemStatType)
+		{
+		case 3:	if (item1_proto->ItemStat[i].ItemStatValue) _val_agi += item1_proto->ItemStat[i].ItemStatValue ;		_cnt_agi++;  break;
+		case 4:	if (item1_proto->ItemStat[i].ItemStatValue) _val_strengh += item1_proto->ItemStat[i].ItemStatValue;	_cnt_strengh++;	break;
+		case 7:	if (item1_proto->ItemStat[i].ItemStatValue) _val_stamina += item1_proto->ItemStat[i].ItemStatValue;	_cnt_stamina++;	break;
+		case 5:	if (item1_proto->ItemStat[i].ItemStatValue) _val_intel += item1_proto->ItemStat[i].ItemStatValue;	_cnt_intel++;	break;
+		case 6:	if (item1_proto->ItemStat[i].ItemStatValue) _val_spirit += item1_proto->ItemStat[i].ItemStatValue;	_cnt_spirit++;	break;
+			default:break;
+		}
+
+		switch (item2_proto->ItemStat[i].ItemStatType)
+		{
+		case 3:	if (item2_proto->ItemStat[i].ItemStatValue) _val_agi += (_val_agi>item2_proto->ItemStat[i].ItemStatValue ? 1: item2_proto->ItemStat[i].ItemStatValue * 0.5);		_cnt_agi++;		break;
+		case 4:	if (item2_proto->ItemStat[i].ItemStatValue) _val_strengh += (_val_strengh > item2_proto->ItemStat[i].ItemStatValue ? 1: item2_proto->ItemStat[i].ItemStatValue * 0.5);	_cnt_strengh++;	break;
+		case 7:	if (item2_proto->ItemStat[i].ItemStatValue) _val_stamina += (_val_stamina > item2_proto->ItemStat[i].ItemStatValue? 1: item2_proto->ItemStat[i].ItemStatValue * 0.5);	_cnt_stamina++;	break;
+		case 5:	if (item2_proto->ItemStat[i].ItemStatValue) _val_intel += (_val_intel > item2_proto->ItemStat[i].ItemStatValue? 1: item2_proto->ItemStat[i].ItemStatValue * 0.5);	_cnt_intel++;	break;
+		case 6:	if (item2_proto->ItemStat[i].ItemStatValue) _val_spirit += (_val_spirit > item2_proto->ItemStat[i].ItemStatValue? 1: item2_proto->ItemStat[i].ItemStatValue * 0.5);	_cnt_spirit++;	break;
+		default:break;
+		}
+	}
+
+	
+	bool qPlus = false;
+	float _exceedFloat = 3.0f;
+
+	//now we need to figure out qPlus
+	if (item1_proto->Quality == 2)  _exceedFloat = 2.5f;
+	else if (item1_proto->Quality == 3)  _exceedFloat = 2.55f;
+	else _exceedFloat = 2.58f;
+
+	//luckdraw injection
+	if (luckydraw > 9000) { _dmg_mux = 1.22f; _prop_mux = 1.38f; qPlus = true; }
+
+	//now check the luckdraw, should around 0-100
+	if (luckydraw > 30)	luckydraw = 30;
+	_exceedFloat = _exceedFloat - (float)(luckydraw / 150.0f);
+
+	if (_exceedFloat < 2.35f) _exceedFloat = 2.35f;
+
+	if (_dmg_mux + _prop_mux > _exceedFloat)	qPlus = true;
+
+	item.ItemId	= __item_max_entry;
+	item.Class	= item1_proto->Class;
+	item.SubClass = item1_proto->SubClass;
+
+	//make the item name
+	std::string customName="";
+    customName.append(_customName.substr(0, _customName.length() - 5));
+
+    #define	__STR(x)		((std::string)(x)).c_str()
+    //20% chance to have a surfix name
+	uint32 _randItemset = 0;
+    if (item1_proto->Quality > 2 && roll_chance_i(25))
+    {
+        _randItemset = PickRandomValue(561, 562, 563, 564, 565);
+		_dmg_mux += frand(0.01, 0.08);
+		_prop_mux += frand(0.01, 0.08);
+    }
+
+	if (qPlus)
+	{
+		_randItemset = 566;
+		_dmg_mux *= 1.05f;
+		_prop_mux *= 1.05f;
+	}
+
+	customName.append(_randItemset == 561 ? __STR("·勇武　")
+		: _randItemset == 562 ? __STR("·庇护　")
+		: _randItemset == 563 ? __STR("·迅捷　")
+		: _randItemset == 564 ? __STR("·奥能　")
+		: _randItemset == 565 ? __STR("·治疗　") 
+		: _randItemset == 566 ? __STR("·升华　")
+		: "");
+
+	item.ItemSet = _randItemset;
+
+	if (_randItemset == 561)	_val_agi += irand(item1_proto->ItemLevel/20, item1_proto->ItemLevel/10 + 1);
+	else if (_randItemset == 562)	_val_stamina += irand(item1_proto->ItemLevel / 15, item1_proto->ItemLevel / 8 + 1);
+	else if (_randItemset == 563)	_val_strengh += irand(item1_proto->ItemLevel / 20, item1_proto->ItemLevel / 10 + 1);
+	else if (_randItemset == 564)	_val_intel += irand(item1_proto->ItemLevel / 15, item1_proto->ItemLevel / 8 + 1);
+	else if (_randItemset == 565)	_val_spirit += irand(item1_proto->ItemLevel / 15, item1_proto->ItemLevel / 8 + 1);
+
+
+	//set the quality
+	item.Quality = (qPlus) ? item1_proto->Quality + 1 : item1_proto->Quality;
+
+	//set the isLegend
+	auto _isLegend = item.Quality > 4 ? true : false;
+
+	//Make the items Spells...
+	//Now we need to think about which spells need to be placed in item
+	_ItemSpell _Spells[MAX_ITEM_PROTO_SPELLS] = {};
+	int j = 0;
+	for (size_t i = 0; (i < MAX_ITEM_PROTO_SPELLS) && (j<MAX_ITEM_PROTO_SPELLS); i++)
+	{
+		//Must have at least one spell
+		if ((i == 0 || roll_chance_i(qPlus? 80: 40)) && item1_proto->Spells[i].SpellId)
+		{
+			_Spells[j].SpellId = (qPlus && item1_proto->Spells[i].SpellTrigger  == 1 )? _PickRandomSpellId_qPlus(item1_proto->Spells[i].SpellId) : item1_proto->Spells[i].SpellId;
+			_Spells[j].SpellTrigger = item1_proto->Spells[i].SpellTrigger;
+			_Spells[j].SpellCharges = item1_proto->Spells[i].SpellCharges;
+			_Spells[j].SpellPPMRate = item1_proto->Spells[i].SpellPPMRate;
+			_Spells[j].SpellCooldown = item1_proto->Spells[i].SpellCooldown;
+			_Spells[j].SpellCategory = item1_proto->Spells[i].SpellCategory;
+			_Spells[j].SpellCategoryCooldown = item1_proto->Spells[i].SpellCategoryCooldown;
+			j++;
+		}
+
+		if (roll_chance_i(qPlus ? 80 : 40) && item2_proto->Spells[i].SpellId)
+		{
+			_Spells[j].SpellId = (qPlus && item2_proto->Spells[i].SpellTrigger == 1) ? _PickRandomSpellId_qPlus(item2_proto->Spells[i].SpellId) : item2_proto->Spells[i].SpellId;
+			_Spells[j].SpellTrigger = item2_proto->Spells[i].SpellTrigger;
+			_Spells[j].SpellCharges = item2_proto->Spells[i].SpellCharges;
+			_Spells[j].SpellPPMRate = item2_proto->Spells[i].SpellPPMRate;
+			_Spells[j].SpellCooldown = item2_proto->Spells[i].SpellCooldown;
+			_Spells[j].SpellCategory = item2_proto->Spells[i].SpellCategory;
+			_Spells[j].SpellCategoryCooldown = item2_proto->Spells[i].SpellCategoryCooldown;
+			j++;
+		}
+	}
+
+	item.Name1 = strdup(customName.c_str()); // (char*)customName.c_str();
+	//item.Description = (strdup)(Desc.c_str());
+	item.DisplayInfoID = item1_proto->DisplayInfoID;
+	item.Flags = item1_proto->Flags;
+	item.BuyCount = item1_proto->BuyCount;
+	item.BuyPrice = item1_proto->ItemId;
+	item.SellPrice = item1_proto->SellPrice;	//set price to item ID
+	item.InventoryType = item1_proto->InventoryType;
+	item.AllowableClass = item1_proto->AllowableClass;
+	item.AllowableRace = item1_proto->AllowableRace;
+	item.ItemLevel = item1_proto->ItemLevel * (_dmg_mux + _prop_mux) / 2 * (_isLegend ? 1.1 : 1);
+
+	Desc.append(std::to_string(item.ItemLevel));
+	Desc.append("  \r\n");
+	Desc.append (std::string("|cff00b72f创造时间：　|r").c_str());
+	//append time　
+	auto _now = sWorld.GetGameTime();
+	struct tm* time_info = localtime(&_now);
+
+	Desc.append(std::to_string(time_info->tm_year + 1900));
+	Desc.append("-" + std::to_string(time_info->tm_mon + 1));
+	Desc.append("-" + std::to_string(time_info->tm_mday));
+	Desc.append(" ");
+
+	item.Description = (strdup)(Desc.c_str());
+
+	item.RequiredLevel = item1_proto->RequiredLevel;
+	item.RequiredSkill = item1_proto->RequiredSkill;
+	item.RequiredSkillRank = item1_proto->RequiredSkillRank;
+	item.RequiredSpell = item1_proto->RequiredSpell;
+	item.RequiredHonorRank = item1_proto->RequiredHonorRank;
+	item.RequiredCityRank = item1_proto->RequiredCityRank;
+	item.RequiredReputationFaction = item1_proto->RequiredReputationFaction;
+	item.RequiredReputationRank = item1_proto->RequiredReputationRank;
+	item.MaxCount = item1_proto->MaxCount;
+	item.Stackable = item1_proto->Stackable;
+	item.ContainerSlots = item1_proto->ContainerSlots;
+	/*for (int i = 0; i < MAX_ITEM_PROTO_STATS; i++)
+	{
+		
+		item.ItemStat[i].ItemStatType = item1_proto->ItemStat[i].ItemStatType;
+		if(item.ItemStat[i].ItemStatType < 5)
+			item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux;
+		else 
+			item.ItemStat[i].ItemStatValue = item1_proto->ItemStat[i].ItemStatValue * _prop_mux * _prop_mux;
+			
+	}*/
+	//Only support 5
+	for (int i = 0; i < MAX_ITEM_PROTO_STATS; i++)
+	{
+		if (i > 5)
+		{
+			item.ItemStat[i].ItemStatType = 0;
+			item.ItemStat[i].ItemStatValue = 0;
+		}
+		else
+		{
+			//i=0--4
+			if (_val_agi)
+			{
+				item.ItemStat[i].ItemStatType = 3;
+				item.ItemStat[i].ItemStatValue = _val_agi * _prop_mux;
+				_val_agi = 0;
+			}
+			else if (_val_strengh)
+			{
+				item.ItemStat[i].ItemStatType = 4;
+				item.ItemStat[i].ItemStatValue = _val_strengh * _prop_mux;
+				_val_strengh = 0;
+			}
+			else if (_val_stamina)
+			{
+				item.ItemStat[i].ItemStatType = 7;
+                item.ItemStat[i].ItemStatValue = _val_stamina * _prop_mux;
+				_val_stamina = 0;
+			}
+			else if (_val_intel)
+			{
+				item.ItemStat[i].ItemStatType = 5;
+                item.ItemStat[i].ItemStatValue = _val_intel * _prop_mux;
+				_val_intel = 0;
+			}
+			else if (_val_spirit)
+			{
+				item.ItemStat[i].ItemStatType = 6;
+                item.ItemStat[i].ItemStatValue = _val_spirit * _prop_mux;
+				_val_spirit = 0;
+			}
+		}
+	}
+
+
+	item.Delay = item1_proto->Delay;
+	if (qPlus)
+	{
+		auto __randDelay = PickRandomValue(0, 0, 0, 0, 0, 0, 0, 100, 100, 100, 100, 100, 100, 200, 200, 300);
+		if (item.InventoryType == INVTYPE_WEAPON)
+		{
+			if (item.Delay > 1600)  item.Delay += __randDelay;
+			else item.Delay -= __randDelay;
+		}
+		else if (item.InventoryType == INVTYPE_2HWEAPON)
+		{
+			if (item.Delay > 3100)  item.Delay += __randDelay;
+			else item.Delay -= __randDelay;
+		}
+		/*
+		else if (item.InventoryType == INVTYPE_RANGED)
+		{
+			if (item.Delay > 3400)  item.Delay += __randDelay;
+			else item.Delay -= __randDelay;
+		}*/
+	}
+
+	item.RangedModRange = item1_proto->RangedModRange;
+	item.AmmoType = item1_proto->AmmoType;
+	for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; i++)
+	{
+		item.Damage[i].DamageMin = item1_proto->Damage[i].DamageMin * _dmg_mux;
+		item.Damage[i].DamageMax = item1_proto->Damage[i].DamageMax * _dmg_mux;
+		item.Damage[i].DamageType = item1_proto->Damage[i].DamageType;
+	}
+	item.Block = item1_proto->Block * _prop_mux;
+	item.Armor = item1_proto->Armor * _prop_mux;
+	item.HolyRes = item1_proto->HolyRes;
+	item.FireRes = item1_proto->FireRes;
+	item.NatureRes = item1_proto->NatureRes;
+	item.FrostRes = item1_proto->FrostRes;
+	item.ShadowRes = item1_proto->ShadowRes;
+	item.ArcaneRes = item1_proto->ArcaneRes;
+	for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; i++)
+	{
+		item.Spells[i].SpellId = _Spells[i].SpellId;
+		item.Spells[i].SpellTrigger = _Spells[i].SpellTrigger;
+		item.Spells[i].SpellCharges = _Spells[i].SpellCharges;
+		item.Spells[i].SpellPPMRate = _Spells[i].SpellPPMRate;
+		item.Spells[i].SpellCooldown = _Spells[i].SpellCooldown;
+		item.Spells[i].SpellCategory = _Spells[i].SpellCategory;
+		item.Spells[i].SpellCategoryCooldown = _Spells[i].SpellCategoryCooldown;
+	}
+	item.Bonding = 0 ; //item1_proto->Bonding;
+	item.PageText = item1_proto->PageText;
+	item.LanguageID = item1_proto->LanguageID;
+	item.PageMaterial = item1_proto->PageMaterial;
+	item.StartQuest = 0;
+	item.LockID = 0;
+	item.Material = item1_proto->Material;
+	item.Sheath = item1_proto->Sheath;
+	item.RandomProperty = item.ItemLevel>78? 13070		//should extend the random to advanced levels..
+		: item.ItemLevel>65 ? 13060
+		: item.ItemLevel>50 ? 13055 : item1_proto->RandomProperty;
+
+	//item.ItemSet = 0;
 	item.MaxDurability = item1_proto->MaxDurability;
 	item.Area = item1_proto->Area;
 	item.Map = item1_proto->Map;

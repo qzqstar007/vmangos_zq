@@ -581,6 +581,7 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝【返回】＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
 
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+		return true;
 	}
 	else if (action >= __MENU_PET_MAIN + __MENU_PET_ACT_UPGRADE && action < __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE)
 	{
@@ -643,6 +644,7 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＝＝【宠物已满级，返回】＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);	
 		}
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+		return true;
 	}
 	else if (action >= __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE)
 	{
@@ -660,6 +662,8 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 				sQZAchievements.ChangeActivePet(player, _newPetType);
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　宠物切换成功，返回　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);	
 				player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+
+				return true;
 			}
 		}
 
@@ -738,7 +742,9 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 				}
 			}
 
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+			return true;
 		}
 
 
@@ -746,28 +752,28 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 
 		//show the pet type, and the cost to change the pet type
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("　　更改宠物类型：　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("　　更改（开启）宠物类型：　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		//need to pay gold to active the pet, and icnreased the cost when more pets
 		if(_petEntry.data1) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　①：寒冰系－寒冰箭（可开启）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 1);
-		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　①：寒冰系－寒冰箭（点击购买）　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　①：寒冰系－寒冰箭（可购买）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_BUY + 1);
 		
 		if(_petEntry.data2) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　②：火焰系－火球术（可开启）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 2);
-		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　②：火焰系－火球术（点击购买）　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　②：火焰系－火球术（可购买）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_BUY + 2);
 		
 		if(_petEntry.data3) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　③：暗影系－暗影箭（可开启）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 3);
-		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　③：暗影系－暗影箭（点击购买）　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　③：暗影系－暗影箭（可购买）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_BUY + 3);
 		
 		if(_petEntry.data4) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　④：自然系－闪电链（可开启）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 4);
-		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　④：自然系－闪电链（点击购买）　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　④：自然系－闪电链（可购买）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_BUY + 4);
 		
 		if(_petEntry.data5) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　⑤：奥术系－星火术（可开启）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 5);
-		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　⑤：奥术系－星火术（点击购买）　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　⑤：奥术系－星火术（可购买）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_BUY + 5);
 
 		if(_petEntry.data6) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　⑥：神圣系－治疗术（可开启）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 6);
-		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　⑥：神圣系－治疗术（点击购买）　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　⑥：神圣系－治疗术（可购买）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_BUY + 6);
 
 		if(_petEntry.data7) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("　＝＞　⑦：物理系－顺劈斩（可开启）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_CHANGE + 7);
-		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　⑦：物理系－顺劈斩（点击购买）　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("　＝＞　⑦：物理系－顺劈斩（可购买）　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_BUY + 7);
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR((" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);

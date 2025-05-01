@@ -196,6 +196,84 @@ bool QzqstarAchievements::SetVIPLevel(Player * _player, uint32 level)
 
 
 /* ================================================================================================================== */
+/* ========================= Rune system  ============================================================================ */
+/* ================================================================================================================== */
+#pragma region  Rune system
+/**
+ * @brief get the player's Rune Slots, if the player has not got any Rune Slots, return 2.
+ * @param _player the player to check
+ * @return get the player's Rune Slots, if the player has not got any Rune Slots, return 2.
+ */
+uint32 QzqstarAchievements::GetRuneSlots(Player * _player)
+{
+	//check _player if none
+	if (!_player)
+		return 0;
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry e = *it;
+		if (e.type == ACHIEVEMENT_RUNE)
+		{
+			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::GetRuneSlots] Player:%s GetRuneSlots: %u", _player->GetName(), e.data1);
+			return e.data1;
+		}	
+	}
+
+	//add one VIP level to the _playerAchievements vector map of this player if not found
+	AchievementsEntry e;
+	e.guid = _player->GetGUID();
+	e.type = ACHIEVEMENT_RUNE;
+	e.subType = 0;
+	e.data1 = 2;
+	e.data2 = 0;
+	e.data3 = 0;
+	e.data4 = 0;
+	e.note = "";
+	_playerAchievements[_player->GetGUID()].push_back(e);
+
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::GetRuneSlots] Not found but init one Rune Entry: %u", _player->GetGUID());
+	return 2;
+}
+
+/**
+ * @brief set the player's Rune Slots and add the Rune Slots to the player's achievements vector
+ * @param _player the player to check
+ * @param numbers the Rune Slots to set, if the numbers is 0, the Rune Slots will be set to 2.
+ * @return true if the Rune Slots is set successfully, false if the Rune Slots is not set successfully.
+ */
+bool QzqstarAchievements::SetRuneSlots(Player * _player, uint32 numbers)
+{
+	//check _player if none
+	if (!_player)
+		return false;
+
+	//check if the numbers is 0, if so, set it to 2
+	if (numbers < 2)
+		numbers = 2;
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)	
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_RUNE)
+		{
+			//slog out with player info
+			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::SetRuneSlots] Player:%s SetRuneSlots: %u", _player->GetName(), numbers);
+			e.data1 = numbers;
+			break;
+		}	
+	}
+
+	return true;
+}
+
+#pragma endregion
+
+
+
+/* ================================================================================================================== */
 /* ======================= Quest system  ============================================================================ */
 /* ================================================================================================================== */
 

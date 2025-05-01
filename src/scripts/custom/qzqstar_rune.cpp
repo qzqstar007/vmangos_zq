@@ -24,6 +24,8 @@
 
 #include "chat.h"
 
+#include "QzqstarAchievements.h"
+
 
 // RUNE NPC
 #define	__MENU_NONE					0
@@ -53,13 +55,29 @@ bool GossipHello_Rune(Player *player, Creature *_Creature)
 {
 	//check levels
 	//if (player->GetLevel() == 1)  player->ADD_GOSSIP_ITEM(5, __STR(__RED("挑战::|一命自强模式|")), GOSSIP_SENDER_MAIN, __MENU_ZQ_MAIN);
-	if (player->GetLevel() >= 5)  player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　社　区　贡　献　| ===")), GOSSIP_SENDER_MAIN,	__MENU_SOCIAL_MAIN);
-	if (player->GetLevel() >= 5)  player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　挑　战　模　式　| ===")), GOSSIP_SENDER_MAIN,	__MENU_MODE_MAIN);
-	if (player->GetLevel() >= 5)  player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　装　备　创　造　| ===")), GOSSIP_SENDER_MAIN,   __MENU_CREATE_MAIN);
-	if (player->GetLevel() >= 5)  player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　符　文　系　统　| ===")), GOSSIP_SENDER_MAIN,	__MENU_RUNE_MAIN);
-	if (player->GetLevel() >= 15) player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　字　条　提　取　| ===")), GOSSIP_SENDER_MAIN,	__MENU_SLOT_MAIN);
-	if (player->GetLevel() >= 20) player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　碎　片　兑　换　| ===")), GOSSIP_SENDER_MAIN,	__MENU_FRAG_MAIN);
-	if (player->GetLevel() >= 60) player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　巅　峰　等　级　| ===")), GOSSIP_SENDER_MAIN,	__MENU_PEAK_MAIN);
+
+	player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=========================")), GOSSIP_SENDER_MAIN,	__MENU_MODE_MAIN);
+	player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　挑　战　模　式　| ===")), GOSSIP_SENDER_MAIN,	__MENU_MODE_MAIN);
+	player->ADD_GOSSIP_ITEM(5, __STR(" "), GOSSIP_SENDER_MAIN,	__MENU_ZQ_MAIN);
+
+	player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　符　文　系　统　| ===")), GOSSIP_SENDER_MAIN,	__MENU_RUNE_MAIN);
+	player->ADD_GOSSIP_ITEM(5, __STR(" "), GOSSIP_SENDER_MAIN,	__MENU_ZQ_MAIN);
+
+	//if (player->GetLevel() >= 15) player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　字　条　提　取　| ===")), GOSSIP_SENDER_MAIN,	__MENU_SLOT_MAIN);
+	if (player->GetLevel() >= 15) 
+	{
+		player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　碎　片　兑　换　| ===")), GOSSIP_SENDER_MAIN,	__MENU_FRAG_MAIN);
+		player->ADD_GOSSIP_ITEM(5, __STR(" "), GOSSIP_SENDER_MAIN,	__MENU_ZQ_MAIN);
+
+		player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　社　区　贡　献　| ===")), GOSSIP_SENDER_MAIN,	__MENU_SOCIAL_MAIN);
+		player->ADD_GOSSIP_ITEM(5, __STR(" "), GOSSIP_SENDER_MAIN,	__MENU_ZQ_MAIN);
+	}
+	if (player->GetLevel() >= 60) 
+	{
+		player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　巅　峰　等　级　| ===")), GOSSIP_SENDER_MAIN,	__MENU_PEAK_MAIN);
+		player->ADD_GOSSIP_ITEM(5, __STR(" "), GOSSIP_SENDER_MAIN,	__MENU_ZQ_MAIN);
+	}
+	player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=========================")), GOSSIP_SENDER_MAIN,	__MENU_MODE_MAIN);
 	//if (player->GetLevel() >= 60) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("==下赛季继承点券查询 | 不断完善中 | (赞助另算)=="), GOSSIP_SENDER_MAIN, __MENU_OTHER_MAIN);
 	
 	//if(player->GetLevel() >= 60 && player->HasSpell(32990) &&(!player->HasSpell(32988)) )	player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |继续 一命自强模式| ====")), GOSSIP_SENDER_MAIN, __MENU_ZQ_MAIN+100);
@@ -140,7 +158,10 @@ void SendDefaultMenu_ZQ(Player *player, Creature *_Creature, uint32 action)
 
 #pragma region MENU RUNE
 
-#define	__MENU_RUNE_SLOT_1			(__MENU_RUNE_MAIN)
+#define __MENU_RUNE_SLOT_LEARN		(100)	//1100-1199 learn slot spell
+#define __MENU_RUNE_SLOT_FORGET		(200)	//2100-2199 forget slot spell
+
+#define __MENU_RUNE_SLOT_BUY		(800)	//buy rune slot
 
 #define	__RUNE_UPGRADE_ITEM_ALL			(30136)	//ALL
 #define	__RUNE_UPGRADE_ITEM_ZLS			(30137)	//战猎萨
@@ -148,33 +169,32 @@ void SendDefaultMenu_ZQ(Player *player, Creature *_Creature, uint32 action)
 #define	__RUNE_UPGRADE_ITEM_ZFD			(30139)	//贼法德
 #define	__MENU_RUNE_TEST_MENU		(__MENU_RUNE_MAIN + 999)
 
-#define __MODE_KILLER       (30849)
-#define __MODE_KILLER_REWARD       (30852)
+#define __MODE_KILLER       		(30849)
+#define __MODE_KILLER_REWARD       	(30852)
 uint32 __rune_slot_numbers(Player *player)
 {
 	//will have one slot every level/15
-	uint32 _nums = 1;
-
-	_nums += player->GetLevel() / 15;
+	uint32 _nums = sQZAchievements.GetRuneSlots(player);
 
 	//check if has the __MODE_KILLER
-	if (player->HasSpell(__MODE_KILLER) || player->HasSpell(__MODE_KILLER_REWARD)) _nums += 1;
+	//if (player->HasSpell(__MODE_KILLER) || player->HasSpell(__MODE_KILLER_REWARD)) _nums += 1;
 
 	//extra slots
-
 	return _nums;
 }
 
-uint32 __rune_need_num(Player *player, uint32 curslots)
+uint32 __rune_need_num(Player *player)
 {
 	auto needNum = 0;
-	auto freeNum = 1;
-	if (player->HasSpell(__MODE_KILLER) || player->HasSpell(__MODE_KILLER_REWARD)) freeNum += 1;
+	auto freeNum = 2;
+	//if (player->HasSpell(__MODE_KILLER) || player->HasSpell(__MODE_KILLER_REWARD)) freeNum += 1;
+
+	int32 curslots = __rune_slot_numbers(player);
 
 	if (curslots < freeNum) needNum = 0;
 	else
 	{
-		needNum = 10 * (curslots - freeNum + 1);
+		needNum = 10 * (curslots - freeNum + 1) * (curslots - freeNum + 1);
 	}
 	return needNum;
 }
@@ -191,15 +211,15 @@ void SendDefaultMenu_Rune(Player *player, Creature *_Creature, uint32 action)
 	//All player enter this menu, and then got the class menu belongs to him
 	Rune_Spell_Menu_t _LocalMenus[RUNE_SPELLS_NUM];
 
-	if (player->GetClass() == CLASS_WARRIOR) { _copy_rune(_Spells_Menu_Warrior, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16021; }
-	else if (player->GetClass() == CLASS_MAGE) { _copy_rune(_Spells_Menu_Mage, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16022; }
-	else if (player->GetClass() == CLASS_ROGUE) { _copy_rune(_Spells_Menu_Rogue, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16023; }
-	else if (player->GetClass() == CLASS_PALADIN) { _copy_rune(_Spells_Menu_Paladin, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16024; }
-	else if (player->GetClass() == CLASS_DRUID) { _copy_rune(_Spells_Menu_Druid, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16025; }
-	else if (player->GetClass() == CLASS_HUNTER) { _copy_rune(_Spells_Menu_Hunter, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16026; }
-	else if (player->GetClass() == CLASS_PRIEST) { _copy_rune(_Spells_Menu_Priest, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16027; }
-	else if (player->GetClass() == CLASS_WARLOCK) { _copy_rune(_Spells_Menu_Warlock, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16028; }
-	else if (player->GetClass() == CLASS_SHAMAN) { _copy_rune(_Spells_Menu_Shaman, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16029; }
+	if (player->GetClass() == CLASS_WARRIOR) { _copy_rune(_Spells_Menu_Warrior, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_MAGE) { _copy_rune(_Spells_Menu_Mage, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_ROGUE) { _copy_rune(_Spells_Menu_Rogue, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_PALADIN) { _copy_rune(_Spells_Menu_Paladin, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_DRUID) { _copy_rune(_Spells_Menu_Druid, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_HUNTER) { _copy_rune(_Spells_Menu_Hunter, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_PRIEST) { _copy_rune(_Spells_Menu_Priest, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_WARLOCK) { _copy_rune(_Spells_Menu_Warlock, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_SHAMAN) { _copy_rune(_Spells_Menu_Shaman, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
 	else
 	{
 		player->ADD_GOSSIP_ITEM(5, __STR("========|该职业暂时不支持...|========="), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -231,11 +251,14 @@ void SendDefaultMenu_Rune(Player *player, Creature *_Creature, uint32 action)
 	
 	if (action == __MENU_RUNE_MAIN)
 	{
-		player->ADD_GOSSIP_ITEM(5, __STR("========|已有符文状态|========="), GOSSIP_SENDER_MAIN, __MENU_NONE);
-		text = __STR(__BLUE("=== 最多开启符文槽数量： "));
-		text.append(" |cffdd0000 " + __NSTR(_MAX_RUNE_SLOT) + "  |r ");
-		player->ADD_GOSSIP_ITEM(5, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
-
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("==========|符文槽状态|=========")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		text = __STR(__BLUE("=== 符文槽数量： "));
+		text.append(" |cffdd0000 " + __NSTR(_player_learned_num) + " / "+ __NSTR(_MAX_RUNE_SLOT) + "  |r ");
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		text = __STR(__BLUE("===>> 点击开启额外符文槽 <<===== "));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(text), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_BUY);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("==========|可用符文列表|========")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 
 		//add to the gossip item
 		for (size_t i = 0; i < RUNE_SPELLS_NUM; i++)
@@ -250,28 +273,29 @@ void SendDefaultMenu_Rune(Player *player, Creature *_Creature, uint32 action)
 			if (_LocalMenus[i].flags)
 			{
 				//alreay learned
-				text.append(__RED("[ 已启用 - 点击遗忘 ]"));
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN + 130 + i);
+				text.append(__GREEN("［已启－点击遗忘］ "));
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_FORGET + i);
 			}
 			else
 			{
-				text.append(__GREEN("[ 未启用 - 点击学习 ]"));
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN + 120 + i);
+				text.append(__BLUE("［未启－点击学习］ "));
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN + i);
 			}
 		}
 	}
 
 #define RUNE_CONFIRM_OFFSET		100
 	//1120-1129, learn spell
-	else if ( (action >= __MENU_RUNE_MAIN + 120) && ( action <= __MENU_RUNE_MAIN + 129))
+	else if ( (action >= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN) && ( action <= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN + 99))
 	{
-		uint32 spell_to_learn_slot = action - (__MENU_RUNE_MAIN + 120 );
+		uint32 spell_to_learn_slot = action - (__MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN );
 		if (!_can_learn_more)
 		{
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__RED("符文已满, 没有额外位置, 请返回并删除部分符文再来哦.")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__RED("符文已满, 请返回并删除部分符文再来哦.")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 		}
 		else
 		{
+			/*
 			text = "学习技能:";
 			text.append(_LocalMenus[spell_to_learn_slot].text);
 			text.append(__RED(", 需要花费符文石数量Ｘ "));
@@ -280,10 +304,14 @@ void SendDefaultMenu_Rune(Player *player, Creature *_Creature, uint32 action)
 			player->ADD_GOSSIP_ITEM(5, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->ADD_GOSSIP_ITEM(5,   __STR(__RED("=====| 确定 | 返回 |=====")), GOSSIP_SENDER_MAIN, action + RUNE_CONFIRM_OFFSET);
 			player->ADD_GOSSIP_ITEM(5, __STR(__GREEN("=====| 取消 | 返回 |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
+			*/
+			player->LearnSpell(_LocalMenus[spell_to_learn_slot].spell_id, false);
+			player->ADD_GOSSIP_ITEM(5, __STR(__RED("====| 学习成功! |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 		}
 	}
 
 	//confirm the spell
+	/* 
 	else if ((action >= __MENU_RUNE_MAIN + 120 + RUNE_CONFIRM_OFFSET) && (action <= __MENU_RUNE_MAIN + 129 + RUNE_CONFIRM_OFFSET))
 	{
 		uint32 spell_to_learn_slot = action - (__MENU_RUNE_MAIN + 120 + RUNE_CONFIRM_OFFSET);
@@ -302,12 +330,13 @@ void SendDefaultMenu_Rune(Player *player, Creature *_Creature, uint32 action)
 		}
 
 	}
-
+	*/
 	//1130-1139, forget spell
-	else if ((action >= __MENU_RUNE_MAIN + 130) && (action <= __MENU_RUNE_MAIN + 139))
+	else if ((action >= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_FORGET) && (action <= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_FORGET + 99))
 	{
-		uint32 spell_to_delete_slot = action - (__MENU_RUNE_MAIN + 130);
+		uint32 spell_to_delete_slot = action - (__MENU_RUNE_MAIN + __MENU_RUNE_SLOT_FORGET);
 
+		/*
 		text = __RED("确定要遗忘此技能?-->");
 		text.append(_LocalMenus[spell_to_delete_slot].text);
 		text.append(__RED("<-- 返还符文石数量Ｘ "));
@@ -316,8 +345,12 @@ void SendDefaultMenu_Rune(Player *player, Creature *_Creature, uint32 action)
 		player->ADD_GOSSIP_ITEM(5, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		player->ADD_GOSSIP_ITEM(5, __STR(__RED("====| 确定 | 返回 | =====")), GOSSIP_SENDER_MAIN, action + RUNE_CONFIRM_OFFSET);
 		player->ADD_GOSSIP_ITEM(5, __STR(__GREEN("====| 取消 | 返回 |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
+		*/
+		player->RemoveSpell(_LocalMenus[spell_to_delete_slot].spell_id);
+		player->ADD_GOSSIP_ITEM(5, __STR(__GREEN("====已经遗忘, |返回|=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 	}
 	//confirm the spell
+	/*
 	else if ((action >= __MENU_RUNE_MAIN + 130 + RUNE_CONFIRM_OFFSET) && (action <= __MENU_RUNE_MAIN + 139 + RUNE_CONFIRM_OFFSET))
 	{
 		uint32 spell_to_delete_slot = action - (__MENU_RUNE_MAIN + 130 + RUNE_CONFIRM_OFFSET);
@@ -335,6 +368,50 @@ void SendDefaultMenu_Rune(Player *player, Creature *_Creature, uint32 action)
 		else
 			player->ADD_GOSSIP_ITEM(5, __STR(__RED("====出错, |返回|=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 	}
+	*/
+	else if ((action >= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_BUY) && (action <= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_BUY + 99))
+	{
+		uint32 _realAction = action - (__MENU_RUNE_MAIN + __MENU_RUNE_SLOT_BUY);
+
+		//get the rune stones that player need to buy
+		uint32 _rune_stones_need = 0;
+		_rune_stones_need = __rune_need_num(player);
+		//slog
+		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Rune Stones Need: %d", _rune_stones_need);
+
+		if (_realAction == 0)
+		{
+			//make up the text
+			text = __STR(__BLUE("购买符文槽, 需要花费 "));
+			text.append(__NSTR(_rune_stones_need));
+			text.append(__BLUE(" 个符文石."));
+			player->ADD_GOSSIP_ITEM(5, __BLUE(" ========================= "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(5, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(5, __BLUE(" ========================= "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("====| 确定 | 返回 | =====")), GOSSIP_SENDER_MAIN, action + 1);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("====| 取消 | 返回 |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
+		}
+		else if (_realAction == 1)
+		{
+			//check if has enough stones
+			if (player->HasItemCount(__RUNE_UPGRADE_ITEM, _rune_stones_need))
+			{
+				//delete the item count
+				player->DestroyItemCount(__RUNE_UPGRADE_ITEM, _rune_stones_need, true);
+
+				//add the rune slot
+				sQZAchievements.SetRuneSlots(player, sQZAchievements.GetRuneSlots(player) + 1);	
+
+				//add the rune slot to the player
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__GREEN("====| 购买成功! |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
+
+			}else
+			{
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("====| 材料不够 | 返回 |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);	
+			}
+		}
+	}
+
 
 	player->SEND_GOSSIP_MENU(_CLASS_DESC, _Creature->GetGUID());
 }
@@ -2138,11 +2215,11 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 	else
 	{
 		if (   pItem2->GetProto()->InventoryType != pItem->GetProto()->InventoryType
-			//|| pItem2->GetProto()->SubClass != pItem->GetProto()->SubClass
+			//|| ( (pItem->GetProto()->Quality + pItem2->GetProto()->Quality > 6 ) && (pItem2->GetProto()->SubClass != pItem->GetProto()->SubClass))
 			|| pItem2->GetProto()->Class != pItem->GetProto()->Class
 			)
 		{
-			std::string text = __BLUE("[|待合成装备类型必须一致，可以跨甲！|]");
+			std::string text = __BLUE("[|待合成装备类型必须一致，紫装不可跨甲！|]");
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_SLOT_MAIN);
 			player->SEND_GOSSIP_MENU(__GOSSIP_EQCREATE_DESC, _Creature->GetGUID());
 
@@ -2280,7 +2357,7 @@ void SendDefaultMenu_EQCreate(Player *player, Creature *_Creature, uint32 action
 
 			//create the new item
 			if (_mustHit) player->M_Spare_Data2 = 9999;
-			auto newItem = sObjectMgr.DynamicGenerateItem(pItem, pItem2, item_new_text, item_desc, player->M_Spare_Data2, (Classes)player->GetClass());
+			auto newItem = sObjectMgr.DynamicGenerateItem(pItem->GetProto(), pItem2->GetProto(), item_new_text, item_desc, player->M_Spare_Data2, (Classes)player->GetClass());
 
 			//Set can be used by creator
 			Item *ppItem = player->AddItem(newItem->ItemId);
@@ -2632,8 +2709,8 @@ bool GossipSelect_Rune(Player *player, Creature *_Creature, uint32 sender, uint3
  ******************************************************************************************/
  #define __MENU_EQUIP_MAIN 				1000
  #define __MENU_EQUIP_SUB_CREATE 		2000
- #define __MENU_EQUIP_SUB_UPGRADE 		3000
- #define __MENU_EQUIP_SUB_MOD	 		4000
+ #define __MENU_EQUIP_SUB_UPGRADE		3000
+ #define __MENU_EQUIP_SUB_MODDISP 		4000
  #define __MENU_EQUIP_SUB_DISENCHANT 	5000
  #define __MENU_SIZE					 999 //Each SubMenu holds 999 items.
 bool Menus_Equip_Main(Player *player, GameObject *_go, uint32 sender, uint32 action)
@@ -2646,26 +2723,316 @@ bool Menus_Equip_Main(Player *player, GameObject *_go, uint32 sender, uint32 act
 	// 1. Equipment Creation: Create the equipment with the player's items.
 	// 2. Equipment Upgrade: Upgrade the equipment with the player's items.
 	// 3. Equipment Disenchant : Disenchant the equipment with the player's items.
-	
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Creation", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);	
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Upgrade", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_UPGRADE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Disenchant", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
-
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);	
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装备创造　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);	
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　字条转移　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_UPGRADE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);		
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装备幻化　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);	
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装备分解　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
 	return true;
 }
 
+std::string __get_Item_Name_GO(uint32 Class, uint32 SubClass, uint32 Inv)
+{
+	switch (Class)
+	{
+	case ITEM_CLASS_WEAPON:
+		switch (SubClass)
+		{
+		case ITEM_SUBCLASS_WEAPON_AXE: 			return  __STR("创造的单手斧·　");
+		case ITEM_SUBCLASS_WEAPON_AXE2:			return  __STR("创造的双手斧·　");
+		case ITEM_SUBCLASS_WEAPON_BOW:			return  __STR("创造的弓·　");
+		case ITEM_SUBCLASS_WEAPON_GUN:			return  __STR("创造的枪·　");
+		case ITEM_SUBCLASS_WEAPON_MACE:			return  __STR("创造的单手锤·　");
+		case ITEM_SUBCLASS_WEAPON_MACE2:		return  __STR("创造的双手锤·　");
+		case ITEM_SUBCLASS_WEAPON_POLEARM:		return  __STR("创造的长柄·　");
+		case ITEM_SUBCLASS_WEAPON_SWORD:		return  __STR("创造的单手剑·　");
+		case ITEM_SUBCLASS_WEAPON_SWORD2:		return  __STR("创造的双手剑·　");
+		case ITEM_SUBCLASS_WEAPON_STAFF:		return  __STR("创造的法杖·　");
+		case ITEM_SUBCLASS_WEAPON_DAGGER:		return  __STR("创造的匕首·　");
+		case ITEM_SUBCLASS_WEAPON_THROWN:		return  __STR("创造的飞刀·　");
+		case ITEM_SUBCLASS_WEAPON_SPEAR:		return  __STR("创造的长矛·　");
+		case ITEM_SUBCLASS_WEAPON_CROSSBOW:		return  __STR("创造的弩·　");
+		case ITEM_SUBCLASS_WEAPON_WAND:			return  __STR("创造的魔杖·　");
+		}
+		return  __STR("创造的未知武器·　");
+	case ITEM_CLASS_ARMOR:
+		switch (Inv)
+		{
+		case INVTYPE_HEAD:				return  __STR("创造的头饰·　");
+		case INVTYPE_NECK:				return  __STR("创造的项链·　");
+		case INVTYPE_SHOULDERS:			return  __STR("创造的护肩·　");
+		case INVTYPE_BODY:				return  __STR("创造的衬衣·　");
+		case INVTYPE_ROBE:				return  __STR("创造的长袍·　");
+		case INVTYPE_CHEST:				return  __STR("创造的胸甲·　");
+		case INVTYPE_WAIST:				return  __STR("创造的腰带·　");
+		case INVTYPE_LEGS:				return  __STR("创造的护腿·　");
+		case INVTYPE_FEET:				return  __STR("创造的靴子·　");
+		case INVTYPE_WRISTS:			return  __STR("创造的护腕·　");
+		case INVTYPE_HANDS:				return  __STR("创造的护手·　");
+		case INVTYPE_FINGER:			return  __STR("创造的戒指·　");
+		case INVTYPE_TRINKET:			return  __STR("创造的饰品·　");
+		case INVTYPE_SHIELD:			return  __STR("创造的盾牌·　");
+		case INVTYPE_CLOAK:				return  __STR("创造的披风·　");
+		case INVTYPE_HOLDABLE:			return  __STR("创造的副手·　");
+		case INVTYPE_RELIC:				return  __STR("创造的圣物·　");
+		}
+	}
+	return  __STR("创造的未知装备·　");
+}
 //Menus for Equip Creation
 bool Menus_Equip_Sub_Create(Player *player, GameObject *_go, uint32 sender, uint32 action)
 {
-	/*
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Creation", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+	//Now need to find the first bag
+	auto pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START);
+	if (!pItem || (pItem->GetProto()->Class != ITEM_CLASS_WEAPON && pItem->GetProto()->Class != ITEM_CLASS_ARMOR) 
+		|| pItem->GetProto()->DisenchantID == 0
+		|| pItem->GetProto()->Quality > 4 || pItem->GetProto()->Quality < 2
+		//|| pItem->GetProto()->ItemId > 38000, check the first equipment
+		)
+	{
+		std::string text = __BLUE("[|请将不一样的装备放在角色行囊里前两个格子，（仅限绿、蓝、紫等可分解装备）|]");
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_SLOT_MAIN);
+		player->SEND_GOSSIP_MENU(__GOSSIP_EQCREATE_DESC, _go->GetGUID());
 
-	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
+		return false;
+	}
+
+	auto pItem1Proto = pItem->GetProto();
+
+	//if pItem Id is larger than 40000, means it's a invented item, we need to find the orignal item
+	if (pItem1Proto->ItemId > 40000)
+	{
+		//find the original item
+		auto pItemOrig = sObjectMgr.GetItemPrototype(pItem1Proto->BuyPrice);	
+		if (pItemOrig)	pItem1Proto = pItemOrig; //should be OK for future steps
+	}
+
+	auto pItem2 = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + 1);
+	if (!pItem2 || (pItem2->GetProto()->Class != ITEM_CLASS_WEAPON && pItem2->GetProto()->Class != ITEM_CLASS_ARMOR) 
+		|| pItem2->GetProto()->DisenchantID == 0
+		|| pItem2->GetProto()->Quality > 4 || pItem2->GetProto()->Quality < 2
+		//|| pItem1Proto->SubClass != pItem2->GetProto()->SubClass	//Should be same type of equipment
+		|| pItem2->GetProto()->ItemId > 38000
+		|| pItem1Proto->ItemId == pItem2->GetProto()->ItemId
+		)
+	{
+		std::string text = __BLUE("[|请将不一样的装备放在角色行囊里前两个格子，限可分解装备|]");
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_SLOT_MAIN);
+		player->SEND_GOSSIP_MENU(__GOSSIP_EQCREATE_DESC, _go->GetGUID());
+
+		return false;
+	}
+	auto pItem2Proto = pItem2->GetProto();
+
+	//fix the gun, crossbow and bow together， 15,26,26
+	//relic 28
+	if(  ( (pItem2Proto->InventoryType == 26) || (pItem2Proto->InventoryType == 15) || (pItem2Proto->InventoryType == 28))
+		&&
+		((pItem1Proto->InventoryType == 26) || (pItem1Proto->InventoryType == 15) || (pItem1Proto->InventoryType == 28) )
+	   )
+	{
+		//can combine
+	}
+	else
+	{
+		if (   pItem2Proto->InventoryType != pItem1Proto->InventoryType
+			|| ( ( pItem2Proto->SubClass != pItem1Proto->SubClass )&&(pItem2Proto->Quality + pItem1Proto->Quality>6))
+			|| pItem2Proto->Class != pItem1Proto->Class
+			)
+		{
+			std::string text = __BLUE("[|待合成装备类型必须一致，紫装不可跨甲！|]");
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_SLOT_MAIN);
+			player->SEND_GOSSIP_MENU(__GOSSIP_EQCREATE_DESC, _go->GetGUID());
+
+			return false;
+		}
+	}
+
+	//now get the proto spell of old item (to be destroyed)
+	auto localIdx = player->GetSession()->GetSessionDbLocaleIndex();
+
+	auto item_1_local = sObjectMgr.GetItemLocale(pItem1Proto->ItemId);
+	auto item_1_text = (item_1_local == nullptr ? pItem1Proto->Name1 : item_1_local->Name[localIdx]);
+
+	auto item_2_local = sObjectMgr.GetItemLocale(pItem2Proto->ItemId);
+	auto item_2_text = (item_2_local == nullptr ? pItem2Proto->Name1 : item_2_local->Name[localIdx]);
+
+	auto _needGold = pItem1Proto->ItemLevel * pItem2Proto->ItemLevel / 300;
+	if (_needGold < 1)  _needGold = 1;
+
+	/*
+	auto _needSuiliNum = 9999;
+	if (pItem1Proto->Quality == 4 && pItem1Proto->ItemLevel > 60)
+		_needSuiliNum = (pItem1Proto->ItemLevel - 55) *  (pItem1Proto->ItemLevel - 55) / 5;
+	if (_needSuiliNum < 1) _needSuiliNum = 1;
 	*/
-	SendDefaultMenu_EQCreate(player, (Creature *)player, __MENU_CREATE_MAIN);
+
+	std::string item_new_text = "　";
+	item_new_text.append(__STR(player->GetName()));
+	//item_new_text.append(__STR("创造的"));
+	item_new_text.append(__get_Item_Name_GO(pItem1Proto->Class, pItem1Proto->SubClass, pItem1Proto->InventoryType));
+
+	std::string item_desc = "原合成物品：①　";
+	item_desc.append(__STR(item_1_text));
+	item_desc.append(__STR("、　②　"));
+	item_desc.append(__STR(item_2_text));
+	item_desc.append(__STR("。　\r\n"));
+	item_desc.append(__STR(__GREEN("装备等级：　")));
+	//item_desc.append(__STR(player->GetName()));
+
+	//now get the proto of 
+	switch (action)
+	{
+	case __MENU_EQUIP_SUB_CREATE:
+	{
+
+		std::string text = __RED("[合成材料①]");
+		text.append(item_1_text);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+
+		text = __RED("[合成材料②]");
+		text.append(item_2_text);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+
+
+		text = __GREEN(" 合成需要花费金：--->");
+		text.append(__NSTR(_needGold));
+		text.append(" G");
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(text), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+
+
+		text = __RED("[自制装备]==>  ");
+		text.append(item_new_text.substr(0, item_new_text.length() - 5));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, __STR(__BLUE(" ===== [确定合成] ===== ")), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE + __MENU_SLOT_ACT_1);
+
+		/*
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, __STR(" === [普通合成，确定] ===== "), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN + __MENU_SLOT_ACT_1);
+		text = __STR(" === [必定升华，消耗【橙武碎粒】数量： |cffdd2200 ");
+		
+		text.append(__NSTR(_needSuiliNum));
+		text.append(" |r ] =="); */
+		//if(player->HasItemCount(30320)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, __STR(__BLUE(" === [SVIP, 消耗一枚标记必定升华] === ")), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN + __MENU_SLOT_ACT_2);
+		if (player->HasItemCount(30320)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK,  __STR(__BLUE(" == [使用垫刀石，失败不消耗装备] == ")), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE + __MENU_SLOT_ACT_2);
+
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, __STR(" ======= [返回] ======= "), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+
+
+		player->SEND_GOSSIP_MENU(__GOSSIP_EQCREATE_DESC, _go->GetGUID());
+
+		break;
+	}
+
+	case __MENU_EQUIP_SUB_CREATE + __MENU_SLOT_ACT_1:
+	case __MENU_EQUIP_SUB_CREATE + __MENU_SLOT_ACT_2:
+	case __MENU_EQUIP_SUB_CREATE + __MENU_SLOT_ACT_3:
+	{
+
+		if ( (player->GetMoney()) < (uint32)_needGold * 10000 )
+		{
+			player->ADD_GOSSIP_ITEM(5, __RED("<== |金币不够或者武器错误，返回首页| ==="), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+		}
+		//check if has enough suilis
+		else if (action ==  (__MENU_EQUIP_SUB_CREATE + __MENU_SLOT_ACT_2) && (!player->HasItemCount(30320)) )
+		{
+			player->ADD_GOSSIP_ITEM(5, __RED("<== |垫刀石不够或者武器错误，返回首页| ==="), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+		}
+		else
+		{
+			//should apply the chance?
+			auto _mustHit = false;
+
+			//remove money
+			player->ModifyMoney(0 - (_needGold * 10000));
+
+			//must remove the second slot
+			player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + 1, true);
+
+			//if weapon must up
+			if (action == (__MENU_CREATE_MAIN + __MENU_SLOT_ACT_2) && player->HasItemCount(30320))
+			{
+				player->DestroyItemCount(30320, 1, true);
+
+				player->M_Spare_Data2++;
+
+				//roll chance
+				if (roll_chance_i(15 + player->M_Spare_Data2))
+				{
+					_mustHit = true;
+				}
+				else
+				{
+					player->ADD_GOSSIP_ITEM(5, __BLUE("<== |升华失败，不消耗装备。| ==="), GOSSIP_SENDER_MAIN, __MENU_CREATE_MAIN);
+					player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
+					return false;
+				}
+				
+			}
+
+			//remove the item, remains if not success
+			player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
+
+			//create the new item
+			if (_mustHit) player->M_Spare_Data2 = 9999;
+			auto newItem = sObjectMgr.DynamicGenerateItem(pItem1Proto, pItem2Proto, item_new_text, item_desc, player->M_Spare_Data2, (Classes)player->GetClass());
+
+			//Set can be used by creator
+			Item *ppItem = player->AddItem(newItem->ItemId);
+			ppItem->SetGuidValue(ITEM_FIELD_CREATOR, player->GetObjectGuid());
+
+			//Annouce to players online
+			//【幸运者】
+			if (newItem->Quality > pItem1Proto->Quality)
+			{
+				//reset the luck draw
+				player->M_Spare_Data2 = 0;
+
+				auto const& sessions = sWorld.GetAllSessions();
+				for (const auto& itr : sessions)
+				{
+					if (WorldSession* session = itr.second)
+					{
+						Player* __player = session->GetPlayer();
+						if (__player && __player->IsInWorld() && __player->IsAlive())
+						{
+							//|cffD2691E[幸运公告]|r 幸运玩家：|cffD2691E[%s]|r  成功创造极品装备：%s，品质：%s，装等：%u，合成材料为：%s 、 %s。
+							ChatHandler(__player).PSendSysMessage(9037, player->GetName(), newItem->Name1,
+								newItem->Quality == 5 ? __ORANGE("传奇") : newItem->Quality == 4 ? __PINK("史诗") : __BLUE("精良"),
+								newItem->ItemLevel, item_1_text, item_2_text);
+						}
+					}
+				}
+			}
+			//not lucky
+			else {
+				player->M_Spare_Data2++;
+			}
+
+			//add new item
+			player->ADD_GOSSIP_ITEM(5, __BLUE("<== |合成成功，请检查背包| ==="), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_CREATE);
+		}
+
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
+
+		break;
+	}
+
+
+	default:
+		break;
+	}
+
 	return true;
 }
 
@@ -2682,9 +3049,9 @@ bool Menus_Equip_Sub_Upgrade(Player *player, GameObject *_go, uint32 sender, uin
 //Menus for Equip Display Modify
 bool Menus_Equip_Sub_DispMod(Player *player, GameObject *_go, uint32 sender, uint32 action)
 {
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Display Modify", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Display Modify", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
 	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());		
 	return true;
 
@@ -2693,9 +3060,9 @@ bool Menus_Equip_Sub_DispMod(Player *player, GameObject *_go, uint32 sender, uin
 //Menus for Equip Disenchant
 bool Menus_Equip_Sub_Disenchant(Player *player, GameObject *_go, uint32 sender, uint32 action)
 {
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Disenchant", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MOD);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Disenchant", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
 	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
 	return true;	
 }
@@ -2724,7 +3091,7 @@ bool Equip_Menus(Player *player, GameObject *_go, uint32 sender, uint32 action)
 	{
 		return Menus_Equip_Sub_Upgrade(player, _go, sender, action);
 	}
-	else if (action >= __MENU_EQUIP_SUB_MOD && action <= __MENU_EQUIP_SUB_MOD + __MENU_SIZE)
+	else if (action >= __MENU_EQUIP_SUB_MODDISP && action <= __MENU_EQUIP_SUB_MODDISP + __MENU_SIZE)
 	{
 		return Menus_Equip_Sub_DispMod(player, _go, sender, action);
 	}

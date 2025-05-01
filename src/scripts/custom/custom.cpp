@@ -25,5 +25,7 @@ void AddSC_zero_scripts()
 	AddSC_qzqstar_vip_creatures();
 	AddSC_qzqstar_summon_boss();
 	AddSC_qzqstar_custom();
+
+	AddSC_qzqstar_cpp_kelala();
 }
 

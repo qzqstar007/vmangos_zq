@@ -3968,10 +3968,15 @@ void Spell::EffectEnchantItemDiamond(SpellEffectIndex eff_idx)
 	if (!itemTarget)
 		return;
 
+    //todo, this diamond enchanting can be used in SLOT_1...3
+    uint32 enchant_slot_num = m_spellInfo->EffectApplyAuraName[eff_idx];
+    if(enchant_slot_num>2) enchant_slot_num = 2;    //Can only be 0..2
+    enchant_slot_num += PROP_ENCHANTMENT_SLOT_1;
+
 	//check if the target has enchant id
-	if (itemTarget->GetEnchantmentId(PROP_ENCHANTMENT_SLOT_1) < 3000)
+	if (itemTarget->GetEnchantmentId((EnchantmentSlot)enchant_slot_num) < 3000)
 	{
-		ChatHandler(p_caster).PSendSysMessage(">>>请检查目标物品有【宝石槽】位，并且护甲或者武器品质为绿色及以上。<<<");
+		ChatHandler(p_caster).PSendSysMessage(">>>请检查目标物品有【空槽位】，并且护甲或者武器品质为绿色及以上。<<<");
 		return;
 	}
 
@@ -3998,12 +4003,12 @@ void Spell::EffectEnchantItemDiamond(SpellEffectIndex eff_idx)
 		return;
 
 	// remove old enchant before applying new
-	item_owner->ApplyEnchantment(itemTarget, PROP_ENCHANTMENT_SLOT_1, false);
+	item_owner->ApplyEnchantment(itemTarget, (EnchantmentSlot)enchant_slot_num, false);
 
-	itemTarget->SetEnchantment(PROP_ENCHANTMENT_SLOT_1, enchant_id, 0, 0, m_caster->GetObjectGuid());
+	itemTarget->SetEnchantment((EnchantmentSlot)enchant_slot_num, enchant_id, 0, 0, m_caster->GetObjectGuid());
 
 	// add new enchanting if equipped
-	item_owner->ApplyEnchantment(itemTarget, PROP_ENCHANTMENT_SLOT_1, true);
+	item_owner->ApplyEnchantment(itemTarget, (EnchantmentSlot)enchant_slot_num, true);
 }
 
 void Spell::EffectTameCreature(SpellEffectIndex /*effIdx*/)

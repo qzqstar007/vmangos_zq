@@ -23,3 +23,6 @@ void AddSC_qzqstar_rune_creatures();
 void AddSC_qzqstar_vip_creatures();
 void AddSC_qzqstar_summon_boss();
 void AddSC_qzqstar_custom();
+
+void AddSC_qzqstar_cpp_kelala();
+
