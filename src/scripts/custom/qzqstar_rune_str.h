@@ -22,6 +22,12 @@
 #ifndef _QZQSTAR_RUNE_STR_H
 #define _QZQSTAR_RUNE_STR_H
 
+typedef struct __rep_list {
+	uint32			rep_level;
+	uint32			rep_id;
+	std::string		rep_name;
+}Rep_List_t;
+
 typedef struct __rune_spell_menu {
 	uint32			flags;
 	uint32			spell_id;
@@ -29,9 +35,31 @@ typedef struct __rune_spell_menu {
 	std::string		desc;
 }Rune_Spell_Menu_t;
 
-#define	RUNE_SPELLS_NUM				(9)
-//#define	__XSTR(x)		((std::string)(x)).c_str()
+
 #define	__XSTR(x)		(x)
+
+//Rep lists
+const Rep_List_t _Rep_List[] =
+{
+	{1, 1001, __XSTR("主城声望　 ")},
+	{1, 369, __XSTR("加基森　 ")},
+	{15, 909, __XSTR("暗月马戏团　 ")},
+	{25, 59, __XSTR("瑟银兄弟会　 ")},
+	{25, 349, __XSTR("拉文霍德　 ")},
+	{45, 576, __XSTR("木喉要塞　 ")},
+	{60, 270, __XSTR("赞达拉部族　 ")},
+	{60, 910, __XSTR("诺兹多姆的子嗣　 ")},
+	{15, 1002, __XSTR("战歌峡谷　 ")},
+	{25, 1003, __XSTR("阿拉希盆地　 ")},
+	{45, 1004, __XSTR("奥特兰克山谷　 ")}
+};
+
+
+
+
+
+#define	RUNE_SPELLS_NUM				(9)
+
 //Should not modify by users.
 const Rune_Spell_Menu_t _Spells_Menu_Warrior[RUNE_SPELLS_NUM] = 	//Warrior
 {

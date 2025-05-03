@@ -187,7 +187,43 @@ AuraScript* GetScript_PetTrigAura(SpellEntry const*)
 }
 
 
+//add mode support for the challenge system
+struct ModeSpellScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        //check the player level, cannot be more than level 1
+        if (spell->m_caster->GetLevel() > 1) 
+        {
+            //tell the player that he cannot use this spell in the challenge mode
+			ChatHandler(spell->m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>你等级太高了，只能一级使用。<<<")).c_str());
+            return false;
+        }
 
+        //check the spell id
+        if (spell->m_spellInfo->Id == 30856 || spell->m_spellInfo->Id == 30854 || spell->m_spellInfo->Id == 30852)
+        {
+            if (Player* player = spell->m_caster->ToPlayer())
+            {
+            	if(player->HasSpell(30851)
+                || player->HasSpell(30853)
+                || player->HasSpell(30855)
+                )
+                {
+					ChatHandler(player).PSendSysMessage(((std::string)(">>>杀手模式只能选择一种。！!<<<")).c_str());
+                    return false;
+                }	
+            }
+        }
+
+		return true;
+    }
+};
+
+SpellScript* GetScript_Mode_Spell(SpellEntry const*)
+{
+    return new ModeSpellScript();
+}
 
 void AddSC_special_spell_scripts()
 {
@@ -218,5 +254,11 @@ void AddSC_special_spell_scripts()
     newscript = new Script;
     newscript->Name = "qzqstar_pet_aura";
     newscript->GetAuraScript = &GetScript_PetTrigAura;
+    newscript->RegisterSelf();
+
+    //add challenge mode spell script for the challenge system
+    newscript = new Script;
+    newscript->Name = "qzqstar_mode_spell";
+    newscript->GetSpellScript = &GetScript_Mode_Spell;
     newscript->RegisterSelf();
 }
