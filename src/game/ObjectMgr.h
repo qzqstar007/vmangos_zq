@@ -677,6 +677,11 @@ class ObjectMgr
             return m_itemPrototypesMap;
         }
 
+		ItemPrototypeMap& GetItemPrototypeMapUnsafe()
+		{
+			return m_itemPrototypesMap;
+		}
+
         CreatureClassLevelStats const* GetCreatureClassLevelStats(uint32 unitClass, uint32 level) const;
 
         PetLevelInfo const* GetPetLevelInfo(uint32 creature_id, uint32 level) const;

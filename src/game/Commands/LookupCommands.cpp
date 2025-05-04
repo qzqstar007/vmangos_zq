@@ -170,6 +170,10 @@ void ChatHandler::ShowItemListHelper(uint32 itemId, int loc_idx, Player* target 
     if (!itemProto)
         return;
 
+
+    //qzqstar, 250504, slog out the item info
+	//sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Item Info] Name:%s ID:%u DisplayID:%u", itemProto->Name1, itemProto->ItemId, itemProto->DisplayInfoID);
+
     std::string name;
 
     if (ItemLocale const* il = loc_idx >= 0 ? sObjectMgr.GetItemLocale(itemProto->ItemId) : nullptr)

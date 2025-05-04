@@ -1587,7 +1587,7 @@ bool Rune_Menus(Player *player, Creature *_c, uint32 sender, uint32 action)
  #define __MENU_EQUIP_SUB_CREATE 		2000
  #define __MENU_EQUIP_SUB_SLOT			3000
  #define __MENU_EQUIP_SUB_MODDISP 		4000
- #define __MENU_EQUIP_SUB_DISENCHANT 	5000
+ #define __MENU_EQUIP_SUB_RESTORE	 	5000
 #define	__GOSSIP_EQCREATE_DESC			(16501)
 bool Menus_Equip_Main(Player *player, GameObject *_go, uint32 sender, uint32 action)
 {
@@ -1607,12 +1607,14 @@ bool Menus_Equip_Main(Player *player, GameObject *_go, uint32 sender, uint32 act
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);		
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装备幻化　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);	
-	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装备分解　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装备还原　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_RESTORE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
 	return true;
 }
+
+#pragma region 	Equip Creation System
 
 std::string __get_Item_Name_GO(uint32 Class, uint32 SubClass, uint32 Inv)
 {
@@ -1916,7 +1918,10 @@ bool Menus_Equip_Sub_Create(Player *player, GameObject *_go, uint32 sender, uint
 	return true;
 }
 
-#pragma region Menu ESS Equipment Slot System
+#pragma endregion
+
+
+#pragma region  Equipment Slot System
 
 #define	__GOSSIP_SLOT_DESC				(16101)
 
@@ -2082,31 +2087,246 @@ bool Menus_Equip_Sub_Upgrade(Player *player, GameObject *_go, uint32 sender, uin
 		break;
 	}
 
-
+	return true;
 }
 #pragma endregion
 
+#pragma region  Equipment Display Modify System
+#define	__MENU_DISP_MOD_MAIN				__MENU_EQUIP_SUB_MODDISP
+#define __MENU_DISP_MOD_ACT_1					(10)
+#define __GOSSIP_DISP_MOD_DESC					(16034)
 //Menus for Equip Display Modify
 bool Menus_Equip_Sub_DispMod(Player *player, GameObject *_go, uint32 sender, uint32 action)
 {
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Display Modify", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
-	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());		
+	//check player and go
+	if (!player ||!_go) return false;
+	
+	//Now need to find the first bag
+	auto pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START);
+
+
+	if (!pItem || (pItem->GetProto()->Class != ITEM_CLASS_WEAPON && pItem->GetProto()->Class != ITEM_CLASS_ARMOR) 
+		)
+	{
+		std::string text = __BLUE("== |请将幻化样式放在行囊第一个格子| ==");
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_DISP_MOD_MAIN);
+		player->SEND_GOSSIP_MENU(__GOSSIP_DISP_MOD_DESC, _go->GetGUID());
+
+		return true;
+	}
+
+	//get allowed slots for the equipment
+	uint8 slots[4];
+	pItem->GetProto()->GetAllowedEquipSlots(slots, player->GetClass(), false);
+	auto pEquippedItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slots[0]);
+	if (!pEquippedItem 
+		|| pEquippedItem->GetProto()->ItemId < 40000
+		|| pEquippedItem->GetProto()->InventoryType != pItem->GetProto()->InventoryType 
+		|| pEquippedItem->GetProto()->SubClass != pItem->GetProto()->SubClass
+		|| pEquippedItem->GetProto()->Class != pItem->GetProto()->Class
+		)
+	{
+		std::string text = __BLUE("[|待幻化装备需要在角色身上，并且是自制装备，类型保持一致！|]");
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_SLOT_MAIN);
+		player->SEND_GOSSIP_MENU(__GOSSIP_DISP_MOD_DESC, _go->GetGUID());
+
+		return true; 
+	}
+
+	//now get the proto spell of old item (to be targeted)
+	auto localIdx = player->GetSession()->GetSessionDbLocaleIndex();
+
+	auto item_target_local = sObjectMgr.GetItemLocale(pItem->GetProto()->ItemId);
+	auto item_target_text = (item_target_local == nullptr ? pItem->GetProto()->Name1 : item_target_local->Name[localIdx]);
+
+	auto item_equipped_local = sObjectMgr.GetItemLocale(pEquippedItem->GetProto()->ItemId);
+	auto item_equipped_text = (item_equipped_local == nullptr ? pEquippedItem->GetProto()->Name1 : item_equipped_local->Name[localIdx]);
+
+	auto _needGold = pEquippedItem->GetProto()->ItemLevel * pEquippedItem->GetProto()->ItemLevel / 60 + 1;
+
+	//now get the proto of 
+	switch (action)
+	{
+	case __MENU_DISP_MOD_MAIN:
+	{
+		if (true)
+		{
+			std::string text = __RED("[幻化样式]");
+			text.append(item_target_text);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_DISP_MOD_MAIN);
+
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_DISP_MOD_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_DISP_MOD_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_DISP_MOD_MAIN);
+
+			text = __GREEN("[转移到装备]");
+			text.append(item_equipped_text);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_DISP_MOD_MAIN);
+
+
+			text = __GREEN("需要花费金币：--->");
+			text.append(__NSTR(_needGold));
+			text.append(" G");
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(text), GOSSIP_SENDER_MAIN, __MENU_DISP_MOD_MAIN);
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("======== | 确定转移 | =======")), GOSSIP_SENDER_MAIN, __MENU_DISP_MOD_MAIN + __MENU_DISP_MOD_ACT_1);
+			player->SEND_GOSSIP_MENU(__GOSSIP_DISP_MOD_DESC, _go->GetGUID());
+		}
+		break;
+	}
+
+	case __MENU_DISP_MOD_MAIN + __MENU_DISP_MOD_ACT_1:
+	{
+
+		// Get player money 
+		if ((player->GetMoney() > (uint32)_needGold * 10000) && (pEquippedItem->GetProto()->ItemId > 40000))
+		{
+			//remove money
+			player->ModifyMoney(0 - (_needGold * 10000));
+
+			//get the GetItemPrototypeMap
+			ItemPrototypeMap& _item_Maps = sObjectMgr.GetItemPrototypeMapUnsafe();
+			auto iter = _item_Maps.find(pEquippedItem->GetProto()->ItemId);
+			if (iter == _item_Maps.end())
+			{
+				player->ADD_GOSSIP_ITEM(5, __RED("<== 金币不够或者武器错误，返回首页 ==="), GOSSIP_SENDER_MAIN, __MENU_DISP_MOD_MAIN);
+				return true;
+			}
+
+			else
+			{	
+				sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[ModDisp] Player:%s modify item display ID:%u from %u to %u", 
+					player->GetName(),
+					iter->second.ItemId,
+					iter->second.DisplayInfoID,
+					pItem->GetProto()->DisplayInfoID);
+				
+				//save to the display id.
+				iter->second.DisplayInfoID = pItem->GetProto()->DisplayInfoID;
+
+				//_item_Maps[pEquippedItem->GetProto()->ItemId].DisplayInfoID = pItem->GetProto()->DisplayInfoID;
+			}
+
+
+			//save to db
+			static SqlStatementID updItem;
+
+            SqlStatement stmt = WorldDatabase.CreateStatement(updItem, "UPDATE `item_template_custom` SET `display_id` = ? WHERE `entry` = ?");
+            stmt.addUInt32(pItem->GetProto()->DisplayInfoID);
+            stmt.addUInt32(pEquippedItem->GetProto()->ItemId);
+            stmt.Execute();
+
+			player->ADD_GOSSIP_ITEM(5, __BLUE("<== 转移成功，需要删除WDB才能生效 ==="), GOSSIP_SENDER_MAIN, __MENU_DISP_MOD_MAIN);
+
+			pEquippedItem->MarkForClientUpdate();
+			pEquippedItem->SendForcedObjectUpdate();
+		}
+		else
+		{
+			player->ADD_GOSSIP_ITEM(5, __RED("<== 金币不够或者武器错误，返回首页 ==="), GOSSIP_SENDER_MAIN, __MENU_DISP_MOD_MAIN);
+		}
+
+		player->SEND_GOSSIP_MENU(__GOSSIP_DISP_MOD_DESC, _go->GetGUID());
+
+		break;
+	}
+
+
+	default:
+		break;
+	}
 	return true;
-
 }
+#pragma endregion
 
-//Menus for Equip Disenchant
-bool Menus_Equip_Sub_Disenchant(Player *player, GameObject *_go, uint32 sender, uint32 action)
+#pragma region  Equipment Restore System
+//Menus for restore equipment to orignal state
+//located at the 1st slot of bag 0
+#define __MENU_EQUIP_RESTORE_MAIN				__MENU_EQUIP_SUB_RESTORE
+#define __MENU_EQUIP_RESTORE_ACT_1				(10)
+#define __GOSSIP_EQUIP_RESTORE_DESC				(16033)
+bool Menus_Equip_Sub_Restore(Player *player, GameObject *_go, uint32 sender, uint32 action)
 {
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "Equipment Disenchant", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_SUB_MODDISP);
-	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
+	//check player and go
+	if (!player ||!_go) return false;
+
+	//get the first item in the bag 0
+	auto pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START);
+	auto localIdx = player->GetSession()->GetSessionDbLocaleIndex();
+
+	if (pItem && pItem->GetProto()->ItemId > 42000)
+	{
+		//need extra mats, such as gold, suili, etc.
+		auto item_1_local = sObjectMgr.GetItemLocale(pItem->GetProto()->ItemId);
+		auto item_1_text = (item_1_local == nullptr ? pItem->GetProto()->Name1 : item_1_local->Name[localIdx]);
+
+		auto item_2_proto = sObjectMgr.GetItemPrototype(pItem->GetProto()->BuyPrice);
+		auto item_2_local = sObjectMgr.GetItemLocale(pItem->GetProto()->BuyPrice);
+		//check null
+		if (!item_2_proto || !item_2_local) 
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝恢复装备有误，请反馈GM＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+			player->SEND_GOSSIP_MENU(__GOSSIP_EQUIP_RESTORE_DESC, _go->GetGUID());
+			return false;
+		}
+		auto item_2_text = (item_2_local == nullptr ? item_2_proto->Name1 : item_2_local->Name[localIdx]);
+
+		//get the need gold
+		auto _needSuiliNum = pItem->GetProto()->Quality < 4 ? 0 : (pItem->GetProto()->Quality - 3) * pItem->GetProto()->ItemLevel / 20;
+
+		if (action == __MENU_EQUIP_RESTORE_MAIN)
+		{
+			std::string text = __STR(__RED("[摧毁装备]::"));
+			text.append(item_1_text);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_EQUIP_RESTORE_MAIN);
+			text = __STR(__RED("额外需要橙武碎粒：-> "));
+			text.append(__NSTR(_needSuiliNum));
+			text.append("  个  ");
+			if(_needSuiliNum) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(text), GOSSIP_SENDER_MAIN, __MENU_EQUIP_RESTORE_MAIN);
+		
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_RESTORE_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　丨丨 ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_RESTORE_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, "　　　　　　ｖｖ ", GOSSIP_SENDER_MAIN, __MENU_EQUIP_RESTORE_MAIN);
+			text = __STR(__BLUE("[原始装备]::"));
+			text.append(item_2_text);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_EQUIP_RESTORE_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_EQUIP_RESTORE_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝【确定恢复】＝＝＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_EQUIP_RESTORE_MAIN + __MENU_EQUIP_RESTORE_ACT_1);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＝【退出】＝＝＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_EQUIP_RESTORE_MAIN);
+		
+		}
+		else if (action == __MENU_EQUIP_RESTORE_MAIN + __MENU_EQUIP_RESTORE_ACT_1)
+		{
+			//check if player has enough suili
+			if ((_needSuiliNum==0) || player->HasItemCount(30521, _needSuiliNum))
+			{
+				//remove the item
+				player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
+
+				//remove the suili
+				if(_needSuiliNum) player->DestroyItemCount(30521, _needSuiliNum, true);
+
+				//add the item
+				player->AddItem(pItem->GetProto()->BuyPrice, 1);
+
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __BLUE("＝＝＝＝【恢复成功】＝＝＝＝ "), GOSSIP_SENDER_MAIN, __MENU_EQUIP_RESTORE_MAIN);
+			}
+			else
+			{
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __RED("＝＝＝【橙武碎片不够】＝＝＝ "), GOSSIP_SENDER_MAIN, __MENU_EQUIP_RESTORE_MAIN);
+			}
+		}
+	}
+	else
+	{
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝请将待还原装备放在第一个格子＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+	}
+
+	player->SEND_GOSSIP_MENU(__GOSSIP_EQUIP_RESTORE_DESC, _go->GetGUID());
 	return true;	
 }
-
+#pragma endregion
 
 
 
@@ -2135,9 +2355,9 @@ bool Equip_Menus(Player *player, GameObject *_go, uint32 sender, uint32 action)
 	{
 		return Menus_Equip_Sub_DispMod(player, _go, sender, action);
 	}
-	else if (action >= __MENU_EQUIP_SUB_DISENCHANT && action <= __MENU_EQUIP_SUB_DISENCHANT + __MENU_SIZE)
+	else if (action >= __MENU_EQUIP_RESTORE_MAIN && action <= __MENU_EQUIP_RESTORE_MAIN + __MENU_SIZE)
 	{
-		return Menus_Equip_Sub_Disenchant(player, _go, sender, action);
+		return Menus_Equip_Sub_Restore(player, _go, sender, action);
 	}
 
 	return false;
