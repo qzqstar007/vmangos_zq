@@ -1554,8 +1554,10 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint
     Player* player = sObjectMgr.GetPlayer(guid);
 
 	// qzqstar, 241204, zq challenge, cancels the invite if has spell
-	if (player)
-	{
+    // skip check, 250508
+	//if (player)
+	if(false)
+    {
 		bool __hasHC = false;
 		uint32 _maxlevel = 0;
 		uint32 _minlevel = 60;

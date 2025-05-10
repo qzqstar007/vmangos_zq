@@ -48,7 +48,7 @@
 #define __YELLOW(x)		"|cfff9dc24"##x##"|r"
 #define __PINK(x)		"|cff800080"##x##"|r"
 
-
+#pragma region Tisheng Menus
 bool Menus_Tish_Main(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 {
 
@@ -66,9 +66,9 @@ bool Menus_Tish_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 	if (player->GetLevel() >= 60) 
 	{
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　巅峰等级　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PEAK_MAIN);
-		player->ADD_GOSSIP_ITEM(5, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	}
-	player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	//if (player->GetLevel() >= 60) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("==下赛季继承点券查询 | 不断完善中 | (赞助另算)=="), GOSSIP_SENDER_MAIN, __MENU_OTHER_MAIN);
 	
 	//if(player->GetLevel() >= 60 && player->HasSpell(32990) &&(!player->HasSpell(32988)) )	player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |继续 一命自强模式| ====")), GOSSIP_SENDER_MAIN, __MENU_ZQ_MAIN+100);
@@ -76,6 +76,7 @@ bool Menus_Tish_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 	player->SEND_GOSSIP_MENU(16001, _Creature->GetGUID());
 	return true;
 }
+#pragma endregion
 
 #pragma region MENU COMM RUNE
 
@@ -177,9 +178,9 @@ bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 
 	std::string text = "";
 	
-	if (action == __MENU_RUNE_MAIN)
+	if (action == __MENU_RUNE_MAIN || action == __MENU_RUNE_MAIN + 1)
 	{
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("==========|符文槽状态|=========")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("==========|符文槽状态|=========")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		text = __STR(__BLUE("=== 符文槽数量： "));
 		text.append(" |cffdd0000 " + __NSTR(_player_learned_num) + " / "+ __NSTR(_MAX_RUNE_SLOT) + "  |r ");
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -188,8 +189,22 @@ bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("==========|可用符文列表|========")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 
-		//add to the gossip item
-		for (size_t i = 0; i < RUNE_SPELLS_NUM; i++)
+		//add to the gossip item, split to two pages.
+		#define RUNE_SLOT_PAGE_ONE		8
+		auto _start_id = 0;
+		auto _end_id = RUNE_SLOT_PAGE_ONE;
+		if(action == __MENU_RUNE_MAIN) 
+		{
+			_start_id = 0;
+			_end_id = RUNE_SLOT_PAGE_ONE; //not include the RUNE_SLOT_PAGE_ONE
+		}
+		else if (action == __MENU_RUNE_MAIN + 1)
+		{
+			_start_id = RUNE_SLOT_PAGE_ONE;
+			_end_id = RUNE_SPELLS_NUM;
+		}
+
+		for (size_t i = _start_id; i < _end_id; i++)
 		{
 			text = __BLUE("[符文槽]-");
 			text.append(__NSTR(i+1));	
@@ -210,55 +225,68 @@ bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN + i);
 			}
 		}
+
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
+		//add the next page button
+		if (action == __MENU_RUNE_MAIN)
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＝＝＝丨下一页｜＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN + 1);	
+		}else
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＝＝＝丨上一页｜＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);	
+		}
 	}
 
-#define RUNE_CONFIRM_OFFSET		100
+#define RUNE_CONFIRM_OFFSET		50
 	//1120-1129, learn spell
-	else if ( (action >= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN) && ( action <= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN + 99))
+	else if ( (action >= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN) && ( action < __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN + RUNE_CONFIRM_OFFSET))
 	{
 		uint32 spell_to_learn_slot = action - (__MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN );
+
+		//display the infos of the spell to learn, and then ask for the confirm from the player, and then learn the spell to him.
+		text = "|cff002fa7符文：　";
+		text.append(_LocalMenus[spell_to_learn_slot].text);
+		text.append("　|r");
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+		text = "|cff002fa7功能：　";
+		text.append(_LocalMenus[spell_to_learn_slot].desc);
+		text.append("　|r");
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+		player->ADD_GOSSIP_ITEM(5, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
 		if (!_can_learn_more)
 		{
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__RED("符文已满, 请返回并删除部分符文再来哦.")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 		}
 		else
 		{
+			
+			player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=====｜确定并学习｜=====")), GOSSIP_SENDER_MAIN, action + RUNE_CONFIRM_OFFSET);
+			player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=====｜取消、返回｜=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 			/*
-			text = "学习技能:";
-			text.append(_LocalMenus[spell_to_learn_slot].text);
-			text.append(__RED(", 需要花费符文石数量Ｘ "));
-			text.append(__NSTR((__rune_need_num(player, _player_learned_num))));
-
-			player->ADD_GOSSIP_ITEM(5, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
-			player->ADD_GOSSIP_ITEM(5,   __STR(__RED("=====| 确定 | 返回 |=====")), GOSSIP_SENDER_MAIN, action + RUNE_CONFIRM_OFFSET);
-			player->ADD_GOSSIP_ITEM(5, __STR(__GREEN("=====| 取消 | 返回 |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
-			*/
 			player->LearnSpell(_LocalMenus[spell_to_learn_slot].spell_id, false);
-			player->ADD_GOSSIP_ITEM(5, __STR(__RED("====| 学习成功! |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
+			player->ADD_GOSSIP_ITEM(5, __STR(__RED("====| 学习成功! |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);*/
 		}
 	}
 
 	//confirm the spell
-	/* 
-	else if ((action >= __MENU_RUNE_MAIN + 120 + RUNE_CONFIRM_OFFSET) && (action <= __MENU_RUNE_MAIN + 129 + RUNE_CONFIRM_OFFSET))
+	else if ((action >= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN + RUNE_CONFIRM_OFFSET) && (action <= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN + 99))
 	{
-		uint32 spell_to_learn_slot = action - (__MENU_RUNE_MAIN + 120 + RUNE_CONFIRM_OFFSET);
+		uint32 spell_to_learn_slot = action - (__MENU_RUNE_MAIN + __MENU_RUNE_SLOT_LEARN + RUNE_CONFIRM_OFFSET);
 
-		//check the materials
-		if (player->HasItemCount(__RUNE_UPGRADE_ITEM , __rune_need_num(player, _player_learned_num)))
+		if (!_can_learn_more)
 		{
-			//delete the item count
-			player->DestroyItemCount(__RUNE_UPGRADE_ITEM, __rune_need_num(player, _player_learned_num), true);
-			player->LearnSpell(_LocalMenus[spell_to_learn_slot].spell_id, false);
-			player->ADD_GOSSIP_ITEM(5, __STR(__RED("====| 学习成功! |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__RED("符文已满, 请返回并删除部分符文再来哦.")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 		}
 		else
 		{
-			player->ADD_GOSSIP_ITEM(5, __STR(__GREEN("====| 材料不够 | 返回 |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
+			player->LearnSpell(_LocalMenus[spell_to_learn_slot].spell_id, false);
+			player->ADD_GOSSIP_ITEM(5, __STR(__RED("====| 学习成功! |=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 		}
 
 	}
-	*/
 	//1130-1139, forget spell
 	else if ((action >= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_FORGET) && (action <= __MENU_RUNE_MAIN + __MENU_RUNE_SLOT_FORGET + 99))
 	{
@@ -349,7 +377,7 @@ bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 
 #pragma endregion
 
-#pragma region  MENU FRAG
+#pragma region MENU FRAG
 
 
 
@@ -1155,7 +1183,6 @@ bool Menus_Peak_Main(Player *player, Creature *_Creature, int32 sender, uint32 a
 
 #pragma endregion
 
-
 #pragma region MENU Reputation
 #define __MENU_REPU_ACT_1	(10)
 #define __ITEM_REPU			(30750)
@@ -1269,7 +1296,6 @@ bool Menus_Repu_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 	return true;
 }
 #pragma endregion
-
 
 #pragma region MENU VOUCHER SCORE
 
@@ -1533,6 +1559,7 @@ bool Menus_Voucher_Main(Player *player, Creature *_Creature, uint32 sender, uint
 
 #pragma endregion
 
+#pragma region Rune Menus Wrapper
 //define a wrapper function for the equip system menus
 bool Rune_Menus(Player *player, Creature *_c, uint32 sender, uint32 action)
 {
@@ -1573,9 +1600,11 @@ bool Rune_Menus(Player *player, Creature *_c, uint32 sender, uint32 action)
 	return true;
 }
 
+#pragma endregion
 
 
 
+#pragma region  GO Equip Menus
 /*****************************************************************************************
  *  Equip system Menus for the game object.
  *  @param player: The player who interact with the game object.
@@ -1613,8 +1642,9 @@ bool Menus_Equip_Main(Player *player, GameObject *_go, uint32 sender, uint32 act
 	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _go->GetGUID());
 	return true;
 }
+#pragma endregion
 
-#pragma region 	Equip Creation System
+#pragma region 	Equipment Creation System
 
 std::string __get_Item_Name_GO(uint32 Class, uint32 SubClass, uint32 Inv)
 {
@@ -1919,7 +1949,6 @@ bool Menus_Equip_Sub_Create(Player *player, GameObject *_go, uint32 sender, uint
 }
 
 #pragma endregion
-
 
 #pragma region  Equipment Slot System
 
@@ -2327,7 +2356,6 @@ bool Menus_Equip_Sub_Restore(Player *player, GameObject *_go, uint32 sender, uin
 	return true;	
 }
 #pragma endregion
-
 
 
 //define a wrapper function for the equip system menus

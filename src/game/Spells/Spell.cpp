@@ -5472,6 +5472,7 @@ void Spell::TakePower()
         m_casterUnit->SetLastManaUse(m_spellInfo->Id);
 }
 
+#define __MODE_MANUFACT     (30843)
 void Spell::TakeReagents()
 {
     if (!m_caster->IsPlayer())
@@ -5509,6 +5510,12 @@ void Spell::TakeReagents()
 
                 m_CastItem = nullptr;
             }
+        }
+
+        //qzqstar, 250508, half the reagent counts if has spell_manufact
+        else if(p_caster->HasSpell(__MODE_MANUFACT) && itemcount > 1)
+        {
+            itemcount /= 2;
         }
 
         // if getItemTarget is also spell reagent

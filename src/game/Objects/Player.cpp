@@ -105,10 +105,13 @@
 
 //qzqstar, 250228, Five Modes
 #define __MODE_ONE_LIFE     (30841)
-#define __MODE_ZQ           (30843)
+#define __MODE_MANUFACT     (30843)
 #define __MODE_COLLECT      (30845)
 #define __MODE_TASK         (30847)
-#define __MODE_KILLER       (30849)
+#define __MODE_RICH         (30849)
+#define __MODE_KILLER_HUMAN       (30851)
+#define __MODE_KILLER_BEAST       (30853)
+#define __MODE_KILLER_UNDEAD      (30855)
 
 // [-ZERO] need recheck, some values known not existed in 1.12.1
 enum CharacterFlags
@@ -3104,6 +3107,32 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
 
 	//qzqstar, 250309, if has the boosted aura
 	if (HasAura(30966)) xp *= 2;
+
+    //qzqstar, 250509, mode of the killer according to crature types
+    if (victim && Creature* _creature = victim->ToCreature())
+    {
+        if(HasSpell(__MODE_KILLER_HUMAN))
+        {
+            if (_creature->GetCreatureType() == CREATURE_TYPE_HUMAN)
+                xp *= 2;
+            else 
+                xp *= 0.01;
+        }
+        else if(HasSpell(__MODE_KILLER_BEAST))
+        {
+            if (_creature->GetCreatureType() == CREATURE_TYPE_BEAST)
+                xp *= 2;
+            else
+                xp *= 0.01;
+        }
+        else if(HasSpell(__MODE_KILLER_UNDEAD))
+        {
+            if (_creature->GetCreatureType() == CREATURE_TYPE_UNDEAD)
+                xp *= 2;
+            else
+                xp *= 0.01;
+        }
+    }
 
     if (GetPersonalXpRate() >= 0.0f)
         xp *= GetPersonalXpRate();
@@ -19719,9 +19748,13 @@ void Player::ScheduleCameraUpdate(ObjectGuid guid)
     }
 }
 
+//qzqstar, 250508, increase 2 trade skills if has spell __MODE_MANUFACT
 void Player::InitPrimaryProfessions()
 {
-    SetFreePrimaryProfessions(sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL));
+    if(HasSpell(__MODE_MANUFACT))
+        SetPrimaryProfession(sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL) + 2);
+    else 
+        SetFreePrimaryProfessions(sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL));
 }
 
 void Player::SetComboPoints()

@@ -900,12 +900,12 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 							int32 ratio = curHealth * 100 / maxHealth;
 
-							if (ratio < 30) ratio = 30;
+							if (ratio < 50) ratio = 50;
 							else if (ratio > 100) ratio = 100;
 
-							ratio = (ratio - 29) * 2 - 1;
+							ratio = (ratio - 49) * 2 - 1;
 
-							player->CastCustomSpell(player, 31074, ratio, ratio/2, {}, true, nullptr);
+							player->CastCustomSpell(player, 31074, ratio, ratio/3, {}, true, nullptr);
 						}
 						else if (player->HasAura(31074) && (!player->HasSpell(31073)))
 						{
