@@ -679,8 +679,8 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 
 
 	//qzqstar, 241119, try to fix the damage too big
-#define __DAMAGE_MAX_PHY    (150000)
-#define __DAMAGE_MAX_SPELL  (350000)
+#define __DAMAGE_MAX_PHY    (1500000)   //__MAX_DAMAGE_PHY
+#define __DAMAGE_MAX_SPELL  (3500000)
 	if (this->IsPlayer() && pVictim->IsCreature())
 	{
 		//we don't think 5w could accurs

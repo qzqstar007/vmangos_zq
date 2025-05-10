@@ -458,7 +458,7 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
     max_damage = ((base_value + weapon_maxdamage) * base_pct + total_value + total_phys) * total_pct;
 
 	//qzqstar 24.11.05 fix the damage avoid too big
-	#define     ___MAX_DAMAGE           (20000)
+	#define     ___MAX_DAMAGE           (200000)
 	if (min_damage > ___MAX_DAMAGE)  min_damage = ___MAX_DAMAGE + (min_damage - ___MAX_DAMAGE) / 10000;
 	if (max_damage > ___MAX_DAMAGE)  max_damage = ___MAX_DAMAGE + (max_damage - ___MAX_DAMAGE) / 10000;
 
