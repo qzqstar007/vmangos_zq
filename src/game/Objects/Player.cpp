@@ -102,7 +102,6 @@
 #define SKILL_PERM_BONUS(x)    int16(PAIR32_HIPART(x))
 #define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t,p)
 
-<<<<<<< HEAD
 
 //qzqstar, 250228, Five Modes
 #define __MODE_ONE_LIFE     (30841)
@@ -114,46 +113,6 @@
 #define __MODE_KILLER_BEAST       (30853)
 #define __MODE_KILLER_UNDEAD      (30855)
 
-// [-ZERO] need recheck, some values known not existed in 1.12.1
-enum CharacterFlags
-{
-    CHARACTER_FLAG_NONE                 = 0x00000000,
-    CHARACTER_FLAG_UNK1                 = 0x00000001,
-    CHARACTER_FLAG_RESTING              = 0x00000002,
-    CHARACTER_LOCKED_FOR_TRANSFER       = 0x00000004,
-    CHARACTER_FLAG_UNK4                 = 0x00000008,
-    CHARACTER_FLAG_UNK5                 = 0x00000010,
-    CHARACTER_FLAG_UNK6                 = 0x00000020,
-    CHARACTER_FLAG_UNK7                 = 0x00000040,
-    CHARACTER_FLAG_UNK8                 = 0x00000080,
-    CHARACTER_FLAG_UNK9                 = 0x00000100,
-    CHARACTER_FLAG_UNK10                = 0x00000200,
-    CHARACTER_FLAG_HIDE_HELM            = 0x00000400,
-    CHARACTER_FLAG_HIDE_CLOAK           = 0x00000800,
-    CHARACTER_FLAG_UNK13                = 0x00001000,
-    CHARACTER_FLAG_GHOST                = 0x00002000,
-    CHARACTER_FLAG_RENAME               = 0x00004000,
-    CHARACTER_FLAG_UNK16                = 0x00008000,
-    CHARACTER_FLAG_UNK17                = 0x00010000,
-    CHARACTER_FLAG_UNK18                = 0x00020000,
-    CHARACTER_FLAG_UNK19                = 0x00040000,
-    CHARACTER_FLAG_UNK20                = 0x00080000,
-    CHARACTER_FLAG_UNK21                = 0x00100000,
-    CHARACTER_FLAG_UNK22                = 0x00200000,
-    CHARACTER_FLAG_UNK23                = 0x00400000,
-    CHARACTER_FLAG_UNK24                = 0x00800000,
-    CHARACTER_FLAG_LOCKED_BY_BILLING    = 0x01000000,
-    CHARACTER_FLAG_DECLINED             = 0x02000000,
-    CHARACTER_FLAG_UNK27                = 0x04000000,
-    CHARACTER_FLAG_UNK28                = 0x08000000,
-    CHARACTER_FLAG_UNK29                = 0x10000000,
-    CHARACTER_FLAG_UNK30                = 0x20000000,
-    CHARACTER_FLAG_UNK31                = 0x40000000,
-    CHARACTER_FLAG_UNK32                = 0x80000000
-};
-
-=======
->>>>>>> 0498b88f22d4c5faf74a1a2e7ba4b9c41988176f
 // corpse reclaim times
 #define DEATH_EXPIRE_STEP (5*MINUTE)
 #define MAX_DEATH_COUNT 3
@@ -3113,11 +3072,12 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
 	if (HasAura(30966)) xp *= 2;
 
     //qzqstar, 250509, mode of the killer according to crature types
-    if (victim && Creature* _creature = victim->ToCreature())
+    if (victim && victim->IsCreature())
     {
+		const Creature* _creature = victim->ToCreature();
         if(HasSpell(__MODE_KILLER_HUMAN))
         {
-            if (_creature->GetCreatureType() == CREATURE_TYPE_HUMAN)
+            if (_creature->GetCreatureType() == CREATURE_TYPE_HUMANOID)
                 xp *= 2;
             else 
                 xp *= 0.01;
@@ -4983,7 +4943,7 @@ void Player::KillPlayer()
 		}
 
 		//2. killer mode, lost the money
-		if (HasSpell(__MODE_KILLER))
+		if (HasSpell(__MODE_RICH))
 		{
 			__looseMoney = __totalMoney / 6;
 
@@ -10457,7 +10417,7 @@ InventoryResult Player::CanUseItem(Item const* pItem, bool not_loading) const
         {
 
 			// qzqstar, 250228, zq mode, cannot use the unbind items...
-			if (HasSpell(__MODE_ZQ) && (GetLevel() < (sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))))
+			if (HasSpell(__MODE_MANUFACT) && (GetLevel() < (sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))))
 			{
 				if (((pProto->Class == ITEM_CLASS_WEAPON) || (pProto->Class == ITEM_CLASS_ARMOR))
 					&& (pProto->Quality > 2)        //modify the quality.
@@ -13552,7 +13512,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
 
                         //qzqstar, 241205, zq mode, make the task item suitable for you
                         // set the "Crafted by ..." property of the item
-                        if (HasSpell(__MODE_ZQ) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
+                        if (HasSpell(__MODE_MANUFACT) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
                             item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
                     }
                 }
@@ -13579,7 +13539,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
 
                             //qzqstar, 241205, zq mode, make the task item suitable for you
                             // set the "Crafted by ..." property of the item
-                            if (HasSpell(__MODE_ZQ) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
+                            if (HasSpell(__MODE_MANUFACT) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
                                 item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
                         }
                     }
@@ -13611,7 +13571,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
 
 						//qzqstar, 241205, zq mode, make the task item suitable for you
 						// set the "Crafted by ..." property of the item
-						if (HasSpell(__MODE_ZQ) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
+						if (HasSpell(__MODE_MANUFACT) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
 							item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
 					}
                 }
@@ -15581,8 +15541,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 	//if(GetLevel() > 1) __xpRate = 1.5f; startup server begins
 	if (GetLevel() > 1) __xpRate = 3.5f;
 
-	if (HasSpell(__MODE_KILLER))     __xpRate = 2.0f;
-	if (HasSpell(__MODE_ZQ))         __xpRate = 1.0f;
+	//if (HasSpell(__MODE_KILLER))     __xpRate = 2.0f;
+	if (HasSpell(__MODE_MANUFACT))         __xpRate = 1.0f;
 	if (HasSpell(__MODE_ONE_LIFE))   __xpRate = 1.0f;
 	if (HasSpell(__MODE_COLLECT))    __xpRate = 1.0f;
 	if (HasSpell(__MODE_TASK))       __xpRate = 0.5f;
@@ -15593,7 +15553,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     M_Spare_Data2 = 0;
 
 	//qzqstar, 250227, change name if killer mode
-	if (HasSpell(__MODE_KILLER))
+	if (false)
 	{
 		/*
 		std::string name = sObjectMgr.GeneratePetName(777);
@@ -17911,11 +17871,11 @@ bool Player::CheckInstanceCount(uint32 instanceId) const
 		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 10);
 
 	//qzqstar, 250228, check if killer mode, MAX_INSTANCE_PER_ACCOUNT_PER_HOUR should be 1
-	if (HasSpell(__MODE_KILLER))
-		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 4);
-	else
+	//if (HasSpell(__MODE_MA))
+	//	return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 4);
+	//else
 		//old origs
-		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, sWorld.getConfig(CONFIG_UINT32_INSTANCE_PER_HOUR_LIMIT));
+	return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, sWorld.getConfig(CONFIG_UINT32_INSTANCE_PER_HOUR_LIMIT));
 }
 
 void Player::AddInstanceEnterTime(uint32 instanceId, time_t enterTime) const
@@ -17958,7 +17918,7 @@ void Player::SetPvPDesired(bool state)
 void Player::SetFFAPvP(bool state)
 {
 	//qzqstar, 250227, killer mode, always on
-	if (HasSpell(__MODE_KILLER)) state = true;
+	//if (HasSpell(__MODE_KILLER)) state = true;
 
 
     if (state)
@@ -19768,7 +19728,7 @@ void Player::ScheduleCameraUpdate(ObjectGuid guid)
 void Player::InitPrimaryProfessions()
 {
     if(HasSpell(__MODE_MANUFACT))
-        SetPrimaryProfession(sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL) + 2);
+		SetFreePrimaryProfessions(sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL) + 2);
     else 
         SetFreePrimaryProfessions(sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL));
 }
