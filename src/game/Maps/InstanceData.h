@@ -76,6 +76,9 @@ class InstanceData : public ZoneScript
         virtual uint32 GetData(uint32 /*Type*/) { return 0; }
         virtual void SetData(uint32 /*Type*/, uint32 /*Data*/) {}
 
+        //qzqstar, 250511, add for instance difficulty levels
+        unsigned int CustomDifficulty;
+
         // Condition criteria additional requirements check
         // This is used for such things are heroic loot
         virtual bool CheckConditionCriteriaMeet(Player const* player, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const;

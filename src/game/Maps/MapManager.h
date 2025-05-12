@@ -209,7 +209,7 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
         void DeleteStateMachine();
 
         Map* CreateInstance(uint32 id, Player* player);
-        DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState* save = nullptr);
+        DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState* save = nullptr, uint32 difficulty = 0);
         BattleGroundMap* CreateBattleGroundMap(uint32 id, uint32 InstanceId, BattleGround* bg);
 
         uint32 i_gridCleanUpDelay;

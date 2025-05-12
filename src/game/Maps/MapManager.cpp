@@ -34,6 +34,9 @@
 #include "BattleGround.h"
 #include "ThreadPool.h"
 
+#include "InstanceData.h"
+#include "ScriptedInstance.h"
+
 typedef MaNGOS::ClassLevelLockable<MapManager, std::recursive_mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
 INSTANTIATE_CLASS_MUTEX(MapManager, std::recursive_mutex);
@@ -517,7 +520,7 @@ Map* MapManager::CreateInstance(uint32 id, Player* player)
         map = FindMap(id, NewInstanceId);
         // it is possible that the save exists but the map doesn't
         if (!map)
-            pNewMap = CreateDungeonMap(id, NewInstanceId, pSave);
+            pNewMap = CreateDungeonMap(id, NewInstanceId, pSave, 222);
     }
     else
     {
@@ -525,7 +528,7 @@ Map* MapManager::CreateInstance(uint32 id, Player* player)
         // the instance will be created for the first time
         NewInstanceId = GenerateInstanceId();
         newlyGeneratedInstanceId = true;
-        pNewMap = CreateDungeonMap(id, NewInstanceId);
+        pNewMap = CreateDungeonMap(id, NewInstanceId, nullptr, 222);
     }
 
     //add a new map object into the registry
@@ -586,7 +589,7 @@ void MapManager::DeleteTestMap(Map* map)
     delete map;
 }
 
-DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState* save)
+DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState* save, uint32 difficulty)
 {
     // make sure we have a valid map id
     MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(id);
@@ -603,6 +606,10 @@ DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPe
     // Dungeons can have saved instance data
     bool load_data = save != nullptr;
     map->CreateInstanceData(load_data);
+
+	//qzqstar, 250511, save the diffculty
+	map->GetInstanceData()->CustomDifficulty = difficulty;
+
     map->SpawnActiveObjects();
     return map;
 }

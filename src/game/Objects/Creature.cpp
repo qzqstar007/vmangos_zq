@@ -54,6 +54,9 @@
 #include "TemporarySummon.h"
 #include "GuardMgr.h"
 
+
+#include "scriptPCH.h"
+
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
     TrainerSpellMap::const_iterator itr = spellList.find(spell_id);
@@ -248,6 +251,24 @@ void Creature::AddToWorld()
         AIM_Initialize();
     if (!bWasInWorld && m_zoneScript)
         m_zoneScript->OnCreatureCreate(this);
+
+    //qzqstar, 250511, check if map id is deadmines, for test
+    if (GetMapId() == 36) {
+
+		InstanceData* const pInstanceData = GetMap()->GetInstanceData();
+
+		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "pInstanceData->CustomDifficulty = %u!", pInstanceData->CustomDifficulty);
+
+        if(pInstanceData->CustomDifficulty != 0)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Creature:%s id:%u created!", GetName(), GetGUID());
+            //SetMaxHealth(GetMaxHealth() * 10); SetHealthPercent(100.0f);
+			
+            SetNativeScale(1.5f);
+            CastSpell(this, 23768, true);		
+            CastSpell(this, 32224, true);
+        }
+    }
 }
 
 void Creature::RemoveFromWorld()
