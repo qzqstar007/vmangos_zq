@@ -781,6 +781,56 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 #pragma endregion
 
 
+
+#pragma region Custom difficulty system
+#define __MENU_CUSTOM_DIFFICULTY_MAIN		(1000)
+#define __MENU_CUSTOM_DIFFICULTY_ACT_SET	(100)
+
+
+bool CustomDifficulty_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
+{
+	std::string text = "";
+	uint32 __menu_nums = 0;
+
+	//check player and creature null
+	if (!player || !_Creature) return false;
+
+	//send the main menu
+	if (action == __MENU_CUSTOM_DIFFICULTY_MAIN)
+	{
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("　　　当前副本难度：XX　　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		
+		//show the current difficulty, and the difficulty level, and the difficulty name, and the difficulty description
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝点击修改难度＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__GREEN("＝＝＞　普通　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CUSTOM_DIFFICULTY_MAIN + __MENU_CUSTOM_DIFFICULTY_ACT_SET + 0);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__RED("＝＝＞　试炼　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CUSTOM_DIFFICULTY_MAIN + __MENU_CUSTOM_DIFFICULTY_ACT_SET + 1);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__RED("＝＝＞　地狱　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CUSTOM_DIFFICULTY_MAIN + __MENU_CUSTOM_DIFFICULTY_ACT_SET + 2);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__RED("＝＝＞　梦魇　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CUSTOM_DIFFICULTY_MAIN + __MENU_CUSTOM_DIFFICULTY_ACT_SET + 3);
+
+	}
+
+	else if (action >= __MENU_CUSTOM_DIFFICULTY_MAIN + __MENU_CUSTOM_DIFFICULTY_ACT_SET && action < __MENU_CUSTOM_DIFFICULTY_MAIN + __MENU_CUSTOM_DIFFICULTY_ACT_SET + 99)
+	{
+		//set the difficulty, and send the main menu again, and show the current difficulty, and the difficulty level, and the difficulty name, and the difficulty description
+		//check the difficulty level, and set the difficulty, and send the main menu again, and show the current difficulty, and the difficulty level, and the difficulty name, and the difficulty description
+		auto _difficulty = action - __MENU_CUSTOM_DIFFICULTY_MAIN - __MENU_CUSTOM_DIFFICULTY_ACT_SET;
+		if (_difficulty >= 0 && _difficulty <= 3)
+		{
+			//set the difficulty, and send the main menu again, and show the current difficulty, and the difficulty level, and the difficulty name, and the difficulty description
+			// save the difficutly using achievements system
+			// player->SetDifficulty(_difficulty);
+
+		}
+	}
+}
+
+
+#pragma endregion
+
 void AddSC_qzqstar_custom()
 {
 	Script* newscript;
@@ -806,6 +856,13 @@ void AddSC_qzqstar_custom()
 	newscript->Name = "qzqstar_pet_system";
 	newscript->pGossipHello = [](Player *p, Creature *c) -> bool { return Pet_Menus(p, c, 0, __MENU_BG_MAIN); };
 	newscript->pGossipSelect = &Pet_Menus;
+	newscript->RegisterSelf(false);
+
+	//Add custom difficulty select script
+	newscript = new Script;
+	newscript->Name = "qzqstar_custom_difficulty";
+	newscript->pGossipHello = [](Player *p, Creature *c) -> bool { return CustomDifficulty_Menus(p, c, 0, __MENU_CUSTOM_DIFFICULTY_MAIN); };
+	newscript->pGossipSelect = &CustomDifficulty_Menus;
 	newscript->RegisterSelf(false);
 }
 

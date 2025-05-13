@@ -29,6 +29,7 @@ enum Achievement_t
 	ACHIEVEMENT_CUSTOM_QUEST 	= 100,
 	ACHIEVEMENT_SOCIAL_POINTS 	= 200,
 	ACHIEVEMENT_PETS = 300,
+	ACHIEVEMENT_CUSTOM_DIFFICULTY = 400,
 	ACHIEVEMENT_COUNTERS	=	1000,	//For combine and refreshing...
 };
 
@@ -136,6 +137,17 @@ public:
 	//every 10 minutes, minus 1 happiness points for all players online
 	//add 10 points to pet's relationship points if active
 	void UpdatePetPoints(Player *player);
+
+
+	/*****************************************************
+	 *		Custom Difficulty Functions
+	 *****************************************************/
+	// note on data arrays
+	// subType:  reserved for future use
+	// dataX: each data holds 2 dungeons data, each 8bit
+	//   bit 7-5: dungeon finish indicator
+	//   bit 4-2: dungeon reward indicator
+	//   bit 1-0: dungeon current chosen difficulty
 
 protected:
 	std::vector<AchievementsEntry> entries;
