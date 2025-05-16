@@ -606,4 +606,120 @@ void QzqstarAchievements::UpdatePetPoints(Player *player)
 		}	
 	}
 }
+
+
+
+/* ================================================================================================================== */
+/* ========================= Dungeons system  ======================================================================= */
+/* ================================================================================================================== */
+uint32 QzqstarAchievements::GetDungeonsInfo(Player *player, uint32 ac_mapId /* should be mapped to 0-15 */)
+{
+	//check _player if none
+	if (!player || ac_mapId > 19)
+		return 0;
+
+	//iterate the _playerAchievements vector map of this player to find the pet information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENTS_DUNGEONS)
+		{
+			//if found, return the miscValue data
+			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Loaded Dungeons: %u", player->GetName(), e.subType);
+
+			//get the ac_mapId, 0-15, and return the data1, data2, data3, data4, data5, data6, data7, data8
+			switch(ac_mapId)
+			{
+				case 0: return (e.data1) & 0xF;
+				case 1: return (e.data1 >> 4) & 0xF;
+				case 2: return (e.data1 >> 8) & 0xF;
+				case 3: return (e.data1 >> 12) & 0xF;
+				case 4: return (e.data2) & 0xF;
+				case 5: return (e.data2 >> 4) & 0xF;
+				case 6: return (e.data2 >> 8) & 0xF;
+				case 7: return (e.data2 >> 12) & 0xF;
+				case 8: return (e.data3) & 0xF;
+				case 9: return (e.data3 >> 4) & 0xF;
+				case 10: return (e.data3 >> 8) & 0xF;
+				case 11: return (e.data3 >> 12) & 0xF;
+				case 12: return (e.data4) & 0xF;
+				case 13: return (e.data4 >> 4) & 0xF;
+				case 14: return (e.data4 >> 8) & 0xF;
+				case 15: return (e.data4 >> 12) & 0xF;
+				case 16: return (e.data5) & 0xF;
+				case 17: return (e.data5 >> 4) & 0xF;
+				case 18: return (e.data5 >> 8) & 0xF;
+				case 19: return (e.data5 >> 12) & 0xF;
+				default: return 0;
+			}	
+		}	
+	}
+
+	//if not found, create one and return it
+	AchievementsEntry e;
+	e.guid = player->GetGUID();
+	e.type = ACHIEVEMENTS_DUNGEONS;
+	e.subType = 0;
+	e.data1 = 0;
+	e.data2 = 0;
+	e.data3 = 0;
+	e.data4 = 0;
+	e.note = "";
+	e.data5 = 0;
+	e.data6 = 0;
+	e.data7 = 0;
+	e.data8 = 0;
+	_playerAchievements[player->GetGUID()].push_back(e);
+
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeons: %u", player->GetName(), e.subType);
+
+	//default return code, means level=1, happy and relation to be zero.
+	return 0;
+}
+
+void QzqstarAchievements::SetDungeonsInfo(Player *player, uint32 ac_mapId /* should be mapped to 0-19 */, uint32 value)
+{
+	//check _player if none
+	if (!player || value>15 || ac_mapId > 19) return;
+
+	//iterate the _playerAchievements vector map of this player to find the pet information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENTS_DUNGEONS)
+		{
+			//if found, set the miscValue data
+			switch(ac_mapId)
+			{
+				case 0: e.data1 = (e.data1 & 0xFFF0) | (value); break;
+				case 1: e.data1 = (e.data1 & 0xFF0F) | (value << 4); break;
+				case 2: e.data1 = (e.data1 & 0xF0FF) | (value << 8); break;
+				case 3: e.data1 = (e.data1 & 0x0FFF) | (value << 12); break;
+				case 4: e.data2 = (e.data2 & 0xFFF0) | (value); break;
+				case 5: e.data2 = (e.data2 & 0xFF0F) | (value << 4); break;
+				case 6: e.data2 = (e.data2 & 0xF0FF) | (value << 8); break;
+				case 7: e.data2 = (e.data2 & 0x0FFF) | (value << 12); break;
+				case 8: e.data3 = (e.data3 & 0xFFF0) | (value); break;
+				case 9: e.data3 = (e.data3 & 0xFF0F) | (value << 4); break;
+				case 10: e.data3 = (e.data3 & 0xF0FF) | (value << 8); break;
+				case 11: e.data3 = (e.data3 & 0x0FFF) | (value << 12); break;
+				case 12: e.data4 = (e.data4 & 0xFFF0) | (value); break;
+				case 13: e.data4 = (e.data4 & 0xFF0F) | (value << 4); break;
+				case 14: e.data4 = (e.data4 & 0xF0FF) | (value << 8); break;
+				case 15: e.data4 = (e.data4 & 0x0FFF) | (value << 12); break;
+				case 16: e.data5 = (e.data5 & 0xFFF0) | (value); break;
+				case 17: e.data5 = (e.data5 & 0xFF0F) | (value << 4); break;
+				case 18: e.data5 = (e.data5 & 0xF0FF) | (value << 8); break;
+				case 19: e.data5 = (e.data5 & 0x0FFF) | (value << 12); break;
+				default: break;
+			}	
+		}	
+	}
+}
+
+
+
+
+
+
 #pragma endregion

@@ -21175,6 +21175,15 @@ void Player::AutoStoreLoot(Loot& loot, bool broadcast, uint8 bag, uint8 slot)
 
         SendNotifyLootItemRemoved(i);
         Item* pItem = StoreNewItem(dest, lootItem->itemid, true, lootItem->randomPropertyId);
+
+        //qzqstar, 250515, make the item creator ....
+        if(lootItem->difficulty)
+        {
+            pItem->SetGuidValue(ITEM_FIELD_CREATOR, 3);
+        }
+		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Auto Store111 gen Loot] PLAYER:[%u][%s] === lootItem->difficulty: %d", GetGUID(), GetName(), lootItem->difficulty);
+
+
         SendNewItem(pItem, lootItem->count, false, false, broadcast);
     }
 }

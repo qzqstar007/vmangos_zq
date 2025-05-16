@@ -255,6 +255,20 @@ bool AreaTrigger_at_dmf_chest_wc(Player* pPlayer, AreaTriggerEntry const* pAt)
     return false;
 }
 
+
+struct instance_ragefire : public ScriptedInstance
+{
+    instance_ragefire(Map* pMap) : ScriptedInstance(pMap)
+    {
+        Initialize();
+    }
+};
+
+InstanceData* GetInstanceData_instance_ragefire(Map* pMap)
+{
+    return new instance_ragefire(pMap);
+}
+
 void AddSC_instance_wailing_caverns()
 {
     Script* newscript;
@@ -262,6 +276,11 @@ void AddSC_instance_wailing_caverns()
     newscript = new Script;
     newscript->Name = "instance_wailing_caverns";
     newscript->GetInstanceData = &GetInstanceData_instance_wailing_caverns;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "instance_ragefire";
+    newscript->GetInstanceData = &GetInstanceData_instance_ragefire;
     newscript->RegisterSelf();
 
     newscript = new Script;

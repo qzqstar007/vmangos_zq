@@ -77,7 +77,9 @@ class InstanceData : public ZoneScript
         virtual void SetData(uint32 /*Type*/, uint32 /*Data*/) {}
 
         //qzqstar, 250511, add for instance difficulty levels
-        unsigned int CustomDifficulty;
+        uint32 CustomDifficulty;
+        uint32 CustomDifficultyMask;
+        uint32 CustomDifficulty_NPC[10];
 
         // Condition criteria additional requirements check
         // This is used for such things are heroic loot

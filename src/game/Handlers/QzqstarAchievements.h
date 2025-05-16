@@ -30,6 +30,7 @@ enum Achievement_t
 	ACHIEVEMENT_CUSTOM_QUEST 	= 100,
 	ACHIEVEMENT_SOCIAL_POINTS 	= 200,
 	ACHIEVEMENT_PETS = 300,
+	ACHIEVEMENTS_DUNGEONS 	= 	400,
 	ACHIEVEMENT_COUNTERS	=	1000,	//For combine and refreshing...
 };
 
@@ -148,6 +149,24 @@ public:
 	//every 10 minutes, minus 1 happiness points for all players online
 	//add 10 points to pet's relationship points if active
 	void UpdatePetPoints(Player *player);
+
+
+	/*****************************************************
+	 *
+	 *		Dungeons Systems Functions
+	 *
+	 *****************************************************/
+	// note on data arrays
+	// dataX: used as 2 dungeons status, each holding 8 bits
+	// bit7-4, unused
+	// bit3:2, used as dungeons difficulty achieved;
+	// bit1:0, used as dungeons current difficulty;
+
+	//get the player's dungeons information, return a byte
+	uint32 GetDungeonsInfo(Player *player, uint32 ac_mapId /* should be mapped to 0-15 */);
+
+	//save the player's dungeons information, add the dungeons to the player's achievements vector
+	void SetDungeonsInfo(Player *player, uint32 ac_mapId /* should be mapped to 0-15 */, uint32 value);
 
 protected:
 	std::vector<AchievementsEntry> entries;

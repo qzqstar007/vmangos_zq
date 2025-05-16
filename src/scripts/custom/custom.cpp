@@ -27,5 +27,6 @@ void AddSC_zero_scripts()
 	AddSC_qzqstar_custom();
 
 	AddSC_qzqstar_cpp_kelala();
+	AddSC_qzqstar_cpp_teleport();
 }
 

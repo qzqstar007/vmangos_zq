@@ -353,6 +353,9 @@ LootItem::LootItem(LootStoreItem const& li)
     is_blocked = false;
     is_underthreshold = false;
     is_counted = false;
+
+    difficulty_randomID = 0;
+    difficulty = 0;
 }
 
 LootItem::LootItem(uint32 itemid_, uint32 count_, int32 randomPropertyId_)
@@ -371,6 +374,9 @@ LootItem::LootItem(uint32 itemid_, uint32 count_, int32 randomPropertyId_)
     is_blocked = false;
     is_underthreshold = false;
     is_counted = false;
+
+    difficulty_randomID = 0;
+    difficulty = 0;
 }
 
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot

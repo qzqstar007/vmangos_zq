@@ -1566,7 +1566,7 @@ bool Rune_Menus(Player *player, Creature *_c, uint32 sender, uint32 action)
 	//check if player is null and go is null
 	if (!player || !_c) return false;
 
-	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Equip_Menus] PLAYER:[%u][%s] === action: %d", player->GetGUID(), player->GetName(), action);
+	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Rune Menus] PLAYER:[%u][%s] === action: %d", player->GetGUID(), player->GetName(), action);
 
 	// Main menu
 	if (action >= __MENU_TISH_MAIN && action <= __MENU_TISH_MAIN + __MENU_SIZE)

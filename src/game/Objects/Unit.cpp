@@ -58,7 +58,14 @@
 #include "InstanceStatistics.h"
 #include "MovementPacketSender.h"
 
-//#define DEBUG_DEBUFF_LIMIT
+
+#include "InstanceData.h"
+#include "ScriptedInstance.h"
+#include "QzqstarAchievements.h"
+#include "custom\qzqstar_teleport.h"
+ 
+ //#define DEBUG_DEBUFF_LIMIT
+
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
 {
@@ -1299,6 +1306,61 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
 
             if (playerKiller)
                 pCreatureVictim->GetMap()->BindToInstanceOrRaid(playerKiller, pCreatureVictim->GetRespawnTimeEx(), pCreatureVictim->HasStaticFlag(CREATURE_STATIC_FLAG_2_LOCK_TAPPERS_TO_RAID_ON_DEATH));
+        
+        
+            //qzqstar, 250514, add check for player kill creature in dungeons
+            if(playerKiller && pCreatureVictim)
+            {
+                //get the instance data
+                if (InstanceData * _insData = pCreatureVictim->GetMap()->GetInstanceData())
+                {
+					//get the instance data for the player
+					if ( (_insData->CustomDifficultyMask & 0x01) == 0x01)
+					{
+						bool _sendReward = true;
+
+						for (size_t i = 0; i < 6; i++)
+						{
+							if (_insData->CustomDifficulty_NPC[i] == pCreatureVictim->GetEntry())
+							{
+								_insData->CustomDifficulty_NPC[i] = 0;
+							}
+
+							//check again.
+							if (_insData->CustomDifficulty_NPC[i] > 10) _sendReward = false;
+
+						}
+
+						if (_sendReward)
+						{
+							_insData->CustomDifficultyMask &= 0xFFFE;
+
+							//check the player's info
+							uint32 _dungeonInfo = sQZAchievements.GetDungeonsInfo(playerKiller, QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId()));
+                            if( ((_dungeonInfo >> 2) <= (_dungeonInfo&3) ) && ( (_dungeonInfo>>2) < 3))
+                            {
+                                sQZAchievements.SetDungeonsInfo(playerKiller, QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId()), ((_dungeonInfo>>2) + 1) << 2 | (_dungeonInfo&3) );
+                                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, from %u to %u.", playerKiller->GetName(), TP_Dungeons[QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId())].name, _dungeonInfo>>2, (_dungeonInfo>>2) +1);
+                                //First break through
+                            }
+
+#ifndef __STR
+#define	__STR(x)		((std::string)(x)).c_str()
+#endif
+
+                            uint32 _difficulty = (_dungeonInfo&3);
+                            std::string _diffDesc = _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 ");
+                            ChatHandler(playerKiller).PSendSysMessage(9040, TP_Dungeons[QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId())].name, _diffDesc);
+                            
+                            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, difficulty: %u, Need Reward ....", playerKiller->GetName(), TP_Dungeons[QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId())].name, _dungeonInfo&3);
+						
+                            playerKiller->AddItem(TP_Dungeons[QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId())].npc_list[8] + (_dungeonInfo&3), TP_Dungeons[QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId())].npc_list[9]);
+                        }
+
+					}
+                }
+            }
+        
         }
     }
 

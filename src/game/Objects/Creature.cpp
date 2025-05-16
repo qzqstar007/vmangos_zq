@@ -57,6 +57,8 @@
 
 #include "scriptPCH.h"
 
+#include "QzqstarAchievements.h"
+
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
     TrainerSpellMap::const_iterator itr = spellList.find(spell_id);
@@ -252,21 +254,22 @@ void Creature::AddToWorld()
     if (!bWasInWorld && m_zoneScript)
         m_zoneScript->OnCreatureCreate(this);
 
-    //qzqstar, 250511, check if map id is deadmines, for test
-    if (GetMapId() == 36) {
+    if(GetMap()->IsDungeon())
+    {
+        //qzqstar, 250511, check if map id is deadmines, for test
+        InstanceData* const pInstanceData = GetMap()->GetInstanceData();
 
-		InstanceData* const pInstanceData = GetMap()->GetInstanceData();
-
-		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "pInstanceData->CustomDifficulty = %u!", pInstanceData->CustomDifficulty);
-
-        if(pInstanceData->CustomDifficulty != 0)
+        if(pInstanceData)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Creature:%s id:%u created!", GetName(), GetGUID());
-            //SetMaxHealth(GetMaxHealth() * 10); SetHealthPercent(100.0f);
-			
-            SetNativeScale(1.5f);
-            CastSpell(this, 23768, true);		
-            CastSpell(this, 32224, true);
+            //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Init Creatures for CustomDifficulty = %u!", pInstanceData->CustomDifficulty);
+            if(pInstanceData->CustomDifficulty > 0 && pInstanceData->CustomDifficulty < 4)
+            {
+                //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Creature:%s id:%u created!", GetName(), GetGUID());
+                SetMaxHealth(GetMaxHealth() * (1 + pInstanceData->CustomDifficulty * pInstanceData->CustomDifficulty * 2)); 
+                SetHealthPercent(100.0f);
+                SetNativeScale(1.0f + pInstanceData->CustomDifficulty/5.0f);
+                CastSpell(this, 32054 + pInstanceData->CustomDifficulty, true);
+            }
         }
     }
 }
@@ -1582,6 +1585,7 @@ bool Creature::IsTappedBy(Player const* player) const
     return true;
 }
 
+uint32 QZQSTAR_GET_AC_MAPID(uint32 mapid);
 void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
 {
     if (lootForPickPocketed)
@@ -1597,7 +1601,33 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
         }
     }
 
-    loot.GenerateMoneyLoot(GetCreatureInfo()->gold_min,GetCreatureInfo()->gold_max);
+
+	//qzqstar, 250515, generate money according to diffculty level
+	auto __mapid = GetMapId();
+	auto __goldMux = 0;
+	if ( (!loot.items.empty()) && (__mapid > 1) && (looter) )
+	{
+		auto _ac_mapid = QZQSTAR_GET_AC_MAPID(__mapid);
+		uint32 _dg_info = sQZAchievements.GetDungeonsInfo(looter, _ac_mapid) & 0x03;
+
+		__goldMux = _dg_info == 1 ? 2
+			: _dg_info == 2 ? 5
+			: _dg_info == 3 ? 10
+			: 0;
+
+        //iterate the loot.items
+        for (auto it = loot.items.begin(); it != loot.items.end(); ++it)
+        {
+			if (it->randomPropertyId)
+			{
+				it->difficulty = _dg_info;
+			}
+
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Creature gen Loot] PLAYER:[%u][%s] === __goldMux: %d", looter->GetGUID(), looter->GetName(), __goldMux);
+        }
+	}
+
+    loot.GenerateMoneyLoot(GetCreatureInfo()->gold_min * (5 + __goldMux) / 5,	GetCreatureInfo()->gold_max * (5 + __goldMux) / 5);
 }
 
 void Creature::GeneratePlayerDependentLoot(Player* looter, Group const* pGroupTap)

@@ -36,6 +36,9 @@
 
 #include "InstanceData.h"
 #include "ScriptedInstance.h"
+#include "QzqstarAchievements.h"
+#include "custom/qzqstar_teleport.h"
+
 
 typedef MaNGOS::ClassLevelLockable<MapManager, std::recursive_mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
@@ -494,6 +497,7 @@ uint32 MapManager::GetNumPlayersInInstances()
     return ret;
 }
 
+uint32 QZQSTAR_GET_AC_MAPID(uint32 mapid);
 // returns a new or existing Instance
 // in case of battlegrounds it will only return an existing map, those maps are created by bg-system
 Map* MapManager::CreateInstance(uint32 id, Player* player)
@@ -504,6 +508,11 @@ Map* MapManager::CreateInstance(uint32 id, Player* player)
     uint32 NewInstanceId = 0;                                   // instanceId of the resulting map
     bool newlyGeneratedInstanceId = false;
     MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(id);
+
+    //qzqstar, 250513, get the ac mapid
+    uint32 ac_mapid = QZQSTAR_GET_AC_MAPID(id);
+    uint32 _map_difficulty = sQZAchievements.GetDungeonsInfo(player, ac_mapid) & 0x03;
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MapManager::CreateInstance: Player:%s, mapid %d, ac_mapid %d, difficulty %d", player->GetName(), id, ac_mapid, _map_difficulty);
 
     if (entry->IsBattleGround())
     {
@@ -520,7 +529,7 @@ Map* MapManager::CreateInstance(uint32 id, Player* player)
         map = FindMap(id, NewInstanceId);
         // it is possible that the save exists but the map doesn't
         if (!map)
-            pNewMap = CreateDungeonMap(id, NewInstanceId, pSave, 222);
+            pNewMap = CreateDungeonMap(id, NewInstanceId, pSave, _map_difficulty);
     }
     else
     {
@@ -528,7 +537,7 @@ Map* MapManager::CreateInstance(uint32 id, Player* player)
         // the instance will be created for the first time
         NewInstanceId = GenerateInstanceId();
         newlyGeneratedInstanceId = true;
-        pNewMap = CreateDungeonMap(id, NewInstanceId, nullptr, 222);
+        pNewMap = CreateDungeonMap(id, NewInstanceId, nullptr, _map_difficulty);
     }
 
     //add a new map object into the registry
@@ -608,7 +617,17 @@ DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPe
     map->CreateInstanceData(load_data);
 
 	//qzqstar, 250511, save the diffculty
-	map->GetInstanceData()->CustomDifficulty = difficulty;
+	if(InstanceData *pInstanceData = map->GetInstanceData()) 
+    {
+        pInstanceData->CustomDifficulty = difficulty;
+        pInstanceData->CustomDifficultyMask = 0x01; //inited
+
+        //init the NPC list of this map
+        for(int i=0; i<10; i++)
+        {
+            pInstanceData->CustomDifficulty_NPC[i] = TP_Dungeons[QZQSTAR_GET_AC_MAPID(id)].npc_list[i]; //inited
+        }
+    }
 
     map->SpawnActiveObjects();
     return map;

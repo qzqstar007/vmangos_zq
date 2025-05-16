@@ -214,6 +214,14 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
         --loot->unlootedCount;
 
 
+        //qzqstar, 250515, make the item creator ....
+        if(item->difficulty)
+        {
+            newitem->SetGuidValue(ITEM_FIELD_CREATOR, 3);
+        }
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Handler Loot] PLAYER:[%u][%s] === item->difficulty: %d", player->GetGUID(), player->GetName(), item->difficulty);
+        //qzqstar, 250515, make the item creator....end
+
         sLog.Player(this, LOG_LOOTS, LOG_LVL_MINIMAL, "%s loots %ux%u [loot from %s]", _player->GetShortDescription().c_str(), item->count, item->itemid, lguid.GetString().c_str());
         player->SendNewItem(newitem, uint32(item->count), false, false, true);
         player->OnReceivedItem(newitem);

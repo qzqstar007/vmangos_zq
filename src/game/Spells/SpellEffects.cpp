@@ -2553,22 +2553,16 @@ void Spell::EffectPowerDrain(SpellEffectIndex effIdx)
     if (m_spellInfo->EffectMiscValue[effIdx] < 0 || m_spellInfo->EffectMiscValue[effIdx] >= MAX_POWERS)
         return;
 
-    if (!unitTarget || !unitTarget->IsAlive() || damage < 0)
-        return;
-
     Powers drainPower = Powers(m_spellInfo->EffectMiscValue[effIdx]);
 
-    // happiness is never a creature's main power so it has special handling
-    if (drainPower == POWER_HAPPINESS)
-    {
-        if (!unitTarget->IsPet())
-            return;
-    }
-    else
-    {
-        if (unitTarget->GetPowerType() != drainPower)
-            return;
-    }
+    if (!unitTarget)
+        return;
+    if (!unitTarget->IsAlive())
+        return;
+    if (unitTarget->GetPowerType() != drainPower)
+        return;
+    if (damage < 0)
+        return;
 
     int32 curPower = unitTarget->GetPower(drainPower);
 
@@ -4622,13 +4616,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                 case 20114: // BM Only OFF
                 {
                     if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetCheatBeastmaster(false, true);
+                        pPlayer->SetCheatGod(false, true);
                     return;
                 }
                 case 20115: // BM Only ON
                 {
                     if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetCheatBeastmaster(true, true);
+                        pPlayer->SetCheatGod(true, true);
                     return;
                 }
                 case 29313: // CooldownAll
