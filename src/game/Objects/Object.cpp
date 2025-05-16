@@ -33,7 +33,7 @@
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include "Util.h"
-#include "MapManager.h"
+#include "Geometry.h"
 #include "Transport.h"
 #include "MotionMaster.h"
 #include "VMapFactory.h"
@@ -1883,13 +1883,13 @@ bool WorldObject::HasInArc(WorldObject const* target, float const arcangle, floa
     float arc = arcangle;
 
     // move arc to range 0.. 2*pi
-    arc = MapManager::NormalizeOrientation(arc);
+    arc = Geometry::NormalizeOrientation(arc);
 
     float angle = GetAngle(target);
     angle -= m_position.o + offset;
 
     // move angle to range -pi ... +pi
-    angle = MapManager::NormalizeOrientation(angle);
+    angle = Geometry::NormalizeOrientation(angle);
     if (angle > M_PI_F)
         angle -= 2.0f * M_PI_F;
 
@@ -2584,7 +2584,7 @@ public:
         float angle = Geometry::GetAngle(i_objectX, i_objectY, u->GetPositionX(), u->GetPositionY()) - i_angle;
 
         // move angle to range -pi ... +pi
-        angle = MapManager::NormalizeOrientation(angle);
+        angle = Geometry::NormalizeOrientation(angle);
 
         // dist include size of u
         float dist2d = std::max(Geometry::GetDistance2D(i_objectX, i_objectY, x, y) - i_object.GetObjectBoundingRadius(), 0.0f);
@@ -3136,7 +3136,7 @@ uint32 WorldObject::RespawnNearCreaturesByEntry(uint32 entry, float range)
     return count;
 }
 
-void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z)
+void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z) const
 {
     float orientation = GetOrientation() + M_PI / 2.0f;
 
@@ -3151,7 +3151,7 @@ void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight,
     z = GetPositionZ() + fUpDown;
 }
 
-void WorldObject::GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o)
+void WorldObject::GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o) const
 {
     float circleAng = (float(curr) / float(total)) * (M_PI * 2);
     x = GetPositionX() + (cos(circleAng) * dist);
@@ -3160,14 +3160,14 @@ void WorldObject::GetInCirclePositions(float dist, uint32 curr, uint32 total, fl
     o = circleAng - M_PI;
 }
 
-void WorldObject::GetNearRandomPositions(float distance, float &x, float &y, float &z)
+void WorldObject::GetNearRandomPositions(float distance, float &x, float &y, float &z) const
 {
     x = rand_norm_f() * distance;
     y = rand_norm_f() * distance;
     z = GetPositionZ();
 }
 
-void WorldObject::GetFirstCollision(float dist, float angle, float &x, float &y, float &z)
+void WorldObject::GetFirstCollision(float dist, float angle, float &x, float &y, float &z) const
 {
     x = GetPositionX();
     y = GetPositionY();

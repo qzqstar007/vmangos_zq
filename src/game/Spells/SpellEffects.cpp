@@ -49,7 +49,6 @@
 #include "InstanceData.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
-#include "scriptPCH.h"
 
 #include "QzqstarAchievements.h"
 
