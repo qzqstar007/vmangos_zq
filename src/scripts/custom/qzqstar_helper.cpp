@@ -17,7 +17,7 @@
 #include "scriptPCH.h"
 #include "custom.h"
 #include "qzqstar_helper.h"
-
+#include "Chat.h"
 
 // 添加或更新元素
 void Top10Ranking::addOrUpdate(int score, const std::string& name) {

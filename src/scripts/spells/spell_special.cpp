@@ -17,6 +17,7 @@
 #include "scriptPCH.h"
 
 #include "QzqstarAchievements.h"
+#include "Chat.h"
 
 // 24340, 26558, 28884 - Meteor
 // 26789 - Shard of the Fallen Star

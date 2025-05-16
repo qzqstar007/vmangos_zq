@@ -58,7 +58,7 @@
 #include "InstanceStatistics.h"
 #include "MovementPacketSender.h"
 
-
+#include "Chat.h"
 #include "InstanceData.h"
 #include "ScriptedInstance.h"
 #include "QzqstarAchievements.h"

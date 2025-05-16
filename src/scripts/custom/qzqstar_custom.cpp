@@ -22,6 +22,7 @@
 #include "qzqstar_custom.h"
 #include "QzqstarAchievements.h"
 #include "Qzqstar_db.h"
+#include "Chat.h"
 
 #define	__STR(x)		((std::string)(x)).c_str()
 #define	__NSTR(x)		(std::to_string(x))

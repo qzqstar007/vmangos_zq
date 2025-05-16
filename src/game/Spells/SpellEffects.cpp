@@ -51,6 +51,7 @@
 #include "SocialMgr.h"
 
 #include "QzqstarAchievements.h"
+#include "Chat.h"
 
 using namespace Spells;
 
@@ -310,7 +311,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
     }
 }
 
-
+#include "GridNotifiers.h"
 //qzqstar add support for the one key pickall
 bool Spell::OneKeyPickall(Player* caster)
 {
@@ -396,7 +397,7 @@ bool Spell::OneKeyPickall(Player* caster)
 
 			if (permission == GROUP_PERMISSION || permission == ROUND_ROBIN_PERMISSION || permission == MASTER_PERMISSION)
 			{
-				ChatHandler(caster->GetSession()).PSendSysMessage("Cannot be in Party/Raid.");
+				ChatHandler(caster).PSendSysMessage("Cannot be in Party/Raid.");
 				return false;
 			}
 

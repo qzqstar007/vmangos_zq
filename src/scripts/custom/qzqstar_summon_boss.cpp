@@ -20,6 +20,7 @@
 #include <ctime>
 
 #include "qzqstar_summon_boss.h"
+#include "Chat.h"
 
 #define	__MENU_NONE						0
 #define __MENU_SUMMON_MAIN				 1000

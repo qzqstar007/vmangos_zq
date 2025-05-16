@@ -23,6 +23,7 @@
 #include "qzqstar_kelala.h"
 #include "qzqstar_db.h"
 #include "qzqstar_helper.h"
+#include "Chat.h"
 
 #define	__MENU_NONE						0
 #define	__MENU_SIZE						999
