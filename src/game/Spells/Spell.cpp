@@ -7853,6 +7853,10 @@ SpellCastResult Spell::CheckItems()
                 totems -= 1;
         }
 
+        //qzqstar, 250518, if has spell of ... ignore totems
+        if(p_caster->HasSpell(2329))
+            totems = 0;
+
         if (totems != 0)
             return SPELL_FAILED_ITEM_GONE;                      //[-ZERO] not sure of it
     }
