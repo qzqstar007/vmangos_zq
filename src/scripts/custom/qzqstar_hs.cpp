@@ -19,16 +19,20 @@
 #include "ScriptedAI.h"
 #include <ctime>
 
-#include "qzqstar_vip_str.h"
+#include "qzqstar_hs.h"
+#include "QzqstarAchievements.h"
 
-// Set to Bandiantu,
-//	Spell:		10712
-//	Creature:	7559
 
 #define	__MENU_NONE						0
-#define __MENU_TELEPORT_MAIN			1000
-#define __MENU_DUNGEON_RESET_MAIN		2000
-#define __MENU_END						10000
+#define	__MENU_MAIN						1
+#define __MENU_SIZE						999
+#define __MENU_HOME_MAIN				1000
+#define __MENU_HOME_MAIN				1000
+#define __MENU_CITIES_MAIN				2000
+#define __MENU_GAZAGAN_MAIN				3000
+#define __MENU_SUISHEN_MAIN				5000
+#define __MENU_TEAM_MAIN				6000
+#define __MENU_END						20000
 
 #define	__STR(x)		((std::string)(x)).c_str()
 #define	__NSTR(x)		(std::to_string(x))
@@ -39,123 +43,309 @@
 #define __RED(x)		"|cfff00019"##x##"|r"
 #define __YELLOW(x)		"|cfff9dc24"##x##"|r"
 
-//VIP Spell: 32858
-bool GossipHello_VIP(Player *player, Creature *_Creature)
-{
-	if (player->HasSpell(32858))
-	{
-		//VIP teleport
-		player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　副　本　内　飞　| ===")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_MAIN);
-		//player->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　其　他　功　能　| ===")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-	}
 
-	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
-	return true;
+
+void _Main_Menus(Player *player)
+{
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　使用炉石　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_HOME_MAIN);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　传送加基森　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_GAZAGAN_MAIN);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　主城传送　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　随身功能　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　团队功能　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, player->GetGUID());
 }
 
-
-void SendDefaultMenu_TELEPORT(Player *player, Creature *_Creature, uint32 action)
+bool static __localHandleGroupCommand(Player *pPlayer, uint32 action)
 {
-	std::string text = "";
-	uint32 __menu_nums = 0;
+    //Player* pPlayer = m_session->GetPlayer();
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
 
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
 
-	if (action == __MENU_TELEPORT_MAIN)
-	{
-		//Find all of the mapid from _TELEPORT_Locs
-		for (size_t i = 0; i < sizeof(_TELEPORT_Locs) / sizeof(_TELEPORT_Locs[0]); ++i) {
-
-			if (player->GetMapId() == _TELEPORT_Locs[i].map_id)
+			//check the action
+			switch(action)
 			{
-				//add to menu.
-				++ __menu_nums;
-				player->ADD_GOSSIP_ITEM(5, __STR(_TELEPORT_Locs[i].text), GOSSIP_SENDER_MAIN, _TELEPORT_Locs[i].action_id);
+				case 10:
+				{
+					//summon request
+					pMember->SendSummonRequest(pPlayer->GetObjectGuid(), pPlayer->GetMapId(), pPlayer->GetZoneId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
+					break;
+				}
+
+				case 20:
+				{
+					//revive request
+					if (pMember->IsDead())
+					{
+						pMember->ResurrectPlayer(0.2f);
+						pMember->SpawnCorpseBones();
+					}
+					break;
+				}
+
+				case 30:
+				{
+					//fufill request
+					if (pMember->IsAlive())
+					{
+						pMember->SetHealth(pMember->GetMaxHealth());
+						if (pMember->GetPowerType() == POWER_MANA)
+							pMember->SetPower(POWER_MANA, pMember->GetMaxPower(POWER_MANA));
+					}
+
+					break;
+				}
 			}
 		}
+    }
 
-		if (__menu_nums == 0)
-		{
-			player->ADD_GOSSIP_ITEM(5, __STR(__RED(" ==|　只能在副本使用　|== ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-		}
-
-		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
-	}
-	else if( action > 1010 && action < __MENU_DUNGEON_RESET_MAIN)
-	{
-		//Find all of the mapid from _TELEPORT_Locs
-		for (size_t i = 0; i < sizeof(_TELEPORT_Locs) / sizeof(_TELEPORT_Locs[0]); ++i) {
-
-			if (action == _TELEPORT_Locs[i].action_id)
-			{
-				//just teleport to the position.
-				player->CLOSE_GOSSIP_MENU();
-				player->TeleportTo(_TELEPORT_Locs[i].map_id, _TELEPORT_Locs[i].pos[0], _TELEPORT_Locs[i].pos[1], _TELEPORT_Locs[i].pos[2], _TELEPORT_Locs[i].pos[3]);
-			}
-		}
-	}
-
-
+    PSendSysMessage("团队功能已完成。 ");
+    return true;
 }
 
-
-void SendDefaultMenu_DUNGEN_RESET(Player *player, Creature *_Creature, uint32 action)
-{
-
-}
-
-
-bool GossipSelect_VIP(Player *player, Creature *_Creature, uint32 sender, uint32 action)
-{
-	// Teleport menu
-	if (action < __MENU_DUNGEON_RESET_MAIN)
-		SendDefaultMenu_TELEPORT(player, _Creature, action);
-
-	else if (action < __MENU_END)
-		SendDefaultMenu_DUNGEN_RESET(player, _Creature, action);
-
-	return true;
-}
-
-
-// 18788 - Demonic Sacrifice
-struct CustomVipSpell : SpellScript
+struct CustomHSSpell : SpellScript
 {
 	void OnSuccessfulFinish(Spell* spell) const final
 	{
-		(spell->m_casterUnit)->ToPlayer()->PlayerTalkClass->ClearMenus();
-		(spell->m_casterUnit)->ToPlayer()->M_Spare_Data1 = 1999;
-		(spell->m_casterUnit)->ToPlayer()->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　副　本　内　飞　| ===")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_MAIN);
-		(spell->m_casterUnit)->ToPlayer()->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, spell->m_casterUnit->GetObjectGuid());
+		if(Player *player = (spell->m_casterUnit)->ToPlayer())
+		{
+			player->PlayerTalkClass->ClearMenus();
+			player->M_Spare_Data1 = 1998;
+			
+			_Main_Menus(player);
+		}
+
+		else
+		{
+			sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error of Spell_HS, not a player??.");
+		}
 	}
 
 	void OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action) const final
 	{
 		//sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "test. %d %d", sender, action);
-		SendDefaultMenu_TELEPORT(pPlayer, pCreature, action);
+		pPlayer->CLOSE_GOSSIP_MENU();
+
+		if(action == __MENU_MAIN)
+		{
+			_Main_Menus(pPlayer);	return;
+		}
+		else if(action == __MENU_HOME_MAIN)
+		{
+			pPlayer->TeleportToHomebind(); return;
+		}
+		else if (action == __MENU_GAZAGAN_MAIN)
+		{
+			pPlayer->CastSpell(pPlayer, 23441, true); return;
+		}
+		else if (action >= __MENU_CITIES_MAIN && action <= __MENU_CITIES_MAIN + __MENU_SIZE)
+		{
+			//display the cities
+			if(action == __MENU_CITIES_MAIN)
+			{
+				if (pPlayer->GetTeam() == ALLIANCE)
+				{
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＝＞　暴风城　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 11);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＝＞　铁炉堡　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 12);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＝＞　达纳苏斯　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 13);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＞　人类出生地　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 14);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＞　矮人出生地　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 15);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＞　精灵出生地　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 16);
+				}
+				else //HORDE
+				{
+
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＝＞　奥格瑞玛　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 21);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＝＞　幽暗城　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 22);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＝＞　雷霆崖　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 23);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＞　兽人出生地　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 24);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＞　亡灵出生地　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 25);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＞　牛头出生地　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 26);
+
+				}
+
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＝＞　永望镇　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 31);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＝＞　藏宝海湾　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 32);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＝＞　棘齿城　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 33);
+				
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+				return;
+			}
+
+			else
+			{
+				uint32 _realAction = action - __MENU_CITIES_MAIN;
+				switch(_realAction)
+				{
+				case 11:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -8828.231445f, 627.927490f, 94.055664f, 0.0f); return;
+				case 12:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -4917.0f, -955.0f, 502.0f, 0.0f); return;
+				case 13:	pPlayer->TeleportTo(MAP_KALIMDOR, 9962.712891f, 2280.142822f, 1341.394409f, 0.0f); return;
+				
+				case 14:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -8943.133789f, -132.934921f, 83.704269f, 0.0f); return;
+				case 15:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -6231.106445f, 332.270477f, 383.153931f, 0.0f); return;
+				case 16:	pPlayer->TeleportTo(MAP_KALIMDOR, 10329.918945f, 833.500305f, 1326.260620f, 0.0f); return;
+
+				case 21:	pPlayer->TeleportTo(MAP_KALIMDOR, 1437.0f, -4421.0f, 25.24f, 1.65f); return;
+				case 22:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, 1822.0999f, 238.638855f, 60.694809f, 0.0f); return;
+				case 23:	pPlayer->TeleportTo(MAP_KALIMDOR, -1272.703735f, 116.886490f, 131.016861f, 0.0f); return;
+
+				case 24:	pPlayer->TeleportTo(MAP_KALIMDOR, -602.1253f, -4262.4208f, 38.956341f, 0.0f); return;
+				case 25:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, 1663.517f, 1678.187744f, 120.5303f, 0.0f); return;
+				case 26:	pPlayer->TeleportTo(MAP_KALIMDOR, -2914.16992f, -266.061798f, 53.658211f, 0.0f); return;
+
+				case 31:	pPlayer->TeleportTo(MAP_KALIMDOR, 6755.33f, -4658.09f, 724.8f, 3.4049f); return;
+				case 32:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -14462.0f, 460.0f, 16.1f, 3.4049f); return; 
+				case 33:	pPlayer->TeleportTo(MAP_KALIMDOR, -952.2f, -3746.3f, 5.66f, 1.1f); return;
+				}
+			}
+		}
+
+		else if(action >= __MENU_SUISHEN_MAIN && action <= __MENU_SUISHEN_MAIN + __MENU_SIZE)
+		{
+			uint32 _vipFeature = sQZAchievements.GetVIPFeatures(pPlayer);
+
+			if(action == __MENU_SUISHEN_MAIN)
+			{
+				if (_vipFeature & 0x01) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤维修机器人　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 10);
+				if (_vipFeature & 0x02)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤移动银行　　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 20);
+				if (_vipFeature & 0x04)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤中立拍卖师　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 30);
+				if (_vipFeature & 0x08)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤猎人兽栏　　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 30);
+
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				if (!(_vipFeature & 0x01)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买维修机器（100点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 10 + 100);
+				if (!(_vipFeature & 0x02)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买移动银行（100点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 20 + 100);
+				if (!(_vipFeature & 0x04)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买中立拍卖师（100点券）＜＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 30 + 100);
+				if (!(_vipFeature & 0x08)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买猎人兽栏（100点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 30 + 100);
+
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);
+
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+			}
+
+			else if (action>__MENU_SUISHEN_MAIN && action < __MENU_SUISHEN_MAIN + 99)
+			{
+				switch (action - __MENU_SUISHEN_MAIN)
+				{
+				case 10: pPlayer->CastSpell(pPlayer, 10683, true); return; //summon machine;
+				case 20: pPlayer->CastSpell(pPlayer, 10684, true); return;
+				case 30:return;
+				}
+			}
+
+			else if (action > __MENU_SUISHEN_MAIN + 100 && action < __MENU_SUISHEN_MAIN + 199)
+			{
+				//check if player has enough vouchers
+				
+				if(!pPlayer->HasItemCount(XXXX, 100))
+				{
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　点券不够，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);
+				}
+				else
+				{
+					pPlayer->DestroyItemCount(XXXX, 100, true, true);
+					switch (action - __MENU_SUISHEN_MAIN - 100)
+					{
+						case 10: sQZAchievements.SetVipFeatures(pPlayer, VIP_SUISHEN_ROBOT);  	break;
+						case 20: sQZAchievements.SetVipFeatures(pPlayer, VIP_SUISHEN_BANK); 	break;
+						case 30: sQZAchievements.SetVipFeatures(pPlayer, VIP_SUISHEN_AH); 		break;
+						case 40: sQZAchievements.SetVipFeatures(pPlayer, VIP_SUISHEN_STABLE); 	break;	
+					}	
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　开通成功，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);	
+				}
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+				return;
+			}
+		}
+
+		else if(action >= __MENU_TEAM_MAIN && action <= __MENU_TEAM_MAIN + __MENU_SIZE)
+		{
+			uint32 _vipFeature = sQZAchievements.GetVIPFeatures(pPlayer);
+
+			if(action == __MENU_TEAM_MAIN)
+			{
+				if (_vipFeature & 0x10) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　队伍召唤　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 10);
+				if (_vipFeature & 0x20)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　全体复活　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 20);
+				if (_vipFeature & 0x40)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　全体恢复　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 30);
+
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				if (!(_vipFeature & 0x10)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买队伍召唤（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 10 + 100);
+				if (!(_vipFeature & 0x20)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买全体复活（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 20 + 100);
+				if (!(_vipFeature & 0x40)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买全体恢复（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 30 + 100);
+
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);
+
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+			}
+			else if (action>__MENU_TEAM_MAIN && action < __MENU_TEAM_MAIN + 99)
+			{
+				__localHandleGroupCommand(pPlayer, action - __MENU_TEAM_MAIN);
+				return;
+			}
+			else if (action > __MENU_TEAM_MAIN + 100 && action < __MENU_TEAM_MAIN + 199)
+			{
+				//check if player has enough vouchers
+				if(!pPlayer->HasItemCount(XXXX, 300))
+				{
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　点券不够，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);	
+				}
+				else
+				{
+					pPlayer->DestroyItemCount(XXXX, 300, true, true);
+					switch (action - __MENU_TEAM_MAIN - 100)
+					{
+						case 10: sQZAchievements.SetVipFeatures(pPlayer, VIP_TEAM_SUMMON);  	break;
+						case 20: sQZAchievements.SetVipFeatures(pPlayer, VIP_TEAM_REVIVE); 		break;
+						case 30: sQZAchievements.SetVipFeatures(pPlayer, VIP_TEAM_FULLFILL); 	break;
+					}	
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　开通成功，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);
+
+				}
+
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+				return;
+			}
+		}
 	}
 };
 
-SpellScript* GetScript_CustomVipSpell(SpellEntry const*)
+SpellScript* GetScript_CustomHSSpell(SpellEntry const*)
 {
-	return new CustomVipSpell();
+	return new CustomHSSpell();
 }
 
-void AddSC_qzqstar_vip_creatures()
+void AddSC_qzqstar_spell_hs()
 {
-	Script* newscript;
-	
-	newscript = new Script;
-	newscript->Name = "qzqstar_vip";
-	newscript->pGossipHello = &GossipHello_VIP;
-	newscript->pGossipSelect = &GossipSelect_VIP;
-	newscript->RegisterSelf(false);
-
-
 	Script* newscript2;
 	newscript2 = new Script;
-	newscript2->Name = "spell_vip";
-	newscript2->GetSpellScript = &GetScript_CustomVipSpell;
-	newscript2->pGossipSelect = &GossipSelect_VIP;
+	newscript2->Name = "qzqstar_spell_hs";
+	newscript2->GetSpellScript = &GetScript_CustomHSSpell;
+	//newscript2->pGossipSelect = &GossipHello_HS;
 	newscript2->RegisterSelf(false);
 }
 

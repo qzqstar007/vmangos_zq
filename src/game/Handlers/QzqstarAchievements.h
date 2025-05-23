@@ -34,6 +34,15 @@ enum Achievement_t
 	ACHIEVEMENT_COUNTERS	=	1000,	//For combine and refreshing...
 };
 
+//VIP Features
+#define VIP_SUISHEN_ROBOT	(0x01)
+#define VIP_SUISHEN_BANK	(0x02)
+#define VIP_SUISHEN_AH		(0x04)
+#define VIP_SUISHEN_STABLE	(0x08)
+#define VIP_TEAM_SUMMON		(0x10)
+#define VIP_TEAM_REVIVE		(0x20)
+#define VIP_TEAM_FULLFILL	(0x40)
+
 
 //ACHIEVEMENT_COUNTERS subtype
 #define	ACHIEVEMENT_COUNTERS_COMBINE	(10)
@@ -74,12 +83,19 @@ public:
 	 *****************************************************/
 	// note on data arrays
 	// data1: vip level
+	// data2: vip enabled features, each bit represents a feature, 1 means enabled, 0 means disabled
 
 	// Get the player's VIP level
 	uint32 GetVIPLevel(Player *player);
 
 	// Set the player's VIP level and add the VIP level to the player's achievements vector
 	bool SetVIPLevel(Player *player, uint32 level);
+
+	// Get the player's VIP enabled features
+	uint32 GetVIPFeatures(Player *player);
+
+	// Set the player's VIP enabled features and add the VIP features to the player's achievements vector
+	bool SetVIPFeatures(Player *player, uint32 features);
 
 
 	/*****************************************************

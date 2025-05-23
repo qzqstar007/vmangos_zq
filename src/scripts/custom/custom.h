@@ -27,3 +27,6 @@ void AddSC_qzqstar_custom();
 void AddSC_qzqstar_cpp_kelala();
 
 void AddSC_qzqstar_cpp_teleport();
+
+
+void AddSC_qzqstar_spell_hs();

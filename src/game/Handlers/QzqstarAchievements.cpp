@@ -192,6 +192,61 @@ bool QzqstarAchievements::SetVIPLevel(Player * _player, uint32 level)
 	return true;
 }
 
+
+//VIP enabled features: 1-16, each bit represents a feature, 1 means enabled, 0 means disabled
+//get the player's VIP enabled features, if the player has not got any VIP enabled features, return 0.
+uint32 QzqstarAchievements::GetVIPFeatures(Player * _player)
+{
+	//check _player if none
+	if (!_player) return 0;	
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry e = *it;
+		if (e.type == ACHIEVEMENT_VIP)
+		{
+			return e.data2;	
+		}	
+	}
+
+	//add one VIP level to the _playerAchievements vector map of this player if not found
+	AchievementsEntry e;
+	e.guid = _player->GetGUID();
+	e.type = ACHIEVEMENT_VIP;
+	e.subType = 0;
+	e.data1 = 1;
+	e.data2 = 0;
+	e.data3 = 0;
+	e.data4 = 0;
+	e.note = "";
+	_playerAchievements[_player->GetGUID()].push_back(e);
+
+	return 0;
+}
+
+//set the player's VIP enabled features and add the VIP enabled features to the player's achievements vector
+bool QzqstarAchievements::SetVIPFeatures(Player * _player, uint32 features)
+{
+	//check _player if none
+	if (!_player) return false;
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_VIP)
+		{
+			e.data2 |= features;
+			break;
+		}	
+	}
+	
+	return true;
+}
+
+
+
 #pragma endregion
 
 

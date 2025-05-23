@@ -447,6 +447,14 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
 			}
 		}
 		
+        if (_player->M_Spare_Data1 == 1998)		//HS spell
+		{
+			if (const SpellEntry * spell_info = sSpellMgr.GetSpellEntry(33386))
+			{
+				if(SpellScript* pTempScript = sScriptMgr.GetSpellScript(spell_info))
+					pTempScript->OnGossipSelect(_player, (Creature *)_player, sender, action);
+			}
+		}
 	}
 }
 
