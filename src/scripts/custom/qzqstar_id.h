@@ -27,17 +27,28 @@
 /******************************************************************** 
  *  Item IDs, least first (30000).
  ********************************************************************/
-#define ZQ_ITEM_VOUCHER			30000	//Voucher, 点券
+#define ZQ_ITEM_VOUCHER				30000	//Voucher, 点券
 
 /******************************************************************** 
  *  Spell IDs, largest first (33386).
  ********************************************************************/
 #define ZQ_SPELL_HEARTSTONE			33386	//Heart Stone, 炉石修改（Item ID：6948）
 
+//summon creature spells, such as critter, pet, mount, etc.
+#define ZQ_SPELL_SUMMON_ROBOT		33371	//Summon Robot, 召唤机器人
+#define ZQ_SPELL_SUMMON_BANK		33372	//Summon Bank, 召唤银行
+#define ZQ_SPELL_SUMMON_AH			33373	//Summon AH, 召唤拍卖行
+#define ZQ_SPELL_SUMMON_STABLE		33374	//Summon Stable, 召唤兽栏
+
+
 /******************************************************************** 
- *  Creature IDs, largest first (33386).
+ *  Creature IDs, least first (33386).
  ********************************************************************/
-#define ZQ_CREATURE_HEARTSTONE		33386	//Heart Stone, 炉石修改（Item ID：6948）
+#define ZQ_NPC_KELALA				30000	//Kelala, 克尔拉
+
+
+#define ZQ_NPC_ROBOT				30020	//Robot, 机器人
+#define ZQ_NPC_BANK 				30021	//Bank, 银行
 
 #endif	//_QZQSTAR_CPP_IDS_H
 

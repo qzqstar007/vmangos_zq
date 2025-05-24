@@ -19,8 +19,11 @@
 #include "ScriptedAI.h"
 #include <ctime>
 
+#include "Group.h"
+
 #include "qzqstar_hs.h"
 #include "QzqstarAchievements.h"
+#include "qzqstar_id.h"
 
 
 #define	__MENU_NONE						0
@@ -69,8 +72,7 @@ bool static __localHandleGroupCommand(Player *pPlayer, uint32 action)
     Group* pGroup = pPlayer->GetGroup();
     if (!pGroup)
     {
-        SendSysMessage("You are not in a group.");
-        SetSentErrorMessage(true);
+		pPlayer->PSendSysMessage(__STR("该功能只能组队使用。 "));
         return false;
     }
 
@@ -118,7 +120,7 @@ bool static __localHandleGroupCommand(Player *pPlayer, uint32 action)
 		}
     }
 
-    PSendSysMessage("团队功能已完成。 ");
+	pPlayer->PSendSysMessage(__STR("团队功能已成功释放。 "));
     return true;
 }
 
@@ -233,13 +235,13 @@ struct CustomHSSpell : SpellScript
 				if (_vipFeature & 0x01) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤维修机器人　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 10);
 				if (_vipFeature & 0x02)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤移动银行　　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 20);
 				if (_vipFeature & 0x04)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤中立拍卖师　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 30);
-				if (_vipFeature & 0x08)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤猎人兽栏　　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 30);
+				if (_vipFeature & 0x08)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤猎人兽栏　　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 40);
 
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				if (!(_vipFeature & 0x01)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买维修机器（100点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 10 + 100);
 				if (!(_vipFeature & 0x02)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买移动银行（100点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 20 + 100);
 				if (!(_vipFeature & 0x04)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买中立拍卖师（100点券）＜＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 30 + 100);
-				if (!(_vipFeature & 0x08)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买猎人兽栏（100点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 30 + 100);
+				if (!(_vipFeature & 0x08)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买猎人兽栏（100点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 40 + 100);
 
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);
@@ -251,9 +253,10 @@ struct CustomHSSpell : SpellScript
 			{
 				switch (action - __MENU_SUISHEN_MAIN)
 				{
-				case 10: pPlayer->CastSpell(pPlayer, 10683, true); return; //summon machine;
-				case 20: pPlayer->CastSpell(pPlayer, 10684, true); return;
-				case 30:return;
+				case 10: pPlayer->CastSpell(pPlayer, ZQ_SPELL_SUMMON_ROBOT, true); return; //summon robot;
+				case 20: pPlayer->CastSpell(pPlayer, ZQ_SPELL_SUMMON_BANK, true); return; //summon bank;
+				case 30: pPlayer->CastSpell(pPlayer, ZQ_SPELL_SUMMON_AH, true); return; //summon ah;
+				case 40: pPlayer->CastSpell(pPlayer, ZQ_SPELL_SUMMON_STABLE, true); return; //summon stable;
 				}
 			}
 
@@ -261,19 +264,19 @@ struct CustomHSSpell : SpellScript
 			{
 				//check if player has enough vouchers
 				
-				if(!pPlayer->HasItemCount(XXXX, 100))
+				if(!pPlayer->HasItemCount(ZQ_ITEM_VOUCHER, 100))
 				{
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　点券不够，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);
 				}
 				else
 				{
-					pPlayer->DestroyItemCount(XXXX, 100, true, true);
+					pPlayer->DestroyItemCount(ZQ_ITEM_VOUCHER, 100, true, true);
 					switch (action - __MENU_SUISHEN_MAIN - 100)
 					{
-						case 10: sQZAchievements.SetVipFeatures(pPlayer, VIP_SUISHEN_ROBOT);  	break;
-						case 20: sQZAchievements.SetVipFeatures(pPlayer, VIP_SUISHEN_BANK); 	break;
-						case 30: sQZAchievements.SetVipFeatures(pPlayer, VIP_SUISHEN_AH); 		break;
-						case 40: sQZAchievements.SetVipFeatures(pPlayer, VIP_SUISHEN_STABLE); 	break;	
+						case 10: sQZAchievements.SetVIPFeatures(pPlayer, VIP_SUISHEN_ROBOT);  	break;
+						case 20: sQZAchievements.SetVIPFeatures(pPlayer, VIP_SUISHEN_BANK); 	break;
+						case 30: sQZAchievements.SetVIPFeatures(pPlayer, VIP_SUISHEN_AH); 		break;
+						case 40: sQZAchievements.SetVIPFeatures(pPlayer, VIP_SUISHEN_STABLE); 	break;
 					}	
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　开通成功，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);	
 				}
@@ -310,18 +313,18 @@ struct CustomHSSpell : SpellScript
 			else if (action > __MENU_TEAM_MAIN + 100 && action < __MENU_TEAM_MAIN + 199)
 			{
 				//check if player has enough vouchers
-				if(!pPlayer->HasItemCount(XXXX, 300))
+				if(!pPlayer->HasItemCount(ZQ_ITEM_VOUCHER, 300))
 				{
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　点券不够，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);	
 				}
 				else
 				{
-					pPlayer->DestroyItemCount(XXXX, 300, true, true);
+					pPlayer->DestroyItemCount(ZQ_ITEM_VOUCHER, 300, true, true);
 					switch (action - __MENU_TEAM_MAIN - 100)
 					{
-						case 10: sQZAchievements.SetVipFeatures(pPlayer, VIP_TEAM_SUMMON);  	break;
-						case 20: sQZAchievements.SetVipFeatures(pPlayer, VIP_TEAM_REVIVE); 		break;
-						case 30: sQZAchievements.SetVipFeatures(pPlayer, VIP_TEAM_FULLFILL); 	break;
+						case 10: sQZAchievements.SetVIPFeatures(pPlayer, VIP_TEAM_SUMMON);  	break;
+						case 20: sQZAchievements.SetVIPFeatures(pPlayer, VIP_TEAM_REVIVE); 		break;
+						case 30: sQZAchievements.SetVIPFeatures(pPlayer, VIP_TEAM_FULLFILL); 	break;
 					}	
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　开通成功，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);
 
