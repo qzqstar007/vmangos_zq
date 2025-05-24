@@ -52,6 +52,7 @@
 
 #include "QzqstarAchievements.h"
 #include "Chat.h"
+#include "custom\qzqstar_id.h"
 
 using namespace Spells;
 
@@ -6428,17 +6429,17 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
         //2. one to one mapping between petType and petEntry, if petType is not found, use petEntry as petType
         switch (_petInfo / 100000)
         {
-            case 1: petEntry = 30151; break;
-            case 2: petEntry = 30152; break;
-            case 3: petEntry = 30153; break;
-            case 4: petEntry = 30154; break;
-            case 5: petEntry = 30155; break;
-            case 6: petEntry = 30156; break;
-            case 7: petEntry = 30157; break;
+            case 1: petEntry = ZQ_NPC_PET_FROST; break;
+            case 2: petEntry = ZQ_NPC_PET_FROST + 1; break;
+            case 3: petEntry = ZQ_NPC_PET_FROST + 2; break;
+            case 4: petEntry = ZQ_NPC_PET_FROST + 3; break;
+            case 5: petEntry = ZQ_NPC_PET_FROST + 4; break;
+            case 6: petEntry = ZQ_NPC_PET_FROST + 5; break;
+            case 7: petEntry = ZQ_NPC_PET_FROST + 6; break;
         }
 
         //3. if petEntry is not found, set defualt petEntry to 11111
-        if (!petEntry) petEntry = 30151;
+        if (!petEntry) petEntry = ZQ_NPC_PET_FROST;
     }
 
     CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(petEntry);
@@ -6485,7 +6486,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
     //if(player->GetLevel() > 50) critter->SetTransformScale(2.00f);
     //get summoned critter, and check the pet level
     //if pet level is higher than 50, set the pet size to 2.00f
-    if(petEntry >= 30151 && petEntry<= 30157)
+    if(petEntry >= ZQ_NPC_PET_FROST && petEntry<= ZQ_NPC_PET_FROST + 6)
     {
         int32 _critterInfo = sQZAchievements.GetActivePetInfo(player);
         int32 _critterLevel = _critterInfo % 100000 / 10000;

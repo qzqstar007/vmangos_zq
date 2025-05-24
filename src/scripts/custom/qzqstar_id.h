@@ -29,10 +29,16 @@
  ********************************************************************/
 #define ZQ_ITEM_VOUCHER				30000	//Voucher, 点券
 
+//Functional Items
+#define ZQ_ITEM_PET_EGG				30010	//Pet Egg, 宠物蛋
+
 /******************************************************************** 
  *  Spell IDs, largest first (33386).
  ********************************************************************/
 #define ZQ_SPELL_HEARTSTONE			33386	//Heart Stone, 炉石修改（Item ID：6948）
+
+//Summon Pet Spells
+#define ZQ_SPELL_SUMMON_PET			33381	//Summon Pet, 召唤宠物
 
 //summon creature spells, such as critter, pet, mount, etc.
 #define ZQ_SPELL_SUMMON_ROBOT		33371	//Summon Robot, 召唤机器人
@@ -44,11 +50,29 @@
 /******************************************************************** 
  *  Creature IDs, least first (33386).
  ********************************************************************/
-#define ZQ_NPC_KELALA				30000	//Kelala, 克尔拉
+//NPCs from 30000 to 30019
+#define ZQ_NPC_KELALA				30000	//Kelala, 克尔拉 +4XXXXX is creature instance id
 
+#define ZQ_NPC_BATTLE_ALLIANCE		30010	//Battle Alliance, 联盟战场指挥官
+#define ZQ_NPC_BATTLE_HORDE			30011	//Battle Horde, 部落战场指挥官
 
+//Personal pet from 30020 to 30029
 #define ZQ_NPC_ROBOT				30020	//Robot, 机器人
 #define ZQ_NPC_BANK 				30021	//Bank, 银行
+
+//Critter combat pet from 30030 to 30039
+#define ZQ_NPC_PET_FROST			30031	//Ice Pet, 冰宠
+#define ZQ_NPC_PET_FIRE				30032	//Fire Pet, 火宠
+#define ZQ_NPC_PET_SHADOW			30033	//Shadow Pet, 影宠
+#define ZQ_NPC_PET_NATURE			30034	//Nature Pet, 自然宠
+#define ZQ_NPC_PET_ARCANE			30035	//Arcane Pet, 奥术宠
+#define ZQ_NPC_PET_HOLY				30036	//Divine Pet, 神圣宠
+#define ZQ_NPC_PET_PHY				30037	//Physical Pet, 物理宠
+
+
+
+
+
 
 #endif	//_QZQSTAR_CPP_IDS_H
 

@@ -37,6 +37,8 @@
 #include "World.h"
 #include "Anticheat.h"
 
+#include "custom/qzqstar_id.h"
+
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
@@ -139,9 +141,9 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
     {
         if (!_player->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_BATTLEMASTER))
         {
-			//qzqstar, 250316, ignore the guid of 320050 (custom)
+			//qzqstar, 250316, ignore the guid of 430010 (custom)
 			Creature* pCreature = _player->GetMap()->GetAnyTypeCreature(guid);
-			if (!pCreature || pCreature->GetEntry() != 20050)
+			if (!pCreature || ( pCreature->GetEntry() != ZQ_NPC_BATTLE_ALLIANCE && pCreature->GetEntry()!= ZQ_NPC_BATTLE_HORDE) )
 			{
 				//Old statements
 				ProcessAnticheatAction("PassiveAnticheat", "Attempt to queue for BG through invalid creature", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
