@@ -797,7 +797,7 @@ AchievementsEntry QzqstarAchievements::GetZitiaosInfo(Player *player)
 	AchievementsEntry e;
 	e.guid = player->GetGUID();
 	e.type = ACHIEVEMENTS_ZITIAO;
-	e.subType = 0;
+	e.subType = 4;
 	e.data1 = 9140;
 	e.data2 = 0;
 	e.data3 = 0;
@@ -826,6 +826,7 @@ void QzqstarAchievements::SetZitiaosInfo(Player *player, AchievementsEntry entry
 		AchievementsEntry& e = *it;
 		if (e.type == ACHIEVEMENTS_ZITIAO)
 		{
+			e.subType = entry.subType;
 			e.data1 = entry.data1;
 			e.data2 = entry.data2;
 			e.data3 = entry.data3;
@@ -843,7 +844,7 @@ void QzqstarAchievements::SetZitiaosInfo(Player *player, AchievementsEntry entry
 	AchievementsEntry e;
 	e.guid = player->GetGUID();
 	e.type = ACHIEVEMENTS_ZITIAO;
-	e.subType = 0;
+	e.subType = entry.subType;
 	e.data1 = entry.data1;
 	e.data2 = entry.data2;
 	e.data3 = entry.data3;

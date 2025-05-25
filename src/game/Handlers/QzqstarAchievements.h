@@ -193,6 +193,7 @@ public:
 	 *
 	 *****************************************************/
 	// note on data arrays
+	// subType: used to store the spell numbers that player can have (4+)
 	// dataX: used to store the extracted spell id(learnt spell)
 	// all player have 4 slots free, data1-4
 	// next 4 slots should be payment spells, data5-8

@@ -342,6 +342,11 @@ struct CustomHSSpell : SpellScript
 		else if(action >= __MENU_ZITIAO_MAIN && action <= __MENU_ZITIAO_MAIN + __MENU_SIZE)
 		{
 			AchievementsEntry _aEntry = sQZAchievements.GetZitiaosInfo(pPlayer);
+			auto localIdx = pPlayer->GetSession()->GetSessionDbLocaleIndex();
+			std::string _str = "";
+
+			#define _FREE_SLOTS  		(4)
+			#define _NEED_VOUCHER(X)   (100*((X) - _FREE_SLOTS + 1))
 
 			uint32 spell_id[8];
 
@@ -349,12 +354,29 @@ struct CustomHSSpell : SpellScript
 			spell_id[0] = _aEntry.data1; spell_id[1] = _aEntry.data2; spell_id[2] = _aEntry.data3; spell_id[3] = _aEntry.data4;
 			spell_id[4] = _aEntry.data5; spell_id[5] = _aEntry.data6; spell_id[6] = _aEntry.data7; spell_id[7] = _aEntry.data8;
 
+			//check how many spells player has
+			uint32 _spells_num_have = 0;
+			for (size_t i = 0; i < 8; i++)
+			{
+				if(spell_id[i]!= 0)
+				{
+					_spells_num_have++;
+				}
+			}
+
 			//Zitiao means equip spell effect extract, player can extract the spell effect from equipment;
 			if(action == __MENU_ZITIAO_MAIN)
 			{
 				//Display the spells that player has
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝　已提取特效列表　＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝（点击字条新增或替换）　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝　已提取特效列表　＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝点击字条新增或替换　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				_str = __STR("|cff002fa7＝＝你总共： ");
+				_str.append(__NSTR(_aEntry.subType));
+				_str.append(__STR("条，已使用 "));
+				_str.append(__NSTR(_spells_num_have));
+				_str.append(__STR("条＝＝|r "));
+				
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(_str), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				for (size_t i = 0; i < 8; i++)
 				{
 					if(spell_id[i] != 0)
@@ -363,18 +385,191 @@ struct CustomHSSpell : SpellScript
 						{
 							if (spell_id[i] == __Spells_DBC_Array[j].spell_id)
 							{
-								pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__Spells_DBC_Array[j].text), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN + i);
+								_str = __STR("|cff066e22字条[");
+								_str.append(__NSTR(i+1));
+								_str.append(__STR("]=> "));
+								_str.append(__Spells_DBC_Array[j].text);
+								_str.append(__STR("r"));
+								pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(_str), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN + (i+1));
 								break;
 							}
 						}
 					}
 					else
 					{
-						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("＝＝＞　空字条、点击添加　＜＝＝　"), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN + i);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("＝＝＞　空字条、点击添加　＜＝＝　"), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN + (i + 1));
 					}
 				}
 
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+				return;
+			}
+
+			else if (action >= __MENU_ZITIAO_MAIN + 1 && action <= __MENU_ZITIAO_MAIN + 8)
+			{
+				//Display the spells that player has in this slot
+				uint32 _slot_selected = action - __MENU_ZITIAO_MAIN - 1;
+				
+				if(spell_id[_slot_selected] == 0)
+				{
+					//Means this is a empty slot, so player can add a spell to this slot
+
+					if(_spells_num_have >= _aEntry.subType)
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　已达到最大提取数量　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						_str = __STR("|cfff00019点击开启额外空槽，花费点券： ");
+						_str.append(__NSTR(_NEED_VOUCHER(_spells_num_have)));
+						_str.append(__STR("|r"));
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(_str), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN + 100);
+						pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+						return;
+					}
+				}
+
+				// now display the spells that player has in this slot, and find the first item in bag
+				// to add to this slot.
+				// 1. display the spells that player has in this slot
+				//Now need to find the first bag
+				auto pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START);
+
+				if (!pItem || (pItem->GetProto()->Class != ITEM_CLASS_WEAPON && pItem->GetProto()->Class != ITEM_CLASS_ARMOR) || pItem->GetProto()->Spells[0].SpellId == 0
+					|| pItem->GetProto()->Quality > 4
+					)
+				{
+					std::string text = __BLUE("[|请将可提取绿字字条的装备放在角色行囊里第一个格子|]");
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN);
+					pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+
+					return;
+				}
+
+				// 2. find the first item in bag to add to this slot.
+				//should declare the 3 spell id
+				uint32 spell_id[3];
+				uint32 spell_dbc_id[3];
+				std::string spell_text[3];
+
+				for (size_t i = 0; i < 3; i++)
+				{
+					spell_id[i] = 0; spell_dbc_id[i] = 0;
+					spell_text[i] = __STR("|该字条无法转移|");
+
+					spell_id[i] = pItem->GetProto()->Spells[i].SpellId;
+
+					//sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Item spell: %d", spell_id[i]);
+					if (spell_id[i] != 0)
+					{
+						for (size_t j = 0; j < sizeof(__Spells_DBC_Array) / sizeof(__Spells_DBC_Array[0]); j++)
+						{
+							if (spell_id[i] == __Spells_DBC_Array[j].spell_id)
+							{
+								spell_dbc_id[i] = __Spells_DBC_Array[j].dbc_id;
+								spell_text[i] = __Spells_DBC_Array[j].text;
+								break;
+							}
+						}
+					}
+				}
+
+				// 3. add the item to this slot.
+				std::string text = __RED("[待提取装备]");
+				auto item_destroy_local = sObjectMgr.GetItemLocale(pItem->GetProto()->ItemId);
+				auto item_destroy_text = (item_destroy_local == nullptr ? pItem->GetProto()->Name1 : item_destroy_local->Name[localIdx]);
+				text.append(item_destroy_text);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+				for (size_t i = 0; i < 3; i++)
+				{
+					if (spell_id[i])
+					{
+						text = __GREEN("提取字条＝＞");
+						text.append(spell_text[i]);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(text), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN + 200 + _slot_selected * 10 + i);
+					}
+				}
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+			}
+
+			else if (action >= __MENU_ZITIAO_MAIN + 100 && action <= __MENU_ZITIAO_MAIN + 199)
+			{
+				if(action == __MENU_ZITIAO_MAIN + 100)
+				{
+					//Means player wants to add a empty slot to the zitiaos info
+					if(!pPlayer->HasItemCount(ZQ_ITEM_VOUCHER, _NEED_VOUCHER(_spells_num_have)))	
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　点券不够，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN);
+						pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+						return;	
+					}
+
+					else
+					{
+						pPlayer->DestroyItemCount(ZQ_ITEM_VOUCHER, _NEED_VOUCHER(_spells_num_have), true, true);
+						_aEntry.subType++;
+						sQZAchievements.SetZitiaosInfo(pPlayer, _aEntry);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　开通成功，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN);
+						pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+						return;
+					}
+				}
+			}
+
+			else if (action >= __MENU_ZITIAO_MAIN + 200 && action <= __MENU_ZITIAO_MAIN + 299)
+			{
+				//Means player wants to add a spell to this slot
+				uint32 _fb_slot_selected = (action - __MENU_ZITIAO_MAIN - 200)/10;
+				uint32 _item_spell_selected = (action - __MENU_ZITIAO_MAIN - 200)%10;
+				
+				uint32 _oldSpellId = spell_id[_fb_slot_selected];
+				uint32 _newSpellId = 0;
+
+				auto pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START);
+				if (!pItem || (pItem->GetProto()->Class != ITEM_CLASS_WEAPON && pItem->GetProto()->Class != ITEM_CLASS_ARMOR) || pItem->GetProto()->Spells[_item_spell_selected].SpellId == 0
+					|| pItem->GetProto()->Quality > 4)
+				{
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __RED("此装备错误！请联系GM。。 "), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN);
+					pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+					return;
+				}
+
+				//iterate the spelllist
+				for (size_t j = 0; j < sizeof(__Spells_DBC_Array) / sizeof(__Spells_DBC_Array[0]); j++)
+				{
+					if (pItem->GetProto()->Spells[_item_spell_selected].SpellId == __Spells_DBC_Array[j].spell_id)
+					{
+						//found the spell id, now check if the spell is in the spelllist
+						_newSpellId = __Spells_DBC_Array[j].spell_learn_id;
+						break;
+					}
+				}
+
+				if(!_newSpellId || _oldSpellId == _newSpellId || pPlayer->HasSpell(_newSpellId))
+				{
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __RED("玩家已经有此字条，或装备错误！请联系GM。。 "), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN);		
+					pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+					return;
+				}
+				else
+				{
+					if(_oldSpellId != 0)
+					{
+						pPlayer->RemoveSpell(_oldSpellId);
+					}
+
+					pPlayer->LearnSpell(_newSpellId, false);
+
+					spell_id[_fb_slot_selected] = _newSpellId;
+					_aEntry.data1 = spell_id[0]; _aEntry.data2 = spell_id[1]; _aEntry.data3 = spell_id[2]; _aEntry.data4 = spell_id[3];
+					_aEntry.data5 = spell_id[4]; _aEntry.data6 = spell_id[5]; _aEntry.data7 = spell_id[6]; _aEntry.data8 = spell_id[7];
+					sQZAchievements.SetZitiaosInfo(pPlayer, _aEntry);
+
+					//delete the item
+					player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
+
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __GREEN("字条提取成功，返回查看！"), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN);
+					pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+					return;
+				}
 			}
 		}
 	}
