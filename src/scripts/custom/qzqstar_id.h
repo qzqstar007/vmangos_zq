@@ -76,3 +76,24 @@
 
 #endif	//_QZQSTAR_CPP_IDS_H
 
+
+
+//creature id to be removed
+/* //movement delete the guards
+delete from creature where guid in (23596, 23562,23588, 23560, 23591, 23564, 23563, 23575, 23594, 23586, 23574, 23570);
+delete from creature_movement where id in (23575,23594, 23574, 23586, 23570);
+//update gazagan npc locations, 
+
+
+
+//and some gameobjects should be updated.
+//battleground flags template(310001,300002?)
+//desks and moonwells 500001-510000
+//Black Forge, sieze is 0.3, GO_ID 174045
+//Black Anvil, Siege is 0.3, GO_ID 172911
+
+*/
+
+
+
+
