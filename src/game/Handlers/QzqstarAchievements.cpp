@@ -773,8 +773,88 @@ void QzqstarAchievements::SetDungeonsInfo(Player *player, uint32 ac_mapId /* sho
 }
 
 
+/* ================================================================================================================== */
+/* ========================= Zitiao system  ========================================================================= */
+/* ================================================================================================================== */
+//get the player's zitiaos information, return a vector of AchievementsEntry
+AchievementsEntry QzqstarAchievements::GetZitiaosInfo(Player *player)
+{
+	//check _player if none
+	if (!player)
+		return AchievementsEntry();
 
+	//iterate the _playerAchievements vector map of this player to find the zitiaos information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENTS_ZITIAO)
+		{
+			return e;
+		}	
+	}
 
+	//if not found, create one and return it
+	AchievementsEntry e;
+	e.guid = player->GetGUID();
+	e.type = ACHIEVEMENTS_ZITIAO;
+	e.subType = 0;
+	e.data1 = 9140;
+	e.data2 = 0;
+	e.data3 = 0;
+	e.data4 = 0;
+	e.note = "";
+	e.data5 = 0;
+	e.data6 = 0;
+	e.data7 = 0;
+	e.data8 = 0;
+	_playerAchievements[player->GetGUID()].push_back(e);
 
+	// sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Not found but init one Zitiao Entry: %u", player->GetGUID());
+	return e;
+}
+
+//save the player's zitiaos information, add the zitiaos to the player's achievements vector
+void QzqstarAchievements::SetZitiaosInfo(Player *player, AchievementsEntry entry)
+{
+	//check _player if none
+	if (!player)
+		return;
+	
+	//iterate the _playerAchievements vector map of this player to find the zitiaos information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENTS_ZITIAO)
+		{
+			e.data1 = entry.data1;
+			e.data2 = entry.data2;
+			e.data3 = entry.data3;
+			e.data4 = entry.data4;
+			e.note = entry.note;
+			e.data5 = entry.data5;
+			e.data6 = entry.data6;
+			e.data7 = entry.data7;
+			e.data8 = entry.data8;
+			break;	
+		}	
+	}
+
+	//if not found, create one and return it
+	AchievementsEntry e;
+	e.guid = player->GetGUID();
+	e.type = ACHIEVEMENTS_ZITIAO;
+	e.subType = 0;
+	e.data1 = entry.data1;
+	e.data2 = entry.data2;
+	e.data3 = entry.data3;
+	e.data4 = entry.data4;
+	e.note = entry.note;
+	e.data5 = entry.data5;
+	e.data6 = entry.data6;
+	e.data7 = entry.data7;
+	e.data8 = entry.data8;
+	_playerAchievements[player->GetGUID()].push_back(e);
+	
+}
 
 #pragma endregion

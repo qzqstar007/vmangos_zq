@@ -48,6 +48,14 @@
 #define __YELLOW(x)		"|cfff9dc24"##x##"|r"
 #define __PINK(x)		"|cff800080"##x##"|r"
 
+
+
+//Copy the content of const menus to player specific 
+void _copy_rune(const Rune_Spell_Menu_t *from, Rune_Spell_Menu_t *to, uint32 size)
+{
+	memcpy(to, from, sizeof(Rune_Spell_Menu_t)*size);
+}
+
 #pragma region Tisheng Menus
 bool Menus_Tish_Main(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 {

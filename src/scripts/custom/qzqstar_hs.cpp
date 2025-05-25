@@ -24,6 +24,7 @@
 #include "qzqstar_hs.h"
 #include "QzqstarAchievements.h"
 #include "qzqstar_id.h"
+#include "qzqstar_rune_str.h"
 
 
 #define	__MENU_NONE						0
@@ -35,6 +36,7 @@
 #define __MENU_GAZAGAN_MAIN				3000
 #define __MENU_SUISHEN_MAIN				5000
 #define __MENU_TEAM_MAIN				6000
+#define __MENU_ZITIAO_MAIN				7000
 #define __MENU_END						20000
 
 #define	__STR(x)		((std::string)(x)).c_str()
@@ -57,6 +59,8 @@ void _Main_Menus(Player *player)
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　传送加基森　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_GAZAGAN_MAIN);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　主城传送　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　字条法宝　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　随身功能　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -332,6 +336,45 @@ struct CustomHSSpell : SpellScript
 
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
 				return;
+			}
+		}
+
+		else if(action >= __MENU_ZITIAO_MAIN && action <= __MENU_ZITIAO_MAIN + __MENU_SIZE)
+		{
+			AchievementsEntry _aEntry = sQZAchievements.GetZitiaosInfo(pPlayer);
+
+			uint32 spell_id[8];
+
+			//init the spell_id
+			spell_id[0] = _aEntry.data1; spell_id[1] = _aEntry.data2; spell_id[2] = _aEntry.data3; spell_id[3] = _aEntry.data4;
+			spell_id[4] = _aEntry.data5; spell_id[5] = _aEntry.data6; spell_id[6] = _aEntry.data7; spell_id[7] = _aEntry.data8;
+
+			//Zitiao means equip spell effect extract, player can extract the spell effect from equipment;
+			if(action == __MENU_ZITIAO_MAIN)
+			{
+				//Display the spells that player has
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝　已提取特效列表　＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝（点击字条新增或替换）　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				for (size_t i = 0; i < 8; i++)
+				{
+					if(spell_id[i] != 0)
+					{
+						for (size_t j = 0; j < sizeof(__Spells_DBC_Array) / sizeof(__Spells_DBC_Array[0]); j++)
+						{
+							if (spell_id[i] == __Spells_DBC_Array[j].spell_id)
+							{
+								pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__Spells_DBC_Array[j].text), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN + i);
+								break;
+							}
+						}
+					}
+					else
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("＝＝＞　空字条、点击添加　＜＝＝　"), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN + i);
+					}
+				}
+
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
 			}
 		}
 	}

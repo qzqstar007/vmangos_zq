@@ -25,13 +25,14 @@ struct AchievementsEntry
 
 enum Achievement_t
 {
-	ACHIEVEMENT_VIP 		  	= 66,
-	ACHIEVEMENT_RUNE 		  	= 88,
-	ACHIEVEMENT_CUSTOM_QUEST 	= 100,
-	ACHIEVEMENT_SOCIAL_POINTS 	= 200,
-	ACHIEVEMENT_PETS = 300,
-	ACHIEVEMENTS_DUNGEONS 	= 	400,
-	ACHIEVEMENT_COUNTERS	=	1000,	//For combine and refreshing...
+	ACHIEVEMENT_VIP 		  	= 	66,
+	ACHIEVEMENT_RUNE 		  	= 	88,
+	ACHIEVEMENT_CUSTOM_QUEST 	= 	100,
+	ACHIEVEMENT_SOCIAL_POINTS 	= 	200,
+	ACHIEVEMENT_PETS 			= 	300,
+	ACHIEVEMENTS_DUNGEONS 		= 	400,
+	ACHIEVEMENTS_ZITIAO 		= 	500,
+	ACHIEVEMENT_COUNTERS		=	1000,	//For combine and refreshing...
 };
 
 //VIP Features
@@ -183,6 +184,26 @@ public:
 
 	//save the player's dungeons information, add the dungeons to the player's achievements vector
 	void SetDungeonsInfo(Player *player, uint32 ac_mapId /* should be mapped to 0-15 */, uint32 value);
+
+
+
+	/*****************************************************
+	 *
+	 *		Zitiaos Systems Functions
+	 *
+	 *****************************************************/
+	// note on data arrays
+	// dataX: used to store the extracted spell id(learnt spell)
+	// all player have 4 slots free, data1-4
+	// next 4 slots should be payment spells, data5-8
+
+	//get the player's zitiaos information, return a vector of AchievementsEntry
+	AchievementsEntry GetZitiaosInfo(Player *player);
+
+	//save the player's zitiaos information, add the zitiaos to the player's achievements vector
+	void SetZitiaosInfo(Player *player, AchievementsEntry entry);
+
+
 
 protected:
 	std::vector<AchievementsEntry> entries;

@@ -29,7 +29,9 @@ typedef struct __teleport_menu {
 	float           pos[4];
 }VIP_Teleport_Menu_t;
 
+#ifndef __XSTR
 #define	__XSTR(x)		((std::string)(x)).c_str()
+#endif 
 //#define	__XSTR(x)		(x)
 
 #define	__MAPID_NY		(389)
