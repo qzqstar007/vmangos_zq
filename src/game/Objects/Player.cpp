@@ -15672,7 +15672,25 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 	}
     
 	//qzqstar, 250306, apply the spell upon social points. start from spell 30931
+    //obsolete, use the achievements instead
+    /*
 	auto _socialPoints = GetReputationMgr().GetReputation(967);
+	if (_socialPoints > 1000)
+	{
+		CastSpell(this,
+			_socialPoints > 30000 ? 30935
+			: _socialPoints > 20000 ? 30934
+			: _socialPoints > 10000 ? 30933
+			: _socialPoints >  5000 ? 30932
+			: 30931
+			, true);
+	}*/
+
+    //qzqstar, 250411, load from achievements
+    uint32 __count = sQZAchievements.Load(this);
+
+    //get the social points using new method
+    auto _socialPoints = sQZAchievements.GetSocialPoints(this);
 	if (_socialPoints > 1000)
 	{
 		CastSpell(this,
@@ -15684,10 +15702,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 			, true);
 	}
 
-    //qzqstar, 250411, load from achievements
-    uint32 __count = sQZAchievements.Load(this);
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Player:%s Loaded %u Achievements records.", GetName(), __count);
-
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Player:%s Loaded %u Achievements records. Social Points:%u. ", GetName(), __count, _socialPoints);
 
     // restore remembered power/health values (but not more max values)
     uint32 savedhealth = fields[46].GetUInt32();

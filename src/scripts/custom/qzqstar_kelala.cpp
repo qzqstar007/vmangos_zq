@@ -987,8 +987,10 @@ bool Menus_Kelala_Social(Player *player, Creature *_Creature, uint32 action)
 	int _socialPoints = 0;
 	std::string text;
 	auto localIdx = player->GetSession()->GetSessionDbLocaleIndex();
-	_socialPoints = player->GetReputationMgr().GetReputation(967);
+	//_socialPoints = player->GetReputationMgr().GetReputation(967);
 	int ITEM_COUNTS = sizeof(__item_list) / sizeof(__item_list[0]);
+
+	_socialPoints = sQZAchievements.GetSocialPoints(player);
 
 	if (action == __MENU_SOCIAL_MAIN)
 	{
@@ -1086,8 +1088,13 @@ bool Menus_Kelala_Social(Player *player, Creature *_Creature, uint32 action)
 					player->DestroyItem(INVENTORY_SLOT_BAG_0, __slot, true);
 
 					//add the rep points
+
+					/*
 					if (FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(967))
 						player->GetReputationMgr().ModifyReputation(factionEntry, _addPoints);
+					*/
+					_socialPoints += _addPoints;
+					sQZAchievements.SetSocialPoints(player, _socialPoints);
 
 					sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "PLAYER:[%u][%s] === Destroy:%d BeforePoints:%d AddPoints:%d ", player->GetGUID(), player->GetName(), _pItemID, _socialPoints, _addPoints);
 
@@ -1216,14 +1223,18 @@ bool Menus_Kelala_Social(Player *player, Creature *_Creature, uint32 action)
 				{
 					//add the item and delete rep
 					//delete the rep points
+					_socialPoints -= __getSocialPointsBySeq(_buy_item_seq);
+					sQZAchievements.SetSocialPoints(player, _socialPoints);
+					player->AddItem(__item_list[_buy_item_seq]);
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __BLUE(" ===> 已经购买成功，返回 <==== "), GOSSIP_SENDER_MAIN, __MENU_SOCIAL_BUY);
+
+					/*
 					if (FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(967))
 					{
 						player->GetReputationMgr().ModifyReputation(factionEntry, 0 - __getSocialPointsBySeq(_buy_item_seq));
-
 						player->AddItem(__item_list[_buy_item_seq]);
-
 						player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __BLUE(" ===> 已经购买成功，返回 <==== "), GOSSIP_SENDER_MAIN, __MENU_SOCIAL_BUY);
-					}
+					}*/
 				}
 				else
 				{

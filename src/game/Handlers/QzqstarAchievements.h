@@ -98,6 +98,9 @@ public:
 	// Set the player's VIP enabled features and add the VIP features to the player's achievements vector
 	bool SetVIPFeatures(Player *player, uint32 features);
 
+	// Social points system functions
+	uint32 QzqstarAchievements::GetSocialPoints(Player * _player);
+	void QzqstarAchievements::SetSocialPoints(Player * _player, uint32 _points);
 
 	/*****************************************************
 	 *

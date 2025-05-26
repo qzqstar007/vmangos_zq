@@ -564,7 +564,7 @@ struct CustomHSSpell : SpellScript
 					sQZAchievements.SetZitiaosInfo(pPlayer, _aEntry);
 
 					//delete the item
-					player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
+					pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
 
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __GREEN("字条提取成功，返回查看！"), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN);
 					pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
