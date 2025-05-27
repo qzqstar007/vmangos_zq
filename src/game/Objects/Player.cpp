@@ -104,6 +104,7 @@
 
 
 //qzqstar, 250228, Five Modes
+/* 
 #define __MODE_ONE_LIFE     (30841)
 #define __MODE_MANUFACT     (30843)
 #define __MODE_COLLECT      (30845)
@@ -112,6 +113,7 @@
 #define __MODE_KILLER_HUMAN       (30851)
 #define __MODE_KILLER_BEAST       (30853)
 #define __MODE_KILLER_UNDEAD      (30855)
+*/
 
 // corpse reclaim times
 #define DEATH_EXPIRE_STEP (5*MINUTE)
@@ -3075,21 +3077,21 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
     if (victim && victim->IsCreature())
     {
 		const Creature* _creature = victim->ToCreature();
-        if(HasSpell(__MODE_KILLER_HUMAN))
+        if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_HUMAN)
         {
             if (_creature->GetCreatureType() == CREATURE_TYPE_HUMANOID)
                 xp *= 2;
             else 
                 xp *= 0.01;
         }
-        else if(HasSpell(__MODE_KILLER_BEAST))
+        else if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_BEAST)
         {
             if (_creature->GetCreatureType() == CREATURE_TYPE_BEAST)
                 xp *= 2;
             else
                 xp *= 0.01;
         }
-        else if(HasSpell(__MODE_KILLER_UNDEAD))
+        else if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_UNDEAD)
         {
             if (_creature->GetCreatureType() == CREATURE_TYPE_UNDEAD)
                 xp *= 2;
@@ -3131,7 +3133,7 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
 	if (newXP > 100000000) return;
 
 	//qzqstar, 250228, should not increase if task mode
-	if (HasSpell(__MODE_COLLECT) && (level==25 || level==35 || level==45 || level==58)) return;
+	if ((M_Challenge_Mode & CHALLENGING_MODE_ONELIFE) && (level==25 || level==35 || level==45 || level==58)) return;
 
     while (newXP >= nextLvlXP && level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
     {
@@ -4874,11 +4876,12 @@ void Player::KillPlayer()
 		//qzqstar, 250228, handle the death upon different player modes
 		//1. one-life, lose half of the money, exit the one-life mode 
 		//1.1 if has item - gold modal, remove it and escape the death. - item:39978
-		if (HasSpell(__MODE_ONE_LIFE))
+		//if (HasSpell(__MODE_ONE_LIFE))
+        if(M_Challenge_Mode & CHALLENGING_MODE_ONELIFE)
 		{
 			//safe if full level
 			if ( (__oldLevel >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-			//	|| (HasSpell(__MODE_COLLECT) && (__oldLevel%10 == 0))
+			//	|| ((M_Challenge_Mode & CHALLENGING_MODE_ONELIFE) && (__oldLevel%10 == 0))
 				|| (__oldLevel < 10)
 				)
 			{
@@ -4943,7 +4946,8 @@ void Player::KillPlayer()
 		}
 
 		//2. killer mode, lost the money
-		if (HasSpell(__MODE_RICH))
+		//if (HasSpell(__MODE_RICH))
+		if(M_Challenge_Mode & CHALLENGING_MODE_RICH)
 		{
 			__looseMoney = __totalMoney / 6;
 
@@ -6834,7 +6838,8 @@ void Player::RewardReputation(Quest const* pQuest)
             int32 rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST,  pQuest->RewRepValue[i], pQuest->RewRepFaction[i], GetQuestLevelForPlayer(pQuest));
 
 			// qzqstar, 250228, modify req if task mode
-			if (HasSpell(__MODE_TASK)) rep = rep * 2;
+			//if (HasSpell(__MODE_TASK)) rep = rep * 2;
+			if(M_Challenge_Mode & CHALLENGING_MODE_TASK) rep = rep * 2;
 
             bool noSpillover = (pQuest->GetRewRepSpilloverMask() & (1 << i)) != 0;
 
@@ -10417,7 +10422,7 @@ InventoryResult Player::CanUseItem(Item const* pItem, bool not_loading) const
         {
 
 			// qzqstar, 250228, zq mode, cannot use the unbind items...
-			if (HasSpell(__MODE_MANUFACT) && (GetLevel() < (sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))))
+			if ((M_Challenge_Mode & CHALLENGING_MODE_MANUFACT) && (GetLevel() < (sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))))
 			{
 				if (((pProto->Class == ITEM_CLASS_WEAPON) || (pProto->Class == ITEM_CLASS_ARMOR))
 					&& (pProto->Quality > 2)        //modify the quality.
@@ -13517,7 +13522,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
 
                         //qzqstar, 241205, zq mode, make the task item suitable for you
                         // set the "Crafted by ..." property of the item
-                        if (HasSpell(__MODE_MANUFACT) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
+                        if ((M_Challenge_Mode & CHALLENGING_MODE_MANUFACT) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
                             item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
                     }
                 }
@@ -13544,7 +13549,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
 
                             //qzqstar, 241205, zq mode, make the task item suitable for you
                             // set the "Crafted by ..." property of the item
-                            if (HasSpell(__MODE_MANUFACT) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
+                            if ((M_Challenge_Mode & CHALLENGING_MODE_MANUFACT) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
                                 item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
                         }
                     }
@@ -13576,7 +13581,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
 
 						//qzqstar, 241205, zq mode, make the task item suitable for you
 						// set the "Crafted by ..." property of the item
-						if (HasSpell(__MODE_MANUFACT) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
+						if ((M_Challenge_Mode & CHALLENGING_MODE_MANUFACT) && item->GetProto()->HasSignature() && ((item->GetProto()->Class == ITEM_CLASS_ARMOR) || (item->GetProto()->Class == ITEM_CLASS_WEAPON)))
 							item->SetGuidValue(ITEM_FIELD_CREATOR, GetObjectGuid());
 					}
                 }
@@ -13597,7 +13602,8 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
     uint32 xp = uint32(pQuest->XPValue(GetLevel()) * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST));
 
 	// qzqstar, 250228, modify the quest xp for task mode
-	if (HasSpell(__MODE_TASK)) xp = xp * 3;
+	//if (HasSpell(__MODE_TASK)) xp = xp * 3;
+	if (M_Challenge_Mode & CHALLENGING_MODE_TASK) xp = xp * 3;
 
     if (GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
         GiveXP(xp , nullptr);
@@ -15100,6 +15106,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 	m_ConstName = m_name;
 	//qzqstar, 250211, reset the counts;
 	M_Item_Counts = 0;
+    M_Challenge_Mode = 0;
 
     Object::_Create(guid.GetCounter(), 0, HIGHGUID_PLAYER);
 
@@ -15542,20 +15549,29 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
 
 	//qzqstar, 250227,  modify the 5 modes xp, thus exertnal xp gain can be set to 1.
-	auto __xpRate = 0.5f;
-	//if(GetLevel() > 1) __xpRate = 1.5f; startup server begins
-	if (GetLevel() > 1) __xpRate = 3.5f;
+	auto __xpRate = 1.5f;
+	//if (GetLevel() > 1) __xpRate = 1.5f; startup server begins
+
+
+    //get the challenge mode from db
+    M_Challenge_Mode = sQZAchievements.GetChallengeMode(this);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= %u", GetName(), M_Challenge_Mode);
 
 	//if (HasSpell(__MODE_KILLER))     __xpRate = 2.0f;
-	if (HasSpell(__MODE_MANUFACT))         __xpRate = 1.0f;
-	if (HasSpell(__MODE_ONE_LIFE))   __xpRate = 1.0f;
-	if (HasSpell(__MODE_COLLECT))    __xpRate = 1.0f;
-	if (HasSpell(__MODE_TASK))       __xpRate = 0.5f;
+	//if (HasSpell(__MODE_MANUFACT))   __xpRate = 1.0f;
+	//if (HasSpell(__MODE_ONE_LIFE))   __xpRate = 1.0f;
+	//if (HasSpell(__MODE_COLLECT))    __xpRate = 1.0f;
+	//if (HasSpell(__MODE_TASK))       __xpRate = 0.5f;
+
+    if(M_Challenge_Mode & CHALLENGING_MODE_MANUFACT)    __xpRate = 1.0f;
+    if(M_Challenge_Mode & CHALLENGING_MODE_ONELIFE)     __xpRate = 1.0f;
+    if(M_Challenge_Mode & CHALLENGING_MODE_COLLECT)     __xpRate = 1.0f;
+    if(M_Challenge_Mode & CHALLENGING_MODE_TASK)        __xpRate = 1.0f;
 
 	SetPersonalXpRate(__xpRate);
 
-    // reset the M_Spare_Data2, as lucky draws
-    M_Spare_Data2 = 0;
+    // reset the M_Luckydraw_Times, as lucky draws
+    M_Luckydraw_Times = 0;
 
 	//qzqstar, 250227, change name if killer mode
 	if (false)
@@ -19780,8 +19796,9 @@ void Player::ScheduleCameraUpdate(ObjectGuid guid)
 //qzqstar, 250508, increase 2 trade skills if has spell __MODE_MANUFACT
 void Player::InitPrimaryProfessions()
 {
-    if(HasSpell(__MODE_MANUFACT))
-		SetFreePrimaryProfessions(sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL) + 2);
+    //if(HasSpell(__MODE_MANUFACT))
+	if(M_Challenge_Mode & CHALLENGING_MODE_MANUFACT)
+        SetFreePrimaryProfessions(sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL) + 2);
     else 
         SetFreePrimaryProfessions(sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL));
 }

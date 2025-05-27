@@ -44,6 +44,16 @@ enum Achievement_t
 #define VIP_TEAM_REVIVE		(0x20)
 #define VIP_TEAM_FULLFILL	(0x40)
 
+//Challenging Mode
+#define CHALLENGING_MODE_ONELIFE		(0x01)
+#define CHALLENGING_MODE_MANUFACT		(0x02)
+#define CHALLENGING_MODE_COLLECT		(0x04)
+#define CHALLENGING_MODE_TASK			(0x08)
+#define CHALLENGING_MODE_RICH			(0x10)
+#define CHALLENGING_MODE_KILLER_HUMAN	(0x20)
+#define CHALLENGING_MODE_KILLER_BEAST	(0x40)
+#define CHALLENGING_MODE_KILLER_UNDEAD	(0x80)
+
 
 //ACHIEVEMENT_COUNTERS subtype
 #define	ACHIEVEMENT_COUNTERS_COMBINE	(10)
@@ -86,21 +96,23 @@ public:
 	// data1: vip level
 	// data2: vip enabled features, each bit represents a feature, 1 means enabled, 0 means disabled
 
+	void __init_VIP_Entry(Player *player);	//init the vip entry for the player
+
 	// Get the player's VIP level
 	uint32 GetVIPLevel(Player *player);
-
-	// Set the player's VIP level and add the VIP level to the player's achievements vector
 	bool SetVIPLevel(Player *player, uint32 level);
 
 	// Get the player's VIP enabled features
-	uint32 GetVIPFeatures(Player *player);
+	uint32 	GetVIPFeatures(Player *player);
+	bool 	SetVIPFeatures(Player *player, uint32 features);
 
-	// Set the player's VIP enabled features and add the VIP features to the player's achievements vector
-	bool SetVIPFeatures(Player *player, uint32 features);
+	// Get & Set player's challenging mode, using data3 to store the challenging mode
+	uint32 	GetChallengeMode(Player *player);
+	void 	SetChallengeMode(Player *player, uint32 mode);
 
 	// Social points system functions
-	uint32 QzqstarAchievements::GetSocialPoints(Player * _player);
-	void QzqstarAchievements::SetSocialPoints(Player * _player, uint32 _points);
+	uint32 	GetSocialPoints(Player * _player);
+	void 	SetSocialPoints(Player * _player, uint32 _points);
 
 	/*****************************************************
 	 *

@@ -29,11 +29,11 @@
 
 #define	__MENU_NONE						0
 #define	__MENU_MAIN						1
+#define __MENU_HOME_MAIN				2
+#define __MENU_GAZAGAN_MAIN				3
 #define __MENU_SIZE						999
-#define __MENU_HOME_MAIN				1000
-#define __MENU_HOME_MAIN				1000
+#define __MENU_MODE_MAIN				1000
 #define __MENU_CITIES_MAIN				2000
-#define __MENU_GAZAGAN_MAIN				3000
 #define __MENU_SUISHEN_MAIN				5000
 #define __MENU_TEAM_MAIN				6000
 #define __MENU_ZITIAO_MAIN				7000
@@ -54,6 +54,13 @@ void _Main_Menus(Player *player)
 {
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+	if (player->GetLevel() == 1)
+	{
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("☆☆　挑战模式（一级可选）　☆☆　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	}
+
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　使用炉石　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_HOME_MAIN);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　传送加基森　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_GAZAGAN_MAIN);
@@ -64,8 +71,12 @@ void _Main_Menus(Player *player)
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　随身功能　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　团队功能　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+	if(player->GetLevel() >= 10)
+	{
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　团队功能　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	}
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, player->GetGUID());
 }
@@ -135,7 +146,7 @@ struct CustomHSSpell : SpellScript
 		if(Player *player = (spell->m_casterUnit)->ToPlayer())
 		{
 			player->PlayerTalkClass->ClearMenus();
-			player->M_Spare_Data1 = 1998;
+			player->M_Gossip_Spell_Ind = 1998;
 			
 			_Main_Menus(player);
 		}
@@ -162,6 +173,10 @@ struct CustomHSSpell : SpellScript
 		else if (action == __MENU_GAZAGAN_MAIN)
 		{
 			pPlayer->CastSpell(pPlayer, 23441, true); return;
+		}
+		else if (action >= __MENU_MODE_MAIN && action <= __MENU_MODE_MAIN + __MENU_SIZE)
+		{
+			// display the challenging mode
 		}
 		else if (action >= __MENU_CITIES_MAIN && action <= __MENU_CITIES_MAIN + __MENU_SIZE)
 		{
@@ -383,7 +398,7 @@ struct CustomHSSpell : SpellScript
 					{
 						for (size_t j = 0; j < sizeof(__Spells_DBC_Array) / sizeof(__Spells_DBC_Array[0]); j++)
 						{
-							if (spell_id[i] == __Spells_DBC_Array[j].spell_id)
+							if (spell_id[i] == __Spells_DBC_Array[j].spell_learn_id)
 							{
 								_str = __STR("|cff066e22字条[");
 								_str.append(__NSTR(i+1));

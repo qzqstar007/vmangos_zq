@@ -24,6 +24,7 @@
 #include "qzqstar_db.h"
 #include "qzqstar_helper.h"
 #include "Chat.h"
+#include "qzqstar_id.h"
 
 #define	__MENU_NONE						0
 #define	__MENU_SIZE						999
@@ -1126,12 +1127,11 @@ bool Menus_Kelala_Social(Player *player, Creature *_Creature, uint32 action)
 	{
 		//the listed items should be upon player's level, socialpoints etc..
 		//1. first check if chances runs out
-#define	_CHANCE_QUEST_END 10254 /*10251-3*/
 		auto chances = 3;
 
 		while ((chances > 0) && (action == __MENU_SOCIAL_BUY))
 		{
-			auto pQuest = sObjectMgr.GetQuestTemplate(_CHANCE_QUEST_END - chances);
+			auto pQuest = sObjectMgr.GetQuestTemplate(ZQ_QUEST_SOCIAL_IND - chances);
 			if (player->CanTakeQuest(pQuest, false))
 			{
 				player->RewardQuest(pQuest, 0, player, false);
@@ -1156,10 +1156,10 @@ bool Menus_Kelala_Social(Player *player, Creature *_Creature, uint32 action)
 
 			//add constrains for level 60
 			//ZUG
-			//if (__canSeeRange >= _ITEM_BUY_RANGE_4) __canSeeRange = _ITEM_BUY_RANGE_3;
+			if (__canSeeRange >= _ITEM_BUY_RANGE_4) __canSeeRange = _ITEM_BUY_RANGE_3;
 
 			//MC Range
-			if (__canSeeRange >= _ITEM_BUY_RANGE_5) __canSeeRange = _ITEM_BUY_RANGE_4;
+			//if (__canSeeRange >= _ITEM_BUY_RANGE_5) __canSeeRange = _ITEM_BUY_RANGE_4;
 
 			//BWL&TAQ Range
 			//if (__canSeeRange >= _ITEM_BUY_RANGE_6) __canSeeRange = _ITEM_BUY_RANGE_5;

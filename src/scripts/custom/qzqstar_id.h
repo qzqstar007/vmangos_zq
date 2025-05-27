@@ -70,8 +70,10 @@
 #define ZQ_NPC_PET_PHY				30037	//Physical Pet, 物理宠
 
 
-
-
+/******************************************************************** 
+ *  Quest IDs, least first (9701).
+ ********************************************************************/
+#define ZQ_QUEST_SOCIAL_IND	(9701+3)	//9701-9703Social Points Complete Indicator, 社交积分完成指示
 
 
 #endif	//_QZQSTAR_CPP_IDS_H

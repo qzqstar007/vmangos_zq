@@ -1884,10 +1884,10 @@ bool Menus_Equip_Sub_Create(Player *player, GameObject *_go, uint32 sender, uint
 			{
 				player->DestroyItemCount(30320, 1, true);
 
-				player->M_Spare_Data2++;
+				player->M_Luckydraw_Times++;
 
 				//roll chance
-				if (roll_chance_i(15 + player->M_Spare_Data2))
+				if (roll_chance_i(15 + player->M_Luckydraw_Times))
 				{
 					_mustHit = true;
 				}
@@ -1904,8 +1904,8 @@ bool Menus_Equip_Sub_Create(Player *player, GameObject *_go, uint32 sender, uint
 			player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
 
 			//create the new item
-			if (_mustHit) player->M_Spare_Data2 = 9999;
-			auto newItem = sObjectMgr.DynamicGenerateItem(pItem1Proto, pItem2Proto, item_new_text, item_desc, player->M_Spare_Data2, (Classes)player->GetClass());
+			if (_mustHit) player->M_Luckydraw_Times = 9999;
+			auto newItem = sObjectMgr.DynamicGenerateItem(pItem1Proto, pItem2Proto, item_new_text, item_desc, player->M_Luckydraw_Times, (Classes)player->GetClass());
 
 			//Set can be used by creator
 			Item *ppItem = player->AddItem(newItem->ItemId);
@@ -1916,7 +1916,7 @@ bool Menus_Equip_Sub_Create(Player *player, GameObject *_go, uint32 sender, uint
 			if (newItem->Quality > pItem1Proto->Quality)
 			{
 				//reset the luck draw
-				player->M_Spare_Data2 = 0;
+				player->M_Luckydraw_Times = 0;
 
 				auto const& sessions = sWorld.GetAllSessions();
 				for (const auto& itr : sessions)
@@ -1936,7 +1936,7 @@ bool Menus_Equip_Sub_Create(Player *player, GameObject *_go, uint32 sender, uint
 			}
 			//not lucky
 			else {
-				player->M_Spare_Data2++;
+				player->M_Luckydraw_Times++;
 			}
 
 			//add new item

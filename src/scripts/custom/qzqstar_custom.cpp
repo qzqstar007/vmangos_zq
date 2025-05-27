@@ -55,7 +55,12 @@ bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 		//Add to join the battlegrounds
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝选择战场＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
 
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR("①－战歌峡谷　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_MAIN_WS);
+		if (player->GetLevel() >= 10)
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR("①－战歌峡谷　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_MAIN_WS);
+		}
+		else
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__RED("①－战歌１０级可用。　")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
 		//check player level > 30 to enter Arthas Basin
 		if (player->GetLevel() >= 30)
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR("②－阿拉希盆地　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_MAIN_AB);

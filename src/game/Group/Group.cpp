@@ -1529,9 +1529,6 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant)
     return _addMember(guid, name, isAssistant, groupid);
 }
 
-#define __MODE_ONE_LIFE     (30841)
-#define __MODE_ZQ           (30843)
-
 #include "Chat/Chat.h"
 
 bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint8 group)
@@ -1556,6 +1553,7 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint
 	// qzqstar, 241204, zq challenge, cancels the invite if has spell
     // skip check, 250508
 	//if (player)
+/*
 	if(false)
     {
 		bool __hasHC = false;
@@ -1591,7 +1589,7 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint
 		}
 	}
 
-
+*/
 
     MemberSlot member;
     member.guid      = guid;

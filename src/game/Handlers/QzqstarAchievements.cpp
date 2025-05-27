@@ -122,6 +122,32 @@ void QzqstarAchievements::Save(Player * _player)
 /* ========================= VIP system  ============================================================================ */
 /* ================================================================================================================== */
 #pragma region  VIP system
+
+//__init_VIP_Entry
+void QzqstarAchievements::__init_VIP_Entry(Player * _player)
+{
+	//check _player if none
+	if (!_player)
+		return;
+
+	//add one VIP level to the _playerAchievements vector map of this player if not found
+	AchievementsEntry e;
+	e.guid = _player->GetGUID();
+	e.type = ACHIEVEMENT_VIP;
+	e.subType = 0;
+	e.data1 = 1;
+	e.data2 = 0;
+	e.data3 = 0;
+	e.data4 = 0;
+	e.note = "";
+	e.data5 = 0;	//reuse for Social Points (967 for faction old version)
+	e.data6 = 0;
+	e.data7 = 0;
+	e.data8 = 0;
+	_playerAchievements[_player->GetGUID()].push_back(e);
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::GetVIPLevel] Not found but init one VIP Entry: %u", _player->GetGUID());
+}
+
 /**
  * @brief get the player's VIP level, if the player has not got any VIP level, return 1.
  * @param _player the player to check
@@ -144,23 +170,9 @@ uint32 QzqstarAchievements::GetVIPLevel(Player * _player)
 		}	
 	}
 
-	//add one VIP level to the _playerAchievements vector map of this player if not found
-	AchievementsEntry e;
-	e.guid = _player->GetGUID();
-	e.type = ACHIEVEMENT_VIP;
-	e.subType = 0;
-	e.data1 = 1;
-	e.data2 = 0;
-	e.data3 = 0;
-	e.data4 = 0;
-	e.note = "";
-	e.data5 = 0;	//reuse for Social Points (967 for faction old version)
-	e.data6 = 0;
-	e.data7 = 0;
-	e.data8 = 0;
-	_playerAchievements[_player->GetGUID()].push_back(e);
 
-	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::GetVIPLevel] Not found but init one VIP Entry: %u", _player->GetGUID());
+	//add one VIP level to the _playerAchievements vector map of this player if not found
+	__init_VIP_Entry(_player);
 	return 1;
 }
 
@@ -215,17 +227,7 @@ uint32 QzqstarAchievements::GetVIPFeatures(Player * _player)
 	}
 
 	//add one VIP level to the _playerAchievements vector map of this player if not found
-	AchievementsEntry e;
-	e.guid = _player->GetGUID();
-	e.type = ACHIEVEMENT_VIP;
-	e.subType = 0;
-	e.data1 = 1;
-	e.data2 = 0;
-	e.data3 = 0;
-	e.data4 = 0;
-	e.note = "";
-	_playerAchievements[_player->GetGUID()].push_back(e);
-
+	__init_VIP_Entry(_player);
 	return 0;
 }
 
@@ -249,6 +251,43 @@ bool QzqstarAchievements::SetVIPFeatures(Player * _player, uint32 features)
 	return true;
 }
 
+//get the player's challenging mode, if the player has not got any challenging mode, return 0.
+uint32 QzqstarAchievements::GetChallengeMode(Player * _player)
+{
+	//check _player if none
+	if (!_player) return 0;	
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry e = *it;
+		if (e.type == ACHIEVEMENT_VIP)
+		{
+			return e.data3;
+		}
+	}
+	//add one VIP level to the _playerAchievements vector map of this player if not found
+	__init_VIP_Entry(_player);
+	return 0;
+}
+
+
+//set the player's challenging mode and add the challenging mode to the player's achievements vector
+void QzqstarAchievements::SetChallengeMode(Player * _player, uint32 mode)
+{
+	//check _player if none
+	if (!_player) return;
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_VIP)
+		{
+			e.data3 = mode;
+			break;
+		}	
+	}	
+}
 
 //get set social points for player, if the player has not got any social points, return 0.
 uint32 QzqstarAchievements::GetSocialPoints(Player * _player)
@@ -266,6 +305,8 @@ uint32 QzqstarAchievements::GetSocialPoints(Player * _player)
 		}	
 	}
 
+	//add one VIP level to the _playerAchievements vector map of this player if not found
+	__init_VIP_Entry(_player);
 	return 0;
 }
 

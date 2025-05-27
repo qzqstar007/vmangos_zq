@@ -123,7 +123,7 @@ struct CustomVipSpell : SpellScript
 	void OnSuccessfulFinish(Spell* spell) const final
 	{
 		(spell->m_casterUnit)->ToPlayer()->PlayerTalkClass->ClearMenus();
-		(spell->m_casterUnit)->ToPlayer()->M_Spare_Data1 = 1999;
+		(spell->m_casterUnit)->ToPlayer()->M_Gossip_Spell_Ind = 1999;
 		(spell->m_casterUnit)->ToPlayer()->ADD_GOSSIP_ITEM(5, __STR(__BLUE("=== |　副　本　内　飞　| ===")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_MAIN);
 		(spell->m_casterUnit)->ToPlayer()->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, spell->m_casterUnit->GetObjectGuid());
 	}

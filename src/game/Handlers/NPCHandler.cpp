@@ -438,7 +438,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
 		//	sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Handling .... player menu 2");
 
 		_player->PlayerTalkClass->ClearMenus();
-		if (_player->M_Spare_Data1 == 1999)		//vip spell
+		if (_player->M_Gossip_Spell_Ind == 1999)		//vip spell
 		{
 			if (const SpellEntry * spell_info = sSpellMgr.GetSpellEntry(30005))
 			{
@@ -447,7 +447,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
 			}
 		}
 		
-        if (_player->M_Spare_Data1 == 1998)		//HS spell
+        if (_player->M_Gossip_Spell_Ind == 1998)		//HS spell
 		{
 			if (const SpellEntry * spell_info = sSpellMgr.GetSpellEntry(33386))
 			{

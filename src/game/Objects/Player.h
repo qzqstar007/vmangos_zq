@@ -877,10 +877,9 @@ class Player final: public Unit
     public:
 		// qzqstar, 250211, add counts for bot cheating
 		uint32 M_Item_Counts;
-		uint32 M_Spare_Data1;
-		uint32 M_Spare_Data2;
-		uint32 M_Spare_Data3;
-		uint32 M_Spare_Data4;
+		uint32 M_Gossip_Spell_Ind;  //Used for gossip spells scripts.
+		uint32 M_Luckydraw_Times;
+        uint32 M_Challenge_Mode;    //Challenge Mode
 
 
         Item* AddItem(uint32 itemId, uint32 count = 1);
