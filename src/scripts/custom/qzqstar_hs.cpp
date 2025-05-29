@@ -57,7 +57,7 @@ void _Main_Menus(Player *player)
 
 	if (player->GetLevel() == 1)
 	{
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("☆☆　挑战模式（一级可选）　☆☆　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("☆☆　挑战模式（一级可选）☆☆　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	}
 
@@ -72,7 +72,7 @@ void _Main_Menus(Player *player)
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　随身功能　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-	if(player->GetLevel() >= 10)
+	if(player->GetLevel() >= 2)
 	{
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　团队功能　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -177,6 +177,62 @@ struct CustomHSSpell : SpellScript
 		else if (action >= __MENU_MODE_MAIN && action <= __MENU_MODE_MAIN + __MENU_SIZE)
 		{
 			// display the challenging mode
+			uint32 _Mode = sQZAchievements.GetChallengeMode(pPlayer);
+			if(action == __MENU_MODE_MAIN)
+			{
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝　挑战模式状态　＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+				if(_Mode & CHALLENGING_MODE_ONELIFE) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　一命模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启一命模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 1);
+
+				if(_Mode & CHALLENGING_MODE_MANUFACT) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　工匠模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启工匠模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 2);
+
+				if(_Mode & CHALLENGING_MODE_TASK) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　任务模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启任务模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 3);
+
+				if(_Mode & CHALLENGING_MODE_COLLECT) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　收藏模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启收藏模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 4);
+
+				if(_Mode & CHALLENGING_MODE_RICH) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　富豪模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启富豪模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 5);
+
+				if(_Mode >= CHALLENGING_MODE_KILLER_HUMAN) 
+				{
+					if(_Mode & CHALLENGING_MODE_KILLER_HUMAN)pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　杀手模式（人形）　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+					else if(_Mode & CHALLENGING_MODE_KILLER_BEAST) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　杀手模式（野兽）　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+					else if(_Mode & CHALLENGING_MODE_KILLER_UNDEAD) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　杀手模式（亡灵）　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				}
+				else
+				{
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　开启杀手模式（人形）　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 10);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　开启杀手模式（野兽）　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 11);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　开启杀手模式（亡灵）　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 12);
+				}
+
+			}
+
+			else if(action >= __MENU_MODE_MAIN + 1 && action <= __MENU_MODE_MAIN + 19)
+			{
+				//change the challenging mode
+				auto _realAction = action - __MENU_MODE_MAIN;
+				switch(_realAction)
+				{
+					case 1:	 _Mode |= CHALLENGING_MODE_ONELIFE; break;
+					case 2:	 _Mode |= CHALLENGING_MODE_MANUFACT; break;
+					case 3:	 _Mode |= CHALLENGING_MODE_TASK; break;
+					case 4:	 _Mode |= CHALLENGING_MODE_COLLECT; break;
+					case 5:	 _Mode |= CHALLENGING_MODE_RICH; break;
+					case 10: _Mode |= CHALLENGING_MODE_KILLER_HUMAN; break;
+					case 11: _Mode |= CHALLENGING_MODE_KILLER_BEAST; break;
+					case 12: _Mode |= CHALLENGING_MODE_KILLER_UNDEAD; break;
+				}
+				sQZAchievements.SetChallengeMode(pPlayer, _Mode);
+				pPlayer->M_Challenge_Mode = _Mode;
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　挑战模式已开启　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN);
+			}
+
+			pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
 		}
 		else if (action >= __MENU_CITIES_MAIN && action <= __MENU_CITIES_MAIN + __MENU_SIZE)
 		{

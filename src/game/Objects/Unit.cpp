@@ -694,10 +694,17 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 		if (DIRECT_DAMAGE == damagetype)
 		{
 			if (damage > __DAMAGE_MAX_PHY) damage = __DAMAGE_MAX_PHY + (damage - __DAMAGE_MAX_PHY) / 100;
+
+            //Do heal upon damage
+
+			this->CastCustomSpell(this, 28817, damage/10, 0, 0, true);
 		}
 		else if (SPELL_DIRECT_DAMAGE == damagetype)
 		{
 			if (damage > __DAMAGE_MAX_SPELL) damage = __DAMAGE_MAX_SPELL + (damage - __DAMAGE_MAX_SPELL) / 100;
+
+            //Do heal upon spell damage
+			this->CastCustomSpell(this, 28817, damage / 3, 0, 0, true);
 		}
 	}
 
@@ -3426,6 +3433,33 @@ float Unit::GetTotalAuraMultiplierByMiscMask(AuraType auratype, uint32 misc_mask
         return 1.0f;
 
     float multiplier = 1.0f;
+
+    //qzqstar, 250529, modify the damage done by challenge mode
+    const Player *player = this->ToPlayer();
+    if(player && (auratype == SPELL_AURA_MOD_DAMAGE_DONE_VERSUS))
+    {
+        switch(misc_mask)
+        {
+            case (1<<(CREATURE_TYPE_HUMANOID-1)):
+                if (player->M_Challenge_Mode & CHALLENGING_MODE_KILLER_HUMAN)     
+                {
+                    multiplier *= 3.2f; 	
+                }
+                break;
+            case (1<<(CREATURE_TYPE_BEAST-1)):
+                if (player->M_Challenge_Mode & CHALLENGING_MODE_KILLER_BEAST)    
+                {
+                    multiplier *= 3.2f;
+                } 
+                break;
+            case (1<<(CREATURE_TYPE_UNDEAD-1)):
+                if (player->M_Challenge_Mode & CHALLENGING_MODE_KILLER_UNDEAD)   
+                {
+                    multiplier *= 3.2f;
+                } 
+                break;
+        }
+    }
 
     AuraList const& mTotalAuraList = GetAurasByType(auratype);
     for (const auto& i : mTotalAuraList)

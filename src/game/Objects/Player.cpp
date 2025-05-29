@@ -15548,6 +15548,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     UpdateAllStats();
 
 
+	//qzqstar, 250411, load from achievements
+	uint32 __count = sQZAchievements.Load(this);
+
 	//qzqstar, 250227,  modify the 5 modes xp, thus exertnal xp gain can be set to 1.
 	auto __xpRate = 1.5f;
 	//if (GetLevel() > 1) __xpRate = 1.5f; startup server begins
@@ -15555,18 +15558,28 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     //get the challenge mode from db
     M_Challenge_Mode = sQZAchievements.GetChallengeMode(this);
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= %u", GetName(), M_Challenge_Mode);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= 0x%X", GetName(), M_Challenge_Mode);
 
 	//if (HasSpell(__MODE_KILLER))     __xpRate = 2.0f;
 	//if (HasSpell(__MODE_MANUFACT))   __xpRate = 1.0f;
 	//if (HasSpell(__MODE_ONE_LIFE))   __xpRate = 1.0f;
 	//if (HasSpell(__MODE_COLLECT))    __xpRate = 1.0f;
 	//if (HasSpell(__MODE_TASK))       __xpRate = 0.5f;
+#ifndef __STR
+#define	__STR(x)		((std::string)(x)).c_str()
+#endif
+    std::string _ModeText = __STR("");
+    if(M_Challenge_Mode & CHALLENGING_MODE_MANUFACT)    { _ModeText.append(__STR("工匠模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_ONELIFE)     { _ModeText.append(__STR("一命模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_COLLECT)      { _ModeText.append(__STR("收集模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_TASK)        { _ModeText.append(__STR("任务模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_RICH)        { _ModeText.append(__STR("富豪模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_HUMAN)  { _ModeText.append(__STR("杀手模式（人形）、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_BEAST)  { _ModeText.append(__STR("杀手模式（野兽）、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_UNDEAD)  { _ModeText.append(__STR("杀手模式（亡灵）、、 ")); __xpRate = 1.0f;}
 
-    if(M_Challenge_Mode & CHALLENGING_MODE_MANUFACT)    __xpRate = 1.0f;
-    if(M_Challenge_Mode & CHALLENGING_MODE_ONELIFE)     __xpRate = 1.0f;
-    if(M_Challenge_Mode & CHALLENGING_MODE_COLLECT)     __xpRate = 1.0f;
-    if(M_Challenge_Mode & CHALLENGING_MODE_TASK)        __xpRate = 1.0f;
+    if(M_Challenge_Mode > 0) PSendSysMessage("【注意】你已经开启以下挑战模式：%s 。 ", _ModeText.c_str());
+    else PSendSysMessage("【注意】你没有开启任何挑战模式，只能一级开启。 ");
 
 	SetPersonalXpRate(__xpRate);
 
@@ -15701,9 +15714,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 			: 30931
 			, true);
 	}*/
-
-    //qzqstar, 250411, load from achievements
-    uint32 __count = sQZAchievements.Load(this);
 
     //get the social points using new method
     auto _socialPoints = sQZAchievements.GetSocialPoints(this);

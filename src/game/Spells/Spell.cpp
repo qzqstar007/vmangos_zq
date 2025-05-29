@@ -46,6 +46,8 @@
 #include "ZoneScript.h"
 #include "TradeData.h"
 
+#include "QzqstarAchievements.h"
+
 using namespace Spells;
 
 #define SPELL_CHANNEL_VISUAL_TIMER 800
