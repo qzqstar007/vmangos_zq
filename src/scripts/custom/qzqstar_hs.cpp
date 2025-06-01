@@ -34,6 +34,7 @@
 #define __MENU_SIZE						999
 #define __MENU_MODE_MAIN				1000
 #define __MENU_CITIES_MAIN				2000
+#define __MENU_FRAG_MAIN				3000
 #define __MENU_SUISHEN_MAIN				5000
 #define __MENU_TEAM_MAIN				6000
 #define __MENU_ZITIAO_MAIN				7000
@@ -60,12 +61,11 @@ void _Main_Menus(Player *player)
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("☆☆　挑战模式（一级可选）☆☆　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	}
-
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　使用炉石　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_HOME_MAIN);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　传送加基森　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_GAZAGAN_MAIN);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　主城传送　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　能力提升　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　字条法宝　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ZITIAO_MAIN);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -166,10 +166,6 @@ struct CustomHSSpell : SpellScript
 		{
 			_Main_Menus(pPlayer);	return;
 		}
-		else if(action == __MENU_HOME_MAIN)
-		{
-			pPlayer->TeleportToHomebind(); return;
-		}
 		else if (action == __MENU_GAZAGAN_MAIN)
 		{
 			pPlayer->CastSpell(pPlayer, 23441, true); return;
@@ -239,6 +235,9 @@ struct CustomHSSpell : SpellScript
 			//display the cities
 			if(action == __MENU_CITIES_MAIN)
 			{
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＝＞　使用炉石　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 10);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
 				if (pPlayer->GetTeam() == ALLIANCE)
 				{
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(__BLUE("＝＝＞　暴风城　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_CITIES_MAIN + 11);
@@ -278,6 +277,8 @@ struct CustomHSSpell : SpellScript
 				uint32 _realAction = action - __MENU_CITIES_MAIN;
 				switch(_realAction)
 				{
+				case 10:	pPlayer->TeleportToHomebind(); return;
+
 				case 11:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -8828.231445f, 627.927490f, 94.055664f, 0.0f); return;
 				case 12:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -4917.0f, -955.0f, 502.0f, 0.0f); return;
 				case 13:	pPlayer->TeleportTo(MAP_KALIMDOR, 9962.712891f, 2280.142822f, 1341.394409f, 0.0f); return;
@@ -643,6 +644,46 @@ struct CustomHSSpell : SpellScript
 				}
 			}
 		}
+
+		else if(action >= __MENU_FRAG_MAIN && action <= __MENU_FRAG_MAIN + __MENU_SIZE)
+		{
+			if(action == __MENU_FRAG_MAIN)
+			{
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝　能力提升系统　＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+
+				std::string text = __STR("|cff002fa7【属性】最高１０％，当前：");
+				text.append(__STR("" + __NSTR(2 * 2) + "% |c"));
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 11);
+
+				text = __STR("|cff002fa7【伤害】最高１０％，当前：");				
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 12);
+
+				text = __STR("|cff002fa7【爆伤】最高２０％，当前：");
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 13);
+				
+				text = __STR("|cff002fa7【免伤】最高１０％，当前：");
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 14);
+				
+				text = __STR("|cff002fa7【急速】最高２０％，当前：");
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 15);
+
+				text = __STR("|cff002fa7【移速】最高５０％，当前：");
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 16);
+
+				text = __STR("|cff002fa7【天赋】最高５点，当前： ");
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 17);
+
+				text = __STR("|cff002fa7【物理吸血】最高１０％，当前： ");
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 18);
+
+				text = __STR("|cff002fa7【法术吸血】最高１０％，当前： ");
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 19);
+
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+			}	
+		}
+
 	}
 };
 

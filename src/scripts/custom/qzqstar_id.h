@@ -46,6 +46,22 @@
 #define ZQ_SPELL_SUMMON_AH			33373	//Summon AH, 召唤拍卖行
 #define ZQ_SPELL_SUMMON_STABLE		33374	//Summon Stable, 召唤兽栏
 
+#define ZQ_SPELL_LEECH_PHY		    33361	//Physical Leech, 物理吸血
+#define ZQ_SPELL_LEECH_SPELL	    33362	//Spell Leech, 法术吸血
+
+
+//Group spells lower id
+#define ZQ_SPELL_PROMOTION_STAT     32800	//Promotion Stat, 晋升 
+#define ZQ_SPELL_PROMOTION_DAMAGE   32805	//Promotion Skill, 晋升 
+#define ZQ_SPELL_PROMOTION_CRITDM   32810	//Promotion Critial Damage, 晋升 
+#define ZQ_SPELL_PROMOTION_VOIDAM   32815	//Promotion Haste, 晋升 
+#define ZQ_SPELL_PROMOTION_HASTE    32820	//Promotion Haste, 晋升 
+//Other Promitions from Achievements database
+//9876543210
+//Digit 0 -> Leech Physical
+//Digit 1 -> Leech Spell
+//Digit 2 -> Talents
+//Digit 3 -> Speed
 
 /******************************************************************** 
  *  Creature IDs, least first (33386).
@@ -73,7 +89,7 @@
 /******************************************************************** 
  *  Quest IDs, least first (9701).
  ********************************************************************/
-#define ZQ_QUEST_SOCIAL_IND	(9701+3)	//9701-9703Social Points Complete Indicator, 社交积分完成指示
+#define ZQ_QUEST_SOCIAL_IND	        (9701+3)	//9701-9703Social Points Complete Indicator, 社交积分完成指示
 
 
 #endif	//_QZQSTAR_CPP_IDS_H

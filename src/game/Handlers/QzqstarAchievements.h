@@ -114,6 +114,10 @@ public:
 	uint32 	GetSocialPoints(Player * _player);
 	void 	SetSocialPoints(Player * _player, uint32 _points);
 
+	// Promotions for the player
+	uint32  GetPromotions(Player * _player);
+	void    SetPromotions(Player * _player, uint32 _promotions);
+
 	/*****************************************************
 	 *
 	 *		Rune Systems Functions

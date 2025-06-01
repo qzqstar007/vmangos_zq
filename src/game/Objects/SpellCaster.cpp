@@ -703,6 +703,7 @@ uint32 SpellCaster::SpellCriticalDamageBonus(SpellEntry const* spellProto, uint3
             modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CRIT_DAMAGE_BONUS, crit_bonus, spell);
     }
     
+    //qzqstar, todo, 250531, spell critical bonus
 
     if (!pVictim)
         return damage += crit_bonus;

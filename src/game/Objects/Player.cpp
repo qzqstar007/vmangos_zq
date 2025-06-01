@@ -15107,6 +15107,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 	//qzqstar, 250211, reset the counts;
 	M_Item_Counts = 0;
     M_Challenge_Mode = 0;
+    M_Leech_Phy=0;
+    M_Leech_Spell=0;
+    M_TalentPoints=0;
+    M_Speed = 0;
 
     Object::_Create(guid.GetCounter(), 0, HIGHGUID_PLAYER);
 
@@ -15558,7 +15562,12 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     //get the challenge mode from db
     M_Challenge_Mode = sQZAchievements.GetChallengeMode(this);
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= 0x%X", GetName(), M_Challenge_Mode);
+    uint32 _Promotions = sQZAchievements.GetPromotions(this);
+    M_Leech_Phy = _Promotions % 10;
+    M_Leech_Spell = (_Promotions / 10)%10;
+    M_TalentPoints = (_Promotions / 100)%10;
+    M_Speed = (_Promotions / 1000)%10;
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= 0x%X, Promotions=%d", GetName(), M_Challenge_Mode, _Promotions);
 
 	//if (HasSpell(__MODE_KILLER))     __xpRate = 2.0f;
 	//if (HasSpell(__MODE_MANUFACT))   __xpRate = 1.0f;

@@ -881,6 +881,12 @@ class Player final: public Unit
 		uint32 M_Luckydraw_Times;
         uint32 M_Challenge_Mode;    //Challenge Mode
 
+        uint8  M_Leech_Phy;
+        uint8  M_Leech_Spell;
+        uint8  M_TalentPoints;
+        uint8  M_Speed;
+
+
 
         Item* AddItem(uint32 itemId, uint32 count = 1);
         void InterruptSpellsWithCastItem(Item const* item);

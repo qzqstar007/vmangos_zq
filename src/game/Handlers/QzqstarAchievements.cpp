@@ -328,6 +328,46 @@ void QzqstarAchievements::SetSocialPoints(Player * _player, uint32 points)
 	}	
 }
 
+
+//get the player's promotions, if the player has not got any promotions, return 0.
+uint32 QzqstarAchievements::GetPromotions(Player * _player)
+{
+	//check _player if none
+	if (!_player) return 0;
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry e = *it;	
+		if (e.type == ACHIEVEMENT_VIP)
+		{
+			return e.data6;
+		}	
+	}	
+
+	//add one VIP level to the _playerAchievements vector map of this player if not found
+	__init_VIP_Entry(_player);
+	return 0;
+}
+
+//set the player's promotions and add the promotions to the player's achievements vector
+void QzqstarAchievements::SetPromotions(Player * _player, uint32 promotions)
+{
+	//check _player if none
+	if (!_player) return;
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_VIP)
+		{
+			e.data6 = promotions;
+			break;
+		}	
+	}	
+}
+
 #pragma endregion
 
 

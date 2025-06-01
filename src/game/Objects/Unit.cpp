@@ -63,6 +63,7 @@
 #include "ScriptedInstance.h"
 #include "QzqstarAchievements.h"
 #include "custom\qzqstar_teleport.h"
+#include "custom\qzqstar_id.h"
  
  //#define DEBUG_DEBUFF_LIMIT
 
@@ -690,21 +691,21 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 #define __DAMAGE_MAX_SPELL  (350000)
 	if (this->IsPlayer() && pVictim->IsCreature())
 	{
+		Player *player = this->ToPlayer();
 		//we don't think 5w could accurs
 		if (DIRECT_DAMAGE == damagetype)
 		{
 			if (damage > __DAMAGE_MAX_PHY) damage = __DAMAGE_MAX_PHY + (damage - __DAMAGE_MAX_PHY) / 100;
 
             //Do heal upon damage
-
-			this->CastCustomSpell(this, 28817, damage/10, 0, 0, true);
+			if(player->M_Leech_Phy) this->CastCustomSpell(this, ZQ_SPELL_LEECH_PHY, damage * player->M_Leech_Phy/50.0f, 0, 0, true);
 		}
 		else if (SPELL_DIRECT_DAMAGE == damagetype)
 		{
 			if (damage > __DAMAGE_MAX_SPELL) damage = __DAMAGE_MAX_SPELL + (damage - __DAMAGE_MAX_SPELL) / 100;
 
             //Do heal upon spell damage
-			this->CastCustomSpell(this, 28817, damage / 3, 0, 0, true);
+			if (player->M_Leech_Spell) this->CastCustomSpell(this, ZQ_SPELL_LEECH_SPELL, damage * player->M_Leech_Spell / 50.0f, 0, 0, true);
 		}
 	}
 
@@ -7360,6 +7361,14 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
                 stackBonus     = GetTotalAuraMultiplier(SPELL_AURA_MOD_SPEED_ALWAYS);
                 nonStackBonus = (100.0f + GetMaxPositiveAuraModifier(SPELL_AURA_MOD_SPEED_NOT_STACK)) / 100.0f;
             }
+
+            //qzqstar, 250601, check if is Player, and test the chievements
+            if(Player *player = ToPlayer())
+            {
+                if(player->M_Speed > 0 && player->M_Speed <= 5)
+                    stackBonus *= (100.0f +  10.0f*player->M_Speed)/100.0f;
+            }
+
             break;
         }
         case MOVE_RUN_BACK:
