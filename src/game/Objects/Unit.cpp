@@ -3444,19 +3444,19 @@ float Unit::GetTotalAuraMultiplierByMiscMask(AuraType auratype, uint32 misc_mask
             case (1<<(CREATURE_TYPE_HUMANOID-1)):
                 if (player->M_Challenge_Mode & CHALLENGING_MODE_KILLER_HUMAN)     
                 {
-                    multiplier *= 3.2f; 	
+                    multiplier *= 1.2f; 	
                 }
                 break;
             case (1<<(CREATURE_TYPE_BEAST-1)):
                 if (player->M_Challenge_Mode & CHALLENGING_MODE_KILLER_BEAST)    
                 {
-                    multiplier *= 3.2f;
+                    multiplier *= 1.2f;
                 } 
                 break;
             case (1<<(CREATURE_TYPE_UNDEAD-1)):
                 if (player->M_Challenge_Mode & CHALLENGING_MODE_KILLER_UNDEAD)   
                 {
-                    multiplier *= 3.2f;
+                    multiplier *= 1.2f;
                 } 
                 break;
         }
@@ -7366,7 +7366,10 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
             if(Player *player = ToPlayer())
             {
                 if(player->M_Speed > 0 && player->M_Speed <= 5)
+                {
                     stackBonus *= (100.0f +  10.0f*player->M_Speed)/100.0f;
+                    //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unit::UpdateSpeed: SPEED %f, M_SPEED %d", stackBonus, player->M_Speed);
+                }
             }
 
             break;

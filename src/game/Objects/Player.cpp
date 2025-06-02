@@ -15111,6 +15111,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     M_Leech_Spell=0;
     M_TalentPoints=0;
     M_Speed = 0;
+    M_WeaponSkill = 0;
 
     Object::_Create(guid.GetCounter(), 0, HIGHGUID_PLAYER);
 
@@ -15567,6 +15568,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     M_Leech_Spell = (_Promotions / 10)%10;
     M_TalentPoints = (_Promotions / 100)%10;
     M_Speed = (_Promotions / 1000)%10;
+    M_WeaponSkill = (_Promotions / 10000)%10;
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= 0x%X, Promotions=%d", GetName(), M_Challenge_Mode, _Promotions);
 
 	//if (HasSpell(__MODE_KILLER))     __xpRate = 2.0f;
@@ -15591,6 +15593,15 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     else PSendSysMessage("【注意】你没有开启任何挑战模式，只能一级开启。 ");
 
 	SetPersonalXpRate(__xpRate);
+    UpdateSpeed(MOVE_RUN, false);
+    if(M_WeaponSkill > 0) {
+        if (M_WeaponSkill > 5) M_WeaponSkill = 5;
+        //all of the weapon skill, update ...
+        uint32 _skillList [] = {43,44,45,46,54,55,136,160,162,172,173,174,226,228,229};
+        for (uint32 i=0; i<sizeof(_skillList)/sizeof(uint32); i++) {
+        	ModifySkillBonus(_skillList[i], M_WeaponSkill * 2, false);
+        }
+    }
 
     // reset the M_Luckydraw_Times, as lucky draws
     M_Luckydraw_Times = 0;

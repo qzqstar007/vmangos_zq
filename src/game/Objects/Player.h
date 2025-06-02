@@ -885,6 +885,7 @@ class Player final: public Unit
         uint8  M_Leech_Spell;
         uint8  M_TalentPoints;
         uint8  M_Speed;
+        uint8  M_WeaponSkill;
 
 
 

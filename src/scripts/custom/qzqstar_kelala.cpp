@@ -25,6 +25,7 @@
 #include "qzqstar_helper.h"
 #include "Chat.h"
 #include "qzqstar_id.h"
+#include "qzqstar_rune_str.h"
 
 #define	__MENU_NONE						0
 #define	__MENU_SIZE						999
@@ -36,6 +37,7 @@
 #define __MENU_KELALA_MODE				 4000
 #define __MENU_KELALA_SHOP				 5000
 #define __MENU_KELALA_SOCIAL			 6000
+#define __MENU_KELALA_REP				 7000
 
 
 #define	__STR(x)		((std::string)(x)).c_str()
@@ -1251,6 +1253,121 @@ bool Menus_Kelala_Social(Player *player, Creature *_Creature, uint32 action)
 #pragma endregion
 
 
+#pragma region rep system
+#define __MENU_REPU_MAIN		(__MENU_KELALA_REP)
+#define __MENU_REPU_ACT_1		(10)
+#define __ITEM_REPU				(ZQ_ITEM_FACTION_UPGRADE)
+static uint32 __get_repu_by_player(Player *player, uint32 faction)
+{
+	const uint32 _repu_horde[] = {76,76, 889, 510, 729};
+	const uint32 _repu_alliance[] = {72,72, 890, 509, 730};
+
+	if (faction < 1000) return faction;
+	else if(faction < 1005)
+	{
+		//get faction by player
+		if (player->GetTeam() == HORDE)
+		{
+			return _repu_horde[faction-1000];
+		}
+		else if (player->GetTeam() == ALLIANCE)
+		{
+			return _repu_alliance[faction - 1000];
+		}
+	}
+
+	return faction;
+}
+bool Menus_Kelala_Rep(Player *player, Creature *_Creature, uint32 action)
+{
+	if (!player || !_Creature) return false;
+
+	//get the abs action
+	auto abs_action = action - __MENU_REPU_MAIN;
+	std::string text = "";
+
+	//Main Menu
+	if(abs_action == 0)
+	{
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝兑换声望列表＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝需要消耗【声望碎片】＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		//get the repu list -- _Rep_List
+		//_Rep_List is const Rep_List_t _Rep_List[] 
+		for (size_t i = 0; i < sizeof(_Rep_List) / sizeof(_Rep_List[0]); i++)
+		{
+			auto _faction = _Rep_List[i];
+			//check if the player has the reputation
+			if (player->GetLevel() >= _faction.rep_level)
+			{
+				text = __STR("声望::");
+				text.append(_faction.rep_name);
+				text.append("当前::");
+				auto __real_rep_id = __get_repu_by_player(player, _faction.rep_id);
+				text.append(__NSTR(player->GetReputationMgr().GetReputation(__real_rep_id)));
+				if(player->HasItemCount(__ITEM_REPU, 1)) 
+				{
+					text.append("|cff002fa7 》点击提升《 |r");
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_REPU_MAIN + __MENU_REPU_ACT_1 + i);
+				}
+				else 
+				{
+					text.append(" 》碎片不够《 |r");
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				}
+			}
+		}
+
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	}
+	else if(abs_action >= __MENU_REPU_ACT_1)
+	{
+		abs_action -= __MENU_REPU_ACT_1;
+
+		//check if the player has the repu shards
+		if (player->HasItemCount(__ITEM_REPU, 1))
+		{
+			//remove the repu shards and add the reputation
+			player->DestroyItemCount(__ITEM_REPU, 1, true);
+
+			auto __real_rep_id = __get_repu_by_player(player, _Rep_List[abs_action].rep_id);
+
+			if (FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(__real_rep_id))
+				player->GetReputationMgr().ModifyReputation(factionEntry, 100);
+
+
+			//check more of the rep if CITY
+			if (_Rep_List[abs_action].rep_id == 1001)
+			{
+				if (player->GetTeam() == HORDE)
+				{
+					//remained 3 cities
+					player->GetReputationMgr().ModifyReputation(sObjectMgr.GetFactionEntry(68), 100);
+					player->GetReputationMgr().ModifyReputation(sObjectMgr.GetFactionEntry(81), 100);
+					player->GetReputationMgr().ModifyReputation(sObjectMgr.GetFactionEntry(530), 100);
+				} 
+				else if (player->GetTeam() == ALLIANCE)
+				{
+					player->GetReputationMgr().ModifyReputation(sObjectMgr.GetFactionEntry(47), 100);
+					player->GetReputationMgr().ModifyReputation(sObjectMgr.GetFactionEntry(54), 100);
+					player->GetReputationMgr().ModifyReputation(sObjectMgr.GetFactionEntry(69), 100);
+				}
+
+			}
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝提升成功，返回。＝＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_REPU_MAIN);
+		}
+		else
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＝碎片不够，返回。＝＝＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_REPU_MAIN);
+		}
+	}
+
+	//gossip 16032 for repuation description
+	player->SEND_GOSSIP_MENU(16032, _Creature->GetGUID());
+	return true;
+}
+#pragma endregion
+
 
 bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 action)
 {
@@ -1261,16 +1378,31 @@ bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 acti
 	// Several Features:
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　登陆奖励　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_LOGIN);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　任务系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_TASK);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　挑战模式　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MODE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　点券商城　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SHOP);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　任务系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_TASK);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　社区贡献　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SOCIAL);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　声望奖励　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_REP);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+
+	if(player->GetLevel() >= 60)
+	{
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　挑战奖励　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MODE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	}
+
+
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　衬衣战袍背包升级　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SUIT);
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -1355,6 +1487,11 @@ bool Kelala_Menus(Player *player, Creature *_cr, uint32 sender, uint32 action)
 	else if (action >= __MENU_KELALA_SOCIAL && action <= __MENU_KELALA_SOCIAL + __MENU_SIZE)
 	{
 		return Menus_Kelala_Social(player, _cr, action);	
+	}
+	// Rep menu
+	else if (action >= __MENU_KELALA_REP && action <= __MENU_KELALA_REP + __MENU_SIZE)
+	{
+		return Menus_Kelala_Rep(player, _cr, action);
 	}
 
 

@@ -98,23 +98,23 @@ public:
 
 	void __init_VIP_Entry(Player *player);	//init the vip entry for the player
 
-	// Get the player's VIP level
+	// Get the player's VIP level, data1
 	uint32 GetVIPLevel(Player *player);
 	bool SetVIPLevel(Player *player, uint32 level);
 
-	// Get the player's VIP enabled features
+	// Get the player's VIP enabled features, data2
 	uint32 	GetVIPFeatures(Player *player);
 	bool 	SetVIPFeatures(Player *player, uint32 features);
 
-	// Get & Set player's challenging mode, using data3 to store the challenging mode
+	// Get & Set player's challenging mode, using data3 to store the challenging mode, data3
 	uint32 	GetChallengeMode(Player *player);
 	void 	SetChallengeMode(Player *player, uint32 mode);
 
-	// Social points system functions
+	// Social points system functions, data5
 	uint32 	GetSocialPoints(Player * _player);
 	void 	SetSocialPoints(Player * _player, uint32 _points);
 
-	// Promotions for the player
+	// Promotions for the player, data6
 	uint32  GetPromotions(Player * _player);
 	void    SetPromotions(Player * _player, uint32 _promotions);
 

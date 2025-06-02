@@ -3897,12 +3897,19 @@ void Spell::EffectEnchantItemPerm(SpellEffectIndex effIdx)
     }
 
     // remove old enchanting before applying new if equipped
-    pItemOwner->ApplyEnchantment(itemTarget, PERM_ENCHANTMENT_SLOT, false);
+    //pItemOwner->ApplyEnchantment(itemTarget, PERM_ENCHANTMENT_SLOT, false);
 
-    itemTarget->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantId, 0, 0, m_caster->GetObjectGuid());
-
+    //itemTarget->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantId, 0, 0, m_caster->GetObjectGuid());
     // add new enchanting if equipped
-    pItemOwner->ApplyEnchantment(itemTarget, PERM_ENCHANTMENT_SLOT, true);
+    //pItemOwner->ApplyEnchantment(itemTarget, PERM_ENCHANTMENT_SLOT, true);
+
+    //qzqstar, 250602, modify the PERM_ENCHANTMENT_SLOT to SLOT_4
+    pItemOwner->ApplyEnchantment(itemTarget, PROP_ENCHANTMENT_SLOT_3, false);
+    itemTarget->SetEnchantment(PROP_ENCHANTMENT_SLOT_3, enchantId, 0, 0, m_caster->GetObjectGuid());
+    pItemOwner->ApplyEnchantment(itemTarget, PROP_ENCHANTMENT_SLOT_3, true);
+
+    //if has spell of ..., enable another slot
+
 }
 
 void Spell::EffectEnchantItemTmp(SpellEffectIndex effIdx)

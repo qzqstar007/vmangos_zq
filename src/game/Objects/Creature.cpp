@@ -1618,12 +1618,15 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
         //iterate the loot.items
         for (auto it = loot.items.begin(); it != loot.items.end(); ++it)
         {
-			if (it->randomPropertyId)
+			if (it->randomPropertyId>3300 && it->randomPropertyId<3321)
 			{
 				it->difficulty = _dg_info;
+
+                //should update the random property id according to difficulty level
+                it->randomPropertyId += _dg_info * 5;
 			}
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Creature gen Loot] PLAYER:[%u][%s] === __goldMux: %d", looter->GetGUID(), looter->GetName(), __goldMux);
+            //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Creature gen Loot] PLAYER:[%u][%s] === __goldMux: %d", looter->GetGUID(), looter->GetName(), __goldMux);
         }
 	}
 

@@ -32,6 +32,9 @@
 //Functional Items
 #define ZQ_ITEM_PET_EGG				30010	//Pet Egg, 宠物蛋
 
+//Faction upgrade items
+#define ZQ_ITEM_FACTION_UPGRADE		30020	//Faction Upgrade, 阵营升级
+
 /******************************************************************** 
  *  Spell IDs, largest first (33386).
  ********************************************************************/

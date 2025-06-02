@@ -51,7 +51,7 @@
 
 
 //Copy the content of const menus to player specific 
-void _copy_rune(const Rune_Spell_Menu_t *from, Rune_Spell_Menu_t *to, uint32 size)
+void X_copy_rune(const Rune_Spell_Menu_t *from, Rune_Spell_Menu_t *to, uint32 size)
 {
 	memcpy(to, from, sizeof(Rune_Spell_Menu_t)*size);
 }
@@ -98,7 +98,6 @@ bool Menus_Comm_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 #pragma endregion
 
 #pragma region MENU RUNE
-
 #define __MENU_RUNE_SLOT_LEARN		(100)	//1100-1199 learn slot spell
 #define __MENU_RUNE_SLOT_FORGET		(200)	//2100-2199 forget slot spell
 #define __MENU_RUNE_SLOT_BUY		(800)	//buy rune slot
@@ -107,7 +106,7 @@ bool Menus_Comm_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 
 #define __MODE_KILLER       		(30849)
 #define __MODE_KILLER_REWARD       	(30852)
-uint32 __rune_slot_numbers(Player *player)
+uint32 X__rune_slot_numbers(Player *player)
 {
 	//will have one slot every level/15
 	uint32 _nums = sQZAchievements.GetRuneSlots(player);
@@ -119,13 +118,13 @@ uint32 __rune_slot_numbers(Player *player)
 	return _nums;
 }
 
-uint32 __rune_need_num(Player *player)
+uint32 X__rune_need_num(Player *player)
 {
 	auto needNum = 0;
 	auto freeNum = 2;
 	//if (player->HasSpell(__MODE_KILLER) || player->HasSpell(__MODE_KILLER_REWARD)) freeNum += 1;
 
-	int32 curslots = __rune_slot_numbers(player);
+	int32 curslots = X__rune_slot_numbers(player);
 
 	if (curslots < freeNum) needNum = 0;
 	else
@@ -135,8 +134,11 @@ uint32 __rune_need_num(Player *player)
 	return needNum;
 }
 
-
-bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 action)
+bool X_Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 action)
+{
+	return true;
+}
+bool X_Menus_Rune_Main1(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 {
 	if (!player || !_Creature) return false;
 
@@ -148,15 +150,15 @@ bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 	//All player enter this menu, and then got the class menu belongs to him
 	Rune_Spell_Menu_t _LocalMenus[RUNE_SPELLS_NUM];
 
-	if (player->GetClass() == CLASS_WARRIOR) { _copy_rune(_Spells_Menu_Warrior, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
-	else if (player->GetClass() == CLASS_MAGE) { _copy_rune(_Spells_Menu_Mage, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
-	else if (player->GetClass() == CLASS_ROGUE) { _copy_rune(_Spells_Menu_Rogue, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
-	else if (player->GetClass() == CLASS_PALADIN) { _copy_rune(_Spells_Menu_Paladin, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
-	else if (player->GetClass() == CLASS_DRUID) { _copy_rune(_Spells_Menu_Druid, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
-	else if (player->GetClass() == CLASS_HUNTER) { _copy_rune(_Spells_Menu_Hunter, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
-	else if (player->GetClass() == CLASS_PRIEST) { _copy_rune(_Spells_Menu_Priest, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
-	else if (player->GetClass() == CLASS_WARLOCK) { _copy_rune(_Spells_Menu_Warlock, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
-	else if (player->GetClass() == CLASS_SHAMAN) { _copy_rune(_Spells_Menu_Shaman, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	if (player->GetClass() == CLASS_WARRIOR) { X_copy_rune(_Spells_Menu_Warrior, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_MAGE) { X_copy_rune(_Spells_Menu_Mage, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_ROGUE) { X_copy_rune(_Spells_Menu_Rogue, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_PALADIN) { X_copy_rune(_Spells_Menu_Paladin, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_DRUID) { X_copy_rune(_Spells_Menu_Druid, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_HUNTER) { X_copy_rune(_Spells_Menu_Hunter, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_PRIEST) { X_copy_rune(_Spells_Menu_Priest, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_WARLOCK) { X_copy_rune(_Spells_Menu_Warlock, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
+	else if (player->GetClass() == CLASS_SHAMAN) { X_copy_rune(_Spells_Menu_Shaman, _LocalMenus, RUNE_SPELLS_NUM);  __RUNE_UPGRADE_ITEM = __RUNE_UPGRADE_ITEM_ALL; _CLASS_DESC = 16030; }
 	else
 	{
 		player->ADD_GOSSIP_ITEM(5, __STR("========|该职业暂时不支持...|========="), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -180,7 +182,7 @@ bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 
 	//set to be max of level or active nums
 	//_MAX_RUNE_SLOT = player->GetLevel() / 15;
-	_MAX_RUNE_SLOT = __rune_slot_numbers(player);
+	_MAX_RUNE_SLOT = X__rune_slot_numbers(player);
 
 	bool _can_learn_more = (_player_learned_num < _MAX_RUNE_SLOT);
 
@@ -258,7 +260,7 @@ bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 		text = "|cff002fa7功能：　";
-		text.append(_LocalMenus[spell_to_learn_slot].desc);
+		text.append(__STR(_LocalMenus[spell_to_learn_slot].desc));
 		text.append("　|r");
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
@@ -304,7 +306,7 @@ bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 		text = __RED("确定要遗忘此技能?-->");
 		text.append(_LocalMenus[spell_to_delete_slot].text);
 		text.append(__RED("<-- 返还符文石数量Ｘ "));
-		text.append(__NSTR(__rune_need_num(player, _player_learned_num - 1) / 2));
+		text.append(__NSTR(X__rune_need_num(player, _player_learned_num - 1) / 2));
 
 		player->ADD_GOSSIP_ITEM(5, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		player->ADD_GOSSIP_ITEM(5, __STR(__RED("====| 确定 | 返回 | =====")), GOSSIP_SENDER_MAIN, action + RUNE_CONFIRM_OFFSET);
@@ -324,8 +326,8 @@ bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 			player->RemoveSpell(_LocalMenus[spell_to_delete_slot].spell_id);
 
 			//add runes back to players
-			if((_player_learned_num > 0) && (__rune_need_num(player, _player_learned_num-1) > 0))
-				player->AddItem(__RUNE_UPGRADE_ITEM,  (__rune_need_num(player, _player_learned_num-1)) / 2 );
+			if((_player_learned_num > 0) && (X__rune_need_num(player, _player_learned_num-1) > 0))
+				player->AddItem(__RUNE_UPGRADE_ITEM,  (X__rune_need_num(player, _player_learned_num-1)) / 2 );
 
 			player->ADD_GOSSIP_ITEM(5, __STR(__GREEN("====已经遗忘, |返回|=====")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
 		}
@@ -339,7 +341,7 @@ bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 
 		//get the rune stones that player need to buy
 		uint32 _rune_stones_need = 0;
-		_rune_stones_need = __rune_need_num(player);
+		_rune_stones_need = X__rune_need_num(player);
 		//slog
 		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Rune Stones Need: %d", _rune_stones_need);
 
@@ -1587,7 +1589,7 @@ bool Rune_Menus(Player *player, Creature *_c, uint32 sender, uint32 action)
 	}
 	else if (action >= __MENU_RUNE_MAIN && action <= __MENU_RUNE_MAIN + __MENU_SIZE)
 	{
-		return Menus_Rune_Main(player, _c, sender, action);
+		return X_Menus_Rune_Main(player, _c, sender, action);
 	}
 	else if (action >= __MENU_FRAG_MAIN && action <= __MENU_FRAG_MAIN + __MENU_SIZE)
 	{
