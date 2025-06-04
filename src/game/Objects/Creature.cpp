@@ -58,6 +58,7 @@
 #include "scriptPCH.h"
 
 #include "QzqstarAchievements.h"
+#include "custom\qzqstar_id.h"
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
@@ -268,7 +269,7 @@ void Creature::AddToWorld()
                 SetMaxHealth(GetMaxHealth() * (1 + pInstanceData->CustomDifficulty * pInstanceData->CustomDifficulty * 2)); 
                 SetHealthPercent(100.0f);
                 SetNativeScale(1.0f + pInstanceData->CustomDifficulty/5.0f);
-                CastSpell(this, 32054 + pInstanceData->CustomDifficulty, true);
+                CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1 - 1 + pInstanceData->CustomDifficulty, true);
             }
         }
     }

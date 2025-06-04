@@ -800,13 +800,27 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     // qzqstar, 250602, all item should have random property id
     // id range : 3301,3302,3303,3304,3305,3306,3307,3308,3309,3310,3311,3312,3313,3314,3315,3316,3317,3318,3319,3320
 
-    if(roll_chance_i(50))
+    if( ((itemProto->Class == ITEM_CLASS_WEAPON) ||(itemProto->Class == ITEM_CLASS_ARMOR) ) && roll_chance_i(50) )
     {
-        if(itemProto->ItemLevel < 20) return 3301 + difficulty * 5;
-        else if(itemProto->ItemLevel < 35) return 3302 + difficulty * 5;
-        else if(itemProto->ItemLevel < 55) return 3303 + difficulty * 5;
-        else if(itemProto->ItemLevel < 68) return 3304 + difficulty * 5;
-        else return 3305 + difficulty * 5;
+        uint32 _randomEnchantID = 0;
+        if(itemProto->ItemLevel < 20) _randomEnchantID = 3301 + difficulty * 5;
+        else if(itemProto->ItemLevel < 35) _randomEnchantID = 3302 + difficulty * 5;
+        else if(itemProto->ItemLevel < 55) _randomEnchantID = 3303 + difficulty * 5;
+        else if(itemProto->ItemLevel < 68) _randomEnchantID = 3304 + difficulty * 5;
+        else _randomEnchantID = 3305 + difficulty * 5;
+
+
+        if(roll_chance_i(10)) 
+        {
+            //3321 starting from ... 
+            if(itemProto->Class == ITEM_CLASS_WEAPON) _randomEnchantID += 20;
+
+            else if (itemProto->Class == ITEM_CLASS_ARMOR) 
+            {
+                //
+                //if(itemProto->InventoryType == )
+            }
+        }
     }
 
     // RandomProperty case
@@ -876,6 +890,9 @@ void Item::SetItemRandomProperties(int32 randomPropId)
             {
                 SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, item_rand->ID);
                 SetState(ITEM_CHANGED);
+
+                //Set the random properties
+                SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_0), item_rand->ID, 0, 0);
 
                 //Random Enchantment for slot 2 and 3.
                 auto itemQuality = GetProto()->Quality;

@@ -1063,7 +1063,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 
 				//qzqstar, 250312, auto buff depend on level
-				case 31256: 
+				case ZQ_SPELL_BUFF_ALL: 
 				{
 					if (m_caster && m_caster->IsPlayer())
 					{
@@ -1071,15 +1071,16 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 						if (unitTarget->IsHostileTo(m_caster)) return;
 
-						//At least cast the dragon slayer 32068
-						m_caster->CastSpell(unitTarget, 32068, true, nullptr);
+						//At least cast the dragon slayer 
+						m_caster->CastSpell(unitTarget, ZQ_SPELL_BUFF_DRAGON_SLAYER, true, nullptr);
 		
-						//and 10%
-						if (m_caster->GetLevel() > 24 && unitTarget->GetLevel() > 24)	m_caster->CastSpell(unitTarget, 20217, true, nullptr);
+						//and WARChief
+						if (m_caster->GetLevel() > 24 && unitTarget->GetLevel() > 24)	m_caster->CastSpell(unitTarget, ZQ_SPELL_BUFF_WARCHIEF, true, nullptr);
 
-						//further 32069
-						if (m_caster->GetLevel() > 34 && unitTarget->GetLevel() > 34)	m_caster->CastSpell(unitTarget, 32069, true, nullptr);
-
+						//further zandalar
+						if (m_caster->GetLevel() > 44 && unitTarget->GetLevel() > 44)	m_caster->CastSpell(unitTarget, ZQ_SPELL_BUFF_ZANDALA, true, nullptr);
+                        
+                        /*
 						//55 using the zandalar
 						if (m_caster->GetLevel() > 54 && unitTarget->GetLevel() > 54)	m_caster->CastSpell(unitTarget, 32067, true, nullptr);						
 						
@@ -1091,6 +1092,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 							else
 								m_caster->CastSpell(unitTarget, 22818, true, nullptr);
 						}
+                                */
 					}
 
 					return;

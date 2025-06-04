@@ -40,10 +40,8 @@
  ********************************************************************/
 #define ZQ_SPELL_HEARTSTONE			33386	//Heart Stone, 炉石修改（Item ID：6948）
 
-//Summon Pet Spells
-#define ZQ_SPELL_SUMMON_PET			33381	//Summon Pet, 召唤宠物
-
 //summon creature spells, such as critter, pet, mount, etc.
+#define ZQ_SPELL_SUMMON_PET			33370	//Summon Pet, 召唤宠物
 #define ZQ_SPELL_SUMMON_ROBOT		33371	//Summon Robot, 召唤机器人
 #define ZQ_SPELL_SUMMON_BANK		33372	//Summon Bank, 召唤银行
 #define ZQ_SPELL_SUMMON_AH			33373	//Summon AH, 召唤拍卖行
@@ -51,6 +49,15 @@
 
 #define ZQ_SPELL_LEECH_PHY		    33361	//Physical Leech, 物理吸血
 #define ZQ_SPELL_LEECH_SPELL	    33362	//Spell Leech, 法术吸血
+
+#define ZQ_SPELL_SPELL_DIFFICULTY1	33351	//Spell Difficulty 1, 副本难度1
+#define ZQ_SPELL_SPELL_DIFFICULTY2	33352	//Spell Difficulty 2, 副本难度2
+#define ZQ_SPELL_SPELL_DIFFICULTY3	33353	//Spell Difficulty 3, 副本难度3
+
+#define ZQ_SPELL_BUFF_ALL           33355   //Spell of Buff all
+#define ZQ_SPELL_BUFF_DRAGON_SLAYER 33356   //Call of Dragon slayer
+#define ZQ_SPELL_BUFF_WARCHIEF      33357   //Call of Warchief
+#define ZQ_SPELL_BUFF_ZANDALA       33358   //Call of ZANDALA
 
 
 //Group spells lower id
