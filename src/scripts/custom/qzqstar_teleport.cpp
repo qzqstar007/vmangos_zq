@@ -30,12 +30,11 @@
 #define __MENU_SUB_SIZE					99
 
 #define __MENU_TELEPORT_MAIN			 1000
-#define __MENU_TELEPORT_CITIES		 	 2000
 #define __MENU_TELEPORT_EASTKINGDOM		 3000
-#define __MENU_TELEPORT_KALIMDOR		 4000
+#define __MENU_TELEPORT_KALIMDOR		 3001
+#define __MENU_TELEPORT_TRAINERS		 3002
 #define __MENU_TELEPORT_DUNGEONS		 5000
 #define __MENU_TELEPORT_RAIDS			 6000
-#define __MENU_TELEPORT_TRAINERS		 7000
 
 
 
@@ -59,20 +58,59 @@ const Teleport_Point_t TP_MainCities_HORDE[] = {
 };
 
 const Teleport_Point_t TP_Trainers_ALLIANCE[] = {
-	{0,  0,"Elysium", 0, 1015.0f, 115.0f, 2.0f, 0.0f, {0}},	//Elysium
+	// Makeup from upper comment, reverse order
+	{1, 0,    __XSTR("战士、骑士　 "),   		0, -9468.0f,115.5f,58.0f,5.3f, {0}},
+	{2, 1,    __XSTR("猎人、德鲁伊　 "), 		1, 10131.0f,2541.0f,1322.0f,5.8f, {0}},
+	{3, 0,    __XSTR("急救烹饪、法牧术贼　 "), 	0, -9471.0f,23.5f,64.5f,0.3f, {0}},
+	{4, 0,    __XSTR("采矿、锻造、工程　 "), 	0, -8375.0f,631.0f,95.0f,3.2f, {0}},
+	{5, 0,    __XSTR("剥皮、制皮、钓鱼　 "), 	0, -9393.0f,-89.0f,64.5f,6.2f, {0}},
+	{6, 0,    __XSTR("炼金、采药、裁缝、附魔　 "), 0, -8915.0f,786.0f,87.5f,3.6f, {0}}
 };
 
 const Teleport_Point_t TP_Trainers_HORDE[] = {
-	{0, 0, "Elysium", 0, 1015.0f, 115.0f, 2.0f, 0.0f, {0}},	//Elysium	
+/*80122	0	0	6	0	0	0	0	0	0	0	1	0	0	0	0	2257	242	33.5	0.2	0	法师、牧师、术士、盗贼
+80121	0	0	6	1	0	0	0	0	0	0	1	0	0	0	0	-2313	-351	-9.4	6.2	0	烹饪急救、战德猎萨
+80120	0	0	6	1	0	0	0	0	0	0	1	0	0	0	0	2021	-4725	24.7	6	0	采矿、锻造、工程、钓鱼
+80119	0	0	6	1	0	0	0	0	0	0	1	0	0	0	0	-1122	29	143	2.8	0	剥皮制皮、裁缝附魔、采药炼金
+*/
+	// Makeup from upper comment, reverse order
+	{1, 0,    __XSTR("法师、牧师、术士、盗贼　 "),   		0, 2257.0f,242.0f,33.5f,0.2f, {0}},
+	{2, 1,    __XSTR("烹饪急救、战德猎萨　 "), 		1, -2313.0f,-351.0f,-9.4f,6.2f, {0}},
+	{3, 1,    __XSTR("采矿、锻造、工程、钓鱼　 "), 	1, 2021.0f,-4725.0f,24.7f,6.0f, {0}},
+	{4, 1,    __XSTR("剥皮制皮、裁缝附魔、采药炼金　 "), 1, -1122.0f,29.0f,143.0f,2.8f, {0}}
 };
 
 
 const Teleport_Point_t TP_MainLand_EastKingdom[] = {
-	{0,  0,"Elysium", 0, 1015.0f, 115.0f, 2.0f, 0.0f, {0}},	//Elysium
+	// Makeup from upper comment, reverse order
+	{1, MAP_EASTERN_KINGDOMS,    __XSTR("西部荒野　 "), MAP_EASTERN_KINGDOMS, -10919.0f,1426.0f,43.0f,3.2f, {0}},
+	{2, MAP_EASTERN_KINGDOMS,    __XSTR("赤脊山　 "), MAP_EASTERN_KINGDOMS, -9555.0f,-2201.0f,93.3f,5.5f, {0}},
+	{3, MAP_EASTERN_KINGDOMS,    __XSTR("暮色森林/荆棘谷　 "), MAP_EASTERN_KINGDOMS, -11351.0f,-387.0f,65.6f,2.2f, {0}},
+	{4, MAP_EASTERN_KINGDOMS,    __XSTR("湿地/阿拉希　 "), MAP_EASTERN_KINGDOMS, -2397.0f,-2505.0f,87.0f,6.3f, {0}},
+	{5, MAP_EASTERN_KINGDOMS,    __XSTR("洛克莫丹/荒芜之地　 "), MAP_EASTERN_KINGDOMS, -5957.0f,-3291.0f,275.3f,3.4f, {0}},
+	{6, MAP_EASTERN_KINGDOMS,    __XSTR("奥特兰克山脉　 "), MAP_EASTERN_KINGDOMS, 213.4f,-643.2f,115.0f,0.4f, {0}},
+	{7, MAP_EASTERN_KINGDOMS,    __XSTR("银松森林　 "), MAP_EASTERN_KINGDOMS, -360.0f,1200.0f,64.82f,0.1f, {0}},
+	{8, MAP_EASTERN_KINGDOMS,    __XSTR("悲伤沼泽/诅咒之地　 "), MAP_EASTERN_KINGDOMS, -10682.0f,-2981.0f,36.6f,3.2f, {0}},
+	{9, MAP_EASTERN_KINGDOMS,    __XSTR("辛特兰　 "), MAP_EASTERN_KINGDOMS, 2.4f,-2926.0f,118.0f,1.2f, {0}},
+	{10, MAP_EASTERN_KINGDOMS,   __XSTR("西瘟疫之地　 "), MAP_EASTERN_KINGDOMS, 1716.5f,-795.0f,57.1f,1.6f, {0}},
+	{11, MAP_EASTERN_KINGDOMS,   __XSTR("东瘟疫之地　 "), MAP_EASTERN_KINGDOMS, 1782.0f,-3095.0f,80.0f,1.2f, {0}},
+	{12, MAP_EASTERN_KINGDOMS,   __XSTR("黑石山　 "), MAP_EASTERN_KINGDOMS, -7319.7f,-1086.1f,277.0f,3.5f, {0}}
 };
 
 const Teleport_Point_t TP_MainLand_Kalimdor[] = {
-	{0, 0, "Elysium", 0, 1015.0f, 115.0f, 2.0f, 0.0f, {0}},	//Elysium	
+	// Makeup from upper comment, reverse order
+	{1, MAP_KALIMDOR,    	__XSTR("十字路口　 "), MAP_KALIMDOR, -849.5f,-2562.0f,91.6f,2.6f, {0}},
+	{2, MAP_KALIMDOR,    	__XSTR("黑海岸　 "), MAP_KALIMDOR, 4829.0f,218.0f,49.6f,6.1f, {0}},
+	{3, MAP_KALIMDOR,    	__XSTR("灰谷　 "), MAP_KALIMDOR, 2250.0f,-1743.0f,110.7f,6.0f, {0}},
+	{4, MAP_KALIMDOR,    	__XSTR("石爪山　 "), MAP_KALIMDOR, 1389.0f,765.0f,147.6f,1.0f, {0}},
+	{5, MAP_KALIMDOR,   	__XSTR("千针石林　 "), MAP_KALIMDOR, -5338.6f,-2772.1f,-41.8f,4.2f, {0}},
+	{6, MAP_KALIMDOR,   	__XSTR("凄凉之地　 "), MAP_KALIMDOR, -1064.0f,1979.0f,63.0f,0.0f, {0}},
+	{7, MAP_KALIMDOR,    	__XSTR("菲拉斯　 "), MAP_KALIMDOR, -4844.0f,1317.0f,81.0f,0.1f, {0}},
+	{8, MAP_KALIMDOR,   	__XSTR("尘泥沼泽　 "), MAP_KALIMDOR, -4081.0f,-3715.0f,45.7f,1.1f, {0}},
+	{9, MAP_KALIMDOR,    	__XSTR("艾萨拉　 "), MAP_KALIMDOR, 8004.5f,-6073.4f,113.3f,0.5f, {0}},
+	{10, MAP_KALIMDOR,    	__XSTR("费伍德森林　 "), MAP_KALIMDOR, 5242.0f,-718.0f,343.0f,0.1f, {0}},
+	{11, MAP_KALIMDOR,    	__XSTR("安戈洛环形山　 "), MAP_KALIMDOR, -6113.0f,-1142.0f,-187.7f,3.5f, {0}},
+	{12, MAP_KALIMDOR,   	__XSTR("希利苏斯　"), MAP_KALIMDOR, -6811.0f,836.0f,50.0f,1.0f, {0}}
 };
 
 const Teleport_Point_t TP_Dungeons[] = {
@@ -239,6 +277,101 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 }
 #pragma endregion
 
+#pragma region Teleport EastKingdom and Kalimdor
+
+bool Menus_teleport_Common(Player *player, Creature *_cr, uint32 sender, uint32 action)
+{
+	//check if player is null and creature is null
+	if (!player ||!_cr) return false;
+
+	std::string text = "";
+	uint32      counts = 0;
+	uint32      offset = 0;
+	const Teleport_Point_t *pPoints = nullptr;
+
+	
+
+	//display the EastKingdom list, split to two pages, each page has 8 slots, each slot has 2 lines of text, the first line is the dungeon name, the second line is the difficulty.
+	if(action >= __MENU_TELEPORT_EASTKINGDOM && action < __MENU_TELEPORT_EASTKINGDOM + __MENU_SUB_SIZE)
+	{
+
+		if(action == __MENU_TELEPORT_EASTKINGDOM) 
+		{
+			counts = sizeof(TP_MainLand_EastKingdom)/sizeof(Teleport_Point_t);
+			pPoints = TP_MainLand_EastKingdom;
+			offset = 100;
+		}
+		else if (action == __MENU_TELEPORT_KALIMDOR) 
+		{
+			counts = sizeof(TP_MainLand_Kalimdor)/sizeof(Teleport_Point_t);
+			pPoints = TP_MainLand_Kalimdor;
+			offset = 200;
+		}
+		else if (action == __MENU_TELEPORT_TRAINERS)
+		{
+			if(player->GetTeam() == ALLIANCE)
+			{
+				counts = sizeof(TP_Trainers_ALLIANCE)/sizeof(Teleport_Point_t);
+				pPoints = TP_Trainers_ALLIANCE;
+				offset = 300;
+			}else
+			{
+				counts = sizeof(TP_Trainers_HORDE)/sizeof(Teleport_Point_t);
+				pPoints = TP_Trainers_HORDE;
+				offset = 400;	
+			}
+		}
+
+		else return false;
+
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝请选择要传送的地图＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+		for (auto i = 0; i < counts ; i++)
+		{
+			text = "";
+			//get the dungeon name from the array, if the name is empty, then skip it.
+			text.append(__STR(pPoints[i].name));
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_EASTKINGDOM + offset + i); 
+		}
+
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _cr->GetGUID());
+	}
+
+	else if (action >= __MENU_TELEPORT_EASTKINGDOM + 100 )
+	{
+		
+		auto _acID = action - __MENU_TELEPORT_EASTKINGDOM - 100;
+		if(_acID < __MENU_SUB_SIZE) 
+		{
+			pPoints = TP_MainLand_EastKingdom;
+		}
+		else if (_acID < __MENU_SUB_SIZE + 100){
+			_acID -= 100;
+			pPoints = TP_MainLand_Kalimdor;
+		}
+		else if (_acID < __MENU_SUB_SIZE + 200) {
+			_acID -= 200;
+			pPoints = TP_Trainers_ALLIANCE;
+		}
+		else if (_acID < __MENU_SUB_SIZE + 300) {
+			_acID -= 300;
+			pPoints = TP_Trainers_HORDE;	
+		}
+		else return false;
+
+		player->CLOSE_GOSSIP_MENU();
+		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Teleport to id %d", action);
+
+		if(pPoints) player->TeleportTo(pPoints[_acID].tele_mapid, pPoints[_acID].tele_x, pPoints[_acID].tele_y, pPoints[_acID].tele_z, pPoints[_acID].tele_o);
+	}
+
+	return true;
+}
+
+#pragma endregion
+
+
 #pragma region Teleport Main
 bool Menus_teleport_Main(Player *player, Creature *_cr, uint32 sender, uint32 action)
 {
@@ -249,11 +382,11 @@ bool Menus_teleport_Main(Player *player, Creature *_cr, uint32 sender, uint32 ac
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　主城传送　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　专业职业　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　专业职业　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_TRAINERS);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　东部王国　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　东部王国　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_EASTKINGDOM);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　卡利姆多　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　卡利姆多　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_KALIMDOR);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　副本传送　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_DUNGEONS);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -278,6 +411,13 @@ bool Teleport_Menus(Player *player, Creature *_cr, uint32 sender, uint32 action)
 	{
 		return Menus_teleport_Main(player, _cr, sender, action);
 	}
+
+	// East Kingdom
+	else if (action >= __MENU_TELEPORT_EASTKINGDOM && action <= __MENU_TELEPORT_EASTKINGDOM + __MENU_SIZE)
+	{
+		return Menus_teleport_Common(player, _cr, sender, action);
+	}
+
 	// Teleport to dungeons menu, return true if the menu is displayed, false otherwise.
 	else if (action >= __MENU_TELEPORT_DUNGEONS && action <= __MENU_TELEPORT_DUNGEONS + __MENU_SIZE)
 	{

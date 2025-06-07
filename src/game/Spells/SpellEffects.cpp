@@ -1260,7 +1260,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					else if (itemTarget->GetProto()->Quality == 5)
 					{
 						// yellow quality
-						// need extra Nexus Crystal 20725 and dq 30523
+						// need extra Nexus Crystal 20725 and dq ZQ_ITEM_VOUCHER
 					}
 					else
 					{

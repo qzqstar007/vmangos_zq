@@ -87,6 +87,7 @@
 #include "Chat.h"
 
 #include "QzqstarAchievements.h"
+#include "custom/qzqstar_id.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -19198,7 +19199,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 		//check if has enough vouchers
 		uint32 vouchers = pProto->SellPrice * count;
 
-		if (!HasItemCount(30523, vouchers))
+		if (!HasItemCount(ZQ_ITEM_VOUCHER, vouchers))
 		{
 			SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
 			return false;
@@ -19217,7 +19218,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 			}
 
 			//remove the vouchers
-            DestroyItemCount(30523, vouchers, true);
+            DestroyItemCount(ZQ_ITEM_VOUCHER, vouchers, true);
 
 			pItem = StoreNewItem(dest, item, true, Item::GenerateItemRandomPropertyId(item));
 		}

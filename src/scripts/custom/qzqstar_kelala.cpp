@@ -80,22 +80,22 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 			//add items upon player's vip level
 			if (vip_level == 1)
 			{
-				player->AddItem(30523, 10); player->AddItem(29995, 2); 
+				player->AddItem(ZQ_ITEM_VOUCHER, 10); player->AddItem(29995, 2); 
 			}else if (vip_level == 2)
 			{
-				player->AddItem(30523, 20); player->AddItem(29995, 2); player->AddItem(30746, 2);	player->AddItem(30136, 1);
+				player->AddItem(ZQ_ITEM_VOUCHER, 20); player->AddItem(29995, 2); player->AddItem(30746, 2);	player->AddItem(30136, 1);
 			}
 			else if (vip_level == 3)
 			{
-				player->AddItem(30523, 50); player->AddItem(29995, 5); player->AddItem(30746, 5);	player->AddItem(30136, 2); 
+				player->AddItem(ZQ_ITEM_VOUCHER, 50); player->AddItem(29995, 5); player->AddItem(30746, 5);	player->AddItem(30136, 2); 
 			}
 			else if (vip_level == 4)
 			{
-				player->AddItem(30523, 100);  player->AddItem(30746, 10); player->AddItem(30136, 5); player->AddItem(14344, 10); //Pearls
+				player->AddItem(ZQ_ITEM_VOUCHER, 100);  player->AddItem(30746, 10); player->AddItem(30136, 5); player->AddItem(14344, 10); //Pearls
 			}
 			else if (vip_level == 5)
 			{
-				player->AddItem(30523, 200);  player->AddItem(30746, 30); player->AddItem(30136, 10); player->AddItem(14344, 20); //Pearls
+				player->AddItem(ZQ_ITEM_VOUCHER, 200);  player->AddItem(30746, 30); player->AddItem(30136, 10); player->AddItem(14344, 20); //Pearls
 			}
 
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -387,7 +387,7 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 			if ((player->GetLevel() < 11 || _qRank > 1) && newQuest->RewItemId[i] == 0)
 			{
 				// should pick up random rewards
-				newQuest->RewItemId[i] = 30523;
+				newQuest->RewItemId[i] = ZQ_ITEM_VOUCHER;
 				newQuest->RewItemCount[i] = _qRank > 1 ? _qRank - 1 : 1;
 				break;
 			}
@@ -606,7 +606,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			{
 				//One Life mode
 				player->AddItem(30106);
-				player->AddItem(30523, 600);
+				player->AddItem(ZQ_ITEM_VOUCHER, 600);
 				player->RemoveSpell(__MENU_MODE_SUB_1_SPELL, false, false);
 			}
 			/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
@@ -622,7 +622,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			{
 				//ZQ mode, 5 talents
 				player->LearnSpell(30851, false);
-				player->AddItem(30523, 300);
+				player->AddItem(ZQ_ITEM_VOUCHER, 300);
 				player->RemoveSpell(__MENU_MODE_SUB_2_SPELL, false, false);
 			}
 		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，小退生效，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
@@ -639,7 +639,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			{
 				//ZQ mode, 5 talents
 				player->LearnSpell(30853, false);
-				player->AddItem(30523, 300);
+				player->AddItem(ZQ_ITEM_VOUCHER, 300);
 				player->RemoveSpell(__MENU_MODE_SUB_3_SPELL, false, false);
 			}
 		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
@@ -656,7 +656,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			{
 				//ZQ mode, 5 talents
 				player->AddItem(30522, 10);
-				player->AddItem(30523, 300);
+				player->AddItem(ZQ_ITEM_VOUCHER, 300);
 				player->RemoveSpell(__MENU_MODE_SUB_4_SPELL, false, false);
 			}
 		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
@@ -672,7 +672,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			{
 				//Killer mode, free run slots
 				player->LearnSpell(30852, false);
-				player->AddItem(30523, 300);
+				player->AddItem(ZQ_ITEM_VOUCHER, 300);
 				player->RemoveSpell(__MENU_MODE_SUB_5_SPELL, false, false);
 			}
 			/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;

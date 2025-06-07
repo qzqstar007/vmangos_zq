@@ -23,6 +23,7 @@
 #include "QzqstarAchievements.h"
 #include "Qzqstar_db.h"
 #include "Chat.h"
+#include "qzqstar_id.h"
 
 #define	__STR(x)		((std::string)(x)).c_str()
 #define	__NSTR(x)		(std::to_string(x))
@@ -307,7 +308,7 @@ bool Task_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 actio
 			if ( ( player->GetLevel() < 11 || _qRank > 1) && newQuest->RewItemId[i] == 0)
 			{
 				// should pick up random rewards
-				newQuest->RewItemId[i] = 30523;
+				newQuest->RewItemId[i] = ZQ_ITEM_VOUCHER;
 				newQuest->RewItemCount[i] = _qRank > 1? _qRank-1 : 1;
 				break;
 			}
