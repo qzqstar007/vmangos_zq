@@ -26,8 +26,8 @@ void AddSC_zero_scripts()
 	AddSC_qzqstar_summon_boss();
 	AddSC_qzqstar_custom();
 
-	AddSC_qzqstar_cpp_kelala();
-	AddSC_qzqstar_cpp_teleport();
+	AddSC_qzqstar_kelala();
+	AddSC_qzqstar_teleport();
 	AddSC_qzqstar_spell_hs();
 }
 

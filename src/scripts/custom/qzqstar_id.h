@@ -28,9 +28,12 @@
  *  Item IDs, least first (30000).
  ********************************************************************/
 #define ZQ_ITEM_VOUCHER				30000	//Voucher, 点券
+#define ZQ_ITEM_BUFF           		30001	//Buff, 一键BUFF
+#define ZQ_ITEM_FRAGMENTS   		30002	//Fragments, 提升碎片
 
 //Functional Items
-#define ZQ_ITEM_PET_EGG				30010	//Pet Egg, 宠物蛋
+#define ZQ_ITEM_PET_EGG				30010	//Pet Egg, 宠物蛋，所有玩家出生时获得，跟炉石一样
+#define ZQ_ITEM_PET_FOOD			30011	//Pet Food, 宠物食物
 
 //Faction upgrade items
 #define ZQ_ITEM_FACTION_UPGRADE		30020	//Faction Upgrade, 阵营升级
@@ -99,8 +102,8 @@
 /******************************************************************** 
  *  Quest IDs, least first (9701).
  ********************************************************************/
+#define ZQ_QUEST_LOGON_IND	        (9700)	//Logon Points Complete Indicator, 登录积分完成指示
 #define ZQ_QUEST_SOCIAL_IND	        (9701+3)	//9701-9703Social Points Complete Indicator, 社交积分完成指示
-
 
 #endif	//_QZQSTAR_CPP_IDS_H
 

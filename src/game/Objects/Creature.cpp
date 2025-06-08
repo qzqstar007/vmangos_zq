@@ -1608,12 +1608,28 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
 	auto __goldMux = 0;
 	if ( (!loot.items.empty()) && (__mapid > 1) && (looter) )
 	{
+         /*
 		auto _ac_mapid = QZQSTAR_GET_AC_MAPID(__mapid);
-		uint32 _dg_info = sQZAchievements.GetDungeonsInfo(looter, _ac_mapid) & 0x03;
+       
+        Achievement_t _mapType = ACHIEVEMENTS_DUNGEONS;
+        if (GetMap()->IsRaid())
+            _mapType = ACHIEVEMENTS_RAIDS;
+		uint32 _dg_info = sQZAchievements.GetDungeonsInfo(_mapType, looter, _ac_mapid) & 0x03;
+        */
+        uint32 _dg_info = 0;
+        InstanceData* const pInstanceData = GetMap()->GetInstanceData();
+        if(pInstanceData)
+        {
+            //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Init Creatures for CustomDifficulty = %u!", pInstanceData->CustomDifficulty);
+            if(pInstanceData->CustomDifficulty > 0 && pInstanceData->CustomDifficulty < 4)
+            {
+                _dg_info = pInstanceData->CustomDifficulty;
+            }
+        }
 
 		__goldMux = _dg_info == 1 ? 2
-			: _dg_info == 2 ? 5
-			: _dg_info == 3 ? 10
+			: _dg_info == 2 ? 3
+			: _dg_info == 3 ? 5
 			: 0;
 
         //iterate the loot.items

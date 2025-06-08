@@ -1500,7 +1500,7 @@ bool Kelala_Menus(Player *player, Creature *_cr, uint32 sender, uint32 action)
 
 
 
-void AddSC_qzqstar_cpp_kelala()
+void AddSC_qzqstar_kelala()
 {
 	Script* newscript;
 

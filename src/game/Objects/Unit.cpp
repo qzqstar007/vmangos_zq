@@ -1343,11 +1343,15 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
 						{
 							_insData->CustomDifficultyMask &= 0xFFFE;
 
+							Achievement_t _mapType = ACHIEVEMENTS_DUNGEONS;
+							if (GetMap()->IsRaid())
+								_mapType = ACHIEVEMENTS_RAIDS;
+
 							//check the player's info
-							uint32 _dungeonInfo = sQZAchievements.GetDungeonsInfo(playerKiller, QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId()));
+							uint32 _dungeonInfo = sQZAchievements.GetDungeonsInfo(_mapType, playerKiller, QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId()));
                             if( ((_dungeonInfo >> 2) <= (_dungeonInfo&3) ) && ( (_dungeonInfo>>2) < 3))
                             {
-                                sQZAchievements.SetDungeonsInfo(playerKiller, QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId()), ((_dungeonInfo>>2) + 1) << 2 | (_dungeonInfo&3) );
+                                sQZAchievements.SetDungeonsInfo(_mapType, playerKiller, QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId()), ((_dungeonInfo>>2) + 1) << 2 | (_dungeonInfo&3) );
                                 sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, from %u to %u.", playerKiller->GetName(), TP_Dungeons[QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId())].name, _dungeonInfo>>2, (_dungeonInfo>>2) +1);
                                 //First break through
                             }

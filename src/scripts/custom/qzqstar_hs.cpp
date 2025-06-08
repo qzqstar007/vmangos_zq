@@ -937,46 +937,92 @@ struct CustomHSSpell : SpellScript
 
 		else if(action >= __MENU_FRAG_MAIN && action <= __MENU_FRAG_MAIN + __MENU_SIZE)
 		{
+/*
+#define ZQ_SPELL_PROMOTION_STAT     32800	//Promotion Stat, 晋升 
+#define ZQ_SPELL_PROMOTION_DAMAGE   32805	//Promotion Skill, 晋升 
+#define ZQ_SPELL_PROMOTION_CRITDM   32810	//Promotion Critial Damage, 晋升 
+#define ZQ_SPELL_PROMOTION_VOIDAM   32815	//Promotion Haste, 晋升 
+#define ZQ_SPELL_PROMOTION_HASTE    32820	//Promotion Haste, 晋升 
+ */
+			std::string text = "";
+			int val_stat = 0;
+			int val_dmg = 0;
+			int val_critdmg = 0;
+			int val_defend = 0;
+			int val_haste = 0;
 
+#define _PEAK_MAX_RANK 5
+
+			//step 1, get all of the spells of player
+			//1.1 find the haste spells, support max 5 spells (_PEAK_MAX_RANK)
+			for (size_t i = 0; i < _PEAK_MAX_RANK; i++)
+			{
+				if (pPlayer->HasSpell(ZQ_SPELL_PROMOTION_STAT 	+ i))	val_stat++;
+				if (pPlayer->HasSpell(ZQ_SPELL_PROMOTION_DAMAGE 	+ i))	val_dmg++;
+				if (pPlayer->HasSpell(ZQ_SPELL_PROMOTION_CRITDM 	+ i))	val_critdmg++;
+				if (pPlayer->HasSpell(ZQ_SPELL_PROMOTION_VOIDAM 	+ i))	val_defend++;
+				if (pPlayer->HasSpell(ZQ_SPELL_PROMOTION_HASTE 	+ i))	val_haste++;
+			}
+
+			sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "PLAYER:[%u][%s] === Stat: %d, dmg %d, crigdmg %d, defend %d, haste:%d.",
+				pPlayer->GetGUID(), pPlayer->GetName(),
+				val_stat, val_dmg, val_critdmg, val_defend, val_haste);
+				
 
 			if(action == __MENU_FRAG_MAIN)
 			{
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝　能力提升系统　＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
 
 				std::string text = __STR("|cff002fa7【属性】最高１０％，当前：");
-				text.append(__STR("" + __NSTR(2 * 2) + "% |r"));
+				text.append(__STR("" + __NSTR(val_stat * 2) + "% |r"));
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 11);
 
-				text = __STR("|cff002fa7【伤害】最高１０％，当前：");				
+				text = __STR("|cff002fa7【伤害】最高１０％，当前：");	
+				text.append(__STR("" + __NSTR(val_dmg * 2) + "% |r"));			
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 12);
 
 				text = __STR("|cff002fa7【爆伤】最高２０％，当前：");
+				text.append(__STR("" + __NSTR(val_critdmg * 4) + "% |r"));
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 13);
 				
 				text = __STR("|cff002fa7【免伤】最高１０％，当前：");
+				text.append(__STR("" + __NSTR(val_defend * 2) + "% |r"));
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 14);
 				
 				text = __STR("|cff002fa7【急速】最高２０％，当前：");
+				text.append(__STR("" + __NSTR(val_haste * 4) + "% |r"));
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 15);
 
 				text = __STR("|cff002fa7【移速】最高５０％，当前：");
+				text.append(__STR("" + __NSTR(pPlayer->M_Speed * 10) + "% |r"));
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 16);
 
 				text = __STR("|cff002fa7【天赋】最高５点，当前： ");
+				text.append(__STR("" + __NSTR(pPlayer->M_TalentPoints) + " 点 |r"));
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 17);
 
 				text = __STR("|cff002fa7【物理吸血】最高１０％，当前： ");
+				text.append(__STR("" + __NSTR(pPlayer->M_Leech_Phy * 2) + "% |r"));
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 18);
 
 				text = __STR("|cff002fa7【法术吸血】最高１０％，当前： ");
+				text.append(__STR("" + __NSTR(pPlayer->M_Leech_Spell * 2) + "% |r"));
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 19);
 
 				text = __STR("|cff002fa7【武器技能】最高１０点，当前： ");
+				text.append(__STR("" + __NSTR(pPlayer->M_WeaponSkill) + " 点 |r"));
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN + 20);
 
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
-			}	
+			}
+
+			//upgrade the ability using fragments
+			else if (action >= __MENU_FRAG_MAIN + 11 && action <= __MENU_FRAG_MAIN + 20)
+			{
+				//check if player has enough fragments
+				if(!pPlayer->HasItemCount(ZQ_ITEM_FRAGMENTS, 10))	
+			}
 		}
 
 	}

@@ -788,17 +788,20 @@ void QzqstarAchievements::UpdatePetPoints(Player *player)
 /* ================================================================================================================== */
 /* ========================= Dungeons system  ======================================================================= */
 /* ================================================================================================================== */
-uint32 QzqstarAchievements::GetDungeonsInfo(Player *player, uint32 ac_mapId /* should be mapped to 0-15 */)
+uint32 QzqstarAchievements::GetDungeonsInfo(Achievement_t _mapType, Player *player, uint32 ac_mapId /* should be mapped to 0-15 */)
 {
 	//check _player if none
 	if (!player || ac_mapId > 19)
+		return 0;
+
+	if(_mapType !=ACHIEVEMENTS_DUNGEONS && _mapType!=ACHIEVEMENTS_RAIDS)
 		return 0;
 
 	//iterate the _playerAchievements vector map of this player to find the pet information
 	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
 	{
 		AchievementsEntry& e = *it;
-		if (e.type == ACHIEVEMENTS_DUNGEONS)
+		if (e.type == _mapType)
 		{
 			//if found, return the miscValue data
 			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Loaded Dungeons: %u", player->GetName(), e.subType);
@@ -834,7 +837,7 @@ uint32 QzqstarAchievements::GetDungeonsInfo(Player *player, uint32 ac_mapId /* s
 	//if not found, create one and return it
 	AchievementsEntry e;
 	e.guid = player->GetGUID();
-	e.type = ACHIEVEMENTS_DUNGEONS;
+	e.type = _mapType;
 	e.subType = 0;
 	e.data1 = 0;
 	e.data2 = 0;
@@ -853,16 +856,18 @@ uint32 QzqstarAchievements::GetDungeonsInfo(Player *player, uint32 ac_mapId /* s
 	return 0;
 }
 
-void QzqstarAchievements::SetDungeonsInfo(Player *player, uint32 ac_mapId /* should be mapped to 0-19 */, uint32 value)
+void QzqstarAchievements::SetDungeonsInfo(Achievement_t _mapType, Player *player, uint32 ac_mapId /* should be mapped to 0-19 */, uint32 value)
 {
 	//check _player if none
 	if (!player || value>15 || ac_mapId > 19) return;
+
+	if(_mapType!=ACHIEVEMENTS_DUNGEONS && _mapType!=ACHIEVEMENTS_RAIDS) return;
 
 	//iterate the _playerAchievements vector map of this player to find the pet information
 	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
 	{
 		AchievementsEntry& e = *it;
-		if (e.type == ACHIEVEMENTS_DUNGEONS)
+		if (e.type == _mapType)
 		{
 			//if found, set the miscValue data
 			switch(ac_mapId)

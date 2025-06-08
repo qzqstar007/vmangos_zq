@@ -31,6 +31,7 @@ enum Achievement_t
 	ACHIEVEMENT_SOCIAL_POINTS 	= 	200,
 	ACHIEVEMENT_PETS 			= 	300,
 	ACHIEVEMENTS_DUNGEONS 		= 	400,
+	ACHIEVEMENTS_RAIDS 			= 	401,
 	ACHIEVEMENTS_ZITIAO 		= 	500,
 	ACHIEVEMENT_COUNTERS		=	1000,	//For combine and refreshing...
 };
@@ -199,12 +200,10 @@ public:
 	// bit1:0, used as dungeons current difficulty;
 
 	//get the player's dungeons information, return a byte
-	uint32 GetDungeonsInfo(Player *player, uint32 ac_mapId /* should be mapped to 0-15 */);
+	uint32 GetDungeonsInfo(Achievement_t _mapType, Player *player, uint32 ac_mapId /* should be mapped to 0-15 */);
 
 	//save the player's dungeons information, add the dungeons to the player's achievements vector
-	void SetDungeonsInfo(Player *player, uint32 ac_mapId /* should be mapped to 0-15 */, uint32 value);
-
-
+	void SetDungeonsInfo(Achievement_t _mapType, Player *player, uint32 ac_mapId /* should be mapped to 0-15 */, uint32 value);
 
 	/*****************************************************
 	 *
