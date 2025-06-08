@@ -205,5 +205,18 @@ const VIP_Teleport_Menu_t _TELEPORT_Locs[] = 	//All Map id and pos
 };
 
 
+//create struct to store the fragment upgrade info.
+#define _PEAK_MAX_RANK 5
+#define _ABILITIES_NUM 10
+typedef struct _Fragment_Upgrade_t
+{
+	int				_id;
+	int             multi;
+	std::string		desc;
+	std::string     unit;
+}FragUpgrade_t;
+
+
+
 #endif	//_QZQSTAR_VIP_STR_H
 

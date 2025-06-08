@@ -1602,6 +1602,12 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
         }
     }
 
+    //qzqstar, 250515, generate some special loot by creature difficulty level
+    if (GetMapId() > 1)
+    {
+        	
+    }
+
 
 	//qzqstar, 250515, generate money according to diffculty level
 	auto __mapid = GetMapId();
