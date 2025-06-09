@@ -212,6 +212,7 @@ typedef struct _Fragment_Upgrade_t
 {
 	int				_id;
 	int             multi;
+	uint32			spellId;
 	std::string		desc;
 	std::string     unit;
 }FragUpgrade_t;

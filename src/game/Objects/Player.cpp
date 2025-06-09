@@ -15571,7 +15571,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     M_Speed = (_Promotions / 1000)%10;
     M_WeaponSkill = (_Promotions / 10000)%10;
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= 0x%X, Promotions=%d", GetName(), M_Challenge_Mode, _Promotions);
-
+    
+    UpdateFreeTalentPoints(false);
 	//if (HasSpell(__MODE_KILLER))     __xpRate = 2.0f;
 	//if (HasSpell(__MODE_MANUFACT))   __xpRate = 1.0f;
 	//if (HasSpell(__MODE_ONE_LIFE))   __xpRate = 1.0f;
@@ -21297,16 +21298,12 @@ uint32 Player::CalculateTalentsPoints() const
 
 	//qzqstar, 241201, add extra talents for spell
 	talentPointsForLevel = uint32(talentPointsForLevel * sWorld.getConfig(CONFIG_FLOAT_RATE_TALENT));
-#define __SPELL_TALENT  (31285) 
-	for (int i = 0; i<5; i++)
-	{
-		if (HasSpell(__SPELL_TALENT + i)) talentPointsForLevel++;
-	}
 
+    talentPointsForLevel += M_TalentPoints;
 	//#define  __SPELL_VIP        (32858)
 	//if (HasSpell(__SPELL_VIP))   talentPointsForLevel += 5;
-	if (HasSpell(30010))         talentPointsForLevel += 5; //shanshan special
-    if (HasSpell(30851))         talentPointsForLevel += 5; //collect bonus
+	//if (HasSpell(30010))         talentPointsForLevel += 5; //shanshan special
+    //if (HasSpell(30851))         talentPointsForLevel += 5; //collect bonus
 	return talentPointsForLevel;
 }
 

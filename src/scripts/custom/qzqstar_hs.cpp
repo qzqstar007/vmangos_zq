@@ -354,16 +354,16 @@ bool Menus_Rune_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 #pragma region MENU FRAGMENTS
 const FragUpgrade_t _Ability_Menu[_ABILITIES_NUM]=
 {
-	{0, 2,  __STR("|cff002fa7【属性】最高１０％　|r"), __STR("％　")},
-	{1, 2, __STR("|cff002fa7【伤害】最高１０％　|r"), __STR("％　")},
-	{2, 4, __STR("|cff002fa7【暴伤】最高２０％　|r"), __STR("％　")},
-	{3, 2, __STR("|cff002fa7【免伤】最高１０％　|r"), __STR("％　")},
-	{4, 4, __STR("|cff002fa7【急速】最高２０％　|r"), __STR("％　")},
-	{5, 10, __STR("|cff002fa7【移速】最高５０％　|r"), __STR("％　")},
-	{6, 1, __STR("|cff002fa7【天赋】最高５点　|r"), __STR("点　")},
-	{7, 2, __STR("|cff002fa7【物理吸血】最高１０％　|r"), __STR("％　")},
-	{8, 2, __STR("|cff002fa7【法术吸血】最高１０％　|r"), __STR("％　")},
-	{9, 2, __STR("|cff002fa7【武器技能】最高１０点　|r"), __STR("点　")}
+	{0, 2, ZQ_SPELL_PROMOTION_STAT,   __STR("|cff002fa7【属性】最高１０％　|r"), __STR("％　")},
+	{1, 2, ZQ_SPELL_PROMOTION_DAMAGE, __STR("|cff002fa7【伤害】最高１０％　|r"), __STR("％　")},
+	{2, 4, ZQ_SPELL_PROMOTION_CRITDM, __STR("|cff002fa7【暴伤】最高２０％　|r"), __STR("％　")},
+	{3, 2, ZQ_SPELL_PROMOTION_VOIDAM,  __STR("|cff002fa7【免伤】最高１０％　|r"), __STR("％　")},
+	{4, 4, ZQ_SPELL_PROMOTION_HASTE,  __STR("|cff002fa7【急速】最高２０％　|r"), __STR("％　")},
+	{5, 10, 0, __STR("|cff002fa7【移速】最高５０％　|r"), __STR("％　")},
+	{6, 1, 0, __STR("|cff002fa7【天赋】最高５点　|r"), __STR("点　")},
+	{7, 2, 0, __STR("|cff002fa7【物理吸血】最高１０％　|r"), __STR("％　")},
+	{8, 2, 0, __STR("|cff002fa7【法术吸血】最高１０％　|r"), __STR("％　")},
+	{9, 2, 0, __STR("|cff002fa7【武器技能】最高１０点　|r"), __STR("点　")}
 };
 const int __PLAYER_NUM[5] = {1, 15, 25, 45, 60};
 
@@ -407,7 +407,7 @@ void Menus_Frag_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 	_ability_values[9] = pPlayer->M_WeaponSkill;
 
 
-	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "PLAYER:[%u][%s] === Stat: %d, dmg %d, crigdmg %d, defend %d, haste:%d. talent: %d, leechphysical: %d, leechspell: %d, weaponskill: %d",
+	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "PLAYER:[%u][%s] === Stat: %d, dmg %d, crigdmg %d, defend %d, haste:%d. speed:%d, talent: %d, leechphysical: %d, leechspell: %d, weaponskill: %d",
 		pPlayer->GetGUID(), pPlayer->GetName(),
 		_ability_values[0], _ability_values[1], _ability_values[2], _ability_values[3], _ability_values[4],
 		_ability_values[5], _ability_values[6], _ability_values[7], _ability_values[8], _ability_values[9]);
@@ -465,7 +465,7 @@ void Menus_Frag_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 
 			text = "";
 			text.append(__STR("|cff002fa7升级后：　"));
-			text.append(__NSTR(_Ability_Menu[_realAction].multi));
+			text.append(__NSTR((_ability_values[_realAction] + 1) * _Ability_Menu[_realAction].multi));
 			text.append(__STR(_Ability_Menu[_realAction].unit));
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);	
 			
@@ -478,24 +478,57 @@ void Menus_Frag_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			
 			//check if has enough fragments
-			if (pPlayer->HasItemCount(ZQ_ITEM_FRAGMENTS, _frag_num))
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__BLUE("＝＝＝＝确定升级＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			if(_frag_num <= 0)
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__RED("＝＝该字条已经阶段满级＝＝　")), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN);
+			else if (pPlayer->HasItemCount(ZQ_ITEM_FRAGMENTS, _frag_num))
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__BLUE("＝＝＝＝确定升级＝＝＝＝　")), GOSSIP_SENDER_MAIN, action + 100);
 			else
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG,  __STR(__RED("＝＝＝＝碎片不足＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG,  __STR(__RED("＝＝＝＝碎片不足＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN);
 
 			pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
 		}
 
 		else if(action < __MENU_FRAG_MAIN + 300)
 		{
+			if(_frag_num <= 0)
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__RED("＝＝该字条已经阶段满级＝＝　")), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN);
 			//upgrade the ability
-			if (pPlayer->HasItemCount(ZQ_ITEM_FRAGMENTS, _frag_num))
+			else if (pPlayer->HasItemCount(ZQ_ITEM_FRAGMENTS, _frag_num))
 			{
 				//delete the item count
 				pPlayer->DestroyItemCount(ZQ_ITEM_FRAGMENTS, _frag_num, true);
 
 				//upgrade the ability
-				_ability_values[_realAction] += 1;	
+				if(_realAction < 5)
+				{
+					pPlayer->LearnSpell(_Ability_Menu[_realAction].spellId + _ability_values[_realAction], false);
+				}
+				else 
+				{
+					/*    	uint32 _Promotions = sQZAchievements.GetPromotions(this);
+							M_Leech_Phy = _Promotions % 10;           		//7, 1
+							M_Leech_Spell = (_Promotions / 10)%10;			//8, 10
+							M_TalentPoints = (_Promotions / 100)%10;		//6, 100
+							M_Speed = (_Promotions / 1000)%10;				//5, 1000
+							M_WeaponSkill = (_Promotions / 10000)%10;		//9, 10000
+					*/
+					uint32 _Promotions = sQZAchievements.GetPromotions(pPlayer);
+					if(_realAction == 5) 		{ pPlayer->M_Speed ++;  _Promotions = _Promotions + 1000;}
+					else if(_realAction == 6) 	{ pPlayer->M_TalentPoints ++;  _Promotions = _Promotions + 100;}
+					else if(_realAction == 7) 	{ pPlayer->M_Leech_Phy ++;  _Promotions = _Promotions + 1;}
+					else if(_realAction == 8) 	{ pPlayer->M_Leech_Spell ++;  _Promotions = _Promotions + 10;}
+					else if(_realAction == 9) 	{ pPlayer->M_WeaponSkill ++; _Promotions = _Promotions + 10000;}
+
+					sQZAchievements.SetPromotions(pPlayer, _Promotions);
+				}
+
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__GREEN("＝＝升级成功，小退生效，返回＝＝　")), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN);
+
+			}
+
+			else
+			{
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__RED("＝＝＝碎片不足，返回＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_FRAG_MAIN);
 			}
 
 

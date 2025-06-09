@@ -512,7 +512,7 @@ Map* MapManager::CreateInstance(uint32 id, Player* player)
     //qzqstar, 250513, get the ac mapid
     uint32 ac_mapid = QZQSTAR_GET_AC_MAPID(id);
     Achievement_t _mapType = ACHIEVEMENTS_DUNGEONS;
-    if (map->IsRaid())
+    if (entry && entry->IsRaid()) //Attention Null ptr!
         _mapType = ACHIEVEMENTS_RAIDS;
     uint32 _map_difficulty = sQZAchievements.GetDungeonsInfo(_mapType, player, ac_mapid) & 0x03;
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MapManager::CreateInstance: Player:%s, mapid %d, ac_mapid %d, difficulty %d", player->GetName(), id, ac_mapid, _map_difficulty);
