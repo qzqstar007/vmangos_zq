@@ -428,8 +428,8 @@ bool Task_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 actio
 #define	__MENU_PET_ACT_CHANGE			(300)
 #define	__MENU_PET_ACT_BUY  			(400)
 
-#define __PET_UPGRADE_ITEM				(30746)
-#define	__GOSSIP_PET_ID					(16510)
+#define __PET_UPGRADE_ITEM				(ZQ_ITEM_PET_FOOD)
+#define	__GOSSIP_PET_ID					(DEFAULT_GOSSIP_MESSAGE)
 /**** Pet Development System 
  *
  * Pet using the table sAchievements to store information.
@@ -635,7 +635,7 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 
 			//show need shard numbers
 			text = "";
-			text.append(__STR("　　需要碎片：|cffbb1122　"));
+			text.append(__STR("　　需要宠物饲料：|cffbb1122　"));
 			text.append(__NSTR(_needShardNumber));
 			text.append(__STR("个　|r"));
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
@@ -644,7 +644,7 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 			if ((player->HasItemCount(__PET_UPGRADE_ITEM, _needShardNumber)))
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＝＝【确定升级】＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN + __MENU_PET_ACT_UPGRADE + 1);
 			else
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("＝＝＝＝【碎片不足，返回】＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("＝＝＝＝【饲料不足，返回】＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_PET_MAIN);
 		}
 		else
 		{
