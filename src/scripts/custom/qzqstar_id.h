@@ -30,6 +30,8 @@
 #define ZQ_ITEM_VOUCHER				30000	//Voucher, 点券
 #define ZQ_ITEM_BUFF           		30001	//Buff, 一键BUFF
 #define ZQ_ITEM_FRAGMENTS   		30002	//Fragments, 提升碎片
+#define ZQ_ITEM_FOOD  			    30003	//Food, 食物蜜汁肉松
+#define ZQ_ITEM_NEWBAG			    30004	//New Bag, 新背包
 
 //Functional Items
 #define ZQ_ITEM_PET_EGG				30010	//Pet Egg, 宠物蛋，所有玩家出生时获得，跟炉石一样
@@ -38,10 +40,26 @@
 //Faction upgrade items
 #define ZQ_ITEM_FACTION_UPGRADE		30020	//Faction Upgrade, 阵营升级
 
+//Newbie Boxes
+#define ZQ_ITEM_NEWBIE_INTRO        30030	//Newbie Intro, 新手介绍
+#define ZQ_ITEM_NEWBIE_BOX			30031	//Newbie Box, 新手宝箱 ~ 30036
+
+//Newbie Items
+#define ZQ_ITEM_NEWBIE_ITEM			30041	//Newbie Item, 新手物品 ~ 30046
+
+//VIP Items
+#define ZQ_ITEM_VIP_UPGRADE_ITEM	30051	//VIP Item, 会员物品 ~ 30056
+
+//Mounts Items
+#define ZQ_ITEM_MOUNTS_ITEM			30061	//Mounts Item, 坐骑物品 ~ 30066
+
 /******************************************************************** 
  *  Spell IDs, largest first (33386).
  ********************************************************************/
 #define ZQ_SPELL_HEARTSTONE			33386	//Heart Stone, 炉石修改（Item ID：6948）
+#define ZQ_SPELL_DUNGEON_FLY		33385	//Dungeon Fly, 副本飞行
+#define ZQ_SPELL_AUTOPICK   		33384	//Auto Pick, 自动拾取
+#define ZQ_SPELL_BONDING   		    33383	//Bonding, 羁绊系统
 
 //summon creature spells, such as critter, pet, mount, etc.
 #define ZQ_SPELL_SUMMON_PET			33370	//Summon Pet, 召唤宠物
@@ -63,18 +81,52 @@
 #define ZQ_SPELL_BUFF_ZANDALA       33358   //Call of ZANDALA
 
 
-//Group spells lower id
+
+
+#define ZQ_SPELL_PET_AURA           33311   //Pet Aura, 宠物光环 33311-33317
+#define ZQ_SPELL_PET_TRIGGERED      33321   //Pet Triggered Spell, 宠物触发技能 33321-33327, never forget the spell_Proc
+
+
+#define ZQ_SPELL_MOUNTS_REINDEER            32980   //Mounts, 麋鹿新手坐骑
+#define ZQ_SPELL_MOUNTS_REINDEER_LEARN      32981   //Mounts, 麋鹿新手坐骑
+#define ZQ_SPELL_MOUNTS_LAND                32982   //Mounts, 坐骑100%
+#define ZQ_SPELL_MOUNTS_LAND_LEARN          32983   //Mounts, 坐骑100%
+#define ZQ_SPELL_MOUNTS_FLY                 32984   //Mounts, 飞行坐骑
+#define ZQ_SPELL_MOUNTS_FLY_LEARN           32985   //Mounts, 飞行坐骑
+#define ZQ_SPELL_MOUNTS_TIGER               32986   //Mounts, 幽灵虎
+#define ZQ_SPELL_MOUNTS_TIGER_LEARN         32987   //Mounts, 幽灵虎
+#define ZQ_SPELL_MOUNTS_GRIYP               32988   //Mounts, 幽灵狮鹫
+#define ZQ_SPELL_MOUNTS_GRIYP_LEARN         32989   //Mounts, 幽灵狮鹫
+#define ZQ_SPELL_MOUNTS_TURTLE              32990   //Mounts, 海龟
+#define ZQ_SPELL_MOUNTS_TURTLE_LEARN        32991   //Mounts, 海龟
+
+
+#define ZQ_SPELL_BONUS_APSP         32830   //Bonus, 奖励，例如坐骑之类，被动奖励 50攻强，20法伤
+
+//Promotion Group spells lower id
 #define ZQ_SPELL_PROMOTION_STAT     32800	//Promotion Stat, 晋升 
 #define ZQ_SPELL_PROMOTION_DAMAGE   32805	//Promotion Skill, 晋升 
 #define ZQ_SPELL_PROMOTION_CRITDM   32810	//Promotion Critial Damage, 晋升 
 #define ZQ_SPELL_PROMOTION_VOIDAM   32815	//Promotion Haste, 晋升 
 #define ZQ_SPELL_PROMOTION_HASTE    32820	//Promotion Haste, 晋升 
 //Other Promitions from Achievements database
-//9876543210
-//Digit 0 -> Leech Physical
-//Digit 1 -> Leech Spell
-//Digit 2 -> Talents
-//Digit 3 -> Speed
+
+#define ZQ_SPELL_RAND_ENCHANT_END	    32733//随机附魔
+#define ZQ_SPELL_RAND_ENCHANT_START	    32690//随机附魔
+
+#define ZQ_SPELL_SLOTS_END              32684	//Slots, 技能栏 - end
+#define ZQ_SPELL_SLOTS_START            32531	//Slots 1, 技能栏1 - Start
+
+
+
+
+
+#define ZQ_SPELL_RUNE_TRIG              31246   //Rune Trigger, 符文触发
+#define ZQ_SPELL_RUNE_TRIGGED           31245   //Rune Trigger, 符文触发
+#define ZQ_SPELL_JIBAN                  31244   //羁绊系统
+
+#define ZQ_SPELL_RUNE_END               31192	//Rune, 符文 - End
+#define ZQ_SPELL_RUNE_START             31021	//Rune, 符文 - Start
 
 /******************************************************************** 
  *  Creature IDs, least first (33386).
@@ -98,12 +150,26 @@
 #define ZQ_NPC_PET_HOLY				30036	//Divine Pet, 神圣宠
 #define ZQ_NPC_PET_PHY				30037	//Physical Pet, 物理宠
 
+//Dummy training from 30040 to 30049
+#define ZQ_NPC_DUMMY_TRAINING		30041	//Dummy Training, 训练假人
+
+//Player summonned creature from 30050 to 30059
+#define ZQ_NPC_SPEC_TIGER			30050   //Mounts, 幽灵虎
+
 
 /******************************************************************** 
  *  Quest IDs, least first (9701).
  ********************************************************************/
+#define ZQ_QUEST_NEWBIE				(9699)	//Newbie, 新手
 #define ZQ_QUEST_LOGON_IND	        (9700)	//Logon Points Complete Indicator, 登录积分完成指示
 #define ZQ_QUEST_SOCIAL_IND	        (9701+3)	//9701-9703Social Points Complete Indicator, 社交积分完成指示
+
+
+/******************************************************************** 
+ *  Gossip IDs, least first (15001).
+ ********************************************************************/
+#define ZQ_GOSSIP_VIP_UPGRADE			15001	//VIP Upgrade, 会员升级
+
 
 #endif	//_QZQSTAR_CPP_IDS_H
 
@@ -122,6 +188,11 @@ delete from creature_movement where id in (23575,23594, 23574, 23586, 23570);
 //desks and moonwells 500001-510000
 //Black Forge, sieze is 0.3, GO_ID 174045
 //Black Anvil, Siege is 0.3, GO_ID 172911
+
+//Position
+Start points: every player is in Gazadgan;
+1, -7137    -3821   8.5 2.84
+
 
 */
 

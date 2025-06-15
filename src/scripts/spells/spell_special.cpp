@@ -111,15 +111,15 @@ struct PetTrigSpellScript : public SpellScript
                     int _petHappiness = (petValues % 10000) / 100; // --CD--
                     int _petRelationship = (petValues % 100); // ----EF
 
-                    if(spell->m_spellInfo->Id == 31717) // Weapon Damage
+                    if(spell->m_spellInfo->Id == 33327) // Weapon Damage
                     {
 						//weapon damage
-                        _multiple = (_petLevel / 4.0f) * ( 1.0f + _petHappiness/200.0f) ; // 10% of the pet level
+                        _multiple = (1.0f + _petLevel / 5.0f) * ( 1.0f + _petHappiness/200.0f + _petRelationship/100.0f) ; // 10% of the pet level
 						spell->m_currentBasePoints[0] = spell->m_currentBasePoints[0] * _multiple * frand(0.9, 1.15);
                     }
                     else {
                         //magic damage
-                        _multiple = _petLevel * 7 * ( 1.0f + _petHappiness/100.0f) + _petLevel * _petLevel ; // 10% of the pet level
+                        _multiple = _petLevel * 2 * ( 1.0f + _petHappiness/100.0f + _petRelationship/100.0f) + _petLevel * _petLevel / 2.0f ; // 10% of the pet level
 						spell->damage = basePoints0 * _multiple * frand(0.9, 1.15);
                     }
                }
@@ -147,7 +147,7 @@ struct PetAuraScript : public AuraScript
 
         if (apply && aura->GetEffIndex() == EFFECT_INDEX_1)
         {
-			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Apply Aura1111: %u", aura->GetSpellProto()->Id);
+			//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Apply Aura1111: %u", aura->GetSpellProto()->Id);
             if (Player* player = aura->GetTarget()->ToPlayer())
             {
                //get the player's pet information from sQZAchievementMgr
@@ -226,6 +226,36 @@ SpellScript* GetScript_Mode_Spell(SpellEntry const*)
     return new ModeSpellScript();
 }
 
+
+//APSP Spell for users
+struct APSPSpellScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            if (Player* player = spell->GetCaster()->ToPlayer())
+            {
+                int32 basePoints0 = 0, basePoints1 = 0;
+
+                //update the AP and SP buff for the player
+                basePoints0 = 100;
+                basePoints1 = 100;
+
+                basePoints0 = basePoints0  + player->GetLevel() * 100;
+
+                ChatHandler(player).PSendSysMessage(((std::string)("你因为收集（如坐骑、专业、装备等）而获得了[%d]点攻强和 [%d]点法伤。  ")).c_str(), basePoints0, basePoints1);
+
+                spell->m_currentBasePoints[0] = basePoints0;
+                spell->m_currentBasePoints[1] = basePoints0;
+                spell->m_currentBasePoints[2] = basePoints1;
+            }	
+        }	
+
+        return true;
+    }		
+};
+
 void AddSC_special_spell_scripts()
 {
     Script* newscript;
@@ -261,5 +291,11 @@ void AddSC_special_spell_scripts()
     newscript = new Script;
     newscript->Name = "qzqstar_mode_spell";
     newscript->GetSpellScript = &GetScript_Mode_Spell;
+    newscript->RegisterSelf();
+
+    //add custom spell script for AP and SP buff
+    newscript = new Script;
+    newscript->Name = "qzqstar_apsp_buff";
+    newscript->GetSpellScript = [](SpellEntry const*) -> SpellScript* { return new APSPSpellScript(); };
     newscript->RegisterSelf();
 }

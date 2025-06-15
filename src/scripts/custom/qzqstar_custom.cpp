@@ -820,6 +820,7 @@ void AddSC_qzqstar_custom()
 	newscript->pGossipHello = [](Player *p, Creature *c) -> bool { return Pet_Menus(p, c, 0, __MENU_BG_MAIN); };
 	newscript->pGossipSelect = &Pet_Menus;
 	newscript->RegisterSelf(false);
+
 }
 
 

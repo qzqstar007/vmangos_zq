@@ -319,8 +319,8 @@ bool Spell::OneKeyPickall(Player* caster)
 	if (!caster)
 		return false;
 
-	if (caster->IsNonMeleeSpellCasted(false))
-		caster->InterruptNonMeleeSpells(false);
+	//if (caster->IsNonMeleeSpellCasted(false))
+	//	caster->InterruptNonMeleeSpells(false);
 
 	if (!caster->IsAlive())
 		return false;
@@ -963,7 +963,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					do {
 						// each class add 1% all stat to self.
 						// 1. first get the player class
-						auto _auraID = 31244;
+						auto _auraID = ZQ_SPELL_BONDING;
 						auto _checkClassMask = 0;
 						auto _apply = false;
 						auto _points1 = 0;
@@ -1030,11 +1030,11 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 						if (_mapid == 0 || _mapid == 1)
 						{
-							if (player->HasAura(32095) || player->HasAura(32084) || player->HasAura(32088) || player->HasAura(32080))
+							if (player->HasAura(ZQ_SPELL_MOUNTS_FLY) )//|| player->HasAura(ZQ_SPELL_MOUNTS_GRIYP) //|| player->HasAura(32088) || player->HasAura(32080))
 							{
 								player->SetCheatFly(true, true);
 							}
-							else if (player->HasAura(32053)) //32053, the ghost grython
+							else if (player->HasAura(ZQ_SPELL_MOUNTS_GRIYP)) //32053, the ghost grython
 							{
 								player->SetCheatFly(true, false);	//false means swift rider!
 							}
@@ -1138,7 +1138,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					return;
 				}
 
-				case 32999:
+				case ZQ_SPELL_AUTOPICK:
 				{
 					//qzqstar, 250202, avoid pickall in map 0 or 1
 					if (m_caster && m_caster->IsPlayer())

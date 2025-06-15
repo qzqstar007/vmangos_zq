@@ -27,6 +27,19 @@ typedef struct __rep_list {
 	uint32			rep_id;
 	std::string		rep_name;
 }Rep_List_t;
+extern const Rep_List_t _Rep_List[11];
+
+
+
+//itemset related structure, players can collect the itemsets
+//to upgrade
+typedef struct __item_set {
+	uint32 			item_set_id;
+	uint32 			item_id[10];
+}Item_set_t;
+
+
+
 
 typedef struct __rune_spell_menu {
 	uint32			flags;
@@ -34,9 +47,6 @@ typedef struct __rune_spell_menu {
 	std::string		text; 
 	std::string		desc;
 }Rune_Spell_Menu_t;
-
-extern const Rep_List_t _Rep_List[11];
-
 
 #define	RUNE_SPELLS_NUM				(9)
 extern const Rune_Spell_Menu_t _Spells_Menu_Warrior[RUNE_SPELLS_NUM];
@@ -57,7 +67,6 @@ typedef struct __spell_dbc_desc {
 	uint32			dbc_id;
 	std::string		text;
 }Spell_DBC_t;
-
 
 extern const Spell_DBC_t __Spells_DBC_Array[630];
 

@@ -637,7 +637,7 @@ int32 QzqstarAchievements::GetActivePetInfo(Player * _player)
 		if (e.type == ACHIEVEMENT_PETS)
 		{
 			//if found, return the miscValue data
-			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Loaded Pet: %u", _player->GetName(), e.subType);
+			//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Loaded Pet: %u", _player->GetName(), e.subType);
 
 			switch(e.subType)
 			{	
@@ -983,5 +983,87 @@ void QzqstarAchievements::SetZitiaosInfo(Player *player, AchievementsEntry entry
 	_playerAchievements[player->GetGUID()].push_back(e);
 	
 }
+
+
+
+/* ================================================================================================================== */
+/* ========================= Collect system  ============================\============================================= */
+/* ================================================================================================================== */
+uint32_t QzqstarAchievements::GetCollectAchiveInfo(Player *player, uint32_t itemSetType)
+{
+	//check _player if none
+	if (!player)
+		return 0;
+
+	//iterate the _playerAchievements vector map of this player to find the collect information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENTS_COLLECTIONS)
+		{
+			//if found, return the miscValue data
+			switch(itemSetType)
+			{
+				case COLLECTIONS_TYPE_ITEMSET_DUNGEONS: 	return (e.data1);
+				case COLLECTIONS_TYPE_ITEMSET_RAID_LOW: 	return (e.data2);
+				case COLLECTIONS_TYPE_ITEMSET_RAID_HIGH: 	return (e.data3);
+				case COLLECTIONS_TYPE_PROFESSIONS: 			return (e.data4);
+				case COLLECTIONS_TYPE_EQUIPMENTS_1: 		return (e.data5);
+				case COLLECTIONS_TYPE_EQUIPMENTS_2: 		return (e.data6);
+				case COLLECTIONS_TYPE_EQUIPMENTS_3: 		return (e.data7);
+				case COLLECTIONS_TYPE_EQUIPMENTS_4: 		return (e.data8);
+				default: return 0;
+			}	
+		}	
+	}
+
+	//if not found, create one and return it
+	AchievementsEntry e;
+	e.guid = player->GetGUID();
+	e.type = ACHIEVEMENTS_COLLECTIONS;
+	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
+	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
+	_playerAchievements[player->GetGUID()].push_back(e);
+
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Collections: %u", player->GetName(), e.subType);
+
+	return 0;
+}
+void QzqstarAchievements::SetCollectAchiveInfo(Player *player, uint32_t itemSetType, uint32_t value)
+{
+	//check _player if none
+	if (!player) return;
+
+	//iterate the _playerAchievements vector map of this player to find the collect information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENTS_COLLECTIONS)
+		{
+			//if found, set the miscValue data
+			switch(itemSetType)
+			{
+				case COLLECTIONS_TYPE_ITEMSET_DUNGEONS: 	e.data1 = value; break;
+				case COLLECTIONS_TYPE_ITEMSET_RAID_LOW: 	e.data2 = value; break;
+				case COLLECTIONS_TYPE_ITEMSET_RAID_HIGH: 	e.data3 = value; break;
+				case COLLECTIONS_TYPE_PROFESSIONS: 			e.data4 = value; break;
+				case COLLECTIONS_TYPE_EQUIPMENTS_1: 		e.data5 = value; break;
+				case COLLECTIONS_TYPE_EQUIPMENTS_2: 		e.data6 = value; break;
+				case COLLECTIONS_TYPE_EQUIPMENTS_3: 		e.data7 = value; break;
+				case COLLECTIONS_TYPE_EQUIPMENTS_4: 		e.data8 = value; break;
+				default: break;
+			}	
+		}	
+	}
+	//if not found, create one and return it
+	AchievementsEntry e;
+	e.guid = player->GetGUID();
+	e.type = ACHIEVEMENTS_COLLECTIONS;
+	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
+	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
+	_playerAchievements[player->GetGUID()].push_back(e);
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Collections: %u", player->GetName(), e.subType);
+}
+
 
 #pragma endregion

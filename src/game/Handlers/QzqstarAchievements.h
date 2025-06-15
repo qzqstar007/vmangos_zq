@@ -33,6 +33,7 @@ enum Achievement_t
 	ACHIEVEMENTS_DUNGEONS 		= 	400,
 	ACHIEVEMENTS_RAIDS 			= 	401,
 	ACHIEVEMENTS_ZITIAO 		= 	500,
+	ACHIEVEMENTS_COLLECTIONS 	= 	600,
 	ACHIEVEMENT_COUNTERS		=	1000,	//For combine and refreshing...
 };
 
@@ -55,6 +56,15 @@ enum Achievement_t
 #define CHALLENGING_MODE_KILLER_BEAST	(0x40)
 #define CHALLENGING_MODE_KILLER_UNDEAD	(0x80)
 
+//Itemset type(edada1.2.3) for achievements
+#define COLLECTIONS_TYPE_ITEMSET_DUNGEONS			(1)	
+#define COLLECTIONS_TYPE_ITEMSET_RAID_LOW			(2)
+#define COLLECTIONS_TYPE_ITEMSET_RAID_HIGH			(3)
+#define COLLECTIONS_TYPE_PROFESSIONS				(4)
+#define COLLECTIONS_TYPE_EQUIPMENTS_1				(5)
+#define COLLECTIONS_TYPE_EQUIPMENTS_2				(6)
+#define COLLECTIONS_TYPE_EQUIPMENTS_3				(7)
+#define COLLECTIONS_TYPE_EQUIPMENTS_4				(8)
 
 //ACHIEVEMENT_COUNTERS subtype
 #define	ACHIEVEMENT_COUNTERS_COMBINE	(10)
@@ -223,6 +233,20 @@ public:
 	void SetZitiaosInfo(Player *player, AchievementsEntry entry);
 
 
+	/*****************************************************
+	 *
+	 *		Collections Systems Functions
+	 *
+	 *****************************************************/
+	// note on data arrays, each data can hold about 24 bits, 1 bit for each itemset id
+	// dataX: used to store the itemset id player had achieved, 0 means not achieved, 1 means achieved
+	// data1: stores the lower dungeon item set
+	// data2: stores the lower raid item set, T0, ZUL and T0.5 and T2.5 etc
+	// data3: stores the T1-T3 Item set list
+	// data4: professional item set list
+	// data5-8: stores the equipments collections
+	uint32_t 	GetCollectAchiveInfo(Player *player, uint32_t itemSetType);
+	void 		SetCollectAchiveInfo(Player *player, uint32_t itemSetType, uint32_t value);
 
 protected:
 	std::vector<AchievementsEntry> entries;
