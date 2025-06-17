@@ -48,6 +48,14 @@ typedef struct _level_ItemEqID {
 }Level_ItemEqID_t;
 
 Level_ItemEqID_t DBHelper_GetItemEqByLevel(Player *, int32);
+Level_ItemEqID_t DBHelper_GetItemEqByCreatureLevel(Creature *, int32);
+
+typedef struct _level_enchantID {
+	int32 reqLevel;
+	int32 enchantID;
+}Level_EnchantID_t;
+
+Level_EnchantID_t DBHelper_GetRandEnchantIDByLevel(int32 itemLevel);
 
 
 

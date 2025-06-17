@@ -59,6 +59,7 @@
 
 #include "QzqstarAchievements.h"
 #include "custom\qzqstar_id.h"
+#include "custom\qzqstar_db.h"
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
@@ -1603,9 +1604,18 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
     }
 
     //qzqstar, 250515, generate some special loot by creature difficulty level
-    if (GetMapId() > 1)
+    if (roll_chance_i((100 - GetLevel())/5))
     {
-        	
+        uint32_t _chance = urand(1, 100);
+        auto item = DBHelper_GetItemEqByCreatureLevel(this, _chance < 80 ? 1 : _chance < 95? 2 : 3);
+        if (item.itemID)
+        {
+			if (loot.items.size() < MAX_NR_LOOT_ITEMS)             // Non-quest drop
+			{
+				LootItem _lootItem = LootItem(item.itemID, 1, Item::GenerateItemRandomPropertyId(item.itemID));
+				loot.items.emplace_back(_lootItem);
+			}
+        }
     }
 
 

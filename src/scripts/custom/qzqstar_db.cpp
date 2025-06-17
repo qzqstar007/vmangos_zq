@@ -8868,4 +8868,148 @@ Level_ItemEqID_t DBHelper_GetItemEqByLevel(Player *p, int32 rank)
 		, p->GetLevel() / 2 , p->GetLevel() + CURRENT_PHASE, [](const Level_ItemEqID_t& eq) { return eq; });
 };
 
+Level_ItemEqID_t DBHelper_GetItemEqByCreatureLevel(Creature *c, int32 rank)
+{
+	return DBHelperGetRandomElementInRangeOptimized<Level_ItemEqID_t>(
+		rank == 1 ? _Items_Eq_Rank1 :
+		rank == 2 ? _Items_Eq_Rank2 :
+		_Items_Eq_Rank3
+		, c->GetLevel() / 2 , c->GetLevel(), [](const Level_ItemEqID_t& eq) { return eq; });
+};
+
+
+
+
+const std::vector<Level_EnchantID_t> _Enchant_All =
+{
+	{ 1, 1548 },
+	{ 1, 28 },
+	{ 1, 6 },
+	{ 1, 14 },
+	{ 1, 19 },
+	{ 1, 26 },
+	{ 5, 1549 },
+	{ 5, 113 },
+	{ 5, 23 },
+	{ 5, 17 },
+	{ 5, 96 },
+	{ 5, 112 },
+	{ 9, 1550 },
+	{ 9, 153 },
+	{ 9, 24 },
+	{ 9, 18 },
+	{ 9, 135 },
+	{ 9, 152 },
+	{ 13, 1551 },
+	{ 13, 180 },
+	{ 13, 97 },
+	{ 13, 93 },
+	{ 13, 184 },
+	{ 13, 175 },
+	{ 17, 1552 },
+	{ 17, 182 },
+	{ 17, 115 },
+	{ 17, 111 },
+	{ 17, 186 },
+	{ 17, 177 },
+	{ 20, 108 },
+	{ 21, 1555 },
+	{ 21, 215 },
+	{ 21, 136 },
+	{ 21, 132 },
+	{ 21, 188 },
+	{ 21, 213 },
+	{ 25, 1556 },
+	{ 25, 409 },
+	{ 25, 155 },
+	{ 25, 151 },
+	{ 25, 218 },
+	{ 25, 383 },
+	{ 29, 1557 },
+	{ 29, 411 },
+	{ 29, 189 },
+	{ 29, 167 },
+	{ 29, 333 },
+	{ 29, 385 },
+	{ 30, 128 },
+	{ 33, 1558 },
+	{ 33, 413 },
+	{ 33, 190 },
+	{ 33, 168 },
+	{ 33, 335 },
+	{ 33, 387 },
+	{ 37, 1559 },
+	{ 37, 414 },
+	{ 37, 191 },
+	{ 37, 171 },
+	{ 37, 337 },
+	{ 37, 389 },
+	{ 40, 1608 },
+	{ 41, 1560 },
+	{ 41, 416 },
+	{ 41, 192 },
+	{ 41, 172 },
+	{ 41, 339 },
+	{ 41, 391 },
+	{ 45, 1561 },
+	{ 45, 418 },
+	{ 45, 193 },
+	{ 45, 173 },
+	{ 45, 341 },
+	{ 45, 393 },
+	{ 49, 1562 },
+	{ 49, 420 },
+	{ 49, 219 },
+	{ 49, 211 },
+	{ 49, 343 },
+	{ 49, 394 },
+	{ 50, 1609 },
+	{ 50, 1563 },
+	{ 50, 421 },
+	{ 50, 220 },
+	{ 50, 212 },
+	{ 50, 344 },
+	{ 50, 395 },
+	{ 53, 1564 },
+	{ 53, 422 },
+	{ 53, 307 },
+	{ 53, 267 },
+	{ 53, 345 },
+	{ 53, 396 },
+	{ 57, 1565 },
+	{ 57, 423 },
+	{ 57, 308 },
+	{ 57, 358 },
+	{ 57, 346 },
+	{ 57, 397 },
+	{ 60, 1612 },
+	{ 60, 1566 },
+	{ 60, 424 },
+	{ 60, 309 },
+	{ 60, 359 },
+	{ 60, 347 },
+	{ 60, 398 }	
+};
+
+
+Level_EnchantID_t DBHelper_GetRandEnchantIDByLevel(int32 itemLevel)
+{
+	int _minRange = 0;
+	int _maxRange = 0;
+
+	if(itemLevel <= 10) 
+	{
+		_minRange = 0;
+		_maxRange = 10;
+	}
+	else 
+	{
+		_minRange = itemLevel - 10;
+		_maxRange = itemLevel + 5;
+	}
+
+	return DBHelperGetRandomElementInRangeOptimized<Level_EnchantID_t>(
+		_Enchant_All, _minRange , _maxRange, [](const Level_EnchantID_t& en) { return en; });
+};
+
 #pragma endregion

@@ -442,7 +442,7 @@ bool Menus_teleport_Common(Player *player, Creature *_cr, uint32 sender, uint32 
 			//get the dungeon name from the array, if the name is empty, then skip it.
 			text.append(__STR(pPoints[i].name));
 
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_EASTKINGDOM + offset + i); 
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_EASTKINGDOM + offset + i); 
 		}
 
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _cr->GetGUID());
