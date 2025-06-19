@@ -256,6 +256,7 @@ public:
 	 *		Collection of Dungoens 1/2 Functions
 	 * 
 	 *****************************************************/
+	 AchievementsEntry GetCollectDungeonsInfo(Player *player, uint32_t DungeonsType);
 	 uint32    GetDungeonCollectInfo(Player *player, uint32_t ac_mapId);
 	 void      SetDungeonCollectInfo(Player *player, uint32_t ac_mapId, uint32_t value);
 

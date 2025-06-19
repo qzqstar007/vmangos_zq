@@ -341,7 +341,7 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 		_title.append(__STR("的专属任务　"));
 		//Rare quest if possible
 		newQuest->Title = _title;
-		newQuest->Objectives.append(__STR(" $B$B |cffff0000【注意】任务显示完成后直接回加基森交任务。|r "));
+		newQuest->Objectives.append(__STR(" $B$B |cffff0000【注意】任务显示完成后直接回加基森交任务。如果任务显示不对，需要清除WDB文件夹。|r "));
 
 		//check if any killed or creature needed
 		/**/
@@ -1427,7 +1427,7 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 	else if (action >= __MENU_KELALA_EQUIP_COLLECTS_DUNGEON && action < __MENU_KELALA_EQUIP_COLLECTS_RAID)
 	{
 
-		uint32_t _absAction = action - __MENU_KELALA_EQUIP_COLLECTS_WORLD;
+		uint32_t _absAction = action - __MENU_KELALA_EQUIP_COLLECTS_DUNGEON;
 		std::string text = "";
 
 		//get the player achievement info and check if the player has the achievement
@@ -1435,6 +1435,9 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 		//map id is multplied by 100, offset 1(which ragefire means 1)
 		//so, mapid should be 1 to 18, and action is 100 to 1800
 		//WE Reuse the TP_Dungeons for dislay info
+		AchievementsEntry ACHIVE_Entries[2]; 
+		ACHIVE_Entries[0] = sQZAchievements.GetCollectDungeonsInfo(player, ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1);
+		ACHIVE_Entries[1] = sQZAchievements.GetCollectDungeonsInfo(player, ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2);
 
 		//we need two pages to display the dungeon info
 		if(_absAction <= 1)
@@ -1443,6 +1446,9 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 			uint32_t _startPos = _absAction * 9;
 			uint32_t _endPos = _startPos + 9 ;
 
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝点击副本查看详细内容＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
 			for (size_t i = _startPos; i < _endPos; i++)
 			{
 				if (i >= sizeof(TP_Dungeons) / sizeof(TP_Dungeons[0])) break;
@@ -1450,10 +1456,13 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 				auto _dungeon = TP_Dungeons[i];	
 
 				//make up the text
-				text = __STR(__BLUE("＝＞　|cff0000ff"));
+				text = __STR("|cff0000ff＝＞　");
 				text.append(_dungeon.name);
-				text.append(__STR(__BLUE("|r　＜未完成＞　")));
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+				//get the player achievement info and check if the player has the achievement
+				uint32_t _achive_info = sQZAchievements.GetDungeonCollectInfo(player, i);
+				if(_achive_info == 0xFFFFFF) text.append(__STR("|r ｜　|cff00bb00＜已完成＞　|r "));	
+				else text.append(__STR("|r ｜　|cffbb0000＜未完成＞　|r "));	
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON + (i+1) * 100);	
 			}
 
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -1465,6 +1474,105 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　上一页　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON);
 		}
 
+		else if(_absAction >= 100 && _absAction % 100 == 0)		//main menus of the map
+		{
+			//the detail info of the dungeon
+			//get the mapid
+			//the action should be 100 to 1800
+			//the mapid should be 1 to 18
+			//so, the mapid is action / 100
+			auto _dungeon = TP_Dungeons[(_absAction - 100) / 100];
+
+			//display the detail equip info of the dungeon
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝点击装备查看更多＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+			text = __STR("＝＝＞　|cff0000ff 地图：： ");
+			text.append(_dungeon.name);
+			text.append(__STR("|r　　"));
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+			//achivement info
+			uint32_t _achive_info = sQZAchievements.GetDungeonCollectInfo(player, _dungeon.id);
+
+			auto _eqList = DBHelper_GetDungeonSetByMapID(_dungeon.id);
+			if (_eqList == nullptr) return false;
+
+			for (size_t i = 0; i < 6; i++)
+			{
+				auto item_1_local = sObjectMgr.GetItemLocale(_eqList->weapon_list[i]);
+				auto item_1_text = (item_1_local == nullptr ? __STR("未知装备 ") : item_1_local->Name[LOCALE_deDE]);
+
+				text = __STR(("|cff0000ff＝＝＞　"));
+				text.append(__STR(item_1_text));
+				//text.append(j==0?__STR("（普通）　 "):j==1?__STR("（试炼）　 "):j==2?__STR("（地狱）　 "):__STR("（梦魇）　 "));
+				if( (_achive_info & (3 << i)) == (3<<i)) text.append(__STR("|r　|cff00bb00＜已完成＞|r "));	
+				else text.append(__STR("|r　|cffbb0000＜未完成＞|r "));
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON +  _absAction + (i+1)*10);
+			}
+
+			//start and end of the list is 0 and 5
+			/*
+			auto _startPos = 3 * (_absAction % 100);
+			auto _endPos = _startPos + 3;
+			for (size_t i = _startPos; i < _endPos; i++)
+			{
+				auto item_1_local = sObjectMgr.GetItemLocale(_eqList->weapon_list[i]);
+				auto item_1_text = (item_1_local == nullptr ? __STR("未知装备 ") : item_1_local->Name[LOCALE_deDE]);
+
+				for(int j=0; j<4; j++)
+				{	
+					text = __STR(__BLUE("＝＝＞　|cff0000ff"));
+					text.append(__STR(item_1_text));
+					text.append(j==0?__STR("（普通）　 "):j==1?__STR("（试炼）　 "):j==2?__STR("（地狱）　 "):__STR("（梦魇）　 "));
+					text.append(__STR(__BLUE("|r　＜未完成＞　")));
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON + (_absAction - 100) * 10 + i);
+				}
+			}
+
+			//next or previous page
+			if (_absAction % 100 == 1)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　上一页　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON + _absAction);
+			else if (_absAction % 100 == 0)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　下一页　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON + _absAction + 1);
+			*/
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　返回　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON);
+		}
+
+		else if(_absAction >= 101 && _absAction % 10 == 0)		//equip info of the dungeon
+		{
+			//the detail info of the dungeon
+			auto _dungeon = TP_Dungeons[(_absAction - 100) / 100];
+			auto _eqList = DBHelper_GetDungeonSetByMapID(_dungeon.id);
+			if (_eqList == nullptr) return false;
+			auto _equipID = _eqList->weapon_list[(_absAction % 100) / 10 - 1];
+			//achivement info
+			uint32_t _achive_info = (sQZAchievements.GetDungeonCollectInfo(player, _dungeon.id) >> ((_absAction % 100) / 10 - 1) * 2 ) & 0x03;
+
+			//display the detail equip info of the dungeon
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝将装备放在行囊第一个格子＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+			text = __STR("|cff0000ff＝＝＞　装备：： ");
+			auto item_1_local = sObjectMgr.GetItemLocale(_equipID);
+			auto item_1_text = (item_1_local == nullptr? __STR("未知装备 ") : item_1_local->Name[LOCALE_deDE]);
+			text.append(__STR(item_1_text));
+			text.append(__STR("|r　　"));
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+			//display the detail equip info of the dungeon
+			for (size_t i = 0; i < 4; i++)
+			{
+				text = __STR("|cff0000ff＝＝＞　难度： ");
+				text.append(i==0?__STR("（普通）　 "):i==1?__STR("（试炼）　 "):i==2?__STR("（地狱）　 "):__STR("（梦魇）　 "));
+				if( (_achive_info & (1 << i)) == (1<<i)) text.append(__STR("|r　|cff00bb00＜已完成＞ |r"));
+				else text.append(__STR("|r |cffbb0000＜未完成＞ |r"));
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON + _absAction + i + 1);
+			}
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　返回　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, action / 100 * 100);
+		}
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 		return true;
 	}
@@ -1501,7 +1609,7 @@ bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 acti
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　任务系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_TASK);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　战利品奖励　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_TASK);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装备收集　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　社区贡献　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SOCIAL);

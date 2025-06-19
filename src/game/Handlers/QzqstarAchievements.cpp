@@ -1060,6 +1060,33 @@ void QzqstarAchievements::SetCollectAchiveInfo(Player *player, uint32_t itemSetT
 /* ================================================================================================================== */
 /* ========================= Collections of Dungeon system  ==========================================================*/
 /*=====================================================================================================================*/
+
+AchievementsEntry QzqstarAchievements::GetCollectDungeonsInfo(Player *player, uint32_t DungeonsType)
+{
+	//check _player if none
+	if (!player) return AchievementsEntry();
+
+	//iterate the _playerAchievements vector map of this player to find the collect information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == DungeonsType)
+		{
+			return e;
+		}
+	}
+
+	//if not found, create one and return it
+	AchievementsEntry e;
+	e.guid = player->GetGUID();
+	e.type = DungeonsType;
+	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
+	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
+	_playerAchievements[player->GetGUID()].push_back(e);
+	// sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Not found but init one Dungeon Entry: %u", player->GetGUID());
+	return e;
+}
+
 uint32    QzqstarAchievements::GetDungeonCollectInfo(Player *player, uint32_t ac_mapId)
 {
 	//check _player if none
