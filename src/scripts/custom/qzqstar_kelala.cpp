@@ -26,6 +26,7 @@
 #include "Chat.h"
 #include "qzqstar_id.h"
 #include "qzqstar_rune_str.h"
+#include "qzqstar_teleport.h"
 
 #define	__MENU_NONE						0
 #define	__MENU_SIZE						999
@@ -38,6 +39,11 @@
 #define __MENU_KELALA_SHOP				 5000
 #define __MENU_KELALA_SOCIAL			 6000
 #define __MENU_KELALA_REP				 7000
+#define __MENU_KELALA_EQUIP_COLLECTS     10000
+#define __MENU_KELALA_EQUIP_COLLECTS_WORLD		11000
+#define __MENU_KELALA_EQUIP_COLLECTS_DUNGEON 	12000
+#define __MENU_KELALA_EQUIP_COLLECTS_RAID	 	16000
+#define __MENU_KELALA_EQUIP_COLLECTS_END 19999
 
 
 #define	__STR(x)		((std::string)(x)).c_str()
@@ -1377,6 +1383,105 @@ bool Menus_Kelala_Rep(Player *player, Creature *_Creature, uint32 action)
 #pragma endregion
 
 
+#pragma region Equipment Collects
+
+
+
+bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 action)
+{
+	if (!player ||!_Creature) return false;
+	
+	if (action == __MENU_KELALA_EQUIP_COLLECTS)
+	{
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　野外装备收集　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_WORLD);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　副本装备收集　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　团本装备收集　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_RAID);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＞　返回　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+		return true;	
+	}
+
+	else if (action >= __MENU_KELALA_EQUIP_COLLECTS_WORLD && action < __MENU_KELALA_EQUIP_COLLECTS_DUNGEON)
+	{
+
+		auto _absAction = action - __MENU_KELALA_EQUIP_COLLECTS_WORLD;
+
+
+
+		//world equip collects
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝尚未开放＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+
+
+
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+	}
+
+	else if (action >= __MENU_KELALA_EQUIP_COLLECTS_DUNGEON && action < __MENU_KELALA_EQUIP_COLLECTS_RAID)
+	{
+
+		uint32_t _absAction = action - __MENU_KELALA_EQUIP_COLLECTS_WORLD;
+		std::string text = "";
+
+		//get the player achievement info and check if the player has the achievement
+		//the action should be 0 to 2999 about
+		//map id is multplied by 100, offset 1(which ragefire means 1)
+		//so, mapid should be 1 to 18, and action is 100 to 1800
+		//WE Reuse the TP_Dungeons for dislay info
+
+		//we need two pages to display the dungeon info
+		if(_absAction <= 1)
+		{
+			//sizeof(TP_Dungeons) / sizeof(TP_Dungeons[0] = 18
+			uint32_t _startPos = _absAction * 9;
+			uint32_t _endPos = _startPos + 9 ;
+
+			for (size_t i = _startPos; i < _endPos; i++)
+			{
+				if (i >= sizeof(TP_Dungeons) / sizeof(TP_Dungeons[0])) break;
+
+				auto _dungeon = TP_Dungeons[i];	
+
+				//make up the text
+				text = __STR(__BLUE("＝＞　|cff0000ff"));
+				text.append(_dungeon.name);
+				text.append(__STR(__BLUE("|r　＜未完成＞　")));
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+			}
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+			//add the next page button
+			if(_absAction == 0)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　下一页　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON + 1);
+			else //upper page
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　上一页　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON);
+		}
+
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+		return true;
+	}
+
+	else if (action >= __MENU_KELALA_EQUIP_COLLECTS_RAID && action < __MENU_KELALA_EQUIP_COLLECTS_RAID)
+	{
+		//raid equip collects
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝尚未开放＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+	}
+
+
+
+	return true;
+}
+
+#pragma endregion
+
 bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 action)
 {
 	//check if player is null and go is null
@@ -1396,11 +1501,11 @@ bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 acti
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　任务系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_TASK);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　套装专业　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_TASK);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　战利品奖励　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_TASK);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　社区贡献　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SOCIAL);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　社区贡献　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SOCIAL);
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　声望奖励　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_REP);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -1505,6 +1610,12 @@ bool Kelala_Menus(Player *player, Creature *_cr, uint32 sender, uint32 action)
 	else if (action >= __MENU_KELALA_REP && action <= __MENU_KELALA_REP + __MENU_SIZE)
 	{
 		return Menus_Kelala_Rep(player, _cr, action);
+	}
+
+	//Collects menu
+	else if (action >= __MENU_KELALA_EQUIP_COLLECTS && action <= __MENU_KELALA_EQUIP_COLLECTS_END)
+	{
+		return Menus_Kelala_EquipCollects(player, _cr, action);
 	}
 
 

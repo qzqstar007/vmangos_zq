@@ -29,7 +29,7 @@ typedef struct _level_QuestID {
 	//std::string questTitle;
 }Level_QuestID_t;
 
-Level_QuestID_t DBHelper_GetQuestByLevel(Player *);
+extern Level_QuestID_t DBHelper_GetQuestByLevel(Player *);
 
 
 typedef struct _level_ItemMatsID {
@@ -38,7 +38,7 @@ typedef struct _level_ItemMatsID {
 	//std::string itemName;
 }Level_ItemMatsID_t;
 
-Level_ItemMatsID_t DBHelper_GetItemMatsByLevel(Player *, int32);
+extern Level_ItemMatsID_t DBHelper_GetItemMatsByLevel(Player *, int32);
 
 
 typedef struct _level_ItemEqID {
@@ -47,18 +47,24 @@ typedef struct _level_ItemEqID {
 	//std::string itemName;
 }Level_ItemEqID_t;
 
-Level_ItemEqID_t DBHelper_GetItemEqByLevel(Player *, int32);
-Level_ItemEqID_t DBHelper_GetItemEqByCreatureLevel(Creature *, int32);
+extern Level_ItemEqID_t DBHelper_GetItemEqByLevel(Player *, int32);
+extern Level_ItemEqID_t DBHelper_GetItemEqByCreatureLevel(Creature *, int32);
 
 typedef struct _level_enchantID {
 	int32 reqLevel;
 	int32 enchantID;
 }Level_EnchantID_t;
 
-Level_EnchantID_t DBHelper_GetRandEnchantIDByLevel(int32 itemLevel);
+extern Level_EnchantID_t DBHelper_GetRandEnchantIDByLevel(int32 itemLevel);
 
 
+typedef struct _level_weaponList {
+	int32 dungen_id;
+	int32 reward_apsp[4];	//four dungeons difficulties, such as 1,2,3,4
+	int32 weapon_list[6];
+}Weapon_Dungeon_Set_t;
 
+extern const Weapon_Dungeon_Set_t * DBHelper_GetDungeonSetByMapID(int32 mapId);
 
 #endif	//_QZQSTAR_DB_H
 

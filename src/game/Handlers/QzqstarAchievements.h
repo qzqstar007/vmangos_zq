@@ -34,6 +34,8 @@ enum Achievement_t
 	ACHIEVEMENTS_RAIDS 			= 	401,
 	ACHIEVEMENTS_ZITIAO 		= 	500,
 	ACHIEVEMENTS_COLLECTIONS 	= 	600,
+	ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1 	= 	601,	//collect the items in the dungeon, subtype is the dungeon id, 
+	ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2		= 	602,	//collect the items in the dungeon, subtype is the dungeon id, 
 	ACHIEVEMENT_COUNTERS		=	1000,	//For combine and refreshing...
 };
 
@@ -61,10 +63,10 @@ enum Achievement_t
 #define COLLECTIONS_TYPE_ITEMSET_RAID_LOW			(2)
 #define COLLECTIONS_TYPE_ITEMSET_RAID_HIGH			(3)
 #define COLLECTIONS_TYPE_PROFESSIONS				(4)
-#define COLLECTIONS_TYPE_EQUIPMENTS_1				(5)
-#define COLLECTIONS_TYPE_EQUIPMENTS_2				(6)
-#define COLLECTIONS_TYPE_EQUIPMENTS_3				(7)
-#define COLLECTIONS_TYPE_EQUIPMENTS_4				(8)
+#define COLLECTIONS_TYPE_WEAPONS_0					(5)	//normal difficutly dungeon weapons, each bit means a dungeon set.
+#define COLLECTIONS_TYPE_WEAPONS_1					(6)
+#define COLLECTIONS_TYPE_WEAPONS_2					(7)
+#define COLLECTIONS_TYPE_WEAPONS_3					(8)
 
 //ACHIEVEMENT_COUNTERS subtype
 #define	ACHIEVEMENT_COUNTERS_COMBINE	(10)
@@ -247,6 +249,15 @@ public:
 	// data5-8: stores the equipments collections
 	uint32_t 	GetCollectAchiveInfo(Player *player, uint32_t itemSetType);
 	void 		SetCollectAchiveInfo(Player *player, uint32_t itemSetType, uint32_t value);
+
+
+	/*****************************************************
+	 *
+	 *		Collection of Dungoens 1/2 Functions
+	 * 
+	 *****************************************************/
+	 uint32    GetDungeonCollectInfo(Player *player, uint32_t ac_mapId);
+	 void      SetDungeonCollectInfo(Player *player, uint32_t ac_mapId, uint32_t value);
 
 protected:
 	std::vector<AchievementsEntry> entries;

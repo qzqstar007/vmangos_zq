@@ -9012,4 +9012,35 @@ Level_EnchantID_t DBHelper_GetRandEnchantIDByLevel(int32 itemLevel)
 		_Enchant_All, _minRange , _maxRange, [](const Level_EnchantID_t& en) { return en; });
 };
 
+
+
+const std::vector<Weapon_Dungeon_Set_t> _Weapon_Dungeon_Set =
+{
+	/* MAP_RAGEFIRE_CHASM,    __XSTR("怒焰裂谷　"), */		{ 0, 	{1, 2, 3, 4},	{14145,14151,	14147,14148,  	14149,14150	} },
+	/* MAP_WAILING_CAVERNS,   __XSTR("哀嚎洞穴　"), */		{ 1, 	{1, 2, 4, 5},	{6469,6472,		6463,6630,  	13245,6449 } },
+	/* MAP_DEADMINES,         __XSTR("死亡矿井　"), */		{ 2, 	{1, 3, 4, 6},	{1156,5194,		7230,5198,  	5201,5191 } },
+	/* MAP_SHADOWFANG_KEEP,   __XSTR("影牙城堡　"), */		{ 3, 	{1, 3, 4, 7},	{6318,1292,		6321,3748,  	6320,6220 } },
+	/* MAP_BLACKFATHOM_DEEPS, __XSTR("黑暗深渊　"), */		{ 4, 	{2, 4, 5, 7},	{3078,6905,		6907,6904,  	1155,6909 } },
+	/* MAP_GNOMEREGAN,        __XSTR("诺莫瑞根　"), */		{ 5, 	{2, 4, 5, 7},	{0,0,	0,0,  0,0} },
+	/* MAP_MONASTERY,         __XSTR("血色修道院　"), */	{ 6, 	{2, 4, 6, 8},	{0,0,	0,0,  0,0 } },
+	/* MAP_RAZORFEN_KRAUL,    __XSTR("剃刀沼泽　"), */		{ 7, 	{2, 4, 6, 8},	{0,0,	0,0,  0,0 } },
+	/* MAP_RAZORFEN_DOWNS,    __XSTR("剃刀高地　"), */		{ 8, 	{2, 4, 6, 8},	{0,0,	0,0,  0,0 } },
+	/* MAP_ULDAMAN,           __XSTR("奥达曼　"), */		{ 9, 	{2, 4, 6, 8},	{0,0,	0,0,  0,0 } },
+	/* MAP_MARAUDON,          __XSTR("玛拉顿　"), */		{10, 	{3, 5, 7, 9},	{0,0,	0,0,  0,0 } },
+	/* MAP_ZUL_FARRAK,        __XSTR("祖尔法拉克　"), */	{11, 	 {3, 5, 7, 9},	{0,0,	0,0,  0,0 } },
+	/* MAP_SUNKEN_TEMLE,      __XSTR("沉没的神庙　"), */	{12, 	 {3, 5, 7, 9},	{0,0,	0,0,  0,0 } },
+	/* MAP_BLACKROCK_DEPTHS,  __XSTR("黑石深渊　"), */		{13, 	 {3, 5, 7, 9},	{0,0,	0,0,  0,0 } },
+	/* MAP_DIRE_MAUL,         __XSTR("厄运之锤　"), */		{14, 	 {3, 5, 7, 9},	{0,0,	0,0,  0,0 } },
+	/* MAP_SCHOLOMANCE,       __XSTR("通灵学院　"), */		{15, 	{4, 6, 8, 10},	{0,0,	0,0,  0,0 } },
+	/* MAP_STRATHOLME,        __XSTR("斯坦索姆　"), */		{16, 	{4, 6, 8, 10},	{0,0,	0,0,  0,0 } },
+	/* MAP_BLACKROCK_SPIRE,   __XSTR("黑石塔　"), */		{17, 	{4, 6, 8, 10},	{0,0,	0,0,  0,0 } }
+};
+
+
+const Weapon_Dungeon_Set_t * DBHelper_GetDungeonSetByMapID(int32 mapId)
+{
+	if(mapId >= 0 && mapId <= 17) return &(_Weapon_Dungeon_Set[mapId]);
+	else return nullptr;
+}
+
 #pragma endregion

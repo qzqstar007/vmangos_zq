@@ -1008,10 +1008,6 @@ uint32_t QzqstarAchievements::GetCollectAchiveInfo(Player *player, uint32_t item
 				case COLLECTIONS_TYPE_ITEMSET_RAID_LOW: 	return (e.data2);
 				case COLLECTIONS_TYPE_ITEMSET_RAID_HIGH: 	return (e.data3);
 				case COLLECTIONS_TYPE_PROFESSIONS: 			return (e.data4);
-				case COLLECTIONS_TYPE_EQUIPMENTS_1: 		return (e.data5);
-				case COLLECTIONS_TYPE_EQUIPMENTS_2: 		return (e.data6);
-				case COLLECTIONS_TYPE_EQUIPMENTS_3: 		return (e.data7);
-				case COLLECTIONS_TYPE_EQUIPMENTS_4: 		return (e.data8);
 				default: return 0;
 			}	
 		}	
@@ -1047,10 +1043,6 @@ void QzqstarAchievements::SetCollectAchiveInfo(Player *player, uint32_t itemSetT
 				case COLLECTIONS_TYPE_ITEMSET_RAID_LOW: 	e.data2 = value; break;
 				case COLLECTIONS_TYPE_ITEMSET_RAID_HIGH: 	e.data3 = value; break;
 				case COLLECTIONS_TYPE_PROFESSIONS: 			e.data4 = value; break;
-				case COLLECTIONS_TYPE_EQUIPMENTS_1: 		e.data5 = value; break;
-				case COLLECTIONS_TYPE_EQUIPMENTS_2: 		e.data6 = value; break;
-				case COLLECTIONS_TYPE_EQUIPMENTS_3: 		e.data7 = value; break;
-				case COLLECTIONS_TYPE_EQUIPMENTS_4: 		e.data8 = value; break;
 				default: break;
 			}	
 		}	
@@ -1065,5 +1057,96 @@ void QzqstarAchievements::SetCollectAchiveInfo(Player *player, uint32_t itemSetT
 	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Collections: %u", player->GetName(), e.subType);
 }
 
+/* ================================================================================================================== */
+/* ========================= Collections of Dungeon system  ==========================================================*/
+/*=====================================================================================================================*/
+uint32    QzqstarAchievements::GetDungeonCollectInfo(Player *player, uint32_t ac_mapId)
+{
+	//check _player if none
+	if (!player || ac_mapId > 17) return 0;
+
+	//ac_mapId should be mapped to 0-17, 0-8 for dungeon 1, 9-17 for dungeon 2
+	uint32_t acheiveType = ac_mapId < 9? ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1 : ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2;
+
+	auto _realMapID = ac_mapId % 9;
+
+	//iterate the _playerAchievements vector map of this player to find the collect information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == acheiveType)
+		{
+			//if found, return the miscValue data
+			switch(_realMapID)
+			{
+				case 0: return (e.subType);
+				case 1: return (e.data1);
+				case 2: return (e.data2);
+				case 3: return (e.data3);
+				case 4: return (e.data4);
+				case 5: return (e.data5);
+				case 6: return (e.data6);
+				case 7: return (e.data7);
+				case 8: return (e.data8);
+				default: return 0;
+			}
+		}	
+	}
+
+	//if not found, create one and return it
+	AchievementsEntry e;
+	e.guid = player->GetGUID();
+	e.type = acheiveType;
+	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
+	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
+	_playerAchievements[player->GetGUID()].push_back(e);
+
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeon Collect: %u", player->GetName(), ac_mapId);
+
+	return 0;
+}
+
+void      QzqstarAchievements::SetDungeonCollectInfo(Player *player, uint32_t ac_mapId, uint32_t value)
+{
+	//check _player if none
+	if (!player || ac_mapId > 17) return;
+
+	//ac_mapId should be mapped to 0-17, 0-8 for dungeon 1, 9-17 for dungeon 2
+	uint32_t acheiveType = ac_mapId < 9? ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1 : ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2;
+	auto _realMapID = ac_mapId % 9;
+
+	//iterate the _playerAchievements vector map of this player to find the collect information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == acheiveType)
+		{
+			//if found, set the miscValue data
+			switch(_realMapID)
+			{
+				case 0: e.subType = value; break;
+				case 1: e.data1 = value; break;
+				case 2: e.data2 = value; break;
+				case 3: e.data3 = value; break;
+				case 4: e.data4 = value; break;
+				case 5: e.data5 = value; break;
+				case 6: e.data6 = value; break;
+				case 7: e.data7 = value; break;
+				case 8: e.data8 = value; break;
+				default: break;	
+			}	
+		}	
+	}
+
+	//if not found, create one and return it
+	AchievementsEntry e;
+	e.guid = player->GetGUID();
+	e.type = acheiveType;
+	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
+	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
+	_playerAchievements[player->GetGUID()].push_back(e);
+
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeon Collect: %u", player->GetName(), ac_mapId);
+}
 
 #pragma endregion
