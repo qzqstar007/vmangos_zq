@@ -239,10 +239,36 @@ struct APSPSpellScript : public SpellScript
                 int32 basePoints0 = 0, basePoints1 = 0;
 
                 //update the AP and SP buff for the player
-                basePoints0 = 100;
-                basePoints1 = 100;
+                basePoints0 = 0;
+                basePoints1 = 0;
 
-                basePoints0 = basePoints0  + player->GetLevel() * 100;
+#define ZQ_SPELL_MOUNTS_REINDEER            32980   //Mounts, 麋鹿新手坐骑
+#define ZQ_SPELL_MOUNTS_REINDEER_LEARN      32981   //Mounts, 麋鹿新手坐骑
+#define ZQ_SPELL_MOUNTS_LAND                32982   //Mounts, 坐骑100%
+#define ZQ_SPELL_MOUNTS_LAND_LEARN          32983   //Mounts, 坐骑100%
+#define ZQ_SPELL_MOUNTS_FLY                 32984   //Mounts, 飞行坐骑
+#define ZQ_SPELL_MOUNTS_FLY_LEARN           32985   //Mounts, 飞行坐骑
+#define ZQ_SPELL_MOUNTS_TIGER               32986   //Mounts, 幽灵虎
+#define ZQ_SPELL_MOUNTS_TIGER_LEARN         32987   //Mounts, 幽灵虎
+#define ZQ_SPELL_MOUNTS_GRIYP               32988   //Mounts, 幽灵狮鹫
+#define ZQ_SPELL_MOUNTS_GRIYP_LEARN         32989   //Mounts, 幽灵狮鹫
+#define ZQ_SPELL_MOUNTS_TURTLE              32990   //Mounts, 海龟
+#define ZQ_SPELL_MOUNTS_TURTLE_LEARN        32991   //Mounts, 海龟
+
+                if(player->HasSpell(ZQ_SPELL_MOUNTS_REINDEER)) { basePoints0 += 10; basePoints1 += 5; } // 麋鹿新手坐骑 10攻强，5法伤
+                if(player->HasSpell(ZQ_SPELL_MOUNTS_LAND)) { basePoints0 += 30; basePoints1 += 15; } // 坐骑100% 10攻强，5法伤
+                if(player->HasSpell(ZQ_SPELL_MOUNTS_FLY)) { basePoints0 += 30; basePoints1 += 15; } // 飞行坐骑 10攻强，5法伤
+                if(player->HasSpell(ZQ_SPELL_MOUNTS_TIGER)) { basePoints0 += 100; basePoints1 += 50; } 
+                if(player->HasSpell(ZQ_SPELL_MOUNTS_GRIYP)) { basePoints0 += 100; basePoints1 += 50; } 
+                if(player->HasSpell(ZQ_SPELL_MOUNTS_TURTLE)) { basePoints0 += 30; basePoints1 += 15; }                
+
+                uint32 _doneCounter = PAIR32_HIPART(  sQZAchievements.GetQuestDoneCounters(player)  ); //each quest add 1 AP and 0.5 SP
+                basePoints0 += _doneCounter;
+                basePoints1 += (_doneCounter/2);
+
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[APSP Spell] for user %s : AP:%u, SP:%u. _doneCounter:%u.", 
+                    player->GetName(), basePoints0, basePoints1, _doneCounter);
+
 
                 ChatHandler(player).PSendSysMessage(((std::string)("你因为收集（如坐骑、专业、装备等）而获得了[%d]点攻强和 [%d]点法伤。  ")).c_str(), basePoints0, basePoints1);
 

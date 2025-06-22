@@ -4029,7 +4029,12 @@ void Player::RemoveSpell(uint32 spellId, bool disabled, bool learnLowRank)
     if (sSpellMgr.IsPrimaryProfessionFirstRankSpell(spellId))
     {
         uint32 freeProfs = GetFreePrimaryProfessionPoints() + 1;
-        if (freeProfs <= sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL))
+
+        //qzqstar, 250621, set max primary prof. points
+        uint32 maxProfs = sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL);
+        if(M_Challenge_Mode & CHALLENGING_MODE_MANUFACT) maxProfs += 2;
+
+        if (freeProfs <= maxProfs)
             SetFreePrimaryProfessions(freeProfs);
     }
 
@@ -5599,6 +5604,9 @@ bool Player::UpdateCraftSkill(uint32 spellid)
         {
             uint32 skillValue = GetSkillValuePure(_spell_idx->second->skillId);
             uint32 craftSkillGain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_CRAFTING);
+
+            //if has manufacture, restore to 1
+            if(M_Challenge_Mode & CHALLENGING_MODE_MANUFACT)    craftSkillGain = 1;
 
             if (GetSession()->HasTrialRestrictions())
             {
@@ -10423,6 +10431,7 @@ InventoryResult Player::CanUseItem(Item const* pItem, bool not_loading) const
         {
 
 			// qzqstar, 250228, zq mode, cannot use the unbind items...
+            /*
 			if ((M_Challenge_Mode & CHALLENGING_MODE_MANUFACT) && (GetLevel() < (sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))))
 			{
 				if (((pProto->Class == ITEM_CLASS_WEAPON) || (pProto->Class == ITEM_CLASS_ARMOR))
@@ -10430,7 +10439,7 @@ InventoryResult Player::CanUseItem(Item const* pItem, bool not_loading) const
 					&& (!(pItem->IsSoulBound())) //qzqstar, 241226, the binded item can be used.
 					&& (pItem->GetGuidValue(ITEM_FIELD_CREATOR) != GetObjectGuid()))
 					return EQUIP_ERR_DONT_OWN_THAT_ITEM;
-			}
+			}*/
 
 
             if (pItem->IsBindedNotWith(this))
@@ -16506,6 +16515,7 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, ss.str().c_str());
 
         //todo, add to achievements
+        sQZAchievements.SetNormalQuestDoneNum(this, __quest_count);
     }
 
     // clear quest log tail

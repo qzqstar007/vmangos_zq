@@ -183,7 +183,7 @@ struct PaladinMartyrStrikeScript : SpellScript
 
 			if (_dmgSelfo < 20) _dmgSelfo = 20;
 
-			int32 _dmgSelf = urand(_dmgSelfo / 20, _dmgSelfo/10);
+			int32 _dmgSelf = urand(_dmgSelfo / 10, _dmgSelfo/2);
 			
 			if (pPlayer->GetHealth() < _dmgSelf) _dmgSelf = pPlayer->GetHealth() - 1;
 

@@ -88,7 +88,7 @@ void _Main_Menus(Player *player)
 #define __MENU_RUNE_SLOT_FORGET		(200)	//2100-2199 forget slot spell
 #define __MENU_RUNE_SLOT_BUY		(800)	//buy rune slot
 
-#define	__RUNE_UPGRADE_ITEM_ALL			(30136)	//ALL
+#define	__RUNE_UPGRADE_ITEM_ALL			(ZQ_ITEM_RUNE_STONE)	//ALL
 
 void _copy_rune(const Rune_Spell_Menu_t *from, Rune_Spell_Menu_t *to, uint32 size)
 {

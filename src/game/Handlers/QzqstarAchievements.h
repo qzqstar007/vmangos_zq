@@ -151,8 +151,10 @@ public:
 	 *
 	 *****************************************************/
 	// note on data arrays
-	// data1: quest id
-	// data2: quest complete count (how many times the quest has been completed)
+	// data1: current quest
+	// data2: today quest
+	// data3: total qeust
+	// data4: normal quest done.
 	
 	//check if the player has accepted the custom quest
 	// 0:  means the player has not accepted the quest yet, 
@@ -167,6 +169,9 @@ public:
 
 	//get the quest done counters
 	uint32 GetQuestDoneCounters(Player * _player);
+
+	//set the normal quest done counters
+	void   SetNormalQuestDoneNum(Player * _player, uint32 _counters);
 	
 
 	/*****************************************************

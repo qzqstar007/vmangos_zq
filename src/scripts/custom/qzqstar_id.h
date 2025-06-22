@@ -32,6 +32,7 @@
 #define ZQ_ITEM_FRAGMENTS   		30002	//Fragments, 提升碎片
 #define ZQ_ITEM_FOOD  			    30003	//Food, 食物蜜汁肉松
 #define ZQ_ITEM_NEWBAG			    30004	//New Bag, 新背包
+#define ZQ_ITEM_RUNE_STONE			30005	//Rune Stone, 符文石
 
 //Functional Items
 #define ZQ_ITEM_PET_EGG				30010	//Pet Egg, 宠物蛋，所有玩家出生时获得，跟炉石一样
@@ -170,6 +171,13 @@
  ********************************************************************/
 #define ZQ_GOSSIP_VIP_UPGRADE			15001	//VIP Upgrade, 会员升级
 
+
+
+/******************************************************************** 
+ *  MANgos String IDs, least first (9001).
+ ********************************************************************/
+#define ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT		9010	//Dungeon Player Teleport, 副本玩家传送
+#define ZQ_MANGOS_STRING_DUNGEON_PLAYER_CPLT_NPCS		9011	//Dungeon Player Finish Level, 副本玩家完成等级
 
 #endif	//_QZQSTAR_CPP_IDS_H
 

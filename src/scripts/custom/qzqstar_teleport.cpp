@@ -24,6 +24,7 @@
 #include "qzqstar_db.h"
 #include "qzqstar_helper.h"
 #include "Chat.h"
+#include "qzqstar_id.h"
 
 #define	__MENU_NONE						0
 #define	__MENU_SIZE						999
@@ -109,9 +110,9 @@ const Teleport_Point_t TP_MainLand_Kalimdor[] = {
 };
 
 const Teleport_Point_t TP_Dungeons[] = {
-	{ 0, MAP_RAGEFIRE_CHASM,    __XSTR("怒焰裂谷　"), 1, 1815,-4419,-18.7,5.2, {11518,11520,11517,4,5,6,7,8,1728,1}},
-	{ 1, MAP_WAILING_CAVERNS,   __XSTR("哀嚎洞穴　"), 1, -731.607f,-2218.39f,17.0281f,2.78486f, {3653,3654,3671,3674,3673,3670,7,8,1728,1}},
-	{ 2, MAP_DEADMINES,         __XSTR("死亡矿井　"), 0, -11208.7f,1673.52f,24.6361f,1.51067f, {644,1763,646,639,645,6,7,8,1728,1}},
+	{ 0, MAP_RAGEFIRE_CHASM,    __XSTR("怒焰裂谷　"), 1, 1815,-4419,-18.7,5.2, {11518,11520,11517,4,5,6,7,8,30071,1}},
+	{ 1, MAP_WAILING_CAVERNS,   __XSTR("哀嚎洞穴　"), 1, -731.607f,-2218.39f,17.0281f,2.78486f, {3653,3654,3671,3674,3673,3670,7,8,30071,1}},
+	{ 2, MAP_DEADMINES,         __XSTR("死亡矿井　"), 0, -11208.7f,1673.52f,24.6361f,1.51067f, {644,1763,646,639,645,6,7,8,30071,1}},
 	{ 3, MAP_SHADOWFANG_KEEP,   __XSTR("影牙城堡　"), 0, -234.675,1561.63,76.8921,1.24031, {1,2,3,4,5,6,7,8,9,1}},
 	{ 4, MAP_BLACKFATHOM_DEEPS, __XSTR("黑暗深渊　"), 1, 4249.99,740.102,-25.671,1.34062, {1,2,3,4,5,6,7,8,9,1}},
 	{ 5, MAP_GNOMEREGAN,        __XSTR("诺莫瑞根　"), 0, -5163.54,925.423,257.181,1.57423, {0}},
@@ -267,7 +268,7 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 
 		player->CLOSE_GOSSIP_MENU();
 		//chathandler ...
-		ChatHandler(player).PSendSysMessage(9039, TP_Dungeons[_acID].name, _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "));
+		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Dungeons[_acID].name, _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "));
 		//teleport to the dungeon.
 		player->TeleportTo(TP_Dungeons[_acID].tele_mapid, TP_Dungeons[_acID].tele_x, TP_Dungeons[_acID].tele_y, TP_Dungeons[_acID].tele_z, TP_Dungeons[_acID].tele_o);
 
@@ -377,7 +378,7 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 
 		player->CLOSE_GOSSIP_MENU();
 		//chathandler ...
-		ChatHandler(player).PSendSysMessage(9039, TP_Dungeons[_acID].name, _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "));
+		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Dungeons[_acID].name, _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "));
 		//teleport to the dungeon.
 		player->TeleportTo(TP_Dungeons[_acID].tele_mapid, TP_Dungeons[_acID].tele_x, TP_Dungeons[_acID].tele_y, TP_Dungeons[_acID].tele_z, TP_Dungeons[_acID].tele_o);
 

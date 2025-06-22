@@ -572,11 +572,29 @@ uint32 QzqstarAchievements::GetQuestDoneCounters(Player * _player)
 		if (e.type == ACHIEVEMENT_CUSTOM_QUEST)
 		{
 			//TODAY, TOTAL
-			return MAKE_PAIR32(e.data2, e.data3);
+			return MAKE_PAIR32(e.data2, e.data3 + e.data4);
 		}
 	}
 
 	return 0;
+}
+
+void QzqstarAchievements::SetNormalQuestDoneNum(Player * _player, uint32 counter)
+{
+	//check _player if none
+	if (!_player)
+		return;
+
+	//iterate the _playerAchievements vector map of this player to find the custom quest id the player has accepted
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_CUSTOM_QUEST)
+		{
+			e.data4 = counter;
+			break;
+		}
+	}
 }
 
 #pragma endregion
@@ -804,7 +822,7 @@ uint32 QzqstarAchievements::GetDungeonsInfo(Achievement_t _mapType, Player *play
 		if (e.type == _mapType)
 		{
 			//if found, return the miscValue data
-			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Loaded Dungeons, _ac ID: %u", player->GetName(), ac_mapId);
+			//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Loaded Dungeons, _ac ID: %u", player->GetName(), ac_mapId);
 
 			//get the ac_mapId, 0-15, and return the data1, data2, data3, data4, data5, data6, data7, data8
 			switch(ac_mapId)

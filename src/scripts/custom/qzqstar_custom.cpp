@@ -817,7 +817,7 @@ void AddSC_qzqstar_custom()
 	//Add Pet Development script
 	newscript = new Script;
 	newscript->Name = "qzqstar_pet_system";
-	newscript->pGossipHello = [](Player *p, Creature *c) -> bool { return Pet_Menus(p, c, 0, __MENU_BG_MAIN); };
+	newscript->pGossipHello = [](Player *p, Creature *c) -> bool { return Pet_Menus(p, c, 0, __MENU_PET_MAIN); };
 	newscript->pGossipSelect = &Pet_Menus;
 	newscript->RegisterSelf(false);
 

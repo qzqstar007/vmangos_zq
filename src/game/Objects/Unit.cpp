@@ -1319,9 +1319,18 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
             //qzqstar, 250514, add check for player kill creature in dungeons
             if(playerKiller && pCreatureVictim)
             {
+
+				//sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player[%s] killed creature[%d] in dungeon %d.", playerKiller->GetName(), pCreatureVictim->GetEntry(), GetMapId());
+
+
                 //get the instance data
                 if (InstanceData * _insData = pCreatureVictim->GetMap()->GetInstanceData())
                 {
+                    uint32 _difficulty = _insData->CustomDifficulty;
+
+
+					//sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Difficulty:%d.", _difficulty);
+
 					//get the instance data for the player
 					if ( (_insData->CustomDifficultyMask & 0x01) == 0x01)
 					{
@@ -1331,6 +1340,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
 						{
 							if (_insData->CustomDifficulty_NPC[i] == pCreatureVictim->GetEntry())
 							{
+                                //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "!!! Map %d Complete NPC[%d] - ID: %d.", pCreatureVictim->GetMapId(), i, _insData->CustomDifficulty_NPC[i]);
 								_insData->CustomDifficulty_NPC[i] = 0;
 							}
 
@@ -1341,33 +1351,51 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
 
 						if (_sendReward)
 						{
+                            
 							_insData->CustomDifficultyMask &= 0xFFFE;
+                            uint32_t _acmapID = QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId());
+
+                            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "!!! Complete the %s dungeon, need send rewards.", TP_Dungeons[_acmapID].name);
 
 							Achievement_t _mapType = ACHIEVEMENTS_DUNGEONS;
 							if (GetMap()->IsRaid())
 								_mapType = ACHIEVEMENTS_RAIDS;
 
-							//check the player's info
-							uint32 _dungeonInfo = sQZAchievements.GetDungeonsInfo(_mapType, playerKiller, QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId()));
-                            if( ((_dungeonInfo >> 2) <= (_dungeonInfo&3) ) && ( (_dungeonInfo>>2) < 3))
+                            //get all the players in the dungeon
+                            Map::PlayerList const& players = pCreatureVictim->GetMap()->GetPlayers();
+                            
+
+                            if (!players.isEmpty())
                             {
-                                sQZAchievements.SetDungeonsInfo(_mapType, playerKiller, QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId()), ((_dungeonInfo>>2) + 1) << 2 | (_dungeonInfo&3) );
-                                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, from %u to %u.", playerKiller->GetName(), TP_Dungeons[QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId())].name, _dungeonInfo>>2, (_dungeonInfo>>2) +1);
-                                //First break through
+                                        
+                                for (auto const& playerx : players)
+                                {
+                                    //check the player's info
+									auto player = playerx.getSource();
+                                    uint32 _dungeonInfo = sQZAchievements.GetDungeonsInfo(_mapType, player, _acmapID);
+                                    if( ((_dungeonInfo >> 2) <= (_difficulty&3) ) && ( (_dungeonInfo>>2) < 3))
+                                    {
+                                        sQZAchievements.SetDungeonsInfo(_mapType, player, _acmapID, ((_dungeonInfo>>2) + 1) << 2 | (_difficulty&3) );
+                                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, from %u to %u.", player->GetName(), TP_Dungeons[_acmapID].name, _dungeonInfo>>2, (_dungeonInfo>>2) +1);
+                                        //First break through
+                                    }
+
+                                    #ifndef __STR
+                                    #define	__STR(x)		((std::string)(x)).c_str()
+                                    #endif
+
+                                    
+                                    std::string _diffDesc = _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 ");
+                                    ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_CPLT_NPCS, TP_Dungeons[_acmapID].name, _diffDesc);
+
+                                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, difficulty: %u, Need Reward ....", player->GetName(), TP_Dungeons[_acmapID].name, _difficulty&3);
+
+                                    player->AddItem(TP_Dungeons[_acmapID].npc_list[8] + (_dungeonInfo&3), TP_Dungeons[_acmapID].npc_list[9]);
+
+                                }
                             }
 
-#ifndef __STR
-#define	__STR(x)		((std::string)(x)).c_str()
-#endif
-
-                            uint32 _difficulty = (_dungeonInfo&3);
-                            std::string _diffDesc = _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 ");
-                            ChatHandler(playerKiller).PSendSysMessage(9040, TP_Dungeons[QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId())].name, _diffDesc);
-                            
-                            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, difficulty: %u, Need Reward ....", playerKiller->GetName(), TP_Dungeons[QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId())].name, _dungeonInfo&3);
-						
-                            playerKiller->AddItem(TP_Dungeons[QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId())].npc_list[8] + (_dungeonInfo&3), TP_Dungeons[QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId())].npc_list[9]);
-                        }
+						}
 
 					}
                 }

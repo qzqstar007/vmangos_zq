@@ -425,7 +425,7 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 
 		//auto _orig_quest = sObjectMgr.GetQuestTemplate(_origQuestID);
 		//if(_orig_quest)	newQuest->SetSpecialFlag(_orig_quest->GetSpecialFlag());
-		sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Task System] player:%s create questID:%u", player->GetName(), _Quest_Counter);
+		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Task System] player:%s create questID:%u", player->GetName(), _Quest_Counter);
 
 		auto& questMap = sObjectMgr.GetQuestTemplatesZQ();
 		questMap[_Quest_Counter] = std::move(newQuest);
@@ -489,7 +489,7 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 			//remove the money
 			player->SetMoney(player->GetMoney() - __reset_gold * 10000);
 
-			sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Task System] player:%s reset questID: %u", player->GetName(), _currentQuestID);
+			sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Task System] player:%s reset questID: %u", player->GetName(), _currentQuestID);
 
 			//finish the quest, but not increase counter
 			sQZAchievements.FinishCustomQuest(player, false);
@@ -1548,7 +1548,7 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 			if (_eqList == nullptr) return false;
 			auto _equipID = _eqList->weapon_list[(_absAction % 100) / 10 - 1];
 			//achivement info
-			uint32_t _achive_info = (sQZAchievements.GetDungeonCollectInfo(player, _dungeon.id) >> ((_absAction % 100) / 10 - 1) * 2 ) & 0x03;
+			uint32_t _achive_info = (sQZAchievements.GetDungeonCollectInfo(player, _dungeon.id) >> ((_absAction % 100) / 10 - 1) * 4 ) & 0x0F;
 
 			//display the detail equip info of the dungeon
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝将装备放在行囊第一个格子＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -1565,13 +1565,53 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 			for (size_t i = 0; i < 4; i++)
 			{
 				text = __STR("|cff0000ff＝＝＞　难度： ");
-				text.append(i==0?__STR("（普通）　 "):i==1?__STR("（试炼）　 "):i==2?__STR("（地狱）　 "):__STR("（梦魇）　 "));
+				text.append(i==0?__STR("（普通）　"):i==1?__STR("（试炼）　"):i==2?__STR("（地狱）　"):__STR("（梦魇）　"));
 				if( (_achive_info & (1 << i)) == (1<<i)) text.append(__STR("|r　|cff00bb00＜已完成＞ |r"));
 				else text.append(__STR("|r |cffbb0000＜未完成＞ |r"));
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON + _absAction + i + 1);
 			}
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　返回　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, action / 100 * 100);
+		}
+		else if(_absAction % 10 > 0)		//equip info of the dungeon
+		{
+			auto _dungeon = TP_Dungeons[(_absAction - 100) / 100];
+			auto _eqList = DBHelper_GetDungeonSetByMapID(_dungeon.id);
+			if (_eqList == nullptr) return false;
+			auto _equipID = _eqList->weapon_list[(_absAction % 100) / 10 - 1];
+			auto _difficulty = (_absAction % 10) - 1;
+			//achivement info
+			uint32_t _achive_dg_info = sQZAchievements.GetDungeonCollectInfo(player, _dungeon.id);
+			uint32_t _achive_eq_info = (_achive_dg_info >> ((_absAction % 100) / 10 - 1) * 4 ) & 0x0F;
+
+			if( (_achive_eq_info & (1 << _difficulty)) == (1<<_difficulty))
+			{
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　已完成　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, action / 10 * 10);
+			}
+			else
+			{
+				//check the player if has this in bag slot 1
+				
+				auto pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START);
+
+				if( (pItem && pItem->GetProto()->ItemId == _equipID) && ( (_difficulty==0)||((pItem->GetItemRandomPropertyId()  >3300 + _difficulty * 5) && (pItem->GetItemRandomPropertyId() <3305 + _difficulty * 5) ) ))	
+				{
+					//take the item and add the achievement
+					player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
+
+					//set the achievement info
+					_achive_dg_info |= ( (1 << _difficulty) << ((_absAction % 100) / 10 - 1) * 4 );  
+					sQZAchievements.SetDungeonCollectInfo(player, _dungeon.id, _achive_dg_info);
+
+					
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　已获取此装备增益　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, action / 10 * 10);
+				}
+				else
+				{
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　请将装备放在行囊第一个格子　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, action / 10 * 10);
+				}
+
+			}
 		}
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 		return true;
@@ -1649,6 +1689,18 @@ bool Menus_Kelala_Newbie(Player *player, Creature *_cr, uint32 sender, uint32 ac
 		Quest const* pQuest = sObjectMgr.GetQuestTemplate(__MENU_KELALA_NEWBIE_QUESTID);
 		player->RewardQuest(pQuest, 0, player, false);
 
+		//add item
+		player->AddItem(30000, 200);
+		player->AddItem(30000, 200);
+		player->AddItem(30000, 200);
+		player->AddItem(30000, 200);
+		player->AddItem(30000, 200);
+		player->AddItem(30000, 200);
+		player->AddItem(30000, 200);
+		player->AddItem(30000, 200);
+		player->AddItem(30000, 200);
+		player->AddItem(30000, 200);
+
 		//Cast the first spell
 		player->CastSpell(player, ZQ_SPELL_BUFF_DRAGON_SLAYER, true);
 
@@ -1679,7 +1731,7 @@ bool Kelala_Menus(Player *player, Creature *_cr, uint32 sender, uint32 action)
 	//check if player is null and go is null
 	if (!player || !_cr) return false;
 
-	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Kelala Menus] PLAYER:[%u][%s] === action: %d", player->GetGUID(), player->GetName(), action);
+	//sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Kelala Menus] PLAYER:[%u][%s] === action: %d", player->GetGUID(), player->GetName(), action);
 
 	//just display the new bie
 	if(Menus_Kelala_Newbie(player, _cr, sender, action)) return true;

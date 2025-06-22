@@ -267,7 +267,7 @@ void Creature::AddToWorld()
             if(pInstanceData->CustomDifficulty > 0 && pInstanceData->CustomDifficulty < 4)
             {
                 //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Creature:%s id:%u created!", GetName(), GetGUID());
-                SetMaxHealth(GetMaxHealth() * (1 + pInstanceData->CustomDifficulty * pInstanceData->CustomDifficulty * 2)); 
+                SetMaxHealth(GetMaxHealth() * (1 + pInstanceData->CustomDifficulty * pInstanceData->CustomDifficulty)); 
                 SetHealthPercent(100.0f);
                 SetNativeScale(1.0f + pInstanceData->CustomDifficulty/5.0f);
                 CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1 - 1 + pInstanceData->CustomDifficulty, true);
