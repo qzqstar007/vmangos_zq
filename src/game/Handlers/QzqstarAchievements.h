@@ -34,8 +34,11 @@ enum Achievement_t
 	ACHIEVEMENTS_RAIDS 			= 	401,
 	ACHIEVEMENTS_ZITIAO 		= 	500,
 	ACHIEVEMENTS_COLLECTIONS 	= 	600,
+	ACHIEVEMENTS_COLLECTIONS_WORLD	= 	600,	//collect the items in the dungeon, subtype is the dungeon id, 
 	ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1 	= 	601,	//collect the items in the dungeon, subtype is the dungeon id, 
 	ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2		= 	602,	//collect the items in the dungeon, subtype is the dungeon id, 
+	ACHIEVEMENTS_COLLECTIONS_RAID			= 	603,	//collect the items in the dungeon, subtype is the dungeon id, 
+	ACHIEVEMENTS_COLLECTIONS_SKILLS			= 	620,	//collect the skills of monters
 	ACHIEVEMENT_COUNTERS		=	1000,	//For combine and refreshing...
 };
 
@@ -51,7 +54,7 @@ enum Achievement_t
 //Challenging Mode
 #define CHALLENGING_MODE_ONELIFE		(0x01)
 #define CHALLENGING_MODE_MANUFACT		(0x02)
-#define CHALLENGING_MODE_COLLECT		(0x04)
+#define CHALLENGING_MODE_EQUIPMENT		(0x04)
 #define CHALLENGING_MODE_TASK			(0x08)
 #define CHALLENGING_MODE_RICH			(0x10)
 #define CHALLENGING_MODE_KILLER_HUMAN	(0x20)
@@ -261,9 +264,22 @@ public:
 	 *		Collection of Dungoens 1/2 Functions
 	 * 
 	 *****************************************************/
-	 AchievementsEntry GetCollectDungeonsInfo(Player *player, uint32_t DungeonsType);
+	 AchievementsEntry GetCollectDungeonsEntry(Player *player, uint32_t DungeonsType);
 	 uint32    GetDungeonCollectInfo(Player *player, uint32_t ac_mapId);
 	 void      SetDungeonCollectInfo(Player *player, uint32_t ac_mapId, uint32_t value);
+	 uint32    GetEQCollectBonus(Player *player);
+
+
+	/*****************************************************
+	 *
+	 *		Collection of Skills from monster
+	 * 
+	 *****************************************************/
+	 AchievementsEntry GetSkillsCollectEntry(Player *player);
+	 uint32    GetSkillsCollectActiveID(Player *player);
+	 int32     GetSkillsCollectEmptySlot(Player *player);
+	 void      SetSkillsCollectInfo(Player *player, uint32_t spellId, uint32_t pos);
+
 
 protected:
 	std::vector<AchievementsEntry> entries;

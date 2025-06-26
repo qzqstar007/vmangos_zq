@@ -35,7 +35,7 @@
 #define __MENU_FRAG_MAIN				3000
 #define __MENU_RUNE_MAIN				4000
 #define __MENU_SUISHEN_MAIN				5000
-#define __MENU_TEAM_MAIN				6000
+#define __MENU_SKILL_STOLE				6000
 #define __MENU_ZITIAO_MAIN				7000
 #define __MENU_END						20000
 
@@ -73,7 +73,7 @@ void _Main_Menus(Player *player)
 
 	if(player->GetLevel() >= 2)
 	{
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　团队功能　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　技能盗窃　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	}
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -539,7 +539,9 @@ void Menus_Frag_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 }
 
 #pragma endregion
-
+#define __TEAM_SUMMON_ACTION		10
+#define __TEAM_REVIVE_ACTION		20
+#define __TEAM_FULLHP_ACTION		30
 bool static __localHandleGroupCommand(Player *pPlayer, uint32 action)
 {
     //Player* pPlayer = m_session->GetPlayer();
@@ -549,6 +551,12 @@ bool static __localHandleGroupCommand(Player *pPlayer, uint32 action)
 		pPlayer->PSendSysMessage(__STR("该功能只能组队使用。 "));
         return false;
     }
+
+	if(pPlayer->IsInCombat())
+	{
+		pPlayer->PSendSysMessage(__STR("该功能不能在战斗中使用。 "));
+        return false;
+	}
 
     for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
@@ -560,14 +568,14 @@ bool static __localHandleGroupCommand(Player *pPlayer, uint32 action)
 			//check the action
 			switch(action)
 			{
-				case 10:
+				case __TEAM_SUMMON_ACTION:
 				{
 					//summon request
 					pMember->SendSummonRequest(pPlayer->GetObjectGuid(), pPlayer->GetMapId(), pPlayer->GetZoneId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
 					break;
 				}
 
-				case 20:
+				case __TEAM_REVIVE_ACTION:
 				{
 					//revive request
 					if (pMember->IsDead())
@@ -578,7 +586,7 @@ bool static __localHandleGroupCommand(Player *pPlayer, uint32 action)
 					break;
 				}
 
-				case 30:
+				case __TEAM_FULLHP_ACTION:
 				{
 					//fufill request
 					if (pMember->IsAlive())
@@ -642,8 +650,8 @@ struct CustomHSSpell : SpellScript
 				if(_Mode & CHALLENGING_MODE_TASK) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　任务模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启任务模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 3);
 
-				if(_Mode & CHALLENGING_MODE_COLLECT) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　收藏模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启收藏模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 4);
+				if(_Mode & CHALLENGING_MODE_EQUIPMENT) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装等模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启装等模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 4);
 
 				if(_Mode & CHALLENGING_MODE_RICH) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　富豪模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启富豪模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 5);
@@ -672,7 +680,7 @@ struct CustomHSSpell : SpellScript
 					case 1:	 _Mode |= CHALLENGING_MODE_ONELIFE; break;
 					case 2:	 _Mode |= CHALLENGING_MODE_MANUFACT; break;
 					case 3:	 _Mode |= CHALLENGING_MODE_TASK; break;
-					case 4:	 _Mode |= CHALLENGING_MODE_COLLECT; break;
+					case 4:	 _Mode |= CHALLENGING_MODE_EQUIPMENT; break;
 					case 5:	 _Mode |= CHALLENGING_MODE_RICH; break;
 					case 10: _Mode |= CHALLENGING_MODE_KILLER_HUMAN; break;
 					case 11: _Mode |= CHALLENGING_MODE_KILLER_BEAST; break;
@@ -769,8 +777,6 @@ struct CustomHSSpell : SpellScript
 				if (_vipFeature & 0x02)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤移动银行　　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 20);
 				if (_vipFeature & 0x04)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤中立拍卖师　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 30);
 				if (_vipFeature & 0x08)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　召唤猎人兽栏　　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 40);
-
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				if (!(_vipFeature & 0x01)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞购买维修机器（１００点券）＜＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 10 + 100);
 				if (!(_vipFeature & 0x02)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞购买移动银行（１００点券）＜＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 20 + 100);
 				if (!(_vipFeature & 0x04)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞购买中立拍卖（１００点券）＜＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 30 + 100);
@@ -780,7 +786,17 @@ struct CustomHSSpell : SpellScript
 				if(!pPlayer->HasSpell(ZQ_SPELL_AUTOPICK))	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞购买一键拾取 （１００点券）＜＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 97 + 100);
 				if(!pPlayer->HasSpell(ZQ_SPELL_BUFF_ALL))	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞购买永久BUFF （２００点券）＜＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 98 + 100);
 
+
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				if (_vipFeature & 0x10) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　队伍召唤　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 80);
+				if (_vipFeature & 0x20)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　全体复活　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 81);
+				if (_vipFeature & 0x40)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　全体恢复　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 82);
+				if (!(_vipFeature & 0x10)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买队伍召唤（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 80 + 100);
+				if (!(_vipFeature & 0x20)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买全体复活（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 81 + 100);
+				if (!(_vipFeature & 0x40)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买全体恢复（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 82 + 100);
+
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);
 
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
@@ -794,10 +810,14 @@ struct CustomHSSpell : SpellScript
 				case 20: pPlayer->CastSpell(pPlayer, ZQ_SPELL_SUMMON_BANK, true); return; //summon bank;
 				case 30: pPlayer->CastSpell(pPlayer, ZQ_SPELL_SUMMON_AH, true); return; //summon ah;
 				case 40: pPlayer->CastSpell(pPlayer, ZQ_SPELL_SUMMON_STABLE, true); return; //summon stable;
+
+				case 80: __localHandleGroupCommand(pPlayer, __TEAM_SUMMON_ACTION); return; //summon request;
+				case 81: __localHandleGroupCommand(pPlayer, __TEAM_REVIVE_ACTION); return; //revive request;
+				case 82: __localHandleGroupCommand(pPlayer, __TEAM_FULLHP_ACTION); return; //full hp request;
 				}
 			}
 
-			else if (action > __MENU_SUISHEN_MAIN + 100 && action < __MENU_SUISHEN_MAIN + 190)
+			else if (action > __MENU_SUISHEN_MAIN + 100 && action < __MENU_SUISHEN_MAIN + 150)
 			{
 				//check if player has enough vouchers
 				
@@ -817,6 +837,29 @@ struct CustomHSSpell : SpellScript
 					}	
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　开通成功，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);	
 				}
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+				return;
+			}
+			else if (action >= __MENU_SUISHEN_MAIN + 180 && action < __MENU_SUISHEN_MAIN + 190)
+			{
+				//Team action buy
+				//check if player has enough vouchers
+				if(!pPlayer->HasItemCount(ZQ_ITEM_VOUCHER, 300))
+				{
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　点券不够，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);	
+				}
+				else
+				{
+					pPlayer->DestroyItemCount(ZQ_ITEM_VOUCHER, 300, true, true);
+					switch (action - __MENU_SUISHEN_MAIN - 180)
+					{
+						case 0: sQZAchievements.SetVIPFeatures(pPlayer, VIP_TEAM_SUMMON);  		break;
+						case 1: sQZAchievements.SetVIPFeatures(pPlayer, VIP_TEAM_REVIVE); 		break;
+						case 2: sQZAchievements.SetVIPFeatures(pPlayer, VIP_TEAM_FULLFILL); 	break;
+					}	
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　开通成功，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);
+				}
+
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
 				return;
 			}
@@ -854,54 +897,136 @@ struct CustomHSSpell : SpellScript
 
 		}
 
-		else if(action >= __MENU_TEAM_MAIN && action <= __MENU_TEAM_MAIN + __MENU_SIZE)
+		else if(action >= __MENU_SKILL_STOLE && action <= __MENU_SKILL_STOLE + __MENU_SIZE)
 		{
-			uint32 _vipFeature = sQZAchievements.GetVIPFeatures(pPlayer);
+			AchievementsEntry e = sQZAchievements.GetSkillsCollectEntry(pPlayer);
+			std::string text = "";
 
-			if(action == __MENU_TEAM_MAIN)
+			//Stole the skill from other monsters
+			if(action == __MENU_SKILL_STOLE)
 			{
-				if (_vipFeature & 0x10) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　队伍召唤　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 10);
-				if (_vipFeature & 0x20)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　全体复活　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 20);
-				if (_vipFeature & 0x40)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　全体恢复　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 30);
-
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
-				if (!(_vipFeature & 0x10)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买队伍召唤（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 10 + 100);
-				if (!(_vipFeature & 0x20)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买全体复活（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 20 + 100);
-				if (!(_vipFeature & 0x40)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买全体恢复（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TEAM_MAIN + 30 + 100);
-
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);
-
-				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
-			}
-			else if (action>__MENU_TEAM_MAIN && action < __MENU_TEAM_MAIN + 99)
-			{
-				__localHandleGroupCommand(pPlayer, action - __MENU_TEAM_MAIN);
-				return;
-			}
-			else if (action > __MENU_TEAM_MAIN + 100 && action < __MENU_TEAM_MAIN + 199)
-			{
-				//check if player has enough vouchers
-				if(!pPlayer->HasItemCount(ZQ_ITEM_VOUCHER, 300))
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+				text= "";
+				text.append(__STR("|cff0000ff＝　当前激活技能：　"));
+				if(e.subType == 0) text.append(__STR("无　|r"));
+				else 
 				{
-					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　点券不够，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);	
+					SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(e.subType);
+					if(spellInfo)
+					{
+						std::string name = spellInfo->SpellName[LOCALE_zhCN];
+						if(name.empty()) name = spellInfo->SpellName[LOCALE_enUS];
+						text.append(name);
+					}
+					else
+					{
+						text.append(__STR("无　|r"));
+					}
+				}
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　已学技能列表　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+				if(e.data8 < 2) e.data8 = 2;
+				else if(e.data8 > 4) e.data8 = 4;
+
+				for (size_t i = 0; i < 4; i++)
+				{
+					bool _foundSpell = false;
+					text= "(";
+					text.append(__NSTR(i));
+					text.append(__STR(") 已收集技能：　"));
+
+					uint32_t spell_id = (i==0)?e.data1:
+										(i==1)?e.data2:
+										(i==2)?e.data3:
+											   e.data4;
+
+					if(i < e.data8)
+					{
+						if(spell_id != 0)
+						{
+							SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spell_id);
+							if(spellInfo)
+							{
+								_foundSpell = true;
+
+								std::string name = spellInfo->SpellName[LOCALE_zhCN];
+								if(name.empty()) name = spellInfo->SpellName[LOCALE_enUS];
+								text.append(name);
+								text.append(__STR("（点击激活）　|r"));
+								pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(text), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE + i + 100);
+								text = __STR(__RED("　　　　　　　　↑↑（点击遗忘）"));
+								pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(text), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE + i + 200);
+							}
+						}
+						
+						if(!_foundSpell) 
+						{
+							text.append(__STR("无　|r"));
+							pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						}
+					}
+
+					else //i >= e.data8
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝　消耗５００点券开启法术槽　＝＝")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE + 300);
+					}
+
+					//add menu
+					pPlayer->SEND_GOSSIP_MENU(ZQ_GOSSIP_SPELL_STOLE, pPlayer->GetGUID());
+				}
+			}
+
+			else if(action >= __MENU_SKILL_STOLE + 100 && action <= __MENU_SKILL_STOLE + 103)
+			{
+				//activate the skill
+				uint32_t absAction = action - __MENU_SKILL_STOLE - 100;
+
+				uint32_t spell_id = (absAction==0)?e.data1:
+									(absAction==1)?e.data2:
+									(absAction==2)?e.data3:
+										   e.data4;
+
+				if(spell_id!= 0)
+				{
+					sQZAchievements.SetSkillsCollectInfo(pPlayer, spell_id, 0);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　成功激活技能，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
 				}
 				else
 				{
-					pPlayer->DestroyItemCount(ZQ_ITEM_VOUCHER, 300, true, true);
-					switch (action - __MENU_TEAM_MAIN - 100)
-					{
-						case 10: sQZAchievements.SetVIPFeatures(pPlayer, VIP_TEAM_SUMMON);  	break;
-						case 20: sQZAchievements.SetVIPFeatures(pPlayer, VIP_TEAM_REVIVE); 		break;
-						case 30: sQZAchievements.SetVIPFeatures(pPlayer, VIP_TEAM_FULLFILL); 	break;
-					}	
-					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　开通成功，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);
-
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　技能错误，联系老G　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
 				}
-
-				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
-				return;
 			}
+
+			else if(action >= __MENU_SKILL_STOLE + 200 && action <= __MENU_SKILL_STOLE + 203)
+			{
+				//forget the skill
+				uint32_t absAction = action - __MENU_SKILL_STOLE - 200;
+
+				sQZAchievements.SetSkillsCollectInfo(pPlayer, 0, absAction + 1);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　成功忘记技能，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
+			}
+
+			else if(action == __MENU_SKILL_STOLE + 300)
+			{
+				//open more slots, need 500 voucher
+				if(!pPlayer->HasItemCount(ZQ_ITEM_VOUCHER, 500))
+				{
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　需要500点券，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
+				}
+				else
+				{
+					pPlayer->DestroyItemCount(ZQ_ITEM_VOUCHER, 500, true, true);
+					sQZAchievements.SetSkillsCollectInfo(pPlayer, e.data8+1, 8);	
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　成功开启技能槽，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
+				}
+			}
+
+			//add menu
+			pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+			return ;
 		}
 
 		else if(action >= __MENU_ZITIAO_MAIN && action <= __MENU_ZITIAO_MAIN + __MENU_SIZE)

@@ -269,7 +269,7 @@ void Creature::AddToWorld()
                 //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Creature:%s id:%u created!", GetName(), GetGUID());
                 SetMaxHealth(GetMaxHealth() * (1 + pInstanceData->CustomDifficulty * pInstanceData->CustomDifficulty)); 
                 SetHealthPercent(100.0f);
-                SetNativeScale(1.0f + pInstanceData->CustomDifficulty/5.0f);
+                SetNativeScale(1.0f + pInstanceData->CustomDifficulty/10.0f);
                 CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1 - 1 + pInstanceData->CustomDifficulty, true);
             }
         }
@@ -1615,6 +1615,21 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
 				LootItem _lootItem = LootItem(item.itemID, 1, Item::GenerateItemRandomPropertyId(item.itemID));
 				loot.items.emplace_back(_lootItem);
 			}
+        }
+    }
+
+    if(roll_chance_i(1))
+    {
+        if (loot.items.size() < MAX_NR_LOOT_ITEMS)             // Non-quest drop
+        {
+            uint32_t _itemID = PickRandomValue(ZQ_ITEM_VOUCHER,ZQ_ITEM_VOUCHER,ZQ_ITEM_VOUCHER,ZQ_ITEM_VOUCHER,
+                    ZQ_ITEM_RUNE_STONE,
+                    ZQ_ITEM_BUFF,
+                    ZQ_ITEM_FRAGMENTS,
+                    ZQ_ITEM_PET_FOOD);
+
+            LootItem _lootItem = LootItem(_itemID, 1, 0);
+            loot.items.emplace_back(_lootItem);
         }
     }
 

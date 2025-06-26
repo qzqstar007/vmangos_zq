@@ -65,6 +65,7 @@ typedef struct _level_weaponList {
 }Weapon_Dungeon_Set_t;
 
 extern const Weapon_Dungeon_Set_t * DBHelper_GetDungeonSetByMapID(int32 mapId);
+extern int COUNT_ONES(uint32_t x) ;
 
 #endif	//_QZQSTAR_DB_H
 

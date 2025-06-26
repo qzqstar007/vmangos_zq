@@ -31,6 +31,26 @@
 
 #include "custom/qzqstar_db.h"
 
+//qzqstar, 250622, support for the dungeon difficulty bonus to sets
+//setid can be four kinds
+//normal, trial, hell, nightmare
+void AddItemsetByDifficulty(Player* player, Item* item, uint32 _difficulty)
+{
+    ItemPrototype const* proto = item->GetProto();
+
+    if(!proto)
+        return;
+
+    if(_difficulty > 4)
+        return;
+
+    
+
+}
+
+
+
+
 void AddItemsSetItem(Player* player, Item* item)
 {
     ItemPrototype const* proto = item->GetProto();

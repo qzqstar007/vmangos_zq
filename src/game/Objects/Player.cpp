@@ -10756,6 +10756,9 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
             if (pProto && pProto->ItemSet)
                 AddItemsSetItem(this, pItem);
 
+            //qzqstar, 250622, add itemset for difficulty dungeons
+            //else if()
+
             _ApplyItemMods(pItem, slot, true);
 
             // World of Warcraft Client Patch 1.7.0 (2005-09-13)
@@ -15443,6 +15446,11 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     // make sure the unit is considered out of combat for proper loading
     ClearInCombat();
 
+
+    // SHALL i reload the achivements here?
+    uint32 __count = sQZAchievements.Load(this); //before calling the spells
+
+
     // make sure the unit is considered not in duel for proper loading
     SetGuidValue(PLAYER_DUEL_ARBITER, ObjectGuid());
     SetUInt32Value(PLAYER_DUEL_TEAM, 0);
@@ -15477,6 +15485,19 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     _LoadSpells(holder->TakeResult(PLAYER_LOGIN_QUERY_LOADSPELLS));
 
+    // Load achievements here, before spell and talents
+    //get the challenge mode from db
+    //qzqstar, 250411, load from achievements
+    M_Challenge_Mode = sQZAchievements.GetChallengeMode(this);
+    uint32 _Promotions = sQZAchievements.GetPromotions(this);
+    M_Leech_Phy = _Promotions % 10;
+    M_Leech_Spell = (_Promotions / 10)%10;
+    M_TalentPoints = (_Promotions / 100)%10;
+    M_Speed = (_Promotions / 1000)%10;
+    M_WeaponSkill = (_Promotions / 10000)%10;
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= 0x%X, Promotions=%d", GetName(), M_Challenge_Mode, _Promotions);
+
+        
     // after spell load
     InitTalentForLevel();
     LearnDefaultSpells();
@@ -15563,25 +15584,15 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     UpdateAllStats();
 
 
-	//qzqstar, 250411, load from achievements
-	uint32 __count = sQZAchievements.Load(this);
+
 
 	//qzqstar, 250227,  modify the 5 modes xp, thus exertnal xp gain can be set to 1.
 	auto __xpRate = 1.5f;
 	//if (GetLevel() > 1) __xpRate = 1.5f; startup server begins
 
 
-    //get the challenge mode from db
-    M_Challenge_Mode = sQZAchievements.GetChallengeMode(this);
-    uint32 _Promotions = sQZAchievements.GetPromotions(this);
-    M_Leech_Phy = _Promotions % 10;
-    M_Leech_Spell = (_Promotions / 10)%10;
-    M_TalentPoints = (_Promotions / 100)%10;
-    M_Speed = (_Promotions / 1000)%10;
-    M_WeaponSkill = (_Promotions / 10000)%10;
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= 0x%X, Promotions=%d", GetName(), M_Challenge_Mode, _Promotions);
-    
-    UpdateFreeTalentPoints(false);
+
+    //UpdateFreeTalentPoints(false);
 	//if (HasSpell(__MODE_KILLER))     __xpRate = 2.0f;
 	//if (HasSpell(__MODE_MANUFACT))   __xpRate = 1.0f;
 	//if (HasSpell(__MODE_ONE_LIFE))   __xpRate = 1.0f;
@@ -15593,7 +15604,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     std::string _ModeText = __STR("");
     if(M_Challenge_Mode & CHALLENGING_MODE_MANUFACT)    { _ModeText.append(__STR("工匠模式、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_ONELIFE)     { _ModeText.append(__STR("一命模式、、 ")); __xpRate = 1.0f;}
-    if(M_Challenge_Mode & CHALLENGING_MODE_COLLECT)      { _ModeText.append(__STR("收集模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_EQUIPMENT)      { _ModeText.append(__STR("装等模式、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_TASK)        { _ModeText.append(__STR("任务模式、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_RICH)        { _ModeText.append(__STR("富豪模式、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_HUMAN)  { _ModeText.append(__STR("杀手模式（人形）、、 ")); __xpRate = 1.0f;}

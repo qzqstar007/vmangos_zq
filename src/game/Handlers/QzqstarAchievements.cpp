@@ -6,6 +6,7 @@
 #include "Util.h"
 
 #include "QzqstarAchievements.h"
+#include "custom/qzqstar_db.h"
 
 INSTANTIATE_SINGLETON_1(QzqstarAchievements);
 
@@ -1079,7 +1080,7 @@ void QzqstarAchievements::SetCollectAchiveInfo(Player *player, uint32_t itemSetT
 /* ========================= Collections of Dungeon system  ==========================================================*/
 /*=====================================================================================================================*/
 
-AchievementsEntry QzqstarAchievements::GetCollectDungeonsInfo(Player *player, uint32_t DungeonsType)
+AchievementsEntry QzqstarAchievements::GetCollectDungeonsEntry(Player *player, uint32_t DungeonsType)
 {
 	//check _player if none
 	if (!player) return AchievementsEntry();
@@ -1179,7 +1180,9 @@ void      QzqstarAchievements::SetDungeonCollectInfo(Player *player, uint32_t ac
 				case 7: e.data7 = value; break;
 				case 8: e.data8 = value; break;
 				default: break;	
-			}	
+			}
+			
+			return;
 		}	
 	}
 
@@ -1192,6 +1195,168 @@ void      QzqstarAchievements::SetDungeonCollectInfo(Player *player, uint32_t ac
 	_playerAchievements[player->GetGUID()].push_back(e);
 
 	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeon Collect: %u", player->GetName(), ac_mapId);
+}
+
+
+
+static float __count_weight(uint32_t data)
+{
+	float bonus = 0;
+
+	while (data > 0)
+	{
+		if (data & 0x01)	bonus += 1.0f;	//difficulty 0
+		if (data & 0x02)	bonus += 1.2f;	//1
+		if (data & 0x04)	bonus += 1.5f;	//2
+		if (data & 0x08)	bonus += 1.8f;	//3
+
+		data = data / 16;
+	}
+
+	return bonus;
+}
+
+uint32    QzqstarAchievements::GetEQCollectBonus(Player *player)
+{
+	uint32 bonus = 0;
+
+	//achieve of equipment collection, add 10 AP and 5 SP for each equipment collected.
+	AchievementsEntry ACHIVE_Entries[4]; 
+	ACHIVE_Entries[0] = sQZAchievements.GetCollectDungeonsEntry(player, ACHIEVEMENTS_COLLECTIONS_WORLD);
+	ACHIVE_Entries[1] = sQZAchievements.GetCollectDungeonsEntry(player, ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1);
+	ACHIVE_Entries[2] = sQZAchievements.GetCollectDungeonsEntry(player, ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2);    
+	ACHIVE_Entries[3] = sQZAchievements.GetCollectDungeonsEntry(player, ACHIEVEMENTS_COLLECTIONS_RAID);    
+	
+	/* Do World collections */
+
+
+	/* Do Dungeon collections */
+	bonus += __count_weight(ACHIVE_Entries[1].subType) * 1;
+	bonus += __count_weight(ACHIVE_Entries[1].data1) * 1.2f;
+	bonus += __count_weight(ACHIVE_Entries[1].data2) * 1.4f;
+	bonus += __count_weight(ACHIVE_Entries[1].data3) * 1.6f;
+	bonus += __count_weight(ACHIVE_Entries[1].data4) * 1.8f;
+	bonus += __count_weight(ACHIVE_Entries[1].data5) * 2.0f;
+	bonus += __count_weight(ACHIVE_Entries[1].data6) * 2.2f;
+	bonus += __count_weight(ACHIVE_Entries[1].data7) * 2.4f;
+	bonus += __count_weight(ACHIVE_Entries[1].data8) * 2.6f;
+
+	bonus += __count_weight(ACHIVE_Entries[2].subType) * 2.8f;
+	bonus += __count_weight(ACHIVE_Entries[2].data1) * 3.0f;
+	bonus += __count_weight(ACHIVE_Entries[2].data2) * 3.2f;
+	bonus += __count_weight(ACHIVE_Entries[2].data3) * 3.4f;
+	bonus += __count_weight(ACHIVE_Entries[2].data4) * 3.6f;
+	bonus += __count_weight(ACHIVE_Entries[2].data5) * 3.8f;
+	bonus += __count_weight(ACHIVE_Entries[2].data6) * 4.0f;
+	bonus += __count_weight(ACHIVE_Entries[2].data7) * 4.2f;
+	bonus += __count_weight(ACHIVE_Entries[2].data8) * 4.5f;
+
+	//Do Raid collections
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s GetEQCollectBonus: %u", player->GetName(), bonus);
+	return bonus;
+}
+
+
+
+/* ================================================================================================================== */
+/* ========================= Collections of Skills from monster  =====================================================*/
+/*====================================================================================================================*/
+
+AchievementsEntry QzqstarAchievements::GetSkillsCollectEntry(Player *player)
+{
+	//check _player if none
+	if (!player) return AchievementsEntry();
+
+	//iterate the _playerAchievements vector map of this player to find the collect information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENTS_COLLECTIONS_SKILLS)
+		{
+			return e;
+		}	
+	}
+
+	//if not found, create one and return it
+	AchievementsEntry e;
+	e.guid = player->GetGUID();
+	e.type = ACHIEVEMENTS_COLLECTIONS_SKILLS;
+	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
+	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 2;
+	_playerAchievements[player->GetGUID()].push_back(e);
+	// sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Not found but init one Skills Entry: %u", player->GetGUID());
+	return e;
+}
+
+uint32    QzqstarAchievements::GetSkillsCollectActiveID(Player *player)
+{
+	//check _player if none
+	if (!player) return 0;
+
+	//iterate the _playerAchievements vector map of this player to find the collect information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENTS_COLLECTIONS_SKILLS)
+		{
+			return (e.subType); //Active ID
+		}	
+	}
+}
+void      QzqstarAchievements::SetSkillsCollectInfo(Player *player, uint32_t spellId, uint32_t pos)
+{
+	//check _player if none
+	if (!player) return;
+
+	//iterate the _playerAchievements vector map of this player to find the collect information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENTS_COLLECTIONS_SKILLS)
+		{
+			//if found, set the miscValue data
+			switch(pos)	
+			{
+				case 0: e.subType = spellId; break;
+				case 1: e.data1 = spellId; break;
+				case 2: e.data2 = spellId; break;
+				case 3: e.data3 = spellId; break;
+				case 4: e.data4 = spellId; break;
+				case 8: e.data8 = spellId; break;	//e.data8 means total actived skills count
+				default: break;
+			}
+		}	
+	}
+}
+
+
+int32     QzqstarAchievements::GetSkillsCollectEmptySlot(Player *player)
+{
+	//check _player if none
+	if (!player) return 0;
+
+	//iterate the _playerAchievements vector map of this player to find the collect information
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENTS_COLLECTIONS_SKILLS)
+		{
+			//if found, set the miscValue data
+			if(e.data8 < 2) e.data8 = 2;
+			else if(e.data8 > 4) e.data8 = 4;
+
+			for(int i = 0; i < e.data8; i++)
+			{
+				if(i==0 && e.data1 == 0) return 1;
+				else if(i==1 && e.data2 == 0) return 2;
+				else if(i==2 && e.data3 == 0) return 3;
+				else if(i==3 && e.data4 == 0) return 4;
+			}
+		}	
+	}
+
+	//not found
+	return 0;
 }
 
 #pragma endregion

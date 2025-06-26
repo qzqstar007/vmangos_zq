@@ -55,7 +55,7 @@
 #define __RED(x)		"|cfff00019"##x##"|r"
 #define __YELLOW(x)		"|cfff9dc24"##x##"|r"
 
-#define __KELALA_LOGIN_GOSSIPID			     	(ZQ_GOSSIP_VIP_UPGRADE)
+#define __KELALA_LOGIN_GOSSIPID			     	(ZQ_GOSSIP_KELALA_VIP)
 #define __LOGIN_REWARD_QUEST_ID			 	 	(ZQ_QUEST_LOGON_IND)
 #define __SUBMENU_LOGIN_MAIN					 0
 #define __SUBMENU_LOGIN_VIP_LEVELUP				 800	//Normal Levelup using Gold
@@ -94,15 +94,15 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 			}
 			else if (vip_level == 3)
 			{
-				player->AddItem(ZQ_ITEM_VOUCHER, 30); player->AddItem(ZQ_ITEM_FRAGMENTS, 5); player->AddItem(ZQ_ITEM_PET_FOOD, 5);
+				player->AddItem(ZQ_ITEM_VOUCHER, 30); player->AddItem(ZQ_ITEM_FRAGMENTS, 5); player->AddItem(ZQ_ITEM_PET_FOOD, 5); player->AddItem(ZQ_ITEM_RUNE_STONE, 1);
 			}
 			else if (vip_level == 4)
 			{
-				player->AddItem(ZQ_ITEM_VOUCHER, 50);  player->AddItem(ZQ_ITEM_FRAGMENTS, 10); player->AddItem(ZQ_ITEM_PET_FOOD, 10); //Pearls
+				player->AddItem(ZQ_ITEM_VOUCHER, 50);  player->AddItem(ZQ_ITEM_FRAGMENTS, 10); player->AddItem(ZQ_ITEM_PET_FOOD, 10); player->AddItem(ZQ_ITEM_RUNE_STONE, 2);//Pearls
 			}
 			else if (vip_level == 5)
 			{
-				player->AddItem(ZQ_ITEM_VOUCHER, 100);  player->AddItem(ZQ_ITEM_FRAGMENTS, 15); player->AddItem(ZQ_ITEM_PET_FOOD, 15); //Pearls
+				player->AddItem(ZQ_ITEM_VOUCHER, 100);  player->AddItem(ZQ_ITEM_FRAGMENTS, 15); player->AddItem(ZQ_ITEM_PET_FOOD, 15); player->AddItem(ZQ_ITEM_RUNE_STONE, 3);//Pearls
 			}
 
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -221,11 +221,20 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 	text = __STR("｜　　今日完成：|cff007733");
 	text.append(__NSTR(PAIR32_LOPART(_doneCounter)));
 	text.append(__STR(" |r / 100 "));
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	text = __STR("｜　　总共完成：|cff007733");
 	text.append(__NSTR(PAIR32_HIPART(_doneCounter)));
 	text.append(__STR(" |r / 10000 "));
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	text = __STR("｜　　攻强增加：|cff007733");
+	text.append(__NSTR(PAIR32_HIPART(_doneCounter)));
+	text.append(__STR(" |r 点 "));
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	text = __STR("｜　　法伤增加：|cff007733");
+	text.append(__NSTR(PAIR32_HIPART(_doneCounter)/2));
+	text.append(__STR(" |r 点 "));
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
 
 	auto	_currentQuestID = sQZAchievements.GetCustomQuestID(player);
@@ -523,20 +532,20 @@ bool Menus_Kelala_Shop(Player *player, Creature *_Creature, uint32 sender, uint3
 
 
 #pragma region Mode System
-#define	__GOSSIP_MODE_MSG						(16201)
+#define	__GOSSIP_MODE_MSG						(ZQ_GOSSIP_KELALA_MODE_FUNC)
 #define __MENU_MODE_MAIN						(__MENU_KELALA_MODE + 0)
 #define __MENU_MODE_SUB_1						(__MENU_MODE_MAIN + 10)
 #define	__MENU_MODE_SUB_1_NAME					"[退出一命模式，领取奖励]"
 #define __MENU_MODE_SUB_1_ACT_1					(__MENU_MODE_SUB_1 + 1)
-#define __MENU_MODE_SUB_1_SPELL					(30841)
+#define __MENU_MODE_SUB_1_SPELL					(CHALLENGING_MODE_ONELIFE)
 
 #define __MENU_MODE_SUB_2						(__MENU_MODE_SUB_1 + 10)
 #define	__MENU_MODE_SUB_2_NAME					"[退出自强模式，领取奖励]"
 #define __MENU_MODE_SUB_2_ACT_1					(__MENU_MODE_SUB_2 + 1)
-#define __MENU_MODE_SUB_2_SPELL					(30843)
+#define __MENU_MODE_SUB_2_SPELL					(CHALLENGING_MODE_TASK)
 
 #define __MENU_MODE_SUB_3						(__MENU_MODE_SUB_2 + 10)
-#define	__MENU_MODE_SUB_3_NAME					"[退出收藏模式，领取奖励]"
+#define	__MENU_MODE_SUB_3_NAME					"[退出装等模式，领取奖励]"
 #define __MENU_MODE_SUB_3_ACT_1					(__MENU_MODE_SUB_3 + 1)
 #define __MENU_MODE_SUB_3_SPELL					(30845)
 
@@ -552,7 +561,7 @@ bool Menus_Kelala_Shop(Player *player, Creature *_Creature, uint32 sender, uint3
 
 //Mode function
 #define __MENU_MODE_SUB_31						(__MENU_MODE_MAIN + 100)
-#define	__MENU_MODE_SUB_31_NAME					"[收藏模式：查看装等，突破等级]"
+#define	__MENU_MODE_SUB_31_NAME					"[装等模式：查看装等，突破等级]"
 #define __MENU_MODE_SUB_31_ACT_1				(__MENU_MODE_SUB_31 + 1)
 
 #define __MENU_MODE_SUB_32						(__MENU_MODE_MAIN + 110)
@@ -582,7 +591,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 	{
 		case __MENU_MODE_MAIN:
 		{
-			player->ADD_GOSSIP_ITEM(5, __STR("==|满级可以退出挑战，领取奖励|=="), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(5, __STR("＝＝满级退出挑战，领取奖励＝＝"), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			//Five Modes Exit
 			if (player->GetLevel() == 60 && player->HasSpell(__MENU_MODE_SUB_1_SPELL)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_1_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_1);
 			if (player->GetLevel() == 60 && player->HasSpell(__MENU_MODE_SUB_2_SPELL)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_2_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_2);
@@ -592,15 +601,15 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 
 
 			player->ADD_GOSSIP_ITEM(5, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-			player->ADD_GOSSIP_ITEM(5, __STR("=======模式功能========"), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(5, __STR("＝＝＝＝模式功能＝＝＝＝"), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			
 			// change the player's level to 25/35/45/55 etc..
-			if (player->HasSpell(__MENU_MODE_SUB_3_SPELL) && (pLevel==25 || pLevel == 35 || pLevel == 45 || pLevel == 58)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_31_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_31);
+			if ( (player->M_Challenge_Mode & CHALLENGING_MODE_EQUIPMENT) && (pLevel==25 || pLevel == 35 || pLevel == 45 || pLevel == 58)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_31_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_31);
 			if (pLevel > 58) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_32_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_32);
 
 
 			player->ADD_GOSSIP_ITEM(5, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
-			player->ADD_GOSSIP_ITEM(5, __STR("<===返回===="), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN);
+			player->ADD_GOSSIP_ITEM(5, __STR("<===返回===="), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
 
 			player->SEND_GOSSIP_MENU(__GOSSIP_MODE_MSG, _Creature->GetGUID());
 			break;
@@ -690,15 +699,17 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 
 		//Advanced the level
 		case __MENU_MODE_SUB_31:
+		case __MENU_MODE_SUB_31_ACT_1:
 		{	
 			//get the all levels, and expected level
 			//directly assign the eqlevel
-			//const int _eqLevelEach[] = {25, 40, 55, 70}; - First stage
+			//const int _eqLevelEach[] = {25, 40, 55, 70}; // First stage
 			//const int _eqLevelEach[] = { 20, 40, 55, 70 };	//Second Stage
 			//const int _eqLevelEach[] = { 18, 35, 60, 70 };	//3rd Stage
 			//const int _eqLevelEach[] = { 15, 30, 52, 80 };		//4th Stage
-			const int _eqLevelEach[] = { 10, 20, 40, 65 };		//4th Stage
+			const int _eqLevelEach[] = { 10, 25, 50, 65 };		//4th Stage
 			
+			//pick the _eqLevelEach for different level of player
 			auto __pick = pLevel < 26 ? 0 : pLevel < 36 ? 1 : pLevel < 46 ? 2 : 3;
 			int32 _needEQLevel = 20 * _eqLevelEach[__pick];
 
@@ -714,7 +725,52 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 				{
 					_curEQLevel += pItem->GetProto()->ItemLevel;
 					if(pItem->GetProto()->InventoryType == INVTYPE_2HWEAPON) _curEQLevel += pItem->GetProto()->ItemLevel;
+
+					//check the random properties
+					if(pItem->GetItemRandomPropertyId() > 3300 && pItem->GetItemRandomPropertyId() < 3321)
+					{
+						auto difficutly = (pItem->GetItemRandomPropertyId() -1 ) % 5;
+						_curEQLevel += (difficutly) * pItem->GetProto()->ItemLevel / 10;
+					}
 				}
+			}
+
+			if(action == __MENU_MODE_SUB_31_ACT_1)
+			{
+				//check if the player has enough eqlevel to break through the level
+				if (_curEQLevel >= _needEQLevel && pLevel < 60)
+				{
+					player->GiveLevel(pLevel + 1);
+
+					//give the vouchers
+					if(_curEQLevel > _needEQLevel)
+					{
+						player->AddItem(ZQ_ITEM_VOUCHER, (_curEQLevel - _needEQLevel) );
+					}
+					
+					//Announce the player
+					auto const& sessions = sWorld.GetAllSessions();
+					for (const auto& itr : sessions)
+					{
+						if (WorldSession* session = itr.second)
+						{
+							Player* _onlineplayer = session->GetPlayer();
+							if (_onlineplayer && _onlineplayer->IsInWorld() && player->IsAlive())
+							{
+								//9021 |cff0000bb[等级突破]|r 恭喜玩家：|cff0000bb[%s]|r  成功突破等级限制，装等：%u，原等级：%u，现在等级：%u。
+								ChatHandler(_onlineplayer).PSendSysMessage(ZQ_MANGOS_STRING_CHALLENGE_BREAKTHROUGH, player->GetName(), _curEQLevel, pLevel, pLevel+1);
+							}
+						}
+					}
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "<==突破成功，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN);
+				}	
+				else
+				{
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "<==|未达到要求，返回首页|===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN);
+				}
+
+				player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+				return true;
 			}
 
 			// ----- region -------------- display the rankings
@@ -754,27 +810,18 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			if (_curEQLevel >= _needEQLevel && pLevel<60 )
 			{
-				player->GiveLevel(pLevel + 1);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__GREEN("===|满足装等要求,, 已突破等级|===")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-
-				//Announce the player
-				auto const& sessions = sWorld.GetAllSessions();
-				for (const auto& itr : sessions)
-				{
-					if (WorldSession* session = itr.second)
-					{
-						Player* _onlineplayer = session->GetPlayer();
-						if (_onlineplayer && _onlineplayer->IsInWorld() && player->IsAlive())
-						{
-							ChatHandler(_onlineplayer).PSendSysMessage(9051, player->GetName(), _curEQLevel, pLevel, pLevel+1);
-						}
-					}
-				}
-
+				
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__GREEN("＝＝满足装等要求，可以突破等级＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				text = "|cff0829C9 并获得点券数量：";
+				text.append(__NSTR(_curEQLevel - _needEQLevel));
+				text.append("。|r");
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("==|确定突破|===")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_31_ACT_1);
 			}
-			else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__RED("==装等不够,,等会再来===")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("==装等不够,,等会再来===")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-			player->ADD_GOSSIP_ITEM(5, "<==返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "<==返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN);
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 			break;
 		}
@@ -1393,6 +1440,8 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 	
 	if (action == __MENU_KELALA_EQUIP_COLLECTS)
 	{
+		uint32 _EQBonus = sQZAchievements.GetEQCollectBonus(player);
+
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　野外装备收集　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_WORLD);
@@ -1404,8 +1453,19 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+		std::string text = "";
+		text.append(__STR("|cff0000ff＝＞　当前攻强加成：　"));
+		text.append(__NSTR(_EQBonus));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
+		text = "";
+		text.append(__STR("|cff0000ff＝＞　当前法伤加成：　"));
+		text.append(__NSTR(_EQBonus/2));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＞　返回　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
-		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+
+		player->SEND_GOSSIP_MENU(ZQ_GOSSIP_KELALA_EQ_COLLECT, _Creature->GetGUID());
 		return true;	
 	}
 
@@ -1435,11 +1495,8 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 		//map id is multplied by 100, offset 1(which ragefire means 1)
 		//so, mapid should be 1 to 18, and action is 100 to 1800
 		//WE Reuse the TP_Dungeons for dislay info
-		AchievementsEntry ACHIVE_Entries[2]; 
-		ACHIVE_Entries[0] = sQZAchievements.GetCollectDungeonsInfo(player, ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1);
-		ACHIVE_Entries[1] = sQZAchievements.GetCollectDungeonsInfo(player, ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2);
-
 		//we need two pages to display the dungeon info
+
 		if(_absAction <= 1)
 		{
 			//sizeof(TP_Dungeons) / sizeof(TP_Dungeons[0] = 18
@@ -1511,31 +1568,6 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON +  _absAction + (i+1)*10);
 			}
 
-			//start and end of the list is 0 and 5
-			/*
-			auto _startPos = 3 * (_absAction % 100);
-			auto _endPos = _startPos + 3;
-			for (size_t i = _startPos; i < _endPos; i++)
-			{
-				auto item_1_local = sObjectMgr.GetItemLocale(_eqList->weapon_list[i]);
-				auto item_1_text = (item_1_local == nullptr ? __STR("未知装备 ") : item_1_local->Name[LOCALE_deDE]);
-
-				for(int j=0; j<4; j++)
-				{	
-					text = __STR(__BLUE("＝＝＞　|cff0000ff"));
-					text.append(__STR(item_1_text));
-					text.append(j==0?__STR("（普通）　 "):j==1?__STR("（试炼）　 "):j==2?__STR("（地狱）　 "):__STR("（梦魇）　 "));
-					text.append(__STR(__BLUE("|r　＜未完成＞　")));
-					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON + (_absAction - 100) * 10 + i);
-				}
-			}
-
-			//next or previous page
-			if (_absAction % 100 == 1)
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　上一页　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON + _absAction);
-			else if (_absAction % 100 == 0)
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　下一页　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON + _absAction + 1);
-			*/
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　返回　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON);
 		}
@@ -1655,15 +1687,13 @@ bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 acti
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　社区贡献　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SOCIAL);
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　挑战模式　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MODE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　声望奖励　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_REP);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 
-	if(player->GetLevel() >= 60)
-	{
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　挑战奖励　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MODE);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-	}
 
 
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　衬衣战袍背包升级　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SUIT);

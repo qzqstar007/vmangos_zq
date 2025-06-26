@@ -71,6 +71,7 @@ typedef struct __spell_dbc_desc {
 extern const Spell_DBC_t __Spells_DBC_Array[630];
 
 
+extern uint32_t ZQ_GetRandomEQEnchantment(bool isRare);
 
 
 

@@ -9021,7 +9021,7 @@ const std::vector<Weapon_Dungeon_Set_t> _Weapon_Dungeon_Set =
 	/* MAP_DEADMINES,         __XSTR("死亡矿井　"), */		{ 2, 	{1, 3, 4, 6},	{1156,5194,		7230,5198,  	5201,5191 } },
 	/* MAP_SHADOWFANG_KEEP,   __XSTR("影牙城堡　"), */		{ 3, 	{1, 3, 4, 7},	{6318,1292,		6321,3748,  	6320,6220 } },
 	/* MAP_BLACKFATHOM_DEEPS, __XSTR("黑暗深渊　"), */		{ 4, 	{2, 4, 5, 7},	{3078,6905,		6907,6904,  	1155,6909 } },
-	/* MAP_GNOMEREGAN,        __XSTR("诺莫瑞根　"), */		{ 5, 	{2, 4, 5, 7},	{0,0,	0,0,  0,0} },
+	/* MAP_GNOMEREGAN,        __XSTR("诺莫瑞根　"), */		{ 5, 	{2, 4, 5, 7},	{9446,9447,		9449,9452,  	9454,9453} },
 	/* MAP_MONASTERY,         __XSTR("血色修道院　"), */	{ 6, 	{2, 4, 6, 8},	{0,0,	0,0,  0,0 } },
 	/* MAP_RAZORFEN_KRAUL,    __XSTR("剃刀沼泽　"), */		{ 7, 	{2, 4, 6, 8},	{0,0,	0,0,  0,0 } },
 	/* MAP_RAZORFEN_DOWNS,    __XSTR("剃刀高地　"), */		{ 8, 	{2, 4, 6, 8},	{0,0,	0,0,  0,0 } },
@@ -9041,6 +9041,16 @@ const Weapon_Dungeon_Set_t * DBHelper_GetDungeonSetByMapID(int32 mapId)
 {
 	if(mapId >= 0 && mapId <= 17) return &(_Weapon_Dungeon_Set[mapId]);
 	else return nullptr;
+}
+
+
+int COUNT_ONES(uint32_t x) {
+    int count = 0;
+    while (x) {
+        x &= (x - 1);  // 清除最低位的 1
+        count++;
+    }
+    return count;
 }
 
 #pragma endregion

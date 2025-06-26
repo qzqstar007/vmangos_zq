@@ -113,12 +113,12 @@ const Teleport_Point_t TP_Dungeons[] = {
 	{ 0, MAP_RAGEFIRE_CHASM,    __XSTR("怒焰裂谷　"), 1, 1815,-4419,-18.7,5.2, {11518,11520,11517,4,5,6,7,8,30071,1}},
 	{ 1, MAP_WAILING_CAVERNS,   __XSTR("哀嚎洞穴　"), 1, -731.607f,-2218.39f,17.0281f,2.78486f, {3653,3654,3671,3674,3673,3670,7,8,30071,1}},
 	{ 2, MAP_DEADMINES,         __XSTR("死亡矿井　"), 0, -11208.7f,1673.52f,24.6361f,1.51067f, {644,1763,646,639,645,6,7,8,30071,1}},
-	{ 3, MAP_SHADOWFANG_KEEP,   __XSTR("影牙城堡　"), 0, -234.675,1561.63,76.8921,1.24031, {1,2,3,4,5,6,7,8,9,1}},
-	{ 4, MAP_BLACKFATHOM_DEEPS, __XSTR("黑暗深渊　"), 1, 4249.99,740.102,-25.671,1.34062, {1,2,3,4,5,6,7,8,9,1}},
-	{ 5, MAP_GNOMEREGAN,        __XSTR("诺莫瑞根　"), 0, -5163.54,925.423,257.181,1.57423, {0}},
-	{ 6, MAP_MONASTERY,         __XSTR("血色修道院　"), 1, 2872.6,-764.398,160.332,5.05735, {0}},
-	{ 7, MAP_RAZORFEN_KRAUL,    __XSTR("剃刀沼泽　"), 1, -4470.28,-1677.77,81.3925,1.16302, {0}},
-	{ 8, MAP_RAZORFEN_DOWNS,    __XSTR("剃刀高地　"), 1, -4657.3,-2519.35,81.0529,4.54808, {0}},
+	{ 3, MAP_SHADOWFANG_KEEP,   __XSTR("影牙城堡　"), 0, -234.675,1561.63,76.8921,1.24031, {4274,4279,4275,3886,3887,4278,7,8,30071,1}},
+	{ 4, MAP_BLACKFATHOM_DEEPS, __XSTR("黑暗深渊　"), 1, 4249.99,740.102,-25.671,1.34062, {4887,4831,6243,4829,4832,6,7,8,30071,1}},
+	{ 5, MAP_GNOMEREGAN,        __XSTR("诺莫瑞根　"), 0, -5163.54,925.423,257.181,1.57423, {6235,7079,6229,7800,5,6,7,8,30071,1}},
+	{ 6, MAP_MONASTERY,         __XSTR("血色修道院　"), 0, 2872.6,-764.398,160.332,5.05735, {4543,6487,3976,3975,3977,3974,7,8,30071,1}},
+	{ 7, MAP_RAZORFEN_KRAUL,    __XSTR("剃刀沼泽　"), 1, -4470.28,-1677.77,81.3925,1.16302, {4428,4421,4422,4420,5,6,7,8,30071,1}},
+	{ 8, MAP_RAZORFEN_DOWNS,    __XSTR("剃刀高地　"), 1, -4657.3,-2519.35,81.0529,4.54808, {7357,8567,7354,7355,7358,6,7,8,30071,1}},
 	{ 9, MAP_ULDAMAN,           __XSTR("奥达曼　"), 0, -6071.37,-2955.16,209.782,0.015708, {0}},
 	{10, MAP_MARAUDON,          __XSTR("玛拉顿　"), 1, -1188.37,2879.61,85.7888,5.07366, {0}},
 	{11, MAP_ZUL_FARRAK,        __XSTR("祖尔法拉克　"), 1, -6801.19,-2893.02,9.00388,0.158639, {0}},
@@ -248,7 +248,7 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 		}
 	}
 
-	else if (action >= __MENU_TELEPORT_DUNGEONS_MAIN + __MENU_TELEPORT_DUNGEONS_ACT2 && action < __MENU_TELEPORT_DUNGEONS_MAIN + __MENU_TELEPORT_DUNGEONS_ACT2 + __MENU_SUB_SIZE)
+	else if (action >= __MENU_TELEPORT_DUNGEONS_MAIN + __MENU_TELEPORT_DUNGEONS_ACT2 && action <= __MENU_TELEPORT_DUNGEONS_MAIN + __MENU_TELEPORT_DUNGEONS_ACT2 + 128 /* Note, 0x7F is max 127 */)
 	{
 		//get the real actions = acID
 		uint32 _localBytes = action - __MENU_TELEPORT_DUNGEONS_MAIN - __MENU_TELEPORT_DUNGEONS_ACT2;
@@ -262,8 +262,8 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 		//get the dungeon information
 		uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID);	
 		//save the current difficulty
-		_playerDungeonInfo &= 0x0C; //clear the lower 4 bit, keep the higher 4 bit.
-		_playerDungeonInfo |= _difficulty; //set the lower 4 bit to the difficulty.
+		_playerDungeonInfo &= 0x0C; //clear the lower 2 bit, keep the higher 2 bit.
+		_playerDungeonInfo |= _difficulty; //set the lower 2 bit to the difficulty.
 		sQZAchievements.SetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID, _playerDungeonInfo); //save the dungeon information to the player's achievements vector.
 
 		player->CLOSE_GOSSIP_MENU();
@@ -472,7 +472,7 @@ bool Menus_teleport_Common(Player *player, Creature *_cr, uint32 sender, uint32 
 		else return false;
 
 		player->CLOSE_GOSSIP_MENU();
-		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Teleport to id %d", action);
+		//sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Teleport to id %d", action);
 
 		if(pPoints) player->TeleportTo(pPoints[_acID].tele_mapid, pPoints[_acID].tele_x, pPoints[_acID].tele_y, pPoints[_acID].tele_z, pPoints[_acID].tele_o);
 	}

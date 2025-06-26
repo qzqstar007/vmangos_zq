@@ -72,6 +72,9 @@
 #define ZQ_SPELL_LEECH_PHY		    33361	//Physical Leech, 物理吸血
 #define ZQ_SPELL_LEECH_SPELL	    33362	//Spell Leech, 法术吸血
 
+#define ZQ_SPELL_ACHIEVE_STOLE		33363	//Achieve Stolen, 偷取
+#define ZQ_SPELL_ACHIEVE_CAST		33364	//Achieve Cast, 施法
+
 #define ZQ_SPELL_SPELL_DIFFICULTY1	33351	//Spell Difficulty 1, 副本难度1
 #define ZQ_SPELL_SPELL_DIFFICULTY2	33352	//Spell Difficulty 2, 副本难度2
 #define ZQ_SPELL_SPELL_DIFFICULTY3	33353	//Spell Difficulty 3, 副本难度3
@@ -167,10 +170,12 @@
 
 
 /******************************************************************** 
- *  Gossip IDs, least first (15001).
+ *  Gossip IDs, least first (15001).  // two tables,
  ********************************************************************/
-#define ZQ_GOSSIP_VIP_UPGRADE			15001	//VIP Upgrade, 会员升级
-
+#define ZQ_GOSSIP_KELALA_VIP			15001	//VIP Upgrade, 会员升级
+#define ZQ_GOSSIP_KELALA_EQ_COLLECT		15002	//Kelala Equipment Collection, 克尔拉装备采集
+#define ZQ_GOSSIP_KELALA_MODE_FUNC		15003	//Kelala Mode Function, 克尔拉模式功能
+#define ZQ_GOSSIP_SPELL_STOLE   		15010	//Spell Steal, 偷取技能
 
 
 /******************************************************************** 
@@ -178,6 +183,16 @@
  ********************************************************************/
 #define ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT		9010	//Dungeon Player Teleport, 副本玩家传送
 #define ZQ_MANGOS_STRING_DUNGEON_PLAYER_CPLT_NPCS		9011	//Dungeon Player Finish Level, 副本玩家完成等级
+#define ZQ_MANGOS_STRING_CHALLENGE_BREAKTHROUGH     	9021	//Dungeon Player Finish Teleport, 副本玩家完成传送
+
+/******************************************************************** 
+ *  Random properties.
+ ********************************************************************/
+#define ZQ_RANDOM_DIFFICULTY_NORMAL		3301	//Normal, 普通
+#define ZQ_RANDOM_DIFFICULTY_TRIAL 		3306	//Trial, 试炼
+#define ZQ_RANDOM_DIFFICULTY_HELL		3311	//Hell, 地狱
+#define ZQ_RANDOM_DIFFICULTY_NIGHTMARE	3316	//Nightmare, 噩梦
+#define ZQ_RANDOM_DIFFICULTY_END        3320
 
 #endif	//_QZQSTAR_CPP_IDS_H
 
@@ -201,6 +216,15 @@ delete from creature_movement where id in (23575,23594, 23574, 23586, 23570);
 Start points: every player is in Gazadgan;
 1, -7137    -3821   8.5 2.84
 
+
+//all spell that with unique target should not be push back
+
+
+//npc_trainer price lower 10 times
+update npc_trainer
+set spellcost = spellcost/10;
+update npc_trainer_template
+set spellcost = spellcost/10;
 
 */
 

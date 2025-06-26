@@ -8124,6 +8124,11 @@ void Spell::Delayed()
     if (!m_spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_DAMAGE_PUSHBACK))
         return;
 
+    // qzqstar, 250624, some spells can't be time backed
+	if (m_spellInfo->EffectImplicitTargetA[0] == TARGET_UNIT_ENEMY)
+		return;
+   
+
     //check resist chance
     int32 resistChance = 100;                               //must be initialized to 100 for percent modifiers
     ((Player*)m_caster)->ApplySpellMod(m_spellInfo->Id, SPELLMOD_NOT_LOSE_CASTING_TIME, resistChance, this);

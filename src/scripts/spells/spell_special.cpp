@@ -111,7 +111,7 @@ struct PetTrigSpellScript : public SpellScript
                     int _petHappiness = (petValues % 10000) / 100; // --CD--
                     int _petRelationship = (petValues % 100); // ----EF
 
-                    if(spell->m_spellInfo->Id == 33327) // Weapon Damage
+                    if(spell->m_spellInfo->Id == (33327)) // Weapon Damage
                     {
 						//weapon damage
                         _multiple = (1.0f + _petLevel / 5.0f) * ( 1.0f + _petHappiness/200.0f + _petRelationship/100.0f) ; // 10% of the pet level
@@ -160,6 +160,7 @@ struct PetAuraScript : public AuraScript
                     // CD - Happiness Points (0-99)
                     // EF - Relationship Points (0-99)
                     // get the pet level
+                    int _petType = petValues / 100000; // A-B----
                     int _petLevel = (petValues % 100000) / 10000; // -B----
                     // get the pet relation points and set the values
                     int _petRelationship = (petValues % 100); // ----EF
@@ -174,6 +175,7 @@ struct PetAuraScript : public AuraScript
 						//max is 9 * 99 / 20 about 45 attributes
 						//least should be 
 						_modifier->m_amount = _petLevel * (_petRelationship/20 + 1);
+
                     }
                }
             }
@@ -269,8 +271,11 @@ struct APSPSpellScript : public SpellScript
                 sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[APSP Spell] for user %s : AP:%u, SP:%u. _doneCounter:%u.", 
                     player->GetName(), basePoints0, basePoints1, _doneCounter);
 
+                uint32_t _EQBonus = sQZAchievements.GetEQCollectBonus(player);
+				basePoints0 += _EQBonus;
+				basePoints1 += (_EQBonus/2);
 
-                ChatHandler(player).PSendSysMessage(((std::string)("你因为收集（如坐骑、专业、装备等）而获得了[%d]点攻强和 [%d]点法伤。  ")).c_str(), basePoints0, basePoints1);
+                ChatHandler(player).PSendSysMessage(((std::string)("你因为收集（如坐骑、专业、装备、任务等）而获得了[%d]点攻强和 [%d]点法伤。  ")).c_str(), basePoints0, basePoints1);
 
                 spell->m_currentBasePoints[0] = basePoints0;
                 spell->m_currentBasePoints[1] = basePoints0;
@@ -280,6 +285,121 @@ struct APSPSpellScript : public SpellScript
 
         return true;
     }		
+};
+
+
+
+
+//Stole Spell for users
+struct SpellStealScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            //check the target valid
+            if (!spell->GetUnitTarget())
+                return false;
+
+
+            if (Player* player = spell->GetCaster()->ToPlayer())
+            {
+                //check the target level
+                if (spell->GetUnitTarget()->GetLevel() > 60 ||  spell->GetUnitTarget()->GetLevel() > player->GetLevel())
+                {
+                    //tell the player that he cannot stole the spell from the target
+                    ChatHandler(player).PSendSysMessage(((std::string)(">>>目标等级太高，你无法从该目标身上偷取技能。<<<")).c_str());
+                    return false;
+                }
+                //check the target is a player or a creature
+                else if (!spell->GetUnitTarget()->IsCreature()) {
+                    //tell the player that he cannot stole the spell from the target
+                    ChatHandler(player).PSendSysMessage(((std::string)(">>>你只能从怪物身上偷取技能。<<<")).c_str());
+                    return false;
+                }
+
+                
+                //check the player's achievemnts
+                uint32_t empty_slot = sQZAchievements.GetSkillsCollectEmptySlot(player);
+                
+                if(empty_slot == 0)
+                {
+                    //tell the player that he cannot stole the spell from the target
+                    ChatHandler(player).PSendSysMessage(((std::string)(">>>你技能已满，请删除一些在尝试。<<<")).c_str());
+                    return false;
+                }
+
+				//find the creature spell from creature_info
+				auto _info = spell->GetUnitTarget()->ToCreature()->GetCreatureInfo();
+				if (_info)
+				{
+					//check the creature spell
+					uint32_t spell_IDs[4] = {0,0,0,0};
+					uint32_t spell_IDs_count = 0;
+					for (int i = 0; i < 4; i++)
+					{
+						if (_info->spells[i])
+						{
+							spell_IDs[i] = _info->spells[i];
+							spell_IDs_count++;
+						}
+						else
+						{
+							break;
+						}
+					}
+
+					if (spell_IDs_count > 0)
+					{
+						//random pick a spell from the creature spell list
+						uint32_t _spell_ID = spell_IDs[urand(0, spell_IDs_count-1)];
+
+						//add to achieivement
+						SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(_spell_ID);
+						std::string text = (std::string)(">>>你从该目标身上学习技能： ");
+						if (spellInfo)
+						{
+							std::string name = spellInfo->SpellName[LOCALE_zhCN];
+							if (name.empty()) name = spellInfo->SpellName[LOCALE_enUS];
+							text.append(name);
+						}
+
+						text.append(" <<<");
+
+						//save to the player's achievements
+						sQZAchievements.SetSkillsCollectInfo(player, _spell_ID, empty_slot);
+
+						//tell the player that he can stole the spell from the target
+						ChatHandler(player).PSendSysMessage((text).c_str());
+						return true;
+
+					}
+					else {
+						//tell the player that he cannot stole the spell from the target
+						ChatHandler(player).PSendSysMessage(((std::string)(">>>该目标身上没有技能可以偷取。<<<")).c_str());
+						return true;
+					}
+				}
+            }
+        }		
+    }		
+};
+
+//casting spell for users
+struct SpellCastingScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            //check the target valid
+            if (!spell->GetUnitTarget())
+                return false;
+        }	
+
+
+        return true;
+    }	
 };
 
 void AddSC_special_spell_scripts()
@@ -323,5 +443,17 @@ void AddSC_special_spell_scripts()
     newscript = new Script;
     newscript->Name = "qzqstar_apsp_buff";
     newscript->GetSpellScript = [](SpellEntry const*) -> SpellScript* { return new APSPSpellScript(); };
+    newscript->RegisterSelf();
+
+    //add custom spell script for spell stole 
+    newscript = new Script;
+    newscript->Name = "qzqstar_spell_stole";
+    newscript->GetSpellScript = [](SpellEntry const*) -> SpellScript* { return new SpellStealScript(); };
+    newscript->RegisterSelf();
+
+    //add custom spell script for spell casting
+    newscript = new Script;
+    newscript->Name = "qzqstar_spell_cast";
+    newscript->GetSpellScript = [](SpellEntry const*) -> SpellScript* { return new SpellCastingScript(); };
     newscript->RegisterSelf();
 }
