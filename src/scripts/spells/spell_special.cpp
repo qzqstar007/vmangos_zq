@@ -114,8 +114,9 @@ struct PetTrigSpellScript : public SpellScript
                     if(spell->m_spellInfo->Id == (33327)) // Weapon Damage
                     {
 						//weapon damage
-                        _multiple = (1.0f + _petLevel / 5.0f) * ( 1.0f + _petHappiness/200.0f + _petRelationship/100.0f) ; // 10% of the pet level
-						spell->m_currentBasePoints[0] = spell->m_currentBasePoints[0] * _multiple * frand(0.9, 1.15);
+                        _multiple = (1.0f + _petLevel / 20.0f) * ( 1.0f + _petHappiness/500.0f + _petRelationship/500.0f) ; // 10% of the pet level
+						spell->m_currentBasePoints[0] = spell->m_currentBasePoints[0] * _multiple * frand(0.95, 1.05);
+                        //spell->damage = spell->m_currentBasePoints[0] * _multiple * frand(0.9, 1.15);
                     }
                     else {
                         //magic damage
@@ -265,8 +266,8 @@ struct APSPSpellScript : public SpellScript
                 if(player->HasSpell(ZQ_SPELL_MOUNTS_TURTLE)) { basePoints0 += 30; basePoints1 += 15; }                
 
                 uint32 _doneCounter = PAIR32_HIPART(  sQZAchievements.GetQuestDoneCounters(player)  ); //each quest add 1 AP and 0.5 SP
-                basePoints0 += _doneCounter;
-                basePoints1 += (_doneCounter/2);
+                basePoints0 += _doneCounter/2;
+                basePoints1 += (_doneCounter/4);
 
                 sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[APSP Spell] for user %s : AP:%u, SP:%u. _doneCounter:%u.", 
                     player->GetName(), basePoints0, basePoints1, _doneCounter);
@@ -325,7 +326,7 @@ struct SpellStealScript : public SpellScript
                 if(empty_slot == 0)
                 {
                     //tell the player that he cannot stole the spell from the target
-                    ChatHandler(player).PSendSysMessage(((std::string)(">>>你技能已满，请删除一些在尝试。<<<")).c_str());
+                    ChatHandler(player).PSendSysMessage(((std::string)(">>>你技能已满，请在炉石里删除一些再尝试。<<<")).c_str());
                     return false;
                 }
 
@@ -395,6 +396,32 @@ struct SpellCastingScript : public SpellScript
             //check the target valid
             if (!spell->GetUnitTarget())
                 return false;
+
+            if (Player* player = spell->GetCaster()->ToPlayer())
+            {
+                uint32_t spell_id = sQZAchievements.GetSkillsCollectActiveID(player);
+                if(spell_id == 0)
+                {
+                    //tell the player that he cannot cast the spell from the target
+                    ChatHandler(player).PSendSysMessage(((std::string)(">>>你没有可以使用的技能。<<<")).c_str());
+                    return false;
+                }
+
+                //check the spell target
+                SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spell_id);
+
+                if (spellInfo)
+                {
+                	if(spellInfo->EffectImplicitTargetA[0] == TARGET_UNIT_CASTER)	
+                    {
+                        player->CastSpell(player, spell_id, true);
+                    }
+                    else
+                    {
+                        player->CastSpell(spell->GetUnitTarget(), spell_id, true);	
+                    }
+                }
+            }
         }	
 
 

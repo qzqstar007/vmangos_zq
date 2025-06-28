@@ -1251,6 +1251,9 @@ uint32    QzqstarAchievements::GetEQCollectBonus(Player *player)
 	bonus += __count_weight(ACHIVE_Entries[2].data7) * 4.2f;
 	bonus += __count_weight(ACHIVE_Entries[2].data8) * 4.5f;
 
+	//bonus refine
+	bonus *= 1.5f;
+
 	//Do Raid collections
 	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s GetEQCollectBonus: %u", player->GetName(), bonus);
 	return bonus;

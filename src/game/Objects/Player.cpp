@@ -3134,7 +3134,7 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
 	if (newXP > 100000000) return;
 
 	//qzqstar, 250228, should not increase if task mode
-	if ((M_Challenge_Mode & CHALLENGING_MODE_ONELIFE) && (level==25 || level==35 || level==45 || level==58)) return;
+	if ((M_Challenge_Mode & CHALLENGING_MODE_EQUIPMENT) && (level==25 || level==35 || level==45 || level==58)) return;
 
     while (newXP >= nextLvlXP && level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
     {
@@ -4886,23 +4886,32 @@ void Player::KillPlayer()
         if(M_Challenge_Mode & CHALLENGING_MODE_ONELIFE)
 		{
 			//safe if full level
-			if ( (__oldLevel >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-			//	|| ((M_Challenge_Mode & CHALLENGING_MODE_ONELIFE) && (__oldLevel%10 == 0))
+			if (   (__oldLevel == 60) 
+                || (__oldLevel >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
 				|| (__oldLevel < 10)
 				)
 			{
 				__newLevel = __oldLevel;
 				__looseMoney = __totalMoney / 2;
 			}
-			else if (HasItemCount(39978, 1))
-			{
+			//else if (HasItemCount(39978, 1))
+			//{
 				//delete the item count
-				DestroyItemCount(39978, 1, true);
-			}
+			//	DestroyItemCount(39978, 1, true);
+			//}
 			else
 			{
 				__newLevel = __oldLevel - 2;
 				__looseMoney = __totalMoney / 2;
+
+                //make the bottom each upgrade, such as 25, 35, 45, 58 etc with breakthrough mode.
+                if (M_Challenge_Mode & CHALLENGING_MODE_EQUIPMENT)
+                {
+                    if(__oldLevel == 26 || __oldLevel == 27) __newLevel = 26;
+                    else if(__oldLevel == 36 || __oldLevel == 37) __newLevel = 36;
+                    else if(__oldLevel == 46 || __oldLevel == 47) __newLevel = 46;
+                    else if(__oldLevel == 59 || __oldLevel == 59) __newLevel = 59;
+                }
 			}
 
 			//check the level

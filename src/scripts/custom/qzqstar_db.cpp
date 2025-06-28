@@ -9013,8 +9013,24 @@ Level_EnchantID_t DBHelper_GetRandEnchantIDByLevel(int32 itemLevel)
 };
 
 
+// Equipment list for the world
+const std::vector<EQ_Collect_World_t> _EQ_Collections_World =
+{
+	{0, 20, {0}},
+	{1, 30, {0}},
+	{2, 40, {0}},
+	{3, 50, {0}},
+	{4, 60, {0}},
+};
 
-const std::vector<Weapon_Dungeon_Set_t> _Weapon_Dungeon_Set =
+const EQ_Collect_World_t * DBHelper_GetEQByWorldLevel(uint32 level)
+{
+	if(level > _EQ_Collections_World.size()) return &(_EQ_Collections_World[_EQ_Collections_World.size() - 1]);
+	else return &(_EQ_Collections_World[level]);
+}
+
+//Equipment for Dungeons
+const std::vector<EQ_Collect_Dungeon_t> _Weapon_Dungeon_Set =
 {
 	/* MAP_RAGEFIRE_CHASM,    __XSTR("怒焰裂谷　"), */		{ 0, 	{1, 2, 3, 4},	{14145,14151,	14147,14148,  	14149,14150	} },
 	/* MAP_WAILING_CAVERNS,   __XSTR("哀嚎洞穴　"), */		{ 1, 	{1, 2, 4, 5},	{6469,6472,		6463,6630,  	13245,6449 } },
@@ -9022,12 +9038,12 @@ const std::vector<Weapon_Dungeon_Set_t> _Weapon_Dungeon_Set =
 	/* MAP_SHADOWFANG_KEEP,   __XSTR("影牙城堡　"), */		{ 3, 	{1, 3, 4, 7},	{6318,1292,		6321,3748,  	6320,6220 } },
 	/* MAP_BLACKFATHOM_DEEPS, __XSTR("黑暗深渊　"), */		{ 4, 	{2, 4, 5, 7},	{3078,6905,		6907,6904,  	1155,6909 } },
 	/* MAP_GNOMEREGAN,        __XSTR("诺莫瑞根　"), */		{ 5, 	{2, 4, 5, 7},	{9446,9447,		9449,9452,  	9454,9453} },
-	/* MAP_MONASTERY,         __XSTR("血色修道院　"), */	{ 6, 	{2, 4, 6, 8},	{0,0,	0,0,  0,0 } },
-	/* MAP_RAZORFEN_KRAUL,    __XSTR("剃刀沼泽　"), */		{ 7, 	{2, 4, 6, 8},	{0,0,	0,0,  0,0 } },
-	/* MAP_RAZORFEN_DOWNS,    __XSTR("剃刀高地　"), */		{ 8, 	{2, 4, 6, 8},	{0,0,	0,0,  0,0 } },
-	/* MAP_ULDAMAN,           __XSTR("奥达曼　"), */		{ 9, 	{2, 4, 6, 8},	{0,0,	0,0,  0,0 } },
-	/* MAP_MARAUDON,          __XSTR("玛拉顿　"), */		{10, 	{3, 5, 7, 9},	{0,0,	0,0,  0,0 } },
-	/* MAP_ZUL_FARRAK,        __XSTR("祖尔法拉克　"), */	{11, 	 {3, 5, 7, 9},	{0,0,	0,0,  0,0 } },
+	/* MAP_MONASTERY,         __XSTR("血色修道院　"), */	{ 6, 	{2, 4, 6, 8},	{7682,7685,		7713,7717,		7726, 7720} },
+	/* MAP_RAZORFEN_KRAUL,    __XSTR("剃刀沼泽　"), */		{ 7, 	{2, 4, 6, 8},	{2816,6693,		6694,6691,  	6686,6687 } },
+	/* MAP_RAZORFEN_DOWNS,    __XSTR("剃刀高地　"), */		{ 8, 	{2, 4, 6, 8},	{10769,10770,	10774,10772,  	10761,10762 } },
+	/* MAP_ULDAMAN,           __XSTR("奥达曼　"), */		{ 9, 	{2, 4, 6, 8},	{9387,9416,		9412,9410,		9411,11118 } },
+	/* MAP_MARAUDON,          __XSTR("玛拉顿　"), */		{10, 	{3, 5, 7, 9},	{17752,17744,	17748,17734,  	17717,17715 } },
+	/* MAP_ZUL_FARRAK,        __XSTR("祖尔法拉克　"), */	{11, 	 {3, 5, 7, 9},	{18082,9639,	9470,9379,  	11086,9477 } },
 	/* MAP_SUNKEN_TEMLE,      __XSTR("沉没的神庙　"), */	{12, 	 {3, 5, 7, 9},	{0,0,	0,0,  0,0 } },
 	/* MAP_BLACKROCK_DEPTHS,  __XSTR("黑石深渊　"), */		{13, 	 {3, 5, 7, 9},	{0,0,	0,0,  0,0 } },
 	/* MAP_DIRE_MAUL,         __XSTR("厄运之锤　"), */		{14, 	 {3, 5, 7, 9},	{0,0,	0,0,  0,0 } },
@@ -9037,7 +9053,7 @@ const std::vector<Weapon_Dungeon_Set_t> _Weapon_Dungeon_Set =
 };
 
 
-const Weapon_Dungeon_Set_t * DBHelper_GetDungeonSetByMapID(int32 mapId)
+const EQ_Collect_Dungeon_t * DBHelper_GetEQByDungeonID(int32 mapId)
 {
 	if(mapId >= 0 && mapId <= 17) return &(_Weapon_Dungeon_Set[mapId]);
 	else return nullptr;

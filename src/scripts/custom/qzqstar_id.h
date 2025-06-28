@@ -226,6 +226,18 @@ set spellcost = spellcost/10;
 update npc_trainer_template
 set spellcost = spellcost/10;
 
+
+祭坛激活人数的设置参数在
+数据库 mangos
+表单 gameobject_template
+数据列 data0
+
+
+entry=130511，奥达曼守护者祭坛
+entry=133234，奥达曼阿扎达斯祭坛
+entry=175706，黑石祭坛
+update gameobject_template set data0 = 1 where entry in (130511, 133234, 175706);
+
 */
 
 

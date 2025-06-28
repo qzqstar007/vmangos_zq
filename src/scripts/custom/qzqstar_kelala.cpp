@@ -227,11 +227,11 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 	text.append(__STR(" |r / 10000 "));
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	text = __STR("｜　　攻强增加：|cff007733");
-	text.append(__NSTR(PAIR32_HIPART(_doneCounter)));
+	text.append(__NSTR(PAIR32_HIPART(_doneCounter)/2));
 	text.append(__STR(" |r 点 "));
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	text = __STR("｜　　法伤增加：|cff007733");
-	text.append(__NSTR(PAIR32_HIPART(_doneCounter)/2));
+	text.append(__NSTR(PAIR32_HIPART(_doneCounter)/4));
 	text.append(__STR(" |r 点 "));
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
@@ -707,7 +707,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			//const int _eqLevelEach[] = { 20, 40, 55, 70 };	//Second Stage
 			//const int _eqLevelEach[] = { 18, 35, 60, 70 };	//3rd Stage
 			//const int _eqLevelEach[] = { 15, 30, 52, 80 };		//4th Stage
-			const int _eqLevelEach[] = { 10, 25, 50, 65 };		//4th Stage
+			const int _eqLevelEach[] = { 10, 20, 30, 40 };		//4th Stage
 			
 			//pick the _eqLevelEach for different level of player
 			auto __pick = pLevel < 26 ? 0 : pLevel < 36 ? 1 : pLevel < 46 ? 2 : 3;
@@ -1474,11 +1474,37 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 
 		auto _absAction = action - __MENU_KELALA_EQUIP_COLLECTS_WORLD;
 
-
-
 		//world equip collects
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝尚未开放＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+		//get the player achievement info and check if the player has the achievement
+		if (_absAction == 0)
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝　点击各阶段查看更多　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　等级１　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 100);	
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　等级２　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 200);	
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　等级３　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 300);	
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　等级４　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 400);	
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　等级５　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 500);	
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝　返回主页　＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS);	
+		}
+		else if(_absAction >= 100 && _absAction < 600)
+		{
+			//get the world level info
+			uint32_t _worldlevel = _absAction / 100 - 1;
+			auto _eqList = DBHelper_GetEQByWorldLevel(_worldlevel);
 
+			//get the player achievement info and check if the player has the achievement
+			if (_absAction % 100 == 0)
+			{
+				//get the stage info by _eqList
+				
+			}
+		}
 
 
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
@@ -1552,12 +1578,12 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 			//achivement info
 			uint32_t _achive_info = sQZAchievements.GetDungeonCollectInfo(player, _dungeon.id);
 
-			auto _eqList = DBHelper_GetDungeonSetByMapID(_dungeon.id);
+			auto _eqList = DBHelper_GetEQByDungeonID(_dungeon.id);
 			if (_eqList == nullptr) return false;
 
 			for (size_t i = 0; i < 6; i++)
 			{
-				auto item_1_local = sObjectMgr.GetItemLocale(_eqList->weapon_list[i]);
+				auto item_1_local = sObjectMgr.GetItemLocale(_eqList->eq_list[i]);
 				auto item_1_text = (item_1_local == nullptr ? __STR("未知装备 ") : item_1_local->Name[LOCALE_deDE]);
 
 				text = __STR(("|cff0000ff＝＝＞　"));
@@ -1576,9 +1602,9 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 		{
 			//the detail info of the dungeon
 			auto _dungeon = TP_Dungeons[(_absAction - 100) / 100];
-			auto _eqList = DBHelper_GetDungeonSetByMapID(_dungeon.id);
+			auto _eqList = DBHelper_GetEQByDungeonID(_dungeon.id);
 			if (_eqList == nullptr) return false;
-			auto _equipID = _eqList->weapon_list[(_absAction % 100) / 10 - 1];
+			auto _equipID = _eqList->eq_list[(_absAction % 100) / 10 - 1];
 			//achivement info
 			uint32_t _achive_info = (sQZAchievements.GetDungeonCollectInfo(player, _dungeon.id) >> ((_absAction % 100) / 10 - 1) * 4 ) & 0x0F;
 
@@ -1608,9 +1634,9 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 		else if(_absAction % 10 > 0)		//equip info of the dungeon
 		{
 			auto _dungeon = TP_Dungeons[(_absAction - 100) / 100];
-			auto _eqList = DBHelper_GetDungeonSetByMapID(_dungeon.id);
+			auto _eqList = DBHelper_GetEQByDungeonID(_dungeon.id);
 			if (_eqList == nullptr) return false;
-			auto _equipID = _eqList->weapon_list[(_absAction % 100) / 10 - 1];
+			auto _equipID = _eqList->eq_list[(_absAction % 100) / 10 - 1];
 			auto _difficulty = (_absAction % 10) - 1;
 			//achivement info
 			uint32_t _achive_dg_info = sQZAchievements.GetDungeonCollectInfo(player, _dungeon.id);

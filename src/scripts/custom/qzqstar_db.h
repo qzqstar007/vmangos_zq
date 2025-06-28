@@ -58,14 +58,27 @@ typedef struct _level_enchantID {
 extern Level_EnchantID_t DBHelper_GetRandEnchantIDByLevel(int32 itemLevel);
 
 
-typedef struct _level_weaponList {
+//Equipment list for the world
+typedef struct _level_weaponList_world {
+	int32 world_level;
+	int32 item_level;
+	int32 eq_list[12];
+} EQ_Collect_World_t;
+extern const EQ_Collect_World_t * DBHelper_GetEQByWorldLevel(uint32 level);
+
+//Equipment list for the dungeon
+typedef struct _level_weaponList_dungeon {
 	int32 dungen_id;
 	int32 reward_apsp[4];	//four dungeons difficulties, such as 1,2,3,4
-	int32 weapon_list[6];
-}Weapon_Dungeon_Set_t;
+	int32 eq_list[6];
+}EQ_Collect_Dungeon_t;
 
-extern const Weapon_Dungeon_Set_t * DBHelper_GetDungeonSetByMapID(int32 mapId);
+extern const EQ_Collect_Dungeon_t * DBHelper_GetEQByDungeonID(int32 mapId);
 extern int COUNT_ONES(uint32_t x) ;
+
+
+
+
 
 #endif	//_QZQSTAR_DB_H
 
