@@ -382,7 +382,9 @@ struct SpellStealScript : public SpellScript
 					}
 				}
             }
-        }		
+        }	
+
+		return true;
     }		
 };
 

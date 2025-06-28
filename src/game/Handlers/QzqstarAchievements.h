@@ -38,6 +38,7 @@ enum Achievement_t
 	ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1 	= 	601,	//collect the items in the dungeon, subtype is the dungeon id, 
 	ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2		= 	602,	//collect the items in the dungeon, subtype is the dungeon id, 
 	ACHIEVEMENTS_COLLECTIONS_RAID			= 	603,	//collect the items in the dungeon, subtype is the dungeon id, 
+	ACHIEVEMENTS_COLLECTIONS_PROFESSION		= 	604,	//collect the items of professions,
 	ACHIEVEMENTS_COLLECTIONS_SKILLS			= 	620,	//collect the skills of monters
 	ACHIEVEMENT_COUNTERS		=	1000,	//For combine and refreshing...
 };
@@ -258,17 +259,13 @@ public:
 	uint32_t 	GetCollectAchiveInfo(Player *player, uint32_t itemSetType);
 	void 		SetCollectAchiveInfo(Player *player, uint32_t itemSetType, uint32_t value);
 
-
 	/*****************************************************
-	 *
-	 *		Collection of Dungoens 1/2 Functions
-	 * 
+	 *		Collection of World Functions
 	 *****************************************************/
-	 AchievementsEntry GetCollectDungeonsEntry(Player *player, uint32_t DungeonsType);
-	 uint32    GetDungeonCollectInfo(Player *player, uint32_t ac_mapId);
-	 void      SetDungeonCollectInfo(Player *player, uint32_t ac_mapId, uint32_t value);
-	 uint32    GetEQCollectBonus(Player *player);
-
+	 uint32    			GetEQCollectBonus(Player *player);
+	 AchievementsEntry 	GetCollectionEntry(Player *player, uint32_t collection_type);
+	 uint32    			GetEquipCollectCommon(Player *player, uint32_t collection_type, uint32_t key);
+	 void      			SetEquipCollectCommon(Player *player, uint32_t collection_type, uint32_t key, uint32_t value);
 
 	/*****************************************************
 	 *

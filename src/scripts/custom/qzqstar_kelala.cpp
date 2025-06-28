@@ -40,9 +40,10 @@
 #define __MENU_KELALA_SOCIAL			 6000
 #define __MENU_KELALA_REP				 7000
 #define __MENU_KELALA_EQUIP_COLLECTS     10000
-#define __MENU_KELALA_EQUIP_COLLECTS_WORLD		11000
-#define __MENU_KELALA_EQUIP_COLLECTS_DUNGEON 	12000
-#define __MENU_KELALA_EQUIP_COLLECTS_RAID	 	16000
+#define __MENU_KELALA_EQUIP_COLLECTS_WORLD				11000
+#define __MENU_KELALA_EQUIP_COLLECTS_DUNGEON 			12000
+#define __MENU_KELALA_EQUIP_COLLECTS_RAID	 			16000
+#define __MENU_KELALA_EQUIP_COLLECTS_PROFESSIONAL	 	18000
 #define __MENU_KELALA_EQUIP_COLLECTS_END 19999
 
 
@@ -1450,9 +1451,10 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　团本装备收集　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_RAID);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　专业物品收集　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_PROFESSIONAL);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 		std::string text = "";
 		text.append(__STR("|cff0000ff＝＞　当前攻强加成：　"));
 		text.append(__NSTR(_EQBonus));
@@ -1461,7 +1463,6 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 		text.append(__STR("|cff0000ff＝＞　当前法伤加成：　"));
 		text.append(__NSTR(_EQBonus/2));
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＞　返回　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
 
@@ -1480,33 +1481,94 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 		{
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝　点击各阶段查看更多　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　等级１　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 100);	
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　阶段１　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 100);	
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　等级２　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 200);	
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　等级３　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 300);	
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　等级４　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 400);	
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　等级５　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 500);	
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			if(player->GetLevel() >= 15) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　阶段２　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 200);	
+			if(player->GetLevel() >= 15) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			if(player->GetLevel() >= 25) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　阶段３　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 300);	
+			if(player->GetLevel() >= 25) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			if(player->GetLevel() >= 35) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　阶段４　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 400);	
+			if(player->GetLevel() >= 35) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			if(player->GetLevel() >= 45) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　阶段５　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 500);	
+			if(player->GetLevel() >= 45) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+			if(player->GetLevel() >= 55) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　阶段６　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 600);
+			if(player->GetLevel() >= 55) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝　返回主页　＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS);	
 		}
 		else if(_absAction >= 100 && _absAction < 600)
 		{
 			//get the world level info
-			uint32_t _worldlevel = _absAction / 100 - 1;
-			auto _eqList = DBHelper_GetEQByWorldLevel(_worldlevel);
+			uint32_t _worldlevel = _absAction / 100 ;
+			auto _eq_entry = DBHelper_GetEQByWorldLevel(_worldlevel - 1); // pls note world level is 1 based, so we need to -1
+			//get player's achievement info and check if the player has the achievement
+			uint32_t _achievement = sQZAchievements.GetEquipCollectCommon(player, ACHIEVEMENTS_COLLECTIONS_WORLD, _worldlevel);
 
-			//get the player achievement info and check if the player has the achievement
 			if (_absAction % 100 == 0)
 			{
 				//get the stage info by _eqList
-				
+				std::string text = "";
+				text.append(__STR("|cff0000ff＝收集装备增加 "));
+				text.append(__NSTR(_worldlevel * 20));
+				text.append("攻强");
+				text.append(__NSTR(_worldlevel * 10));
+				text.append("法伤＝ |r");
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				for (size_t i = 0; i < 12; i++)
+				{
+					if (_eq_entry->eq_list[i] > 0)
+					{
+						auto _itemId = _eq_entry->eq_list[i];
+						if (const ItemPrototype *pItem = sObjectMgr.GetItemPrototype(_itemId))	
+						{
+							auto item_local = sObjectMgr.GetItemLocale(pItem->ItemId);
+							auto item_text = (item_local == nullptr? pItem->Name1 : item_local->Name[LOCALE_deDE]);
+
+							text = "|cff0000ff(";
+							text.append(__NSTR(i+1));
+							text.append(")　");
+							text.append(item_text);
+
+							//check if the player has the item
+							if(_achievement & (1 << i))
+							{
+								text.append(__STR(" |r |cff00bb00＜已完成＞　|r "));
+								player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+							}
+							else
+							{
+								text.append(__STR(" |r |cffbb0000＜未完成＞　|r "));
+								player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, action + i + 1);
+							}
+						}
+					}
+				}
+
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝　返回主页　＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS);	
+			}
+
+			else
+			{
+				//get the item info by _eqList
+				auto _equipID = _eq_entry->eq_list[_absAction % 100 - 1];
+				auto pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START);
+
+				if( pItem && pItem->GetProto()->ItemId == _equipID ) 	
+				{
+					//take the item and add the achievement
+					player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
+
+					//set the achievement info
+					_achievement |= (1 << (_absAction % 100 - 1));
+					sQZAchievements.SetEquipCollectCommon(player, ACHIEVEMENTS_COLLECTIONS_WORLD, _worldlevel, _achievement);
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　已获取此装备增益　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, action / 100 * 100);
+				}
+				else
+				{
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　请将装备放在行囊第一个格子　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, action / 100 * 100);
+				}
 			}
 		}
-
-
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 	}
 
@@ -1542,7 +1604,9 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 				text = __STR("|cff0000ff＝＞　");
 				text.append(_dungeon.name);
 				//get the player achievement info and check if the player has the achievement
-				uint32_t _achive_info = sQZAchievements.GetDungeonCollectInfo(player, i);
+				uint32_t _achive_info = sQZAchievements.GetEquipCollectCommon(player, 
+					_absAction=0? ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1:ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2, 
+					i - _startPos);
 				if(_achive_info == 0xFFFFFF) text.append(__STR("|r ｜　|cff00bb00＜已完成＞　|r "));	
 				else text.append(__STR("|r ｜　|cffbb0000＜未完成＞　|r "));	
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_DUNGEON + (i+1) * 100);	
@@ -1576,7 +1640,9 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 			//achivement info
-			uint32_t _achive_info = sQZAchievements.GetDungeonCollectInfo(player, _dungeon.id);
+			uint32_t _achive_info = sQZAchievements.GetEquipCollectCommon(player, 
+				_dungeon.id < 9 ?  ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1:ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2, 
+				_dungeon.id % 9);
 
 			auto _eqList = DBHelper_GetEQByDungeonID(_dungeon.id);
 			if (_eqList == nullptr) return false;
@@ -1606,7 +1672,9 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 			if (_eqList == nullptr) return false;
 			auto _equipID = _eqList->eq_list[(_absAction % 100) / 10 - 1];
 			//achivement info
-			uint32_t _achive_info = (sQZAchievements.GetDungeonCollectInfo(player, _dungeon.id) >> ((_absAction % 100) / 10 - 1) * 4 ) & 0x0F;
+			uint32_t _achive_info = ( (sQZAchievements.GetEquipCollectCommon(player, 
+				_dungeon.id < 9 ?  ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1:ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2, 
+				_dungeon.id % 9)) >> (((_absAction % 100) / 10 - 1) * 4 ) ) & 0x0F;
 
 			//display the detail equip info of the dungeon
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝将装备放在行囊第一个格子＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -1639,7 +1707,9 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 			auto _equipID = _eqList->eq_list[(_absAction % 100) / 10 - 1];
 			auto _difficulty = (_absAction % 10) - 1;
 			//achivement info
-			uint32_t _achive_dg_info = sQZAchievements.GetDungeonCollectInfo(player, _dungeon.id);
+			uint32_t _achive_dg_info = sQZAchievements.GetEquipCollectCommon(player, 
+										_dungeon.id < 9 ?  ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1:ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2, 
+										_dungeon.id % 9);
 			uint32_t _achive_eq_info = (_achive_dg_info >> ((_absAction % 100) / 10 - 1) * 4 ) & 0x0F;
 
 			if( (_achive_eq_info & (1 << _difficulty)) == (1<<_difficulty))
@@ -1659,7 +1729,10 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 
 					//set the achievement info
 					_achive_dg_info |= ( (1 << _difficulty) << ((_absAction % 100) / 10 - 1) * 4 );  
-					sQZAchievements.SetDungeonCollectInfo(player, _dungeon.id, _achive_dg_info);
+					sQZAchievements.SetEquipCollectCommon(player, 
+						_dungeon.id < 9 ?  ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1:ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2, 
+						_dungeon.id % 9, 
+						_achive_dg_info);
 
 					
 					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　已获取此装备增益　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, action / 10 * 10);
@@ -1675,10 +1748,16 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 		return true;
 	}
 
-	else if (action >= __MENU_KELALA_EQUIP_COLLECTS_RAID && action < __MENU_KELALA_EQUIP_COLLECTS_RAID)
+	else if (action >= __MENU_KELALA_EQUIP_COLLECTS_RAID && action < __MENU_KELALA_EQUIP_COLLECTS_PROFESSIONAL)
 	{
 		//raid equip collects
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝尚未开放＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+	}
+
+	else if (action >= __MENU_KELALA_EQUIP_COLLECTS_PROFESSIONAL && action < __MENU_KELALA_EQUIP_COLLECTS_END)
+	{
+		//professional equip collects
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝尚未开放＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	}
 
 

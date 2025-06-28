@@ -1080,7 +1080,7 @@ void QzqstarAchievements::SetCollectAchiveInfo(Player *player, uint32_t itemSetT
 /* ========================= Collections of Dungeon system  ==========================================================*/
 /*=====================================================================================================================*/
 
-AchievementsEntry QzqstarAchievements::GetCollectDungeonsEntry(Player *player, uint32_t DungeonsType)
+AchievementsEntry QzqstarAchievements::GetCollectionEntry(Player *player, uint32_t collection_type)
 {
 	//check _player if none
 	if (!player) return AchievementsEntry();
@@ -1089,7 +1089,7 @@ AchievementsEntry QzqstarAchievements::GetCollectDungeonsEntry(Player *player, u
 	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
 	{
 		AchievementsEntry& e = *it;
-		if (e.type == DungeonsType)
+		if (e.type == collection_type)
 		{
 			return e;
 		}
@@ -1098,7 +1098,7 @@ AchievementsEntry QzqstarAchievements::GetCollectDungeonsEntry(Player *player, u
 	//if not found, create one and return it
 	AchievementsEntry e;
 	e.guid = player->GetGUID();
-	e.type = DungeonsType;
+	e.type = collection_type;
 	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
 	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
 	_playerAchievements[player->GetGUID()].push_back(e);
@@ -1106,21 +1106,16 @@ AchievementsEntry QzqstarAchievements::GetCollectDungeonsEntry(Player *player, u
 	return e;
 }
 
-uint32    QzqstarAchievements::GetDungeonCollectInfo(Player *player, uint32_t ac_mapId)
+uint32    QzqstarAchievements::GetEquipCollectCommon(Player *player, uint32_t key, uint32_t _realMapID)
 {
 	//check _player if none
-	if (!player || ac_mapId > 17) return 0;
-
-	//ac_mapId should be mapped to 0-17, 0-8 for dungeon 1, 9-17 for dungeon 2
-	uint32_t acheiveType = ac_mapId < 9? ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1 : ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2;
-
-	auto _realMapID = ac_mapId % 9;
+	if (!player || _realMapID > 8) return 0;
 
 	//iterate the _playerAchievements vector map of this player to find the collect information
 	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
 	{
 		AchievementsEntry& e = *it;
-		if (e.type == acheiveType)
+		if (e.type == key)
 		{
 			//if found, return the miscValue data
 			switch(_realMapID)
@@ -1142,33 +1137,29 @@ uint32    QzqstarAchievements::GetDungeonCollectInfo(Player *player, uint32_t ac
 	//if not found, create one and return it
 	AchievementsEntry e;
 	e.guid = player->GetGUID();
-	e.type = acheiveType;
+	e.type = key;
 	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
 	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
 	_playerAchievements[player->GetGUID()].push_back(e);
 
-	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeon Collect: %u", player->GetName(), ac_mapId);
+	//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeon Collect: %u", player->GetName(), ac_mapId);
 
 	return 0;
 }
 
-void      QzqstarAchievements::SetDungeonCollectInfo(Player *player, uint32_t ac_mapId, uint32_t value)
+void      QzqstarAchievements::SetEquipCollectCommon(Player *player, uint32_t collection_type, uint32_t key, uint32_t value)
 {
 	//check _player if none
-	if (!player || ac_mapId > 17) return;
-
-	//ac_mapId should be mapped to 0-17, 0-8 for dungeon 1, 9-17 for dungeon 2
-	uint32_t acheiveType = ac_mapId < 9? ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1 : ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2;
-	auto _realMapID = ac_mapId % 9;
+	if (!player || key > 8) return;
 
 	//iterate the _playerAchievements vector map of this player to find the collect information
 	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
 	{
 		AchievementsEntry& e = *it;
-		if (e.type == acheiveType)
+		if (e.type == collection_type)
 		{
 			//if found, set the miscValue data
-			switch(_realMapID)
+			switch(key)
 			{
 				case 0: e.subType = value; break;
 				case 1: e.data1 = value; break;
@@ -1189,12 +1180,12 @@ void      QzqstarAchievements::SetDungeonCollectInfo(Player *player, uint32_t ac
 	//if not found, create one and return it
 	AchievementsEntry e;
 	e.guid = player->GetGUID();
-	e.type = acheiveType;
+	e.type = key;
 	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
 	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
 	_playerAchievements[player->GetGUID()].push_back(e);
 
-	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeon Collect: %u", player->GetName(), ac_mapId);
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeon Collect: %u", player->GetName(), key);
 }
 
 
@@ -1221,38 +1212,44 @@ uint32    QzqstarAchievements::GetEQCollectBonus(Player *player)
 	uint32 bonus = 0;
 
 	//achieve of equipment collection, add 10 AP and 5 SP for each equipment collected.
-	AchievementsEntry ACHIVE_Entries[4]; 
-	ACHIVE_Entries[0] = sQZAchievements.GetCollectDungeonsEntry(player, ACHIEVEMENTS_COLLECTIONS_WORLD);
-	ACHIVE_Entries[1] = sQZAchievements.GetCollectDungeonsEntry(player, ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1);
-	ACHIVE_Entries[2] = sQZAchievements.GetCollectDungeonsEntry(player, ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2);    
-	ACHIVE_Entries[3] = sQZAchievements.GetCollectDungeonsEntry(player, ACHIEVEMENTS_COLLECTIONS_RAID);    
+	AchievementsEntry ACHIVE_Entries[5]; 
+	ACHIVE_Entries[0] = sQZAchievements.GetCollectionEntry(player, ACHIEVEMENTS_COLLECTIONS_WORLD);
+	ACHIVE_Entries[1] = sQZAchievements.GetCollectionEntry(player, ACHIEVEMENTS_COLLECTIONS_DUNGEONS_1);
+	ACHIVE_Entries[2] = sQZAchievements.GetCollectionEntry(player, ACHIEVEMENTS_COLLECTIONS_DUNGEONS_2);
+	ACHIVE_Entries[3] = sQZAchievements.GetCollectionEntry(player, ACHIEVEMENTS_COLLECTIONS_RAID);
+	ACHIVE_Entries[4] = sQZAchievements.GetCollectionEntry(player, ACHIEVEMENTS_COLLECTIONS_PROFESSION);
 	
 	/* Do World collections */
-
+	bonus += COUNT_ONES(ACHIVE_Entries[0].data1) * 20;
+	bonus += COUNT_ONES(ACHIVE_Entries[0].data2) * 40;
+	bonus += COUNT_ONES(ACHIVE_Entries[0].data3) * 60;
+	bonus += COUNT_ONES(ACHIVE_Entries[0].data4) * 80;
+	bonus += COUNT_ONES(ACHIVE_Entries[0].data5) * 100;
 
 	/* Do Dungeon collections */
-	bonus += __count_weight(ACHIVE_Entries[1].subType) * 1;
-	bonus += __count_weight(ACHIVE_Entries[1].data1) * 1.2f;
-	bonus += __count_weight(ACHIVE_Entries[1].data2) * 1.4f;
-	bonus += __count_weight(ACHIVE_Entries[1].data3) * 1.6f;
-	bonus += __count_weight(ACHIVE_Entries[1].data4) * 1.8f;
-	bonus += __count_weight(ACHIVE_Entries[1].data5) * 2.0f;
-	bonus += __count_weight(ACHIVE_Entries[1].data6) * 2.2f;
-	bonus += __count_weight(ACHIVE_Entries[1].data7) * 2.4f;
-	bonus += __count_weight(ACHIVE_Entries[1].data8) * 2.6f;
+	bonus += __count_weight(ACHIVE_Entries[1].subType) * 1.5f;
+	bonus += __count_weight(ACHIVE_Entries[1].data1) * 1.8f;
+	bonus += __count_weight(ACHIVE_Entries[1].data2) * 2.0f;
+	bonus += __count_weight(ACHIVE_Entries[1].data3) * 2.2f;
+	bonus += __count_weight(ACHIVE_Entries[1].data4) * 2.5f;
+	bonus += __count_weight(ACHIVE_Entries[1].data5) * 2.7f;
+	bonus += __count_weight(ACHIVE_Entries[1].data6) * 3.0f;
+	bonus += __count_weight(ACHIVE_Entries[1].data7) * 3.5f;
+	bonus += __count_weight(ACHIVE_Entries[1].data8) * 4.0f;
 
-	bonus += __count_weight(ACHIVE_Entries[2].subType) * 2.8f;
-	bonus += __count_weight(ACHIVE_Entries[2].data1) * 3.0f;
-	bonus += __count_weight(ACHIVE_Entries[2].data2) * 3.2f;
-	bonus += __count_weight(ACHIVE_Entries[2].data3) * 3.4f;
-	bonus += __count_weight(ACHIVE_Entries[2].data4) * 3.6f;
-	bonus += __count_weight(ACHIVE_Entries[2].data5) * 3.8f;
-	bonus += __count_weight(ACHIVE_Entries[2].data6) * 4.0f;
-	bonus += __count_weight(ACHIVE_Entries[2].data7) * 4.2f;
-	bonus += __count_weight(ACHIVE_Entries[2].data8) * 4.5f;
+	bonus += __count_weight(ACHIVE_Entries[2].subType) * 4.2f;
+	bonus += __count_weight(ACHIVE_Entries[2].data1) * 4.5f;
+	bonus += __count_weight(ACHIVE_Entries[2].data2) * 4.7f;
+	bonus += __count_weight(ACHIVE_Entries[2].data3) * 5.0f;
+	bonus += __count_weight(ACHIVE_Entries[2].data4) * 5.5f;
+	bonus += __count_weight(ACHIVE_Entries[2].data5) * 6.0f;
+	bonus += __count_weight(ACHIVE_Entries[2].data6) * 6.5f;
+	bonus += __count_weight(ACHIVE_Entries[2].data7) * 7.0f;
+	bonus += __count_weight(ACHIVE_Entries[2].data8) * 7.5f;
 
-	//bonus refine
-	bonus *= 1.5f;
+	//raid bonus
+
+	//profession bonus
 
 	//Do Raid collections
 	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s GetEQCollectBonus: %u", player->GetName(), bonus);
