@@ -1250,6 +1250,12 @@ uint32    QzqstarAchievements::GetEQCollectBonus(Player *player)
 	//raid bonus
 
 	//profession bonus
+	bonus += COUNT_ONES(ACHIVE_Entries[4].data1) * 50;
+	bonus += COUNT_ONES(ACHIVE_Entries[4].data2) * 50;
+	bonus += COUNT_ONES(ACHIVE_Entries[4].data3) * 50;
+	bonus += COUNT_ONES(ACHIVE_Entries[4].data4) * 50;
+	bonus += COUNT_ONES(ACHIVE_Entries[4].data5) * 50;
+	bonus += COUNT_ONES(ACHIVE_Entries[4].data6) * 50;
 
 	//Do Raid collections
 	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s GetEQCollectBonus: %u", player->GetName(), bonus);

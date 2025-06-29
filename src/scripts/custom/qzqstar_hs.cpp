@@ -674,7 +674,91 @@ struct CustomHSSpell : SpellScript
 			else if(action >= __MENU_MODE_MAIN + 1 && action <= __MENU_MODE_MAIN + 19)
 			{
 				//change the challenging mode
-				auto _realAction = action - __MENU_MODE_MAIN;
+				auto _realAction = action - __MENU_MODE_MAIN ;
+
+				switch(_realAction)
+				{
+					case 1:	 
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　一命模式介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　死亡后等级降低２级　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　死亡掉落一半金币　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜３＞　满级奖励３００点券、乌龟坐骑　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						break;
+					}
+					case 2:	
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　工匠模式介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　可选专业＋２　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　制造专业所需材料减半　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜３＞　专业技能升级降为１点　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						break;	
+					}
+					case 3:	 
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　任务模式介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　杀怪经验降低　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　任务经验提升　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						break;	
+
+					}
+					case 4:	 
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装等模式介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　２５＼３５＼４５等级时，需要突破装等才能继续升级；　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　突破等级可以获取点券奖励；　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜３＞　装等越高，获取奖励越多。　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						break;	
+					}
+					case 5:	
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　富豪模式介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　携带金币可以提升伤害　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　死亡后掉落部分金币　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+						break;	
+					}
+					case 10: 
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　杀手模式（人形）介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　击杀人形获得额外经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　击杀其他类型不获取经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜３＞　对人形伤害提升２０％　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						break;	
+					}
+					case 11: 
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　杀手模式（野兽）介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　击杀野兽获得额外经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　击杀其他类型不获取经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜３＞　对野兽伤害提升２０％　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						break;	
+					}
+					case 12: 
+					{
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　杀手模式（亡灵）介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　击杀亡灵获得额外经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　击杀其他类型不获取经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜３＞　对亡灵伤害提升２０％　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+						break;	
+					}
+				}
+
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,  __STR(__RED("＝＝＝＞＞　确定开启　＜＜＝＝　")), GOSSIP_SENDER_MAIN, action + 20);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞＞　我再想想　＜＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN);
+			}
+			else if (action >= __MENU_MODE_MAIN + 20 && action <= __MENU_MODE_MAIN + 39)
+			{
+				//change the challenging mode
+				auto _realAction = action - __MENU_MODE_MAIN - 20;
 				switch(_realAction)
 				{
 					case 1:	 _Mode |= CHALLENGING_MODE_ONELIFE; break;

@@ -106,7 +106,8 @@ const Teleport_Point_t TP_MainLand_Kalimdor[] = {
 	{8, MAP_KALIMDOR,    	__XSTR("艾萨拉　 "), MAP_KALIMDOR, 8004.5f,-6073.4f,113.3f,0.5f, {0}},
 	{9, MAP_KALIMDOR,    	__XSTR("费伍德森林　 "), MAP_KALIMDOR, 5242.0f,-718.0f,343.0f,0.1f, {0}},
 	{10, MAP_KALIMDOR,    	__XSTR("安戈洛环形山　 "), MAP_KALIMDOR, -6113.0f,-1142.0f,-187.7f,3.5f, {0}},
-	{11, MAP_KALIMDOR,   	__XSTR("希利苏斯　"), MAP_KALIMDOR, -6811.0f,836.0f,50.0f,1.0f, {0}}
+	{11, MAP_KALIMDOR,   	__XSTR("希利苏斯　"), MAP_KALIMDOR, -6811.0f,836.0f,50.0f,1.0f, {0}},
+	{12, MAP_KALIMDOR,   	__XSTR("月光林地　"), MAP_KALIMDOR, 7882.0f,-2312.0f,466.0f,1.0f, {0}}
 };
 
 const Teleport_Point_t TP_Dungeons[] = {

@@ -269,7 +269,7 @@ void Creature::AddToWorld()
                 //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Creature:%s id:%u created!", GetName(), GetGUID());
                 SetMaxHealth(GetMaxHealth() * (1 + pInstanceData->CustomDifficulty * pInstanceData->CustomDifficulty)); 
                 SetHealthPercent(100.0f);
-                SetNativeScale(1.0f + pInstanceData->CustomDifficulty/10.0f);
+                SetNativeScale(GetNativeScale()*(1.0f + pInstanceData->CustomDifficulty/10.0f));
                 CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1 - 1 + pInstanceData->CustomDifficulty, true);
             }
         }
@@ -1604,10 +1604,10 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
     }
 
     //qzqstar, 250515, generate some special loot by creature difficulty level
-    if (roll_chance_i((100 - GetLevel())/5))
+    if (roll_chance_i((100 - GetLevel())/10))
     {
         uint32_t _chance = urand(1, 100);
-        auto item = DBHelper_GetItemEqByCreatureLevel(this, _chance < 80 ? 1 : _chance < 95? 2 : 3);
+        auto item = DBHelper_GetItemEqByCreatureLevel(this, _chance < 90 ? 1 : _chance < 98? 2 : 3);
         if (item.itemID)
         {
 			if (loot.items.size() < MAX_NR_LOOT_ITEMS)             // Non-quest drop

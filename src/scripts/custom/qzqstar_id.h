@@ -238,6 +238,9 @@ entry=133234，奥达曼阿扎达斯祭坛
 entry=175706，黑石祭坛
 update gameobject_template set data0 = 1 where entry in (130511, 133234, 175706);
 
+
+update item_template set bonding = 0 where entry in(6339,11130,11145,16207,9149);
+
 */
 
 

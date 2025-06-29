@@ -59,12 +59,15 @@ extern Level_EnchantID_t DBHelper_GetRandEnchantIDByLevel(int32 itemLevel);
 
 
 //Equipment list for the world
-typedef struct _level_weaponList_world {
+typedef struct _level_weaponList_common {
 	int32 world_level;
 	int32 item_level;
 	int32 eq_list[12];
-} EQ_Collect_World_t;
-extern const EQ_Collect_World_t * DBHelper_GetEQByWorldLevel(uint32 level);
+} EQ_Collect_Common_t;
+extern const EQ_Collect_Common_t * DBHelper_GetEQByWorldLevel(uint32 level);
+extern const EQ_Collect_Common_t * DBHelper_GetEQByProfession(uint32 prof);
+
+
 
 //Equipment list for the dungeon
 typedef struct _level_weaponList_dungeon {

@@ -8857,7 +8857,7 @@ Level_ItemMatsID_t DBHelper_GetItemMatsByLevel(Player *p, int32 rank)
 #define	PHASE_BWL		(16)
 #define	PHASE_TAQ		(20)
 #define	PHASE_NAXX		(30)
-#define	CURRENT_PHASE	(PHASE_BWL)
+#define	CURRENT_PHASE	(PHASE_3DA)
 //Get the Item Reward Equipments by level
 Level_ItemEqID_t DBHelper_GetItemEqByLevel(Player *p, int32 rank)
 {
@@ -9014,7 +9014,7 @@ Level_EnchantID_t DBHelper_GetRandEnchantIDByLevel(int32 itemLevel)
 
 
 // Equipment list for the world
-const std::vector<EQ_Collect_World_t> _EQ_Collections_World =
+const std::vector<EQ_Collect_Common_t> _EQ_Collections_World =
 {
 	{0, 20, {935,12975,12976,12983,		12984,13136,12989,2879,		12992,12990,890,2256}},
 	{1, 30, {12992,12996,12994,2911,	12997,2256,1121,890,		12999,12998,4320,3021}},
@@ -9024,11 +9024,29 @@ const std::vector<EQ_Collect_World_t> _EQ_Collections_World =
 	{5, 60, {0}},
 };
 
-const EQ_Collect_World_t * DBHelper_GetEQByWorldLevel(uint32 level)
+const EQ_Collect_Common_t * DBHelper_GetEQByWorldLevel(uint32 level)
 {
 	if(level > _EQ_Collections_World.size()) return &(_EQ_Collections_World[_EQ_Collections_World.size() - 1]);
 	else return &(_EQ_Collections_World[level]);
 }
+
+//Equipmentlist for professions
+const std::vector<EQ_Collect_Common_t> _EQ_Collections_Profession =
+{
+	{0, 10, {9149,13506,13510,13511,13512,13513,	0,0,0,0,0,0}}, //Alchemy
+	{1, 20, {6339,11130,11145,16207,20748,20749,	0,0,0,0,0,0}}, //Enchanting
+	{2, 30, {4320,14136,16980,18405,18509,18510,	0,0,0,0,0,0}}, //Clothing
+	{3, 40, {4253,8346,19044,16982,16983,19162,		0,0,0,0,0,0}}, //Leatherworking
+	{4, 50, {2870,7938,7954,17013,19164,22384,		0,0,0,0,0,0}}, //Blacksmithing
+	{5, 60, {4368,10645,10588,15999,18283,16007,	0,0,0,0,0,0}}, //Engineering
+};
+
+const EQ_Collect_Common_t * DBHelper_GetEQByProfession(uint32 prof_type)
+{
+	if(prof_type > _EQ_Collections_Profession.size()) return &(_EQ_Collections_Profession[_EQ_Collections_Profession.size() - 1]);
+	else return &(_EQ_Collections_Profession[prof_type]);
+}
+
 
 //Equipment for Dungeons
 const std::vector<EQ_Collect_Dungeon_t> _Weapon_Dungeon_Set =

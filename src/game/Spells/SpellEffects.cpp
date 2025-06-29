@@ -837,7 +837,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 							if (ratio > 100) ratio = 100;
 
 							//set to real
-							ratio = (100 - ratio) / 3;
+							ratio = (100 - ratio) / 4;
 
 							player->CastCustomSpell(player, 31028, ratio, 0 - ratio, 0, true, nullptr);
 						}
@@ -881,8 +881,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 							if (__points > 600) __points = 600;
 
 							//BASIC_LOG("Health:%d, MANA:%d, points=%d", maxHealth, maxMana, __points/3);
-
-							player->CastCustomSpell(player, 31052, __points / 3, {}, {}, true, nullptr);
+							player->CastCustomSpell(player, 31052, __points / 4, {}, {}, true, nullptr);
 						}
 						else if (player->HasAura(31052) && (!player->HasSpell(31051)))
 						{
@@ -906,7 +905,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 							ratio = (ratio - 49) * 2 - 1;
 
-							player->CastCustomSpell(player, 31074, ratio, ratio/3, {}, true, nullptr);
+							player->CastCustomSpell(player, 31074, ratio, ratio/4, {}, true, nullptr);
 						}
 						else if (player->HasAura(31074) && (!player->HasSpell(31073)))
 						{
