@@ -103,7 +103,7 @@ const Teleport_Point_t TP_MainLand_Kalimdor[] = {
 	{5, MAP_KALIMDOR,   	__XSTR("凄凉之地　 "), MAP_KALIMDOR, -1064.0f,1979.0f,63.0f,0.0f, {0}},
 	{6, MAP_KALIMDOR,    	__XSTR("菲拉斯　 "), MAP_KALIMDOR, -4844.0f,1317.0f,81.0f,0.1f, {0}},
 	{7, MAP_KALIMDOR,   	__XSTR("尘泥沼泽　 "), MAP_KALIMDOR, -4081.0f,-3715.0f,45.7f,1.1f, {0}},
-	{8, MAP_KALIMDOR,    	__XSTR("艾萨拉　 "), MAP_KALIMDOR, 8004.5f,-6073.4f,113.3f,0.5f, {0}},
+	{8, MAP_KALIMDOR,    	__XSTR("艾萨拉　 "), MAP_KALIMDOR, 2869.5f,-6073.4f,113.3f,0.5f, {0}}, 
 	{9, MAP_KALIMDOR,    	__XSTR("费伍德森林　 "), MAP_KALIMDOR, 5242.0f,-718.0f,343.0f,0.1f, {0}},
 	{10, MAP_KALIMDOR,    	__XSTR("安戈洛环形山　 "), MAP_KALIMDOR, -6113.0f,-1142.0f,-187.7f,3.5f, {0}},
 	{11, MAP_KALIMDOR,   	__XSTR("希利苏斯　"), MAP_KALIMDOR, -6811.0f,836.0f,50.0f,1.0f, {0}},
@@ -123,19 +123,19 @@ const Teleport_Point_t TP_Dungeons[] = {
 	{ 9, MAP_ULDAMAN,           __XSTR("奥达曼　"), 0, -6071.37,-2955.16,209.782,0.015708, {7291,4854,6910,7206,5,6,7,8,30071,1}},
 	{10, MAP_MARAUDON,          __XSTR("玛拉顿　"), 1, -1188.37,2879.61,85.7888,5.07366, {12203,12201,12236,13282,12258,6,7,8,30071,1}},
 	{11, MAP_ZUL_FARRAK,        __XSTR("祖尔法拉克　"), 1, -6801.19,-2893.02,9.00388,0.158639, {7271,8127,7275,7267,5,6,7,8,30071,1}},
-	{12, MAP_SUNKEN_TEMLE,      __XSTR("沉没的神庙　"), 0, -10177.9,-3994.9,-111.239,6.01885, {0}},
-	{13, MAP_BLACKROCK_DEPTHS,  __XSTR("黑石深渊　"), 0, -7179.34,-921.212,165.821,5.09599, {0}},
-	{14, MAP_DIRE_MAUL,         __XSTR("厄运之锤　"), 1, -3521.29,1085.2,161.097,4.7281, {0}},
-	{15, MAP_SCHOLOMANCE,       __XSTR("通灵学院　"), 0, 1269.64,-2556.21,93.6088,0.620623, {0}},
-	{16, MAP_STRATHOLME,        __XSTR("斯坦索姆　"), 0, 3352.92,-3379.03,144.782,6.25978, {0}},
-	{17, MAP_BLACKROCK_SPIRE,   __XSTR("黑石塔　"), 0, -7527.05,-1226.77,285.732,5.29626, {0}},
+	{12, MAP_SUNKEN_TEMLE,      __XSTR("沉没的神庙　"), 0, -10177.9,-3994.9,-111.239,6.01885, {5710,5721,5720,5719,5,6,7,8,30071,1}},
+	{13, MAP_BLACKROCK_DEPTHS,  __XSTR("黑石深渊　"), 0, -7179.34,-921.212,165.821,5.09599, {9033, 9018, 9019, 8983, 5,6,7,8,30071,1}},
+	{14, MAP_DIRE_MAUL,         __XSTR("厄运之锤　"), 1, -3521.29,1085.2,161.097,4.7281, {14327, 11501, 11486, 11492, 5, 6, 7, 8, 30071, 1}},
+	{15, MAP_SCHOLOMANCE,       __XSTR("通灵学院　"), 0, 1269.64,-2556.21,93.6088,0.620623, {10506, 11261,10505,10503, 1853, 6,7,8,30071,1}},
+	{16, MAP_STRATHOLME,        __XSTR("斯坦索姆　"), 0, 3352.92,-3379.03,144.782,6.25978, {10436, 10437,10440, 10438, 10435, 6,7,8,30071,1}},
+	{17, MAP_BLACKROCK_SPIRE,   __XSTR("黑石塔　"), 0, -7527.05,-1226.77,285.732,5.29626, {10429, 9196, 10430, 9568, 10363, 6,7,8,30071,1}},
 };
 
 
 const Teleport_Point_t TP_Raids[] = {
 	// Makeup from upper comment, reverse order
-	{0, MAP_ZUL_GURUB,      	__XSTR("祖尔格拉布　"), 	MAP_ZUL_GURUB, -11916.9f,-1248.36f,92.5334f,4.72417f, {0}},
-	{1, MAP_MOLTEN_CORE,    	__XSTR("熔火之心　"), 		MAP_MOLTEN_CORE, 1082.04f,-474.596f,-107.762f,5.02623f, {0}},
+	{0, MAP_ZUL_GURUB,      	__XSTR("祖尔格拉布　"), 	MAP_ZUL_GURUB, 		-11916.9f,-1248.36f,92.5334f,4.72417f, {0}},
+	{1, MAP_MOLTEN_CORE,    	__XSTR("熔火之心　"), 		MAP_MOLTEN_CORE, 		1082.04f,-474.596f,-107.762f,5.02623f, {0}},
 	{2, MAP_ONYXIAS_LAIR,   	__XSTR("奥妮克希亚　"), 	MAP_ONYXIAS_LAIR, 29.1607f,-71.3372f,-8.18032f,4.43584f, {0}},
 	{3, MAP_AHN_QIRAJ_RUINS, 	__XSTR("安其拉废墟　"), 	MAP_AHN_QIRAJ_RUINS, -8437.74f,1516.91f,31.9074f,2.73319f, {0}},
 	{4, MAP_BLACKWING_LAIR, 	__XSTR("黑翼之巢　"), 		MAP_BLACKWING_LAIR, -7664.76f,-1100.87f,399.679f,0.561981f, {0}},
@@ -196,7 +196,8 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 
 			text.append(__STR(" => "));
 			text.append(__DUNGEONS_DIFFICULTY_MINIMUM[_achievedDifficulty]);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_DUNGEONS_MAIN + __MENU_TELEPORT_DUNGEONS_ACT1 + i); //add the difficulty to the menu
+			if(player->GetLevel() > i * 3 ) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_DUNGEONS_MAIN + __MENU_TELEPORT_DUNGEONS_ACT1 + i); //add the difficulty to the menu
+			else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝其他地图，玩家等级不够＝ ")), GOSSIP_SENDER_MAIN, __MENU_NONE); //add the difficulty to the menu
 		}
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);	
@@ -271,7 +272,7 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 		//chathandler ...
 		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Dungeons[_acID].name, _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "));
 		//teleport to the dungeon.
-		player->TeleportTo(TP_Dungeons[_acID].tele_mapid, TP_Dungeons[_acID].tele_x, TP_Dungeons[_acID].tele_y, TP_Dungeons[_acID].tele_z, TP_Dungeons[_acID].tele_o);
+		player->TeleportTo(TP_Dungeons[_acID].tele_mapid, TP_Dungeons[_acID].tele_x, TP_Dungeons[_acID].tele_y, TP_Dungeons[_acID].tele_z, TP_Dungeons[_acID].tele_o, TELE_TO_FORCE_MAP_CHANGE);
 
 		return true;
 	}
@@ -332,7 +333,7 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 
 		//display the info
 		text.append(__STR("当前地图：　"));
-		text.append(__STR(TP_Dungeons[_acID].name));
+		text.append(__STR(TP_Raids[_acID].name));
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE); 
 
 		text = "";
@@ -379,9 +380,9 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 
 		player->CLOSE_GOSSIP_MENU();
 		//chathandler ...
-		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Dungeons[_acID].name, _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "));
+		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Raids[_acID].name, _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "));
 		//teleport to the dungeon.
-		player->TeleportTo(TP_Dungeons[_acID].tele_mapid, TP_Dungeons[_acID].tele_x, TP_Dungeons[_acID].tele_y, TP_Dungeons[_acID].tele_z, TP_Dungeons[_acID].tele_o);
+		player->TeleportTo(TP_Raids[_acID].tele_mapid, TP_Raids[_acID].tele_x, TP_Raids[_acID].tele_y, TP_Raids[_acID].tele_z, TP_Raids[_acID].tele_o, TELE_TO_FORCE_MAP_CHANGE);
 
 		return true;
 	}
@@ -475,7 +476,7 @@ bool Menus_teleport_Common(Player *player, Creature *_cr, uint32 sender, uint32 
 		player->CLOSE_GOSSIP_MENU();
 		//sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Teleport to id %d", action);
 
-		if(pPoints) player->TeleportTo(pPoints[_acID].tele_mapid, pPoints[_acID].tele_x, pPoints[_acID].tele_y, pPoints[_acID].tele_z, pPoints[_acID].tele_o);
+		if(pPoints) player->TeleportTo(pPoints[_acID].tele_mapid, pPoints[_acID].tele_x, pPoints[_acID].tele_y, pPoints[_acID].tele_z, pPoints[_acID].tele_o, TELE_TO_FORCE_MAP_CHANGE);
 	}
 
 	return true;
@@ -501,8 +502,11 @@ bool Menus_teleport_Main(Player *player, Creature *_cr, uint32 sender, uint32 ac
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　副本传送　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_DUNGEONS);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　团本传送　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_RAIDS);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	if(player->GetLevel() >= 45) 
+	{
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　团本传送　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_RAIDS);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	}
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _cr->GetGUID());
 	return true;

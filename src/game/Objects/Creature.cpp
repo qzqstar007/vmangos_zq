@@ -1618,7 +1618,7 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
         }
     }
 
-    if(roll_chance_i(1))
+    if(roll_chance_i(2))
     {
         if (loot.items.size() < MAX_NR_LOOT_ITEMS)             // Non-quest drop
         {

@@ -4970,7 +4970,7 @@ void Player::KillPlayer()
 			ModifyMoney(0 - __looseMoney);
 			ChatHandler(this).PSendSysMessage("You died, lost %ug%us.", __looseMoney / 10000, (__looseMoney / 100) % 100);
 
-			if (__looseMoney < __oldLevel * 1000)
+			if (__looseMoney < __oldLevel * 10000)
 			{
 				//Resurrection Sickness
 				CastSpell(this, 15007, true);
@@ -4987,8 +4987,9 @@ void Player::KillPlayer()
 					Player* player = session->GetPlayer();
 					if (player && player->IsInWorld() && player->IsAlive())
 					{
-						if (__looseMoney > __oldLevel * 1000)
+						if (__looseMoney > __oldLevel * 10000)
 						{
+                            //|cffff0000[PVP公告]|r 富豪玩家：|cffff8c00[%s]|r  被 |cffdd2000[%s]|r 击杀，在线玩家平分其部分资产：%u金%u银%u铜。
 							ChatHandler(player).PSendSysMessage(9032, GetName(), _monsterName,
 								__looseMoney / 10000, (__looseMoney / 100) % 100, __looseMoney % 100);
 						}
@@ -5014,7 +5015,7 @@ void Player::KillPlayer()
 			}
 		}
 		//BASIC_LOG => sLog.Out(LOG_BASIC, LOG_LVL_BASIC, 
-		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "PLAYER:[%u][%s] died...  From %u to %u . total sessions: %u",
+		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "RICH PLAYER:[%u][%s] died...  From %u to %u . total sessions: %u",
 			GetGUID(), GetName(), __oldLevel, __newLevel, sWorld.GetActiveSessionCount());
 	}
 }

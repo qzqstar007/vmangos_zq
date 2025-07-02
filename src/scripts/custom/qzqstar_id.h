@@ -54,6 +54,10 @@
 //Mounts Items
 #define ZQ_ITEM_MOUNTS_ITEM			30061	//Mounts Item, 坐骑物品 ~ 30066
 
+//CHenyi ZHanpao
+#define ZQ_ITEM_CHENYI		        30401	//Chenyi Zhanpao, 陈怡之杖
+#define ZQ_ITEM_ZHANPAO		        30501	//Chenyi Zhanpao, 陈怡之杖
+
 /******************************************************************** 
  *  Spell IDs, largest first (33386).
  ********************************************************************/
@@ -74,6 +78,11 @@
 
 #define ZQ_SPELL_ACHIEVE_STOLE		33363	//Achieve Stolen, 偷取
 #define ZQ_SPELL_ACHIEVE_CAST		33364	//Achieve Cast, 施法
+
+#define ZQ_SPELL_SPELL_CHUAN_PROPERTY	33365	//Spell Chuan Property, 传家宝属性
+#define ZQ_SPELL_SPELL_CHUAN_APSP   	33366	//Spell Chuan APSP, 传家宝法强攻强
+#define ZQ_SPELL_SPELL_CHUAN_HASTE	    33367	//Spell Chuan Haste, 传家宝急速
+#define ZQ_SPELL_SPELL_RICH_BONUS	    33368	//Spell Rich Bonus, 富豪奖励
 
 #define ZQ_SPELL_SPELL_DIFFICULTY1	33351	//Spell Difficulty 1, 副本难度1
 #define ZQ_SPELL_SPELL_DIFFICULTY2	33352	//Spell Difficulty 2, 副本难度2
@@ -241,6 +250,11 @@ update gameobject_template set data0 = 1 where entry in (130511, 133234, 175706)
 
 update item_template set bonding = 0 where entry in(6339,11130,11145,16207,9149);
 
+
+//spell id that is tooooo dangerous
+creature id   spell id
+1200    8909
+8550    22917   16592
 */
 
 

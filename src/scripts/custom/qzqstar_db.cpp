@@ -9049,7 +9049,7 @@ const EQ_Collect_Common_t * DBHelper_GetEQByProfession(uint32 prof_type)
 
 
 //Equipment for Dungeons
-const std::vector<EQ_Collect_Dungeon_t> _Weapon_Dungeon_Set =
+const std::vector<EQ_Collect_Dungeon_t> _EQ_Collections_Dungeons =
 {
 	/* MAP_RAGEFIRE_CHASM,    __XSTR("怒焰裂谷　"), */		{ 0, 	{1, 2, 3, 4},	{14145,14151,	14147,14148,  	14149,14150	} },
 	/* MAP_WAILING_CAVERNS,   __XSTR("哀嚎洞穴　"), */		{ 1, 	{1, 2, 4, 5},	{6469,6472,		6463,6630,  	13245,6449 } },
@@ -9074,7 +9074,7 @@ const std::vector<EQ_Collect_Dungeon_t> _Weapon_Dungeon_Set =
 
 const EQ_Collect_Dungeon_t * DBHelper_GetEQByDungeonID(int32 mapId)
 {
-	if(mapId >= 0 && mapId <= 17) return &(_Weapon_Dungeon_Set[mapId]);
+	if(mapId >= 0 && mapId <= 17) return &(_EQ_Collections_Dungeons[mapId]);
 	else return nullptr;
 }
 
@@ -9086,6 +9086,36 @@ int COUNT_ONES(uint32_t x) {
         count++;
     }
     return count;
+}
+
+
+bool isCollectionItem(uint32_t eqItemID)
+{
+	//check world, dungeons, and profession
+	for (auto& eq : _EQ_Collections_World)
+	{
+		for (auto& item : eq.ItemID)
+		{
+			if (item == eqItemID) return true;
+		}
+	}
+
+	for (auto& eq : _EQ_Collections_Dungeons)
+	{
+		for (auto& item : eq.ItemID)
+		{
+			if (item == eqItemID) return true;
+		}
+	}
+	for (auto& eq : _EQ_Collections_Profession)
+	{
+		for (auto& item : eq.ItemID)
+		{
+			if (item == eqItemID) return true;
+		}	
+	}
+
+	return false;
 }
 
 #pragma endregion

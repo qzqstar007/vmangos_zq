@@ -828,25 +828,25 @@ struct CustomHSSpell : SpellScript
 				case 8:	pPlayer->TeleportToHomebind(); return;
 				case 9:	pPlayer->CastSpell(pPlayer, 23441, true); return;
 
-				case 11:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -8828.231445f, 627.927490f, 94.055664f, 0.0f); return;
-				case 12:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -4917.0f, -955.0f, 502.0f, 0.0f); return;
-				case 13:	pPlayer->TeleportTo(MAP_KALIMDOR, 9962.712891f, 2280.142822f, 1341.394409f, 0.0f); return;
+				case 11:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -8828.231445f, 627.927490f, 94.055664f, 0.0f, TELE_TO_FORCE_MAP_CHANGE); return;
+				case 12:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -4917.0f, -955.0f, 502.0f, 0.0f, TELE_TO_FORCE_MAP_CHANGE); return;
+				case 13:	pPlayer->TeleportTo(MAP_KALIMDOR, 9962.712891f, 2280.142822f, 1341.394409f, 0.0f, TELE_TO_FORCE_MAP_CHANGE); return;
 				
-				case 14:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -8943.133789f, -132.934921f, 83.704269f, 0.0f); return;
-				case 15:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -6231.106445f, 332.270477f, 383.153931f, 0.0f); return;
-				case 16:	pPlayer->TeleportTo(MAP_KALIMDOR, 10329.918945f, 833.500305f, 1326.260620f, 0.0f); return;
+				case 14:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -8943.133789f, -132.934921f, 83.704269f, 0.0f, TELE_TO_FORCE_MAP_CHANGE); return;
+				case 15:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -6231.106445f, 332.270477f, 383.153931f, 0.0f, TELE_TO_FORCE_MAP_CHANGE); return;
+				case 16:	pPlayer->TeleportTo(MAP_KALIMDOR, 10329.918945f, 833.500305f, 1326.260620f, 0.0f), TELE_TO_FORCE_MAP_CHANGE; return;
 
-				case 21:	pPlayer->TeleportTo(MAP_KALIMDOR, 1437.0f, -4421.0f, 25.24f, 1.65f); return;
-				case 22:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, 1822.0999f, 238.638855f, 60.694809f, 0.0f); return;
-				case 23:	pPlayer->TeleportTo(MAP_KALIMDOR, -1272.703735f, 116.886490f, 131.016861f, 0.0f); return;
+				case 21:	pPlayer->TeleportTo(MAP_KALIMDOR, 1437.0f, -4421.0f, 25.24f, 1.65f, TELE_TO_FORCE_MAP_CHANGE); return;
+				case 22:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, 1822.0999f, 238.638855f, 60.694809f, 0.0f, TELE_TO_FORCE_MAP_CHANGE); return;
+				case 23:	pPlayer->TeleportTo(MAP_KALIMDOR, -1272.703735f, 116.886490f, 131.016861f, 0.0f), TELE_TO_FORCE_MAP_CHANGE; return;
 
-				case 24:	pPlayer->TeleportTo(MAP_KALIMDOR, -602.1253f, -4262.4208f, 38.956341f, 0.0f); return;
-				case 25:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, 1663.517f, 1678.187744f, 120.5303f, 0.0f); return;
-				case 26:	pPlayer->TeleportTo(MAP_KALIMDOR, -2914.16992f, -266.061798f, 53.658211f, 0.0f); return;
+				case 24:	pPlayer->TeleportTo(MAP_KALIMDOR, -602.1253f, -4262.4208f, 38.956341f, 0.0f, TELE_TO_FORCE_MAP_CHANGE); return;
+				case 25:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, 1663.517f, 1678.187744f, 120.5303f, 0.0f, TELE_TO_FORCE_MAP_CHANGE); return;
+				case 26:	pPlayer->TeleportTo(MAP_KALIMDOR, -2914.16992f, -266.061798f, 53.658211f, 0.0f, TELE_TO_FORCE_MAP_CHANGE); return;
 
-				case 31:	pPlayer->TeleportTo(MAP_KALIMDOR, 6755.33f, -4658.09f, 724.8f, 3.4049f); return;
-				case 32:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -14462.0f, 460.0f, 16.1f, 3.4049f); return; 
-				case 33:	pPlayer->TeleportTo(MAP_KALIMDOR, -952.2f, -3746.3f, 5.66f, 1.1f); return;
+				case 31:	pPlayer->TeleportTo(MAP_KALIMDOR, 6755.33f, -4658.09f, 724.8f, 3.4049f, TELE_TO_FORCE_MAP_CHANGE); return;
+				case 32:	pPlayer->TeleportTo(MAP_EASTERN_KINGDOMS, -14462.0f, 460.0f, 16.1f, 3.4049f, TELE_TO_FORCE_MAP_CHANGE); return; 
+				case 33:	pPlayer->TeleportTo(MAP_KALIMDOR, -952.2f, -3746.3f, 5.66f, 1.1f, TELE_TO_FORCE_MAP_CHANGE); return;
 				}
 			}
 		}
@@ -1008,8 +1008,6 @@ struct CustomHSSpell : SpellScript
 					}
 				}
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
-
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　已学技能列表　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 				if(e.data8 < 2) e.data8 = 2;
@@ -1058,9 +1056,10 @@ struct CustomHSSpell : SpellScript
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝　消耗５００点券开启法术槽　＝＝")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE + 300);
 					}
 
-					//add menu
-					pPlayer->SEND_GOSSIP_MENU(ZQ_GOSSIP_SPELL_STOLE, pPlayer->GetGUID());
+
 				}
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　消耗１点券冷却偷取技能　＝＝")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE + 400);
 			}
 
 			else if(action >= __MENU_SKILL_STOLE + 100 && action <= __MENU_SKILL_STOLE + 103)
@@ -1108,8 +1107,31 @@ struct CustomHSSpell : SpellScript
 				}
 			}
 
+			else if(action == __MENU_SKILL_STOLE + 400)
+			{
+				//cooldown, need 1 voucher
+				if(!pPlayer->HasItemCount(ZQ_ITEM_VOUCHER, 1))	
+				{
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　需要1点券，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);	
+				}
+				else
+				{
+					pPlayer->DestroyItemCount(ZQ_ITEM_VOUCHER, 1, true, true);
+					//todo 
+					// immediately finishes cooldown of stole and cast
+					auto cdCheck = [](SpellEntry const & spellEntry) -> bool
+					{
+						if ((spellEntry.Id == ZQ_SPELL_ACHIEVE_STOLE  || spellEntry.Id == ZQ_SPELL_ACHIEVE_CAST ) && spellEntry.GetRecoveryTime() > 0)
+							return true;
+						return false;
+					};
+					pPlayer->RemoveSomeCooldown(cdCheck);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　成功冷却技能，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
+				}
+			}
+
 			//add menu
-			pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+			pPlayer->SEND_GOSSIP_MENU(ZQ_GOSSIP_SPELL_STOLE, pPlayer->GetGUID());
 			return ;
 		}
 

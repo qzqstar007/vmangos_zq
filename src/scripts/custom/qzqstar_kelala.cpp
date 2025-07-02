@@ -209,6 +209,7 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 #define __MENU_TASK_MAIN						    (__MENU_KELALA_TASK + __SUBMENU_TASK_MAIN)	
 #define	__MENU_TASK_ACT_ACCEPT						(100)
 #define	__MENU_TASK_ACT_COMPLET						(200)
+#define	__MENU_TASK_ACT_COMPLET_BY_COST				(220)
 #define	__MENU_TASK_ACT_REGET						(300)
 
 static int32 _Quest_Counter = 12001;
@@ -262,10 +263,16 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("　"), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__statusStr), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("　"), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
-			if (__qStatus == QUEST_STATUS_COMPLETE)	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__GREEN("== 领取奖励 == ")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN + __MENU_TASK_ACT_COMPLET);
-			else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__GREEN("＝＝【返回】＝＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+			if (__qStatus == QUEST_STATUS_COMPLETE)	
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__GREEN("== 领取奖励 == ")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN + __MENU_TASK_ACT_COMPLET);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("　"), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__GREEN("＝＝【返回】＝＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("　"), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
 
+
+			if (__qStatus != QUEST_STATUS_COMPLETE)	 
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("== 消耗５点券直接完成任务 == ")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN + __MENU_TASK_ACT_COMPLET_BY_COST);
+			
 
 			__statusStr = __STR(("|cffbb0000 ＝＝重新获取任务，花费金币： "));
 			__statusStr.append(__NSTR(__reset_gold));
@@ -487,6 +494,41 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 		return true;
 	}
+	else if (action == __MENU_TASK_MAIN + __MENU_TASK_ACT_COMPLET_BY_COST)
+	{
+		//check player has enough voucher
+		if(!player->HasItemCount(ZQ_ITEM_VOUCHER, 5))
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("＝＝你的点券不够，返回。＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+			return true;
+		}
+
+		player->DestroyItemCount(ZQ_ITEM_VOUCHER, 5, true);
+		if (_currentQuestID)
+		{
+			Quest const* pQuest = sObjectMgr.GetQuestTemplate(_currentQuestID);
+
+			// 删除并获取下一个迭代器
+			auto _kpair = sObjectMgr.GetCreatureInvolvedRelationsMap().equal_range(_QUEST_NPC_ID);
+			for (auto it = _kpair.first; it != _kpair.second; ) {
+				if (it->second == _currentQuestID) {
+					it = sObjectMgr.GetCreatureInvolvedRelationsMap().erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+			player->RewardQuest(pQuest, 0, player, false);
+		}
+
+		sQZAchievements.FinishCustomQuest(player, true);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("　"), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__GREEN("＝＝＝成功完成任务，返回。＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+		return true;
+	}
+
 	else if (action == __MENU_TASK_MAIN + __MENU_TASK_ACT_REGET)
 	{
 
@@ -726,6 +768,9 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 				{
 					_curEQLevel += pItem->GetProto()->ItemLevel;
 					if(pItem->GetProto()->InventoryType == INVTYPE_2HWEAPON) _curEQLevel += pItem->GetProto()->ItemLevel;
+
+					if(pItem->GetEntry() == ZQ_ITEM_CHENYI) _curEQLevel += player->GetLevel();
+					else if(pItem->GetEntry() == ZQ_ITEM_ZHANPAO) _curEQLevel += player->GetLevel();
 
 					//check the random properties
 					if(pItem->GetItemRandomPropertyId() > 3300 && pItem->GetItemRandomPropertyId() < 3321)
@@ -1896,8 +1941,11 @@ bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 acti
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　社区贡献　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SOCIAL);
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　挑战模式　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MODE);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	if (player->GetLevel() >= 25)
+	{
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　挑战模式　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MODE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	}
 
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　声望奖励　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_REP);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -1929,15 +1977,6 @@ bool Menus_Kelala_Newbie(Player *player, Creature *_cr, uint32 sender, uint32 ac
 		player->RewardQuest(pQuest, 0, player, false);
 
 		//add item
-		player->AddItem(30000, 200);
-		player->AddItem(30000, 200);
-		player->AddItem(30000, 200);
-		player->AddItem(30000, 200);
-		player->AddItem(30000, 200);
-		player->AddItem(30000, 200);
-		player->AddItem(30000, 200);
-		player->AddItem(30000, 200);
-		player->AddItem(30000, 200);
 		player->AddItem(30000, 200);
 
 		//Cast the first spell

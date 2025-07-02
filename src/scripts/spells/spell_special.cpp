@@ -289,7 +289,58 @@ struct APSPSpellScript : public SpellScript
 };
 
 
+//APSP Spell for users
+struct ChuanSpellScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            if (Player* player = spell->GetCaster()->ToPlayer())
+            {
+                int32 basePoints0 = 0, basePoints1 = 0, basePoints2 = 0;
 
+                #define ZQ_SPELL_SPELL_CHUAN_PROPERTY	33365	//Spell Chuan Property, 传家宝属性
+                #define ZQ_SPELL_SPELL_CHUAN_APSP   	33366	//Spell Chuan APSP, 传家宝法强攻强
+                #define ZQ_SPELL_SPELL_CHUAN_HASTE	    33367	//Spell Chuan Haste, 传家宝急速
+
+                
+                uint32_t _plevel = player->GetLevel();
+                switch(spell->m_spellInfo->Id)
+                {
+                    case ZQ_SPELL_SPELL_CHUAN_PROPERTY: //property, armor and spell resistance
+                        basePoints0 = _plevel;
+                        basePoints1 = _plevel * 10;
+                        basePoints2 = _plevel / 2;
+                        break;	
+                    case ZQ_SPELL_SPELL_CHUAN_APSP: //APSP, attack and spell power
+                        basePoints0 = _plevel * 4;
+                        basePoints1 = _plevel * 4;
+                        basePoints2 = _plevel * 2;
+                        break;
+                    case ZQ_SPELL_SPELL_CHUAN_HASTE: //Haste, attack and spell power
+                        basePoints0 = _plevel / 6;
+                        basePoints1 = _plevel / 6;
+                        basePoints2 = _plevel / 6;
+                        break;
+                }
+
+                if(player->M_Challenge_Mode & CHALLENGING_MODE_RICH)
+                {
+                    basePoints0 = basePoints0 * 1.5;
+                    basePoints1 = basePoints1 * 1.5;
+                    basePoints2 = basePoints2 * 1.5;
+                }
+
+                spell->m_currentBasePoints[0] = basePoints0;
+                spell->m_currentBasePoints[1] = basePoints1;
+                spell->m_currentBasePoints[2] = basePoints2;
+            }	
+        }	
+
+        return true;
+    }		
+};
 
 //Stole Spell for users
 struct SpellStealScript : public SpellScript
@@ -472,6 +523,12 @@ void AddSC_special_spell_scripts()
     newscript = new Script;
     newscript->Name = "qzqstar_apsp_buff";
     newscript->GetSpellScript = [](SpellEntry const*) -> SpellScript* { return new APSPSpellScript(); };
+    newscript->RegisterSelf();
+
+    //add custom spell script chuan jia bao
+    newscript = new Script;
+    newscript->Name = "qzqstar_chuan";
+    newscript->GetSpellScript = [](SpellEntry const*) -> SpellScript* { return new ChuanSpellScript(); };
     newscript->RegisterSelf();
 
     //add custom spell script for spell stole 

@@ -1057,6 +1057,70 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
                     }while (0);
 
+
+
+                    // qzqstar, 250702, the rich achievement bonus system
+					do {
+						// each class add 1% all stat to self.
+						// 1. first get the player class
+						auto _auraID = ZQ_SPELL_SPELL_RICH_BONUS;
+						auto _apply = true;
+						auto _points0=0, _points1 = 0, _points2=0;
+
+						// 2. check the target player
+                        if(player->M_Challenge_Mode & CHALLENGING_MODE_RICH)
+                        {
+                            auto _money_gold = player->GetMoney()/10000;
+
+                            if(_money_gold >= 10000)
+                            {
+                                _points0 = 20; _points1 = -11; _points2 = 50;
+                            }else if (_money_gold >= 5000)
+                            {
+                                _points0 = 15; _points1 = -9; _points2 = 40;
+                            }else if (_money_gold >= 1000)
+                            {
+                                _points0 = 12; _points1 = -7; _points2 = 30;
+                            }else if (_money_gold >= 500)
+                            {
+                                _points0 = 10; _points1 = -5; _points2 = 20;
+                            }else if (_money_gold >= 200)
+                            {
+                                _points0 = 7; _points1 = -4; _points2 = 10;
+                            }
+                            else if (_money_gold >= 100)
+                            {
+                                _points0 = 5; _points1 = -3; _points2 = 7;
+                            }
+                            else if (_money_gold >= 10)
+                            {
+                                _points0 = 2; _points1 = -2; _points2 = 5;
+                            }
+                            else 
+                            {
+                                _apply = false;
+                            }
+                        
+
+                            if (_apply)
+                            {
+                                if (!player->HasAura(_auraID))
+                                {
+                                    player->CastCustomSpell(player, _auraID, _points0, _points1, _points2, true, nullptr);
+                                }
+                            }
+                            else
+                            {
+                                // need remove aura if has
+                                if (player->HasAura(_auraID))
+                                {
+                                    player->RemoveAurasDueToSpell(_auraID);
+                                }
+                            }
+                        }
+
+					} while (0);
+
 					return;
 				}
 
