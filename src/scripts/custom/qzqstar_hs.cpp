@@ -718,13 +718,14 @@ struct CustomHSSpell : SpellScript
 					{
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　富豪模式介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　携带金币可以提升伤害　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　死亡后掉落部分金币　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　携带金币可以提升伤害、免伤　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　额外增加衬衣战袍的属性　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜３＞　死亡后掉落部分金币　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
 						break;	
 					}
 					case 10: 
 					{
-						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　杀手模式（人形）介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　杀手模式（人形）介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　击杀人形获得额外经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　击杀其他类型不获取经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -733,7 +734,7 @@ struct CustomHSSpell : SpellScript
 					}
 					case 11: 
 					{
-						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　杀手模式（野兽）介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　杀手模式（野兽）介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　击杀野兽获得额外经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　击杀其他类型不获取经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -742,7 +743,7 @@ struct CustomHSSpell : SpellScript
 					}
 					case 12: 
 					{
-						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　杀手模式（亡灵）介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　杀手模式（亡灵）介绍　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE(" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜１＞　击杀亡灵获得额外经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＜２＞　击杀其他类型不获取经验　")), GOSSIP_SENDER_MAIN, __MENU_NONE);

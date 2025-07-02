@@ -79,7 +79,7 @@ typedef struct _level_weaponList_dungeon {
 extern const EQ_Collect_Dungeon_t * DBHelper_GetEQByDungeonID(int32 mapId);
 extern int COUNT_ONES(uint32_t x) ;
 
-
+extern bool isCollectionItem(uint32_t eqItemID);
 
 
 

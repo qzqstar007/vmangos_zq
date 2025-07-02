@@ -269,8 +269,35 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 		sQZAchievements.SetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID, _playerDungeonInfo); //save the dungeon information to the player's achievements vector.
 
 		player->CLOSE_GOSSIP_MENU();
+
+		//make up the monster's name 
+		//传送至副本：%s， 难度：%s，BOSS击杀列表：%s。
+		std::string _monsterName = "";
+
+		auto _npclist = TP_Dungeons[_acID].npc_list;
+		for (auto i = 0; i < 6; i++)
+		{
+			if (_npclist[i] < 10) break;
+
+			else 
+			{
+				
+				//look for the npc name in the database.
+				CreatureLocale const* cl = sObjectMgr.GetCreatureLocale(_npclist[i]);
+				if (cl)
+				{
+					_monsterName.append(__STR(cl->Name[LOCALE_deDE]));
+					_monsterName.append(__STR(", "));
+				}
+			}
+		}
+
+		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "BOSS list: %s", _monsterName);
+
 		//chathandler ...
-		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Dungeons[_acID].name, _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "));
+		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Dungeons[_acID].name.c_str(), _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "), _monsterName.c_str());
+		
+		
 		//teleport to the dungeon.
 		player->TeleportTo(TP_Dungeons[_acID].tele_mapid, TP_Dungeons[_acID].tele_x, TP_Dungeons[_acID].tele_y, TP_Dungeons[_acID].tele_z, TP_Dungeons[_acID].tele_o, TELE_TO_FORCE_MAP_CHANGE);
 

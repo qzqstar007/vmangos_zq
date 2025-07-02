@@ -55,6 +55,8 @@
 #include "RealmZone.h"
 #include <limits>
 
+#include "custom/qzqstar_db.h"
+
 INSTANTIATE_SINGLETON_1(ObjectMgr);
 
 #include "utf8cpp/utf8.h"
@@ -3813,6 +3815,13 @@ void ObjectMgr::LoadItemPrototypes()
         item.SubClass = fields[ 2].GetUInt8();
         item.Name1 = strdup(fields[3].GetString());
         item.Description = strdup(fields[4].GetString());
+
+        //check if collection
+        if(isCollectionItem(entry))
+        {
+            item.Description = strdup(std::string("该物品是【收藏物品】，可以交给克拉拉提升攻强、法伤。 ").c_str());
+        }
+
         item.DisplayInfoID = fields[ 5].GetUInt32();
         item.Quality = fields[ 6].GetUInt8();
         item.Flags = fields[ 7].GetUInt32();

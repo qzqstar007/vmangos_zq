@@ -19228,53 +19228,58 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
     //qzqstar, 250501, add support for the vouchers.
     if (vendorGuid.GetEntry() == 30000)
     {
-		//check if has enough vouchers
-		uint32 vouchers = pProto->SellPrice * count;
+        //skip the item those has price in gold
+        if(pProto->BuyPrice == 0)
+        {
+            //check if has enough vouchers
+            uint32 vouchers = pProto->SellPrice * count;
 
-		if (!HasItemCount(ZQ_ITEM_VOUCHER, vouchers))
-		{
-			SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
-			return false;
-		}
+            if (!HasItemCount(ZQ_ITEM_VOUCHER, vouchers))
+            {
+                SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
+                return false;
+            }
 
-		Item* pItem = nullptr;
+            Item* pItem = nullptr;
 
-		if ((bag == NULL_BAG && slot == NULL_SLOT) || IsInventoryPos(bag, slot))
-		{
-			ItemPosCountVec dest;
-			InventoryResult msg = CanStoreNewItem(bag, slot, dest, item, totalCount);
-			if (msg != EQUIP_ERR_OK)
-			{
-				SendEquipError(msg, nullptr, nullptr, item);
-				return false;
-			}
+            if ((bag == NULL_BAG && slot == NULL_SLOT) || IsInventoryPos(bag, slot))
+            {
+                ItemPosCountVec dest;
+                InventoryResult msg = CanStoreNewItem(bag, slot, dest, item, totalCount);
+                if (msg != EQUIP_ERR_OK)
+                {
+                    SendEquipError(msg, nullptr, nullptr, item);
+                    return false;
+                }
 
-			//remove the vouchers
-            DestroyItemCount(ZQ_ITEM_VOUCHER, vouchers, true);
+                //remove the vouchers
+                DestroyItemCount(ZQ_ITEM_VOUCHER, vouchers, true);
 
-			pItem = StoreNewItem(dest, item, true, Item::GenerateItemRandomPropertyId(item));
-		}
-		else
-		{
-			SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
-			return false;
-		}
+                pItem = StoreNewItem(dest, item, true, Item::GenerateItemRandomPropertyId(item));
+            }
+            else
+            {
+                SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
+                return false;
+            }
 
-		if (!pItem)
-			return false;
+            if (!pItem)
+                return false;
 
-		uint32 new_count = pCreature->UpdateVendorItemCurrentCount(crItem, totalCount);
+            uint32 new_count = pCreature->UpdateVendorItemCurrentCount(crItem, totalCount);
 
-		WorldPacket data(SMSG_BUY_ITEM, 8 + 4 + 4 + 4);
-		data << pCreature->GetObjectGuid();
-		data << uint32(vendorslot + 1);                 // numbered from 1 at client
-		data << uint32(crItem->maxcount > 0 ? new_count : 0xFFFFFFFF);
-		data << uint32(count);
-		GetSession()->SendPacket(&data);
+            WorldPacket data(SMSG_BUY_ITEM, 8 + 4 + 4 + 4);
+            data << pCreature->GetObjectGuid();
+            data << uint32(vendorslot + 1);                 // numbered from 1 at client
+            data << uint32(crItem->maxcount > 0 ? new_count : 0xFFFFFFFF);
+            data << uint32(count);
+            GetSession()->SendPacket(&data);
 
-		SendNewItem(pItem, totalCount, true, false, false);
+            SendNewItem(pItem, totalCount, true, false, false);
 
-        return false;
+            return false;
+            
+        }
     }
 
     uint32 price  = pProto->BuyPrice * count;

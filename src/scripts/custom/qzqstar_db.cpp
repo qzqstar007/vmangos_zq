@@ -9094,7 +9094,7 @@ bool isCollectionItem(uint32_t eqItemID)
 	//check world, dungeons, and profession
 	for (auto& eq : _EQ_Collections_World)
 	{
-		for (auto& item : eq.ItemID)
+		for (auto& item : eq.eq_list)
 		{
 			if (item == eqItemID) return true;
 		}
@@ -9102,14 +9102,14 @@ bool isCollectionItem(uint32_t eqItemID)
 
 	for (auto& eq : _EQ_Collections_Dungeons)
 	{
-		for (auto& item : eq.ItemID)
+		for (auto& item : eq.eq_list)
 		{
 			if (item == eqItemID) return true;
 		}
 	}
 	for (auto& eq : _EQ_Collections_Profession)
 	{
-		for (auto& item : eq.ItemID)
+		for (auto& item : eq.eq_list)
 		{
 			if (item == eqItemID) return true;
 		}	

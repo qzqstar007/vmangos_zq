@@ -255,8 +255,14 @@ update item_template set bonding = 0 where entry in(6339,11130,11145,16207,9149)
 creature id   spell id
 1200    8909
 8550    22917   16592
-*/
 
+fireshield name
+poison clounde
+
+8137 异种蝎群瘟疫
+
+
+*/
 
 
 
