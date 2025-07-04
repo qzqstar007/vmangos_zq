@@ -1121,6 +1121,21 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 					} while (0);
 
+
+                    do{
+                        if(player->HasSpell(ZQ_SPELL_VIP_HASTE))
+                        {
+                            //check if player's near to others
+                            auto p = player->FindNearestPlayer(20);
+                            if (p)
+                            {
+                                player->RemoveSpell(ZQ_SPELL_VIP_HASTE);
+                                ChatHandler(player).PSendSysMessage(((std::string)(">>>周围有其他玩家，关闭急速技能。<<<")).c_str());
+                            }
+
+                        }
+                    }while(0);
+
 					return;
 				}
 

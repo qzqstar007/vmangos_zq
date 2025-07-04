@@ -49,14 +49,17 @@
 #define ZQ_ITEM_NEWBIE_ITEM			30041	//Newbie Item, 新手物品 ~ 30046
 
 //VIP Items
-#define ZQ_ITEM_VIP_UPGRADE_ITEM	30051	//VIP Item, 会员物品 ~ 30056
+#define ZQ_ITEM_VIP_UPGRADE_ITEM	30052	//VIP Item, 会员物品 ~ 30056
 
 //Mounts Items
 #define ZQ_ITEM_MOUNTS_ITEM			30061	//Mounts Item, 坐骑物品 ~ 30066
 
 //CHenyi ZHanpao
-#define ZQ_ITEM_CHENYI		        30401	//Chenyi Zhanpao, 陈怡之杖
-#define ZQ_ITEM_ZHANPAO		        30501	//Chenyi Zhanpao, 陈怡之杖
+#define ZQ_ITEM_CHENYI		        30048	//Chenyi Zhanpao, 陈怡之杖
+#define ZQ_ITEM_ZHANPAO		        30049	//Chenyi Zhanpao, 陈怡之杖
+
+//Bonus Box
+#define ZQ_ITEM_BONUS_BOX			30088	//Bonus Box, 奖励宝箱 ~ 30061
 
 /******************************************************************** 
  *  Spell IDs, largest first (33386).
@@ -65,6 +68,8 @@
 #define ZQ_SPELL_DUNGEON_FLY		33385	//Dungeon Fly, 副本飞行
 #define ZQ_SPELL_AUTOPICK   		33384	//Auto Pick, 自动拾取
 #define ZQ_SPELL_BONDING   		    33383	//Bonding, 羁绊系统
+
+#define ZQ_SPELL_VIP_HASTE			33380	//VIP Haste, 会员急速
 
 //summon creature spells, such as critter, pet, mount, etc.
 #define ZQ_SPELL_SUMMON_PET			33370	//Summon Pet, 召唤宠物
@@ -260,8 +265,9 @@ fireshield name
 poison clounde
 
 8137 异种蝎群瘟疫
-
-
+7102 腐化传染
+血之诅咒 ID: 8282
+玛格拉姆灵魂诅咒 ID: 18159
 */
 
 

@@ -943,7 +943,7 @@ AchievementsEntry QzqstarAchievements::GetZitiaosInfo(Player *player)
 	e.guid = player->GetGUID();
 	e.type = ACHIEVEMENTS_ZITIAO;
 	e.subType = 4;
-	e.data1 = 9140;
+	e.data1 = 0;
 	e.data2 = 0;
 	e.data3 = 0;
 	e.data4 = 0;

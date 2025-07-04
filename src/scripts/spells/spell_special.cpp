@@ -356,6 +356,14 @@ struct SpellStealScript : public SpellScript
 
             if (Player* player = spell->GetCaster()->ToPlayer())
             {
+                //check the player's map
+                if(player->GetMap()->IsRaid())
+                {
+                    //tell the player that he cannot stole the spell from the target
+                    ChatHandler(player).PSendSysMessage(((std::string)(">>>你不能在团本中使用偷取技能。<<<")).c_str());
+                    return false;
+                }
+
                 //check the target level
                 if (spell->GetUnitTarget()->GetLevel() > 60 ||  spell->GetUnitTarget()->GetLevel() > player->GetLevel())
                 {
@@ -482,6 +490,33 @@ struct SpellCastingScript : public SpellScript
     }	
 };
 
+#define ZQ_SPELL_VIP_HASTE  33380
+//vip spell for vippers
+struct SpellVIPHasteScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            if (Player* player = spell->GetCaster()->ToPlayer())
+            {
+                if(player->HasSpell(ZQ_SPELL_VIP_HASTE))
+                {
+                    player->RemoveSpell(ZQ_SPELL_VIP_HASTE);
+                    ChatHandler(player).PSendSysMessage(((std::string)(">>>急速技能：关闭。<<<")).c_str());
+                }
+                else
+                {
+                    player->LearnSpell(ZQ_SPELL_VIP_HASTE, false);
+                    ChatHandler(player).PSendSysMessage(((std::string)(">>>急速技能：打开<<<")).c_str());
+                }
+            }
+        }	
+        return true;
+    }	
+};
+
+
 void AddSC_special_spell_scripts()
 {
     Script* newscript;
@@ -541,5 +576,11 @@ void AddSC_special_spell_scripts()
     newscript = new Script;
     newscript->Name = "qzqstar_spell_cast";
     newscript->GetSpellScript = [](SpellEntry const*) -> SpellScript* { return new SpellCastingScript(); };
+    newscript->RegisterSelf();
+
+    //add vip haste spell script for vip
+    newscript = new Script;
+    newscript->Name = "qzqstar_vip_haste";
+    newscript->GetSpellScript = [](SpellEntry const*) -> SpellScript* { return new SpellVIPHasteScript(); };
     newscript->RegisterSelf();
 }

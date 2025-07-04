@@ -3072,7 +3072,7 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
 #endif
 
 	//qzqstar, 250309, if has the boosted aura
-	if (HasAura(30966)) xp *= 2;
+	//if (HasAura(30966)) xp *= 2;
 
     //qzqstar, 250509, mode of the killer according to crature types
     if (victim && victim->IsCreature())
@@ -3114,7 +3114,21 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
 
     // XP to money conversion processed in Player::RewardQuest
     if (level >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+    {
+        // Save to Achievement and store it for further reward
+        M_Item_Counts += xp;
+
+        if(M_Item_Counts > level * level * 30)
+        {
+            M_Item_Counts = 0;
+
+            //reward 
+            this->AddItem(ZQ_ITEM_VOUCHER, 1);
+			ChatHandler(this).PSendSysMessage(">>>你因为溢出经验而获得点券奖励，查收背包。<<<");
+        }
+
         return;
+    }
 
     if (level >= TRIAL_MAX_LEVEL && GetSession()->HasTrialRestrictions())
         return;

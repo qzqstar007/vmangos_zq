@@ -30,6 +30,7 @@
 #include "GuildMgr.h"
 
 #include "custom/qzqstar_db.h"
+#include "custom/qzqstar_id.h"
 
 //qzqstar, 250622, support for the dungeon difficulty bonus to sets
 //setid can be four kinds
@@ -817,6 +818,10 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(item_id);
 
     if (!itemProto)
+        return 0;
+
+    // the chenyi and zhanpao has no random properties
+    if(item_id == ZQ_ITEM_CHENYI || item_id == ZQ_ITEM_ZHANPAO)
         return 0;
 
     // qzqstar, 250602, all item should have random property id

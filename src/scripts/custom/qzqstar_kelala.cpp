@@ -91,7 +91,7 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 			}
 			else if (vip_level == 2)
 			{
-				player->AddItem(ZQ_ITEM_VOUCHER, 10); player->AddItem(ZQ_ITEM_BUFF, 2); player->AddItem(ZQ_ITEM_FRAGMENTS, 2);	player->AddItem(ZQ_ITEM_PET_FOOD, 1);
+				player->AddItem(ZQ_ITEM_VOUCHER, 10); player->AddItem(ZQ_ITEM_BUFF, 2); player->AddItem(ZQ_ITEM_FRAGMENTS, 2);	player->AddItem(ZQ_ITEM_PET_FOOD, 2);
 			}
 			else if (vip_level == 3)
 			{
@@ -99,11 +99,11 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 			}
 			else if (vip_level == 4)
 			{
-				player->AddItem(ZQ_ITEM_VOUCHER, 50);  player->AddItem(ZQ_ITEM_FRAGMENTS, 10); player->AddItem(ZQ_ITEM_PET_FOOD, 10); player->AddItem(ZQ_ITEM_RUNE_STONE, 2);//Pearls
+				player->AddItem(ZQ_ITEM_VOUCHER, 100);  player->AddItem(ZQ_ITEM_FRAGMENTS, 10); player->AddItem(ZQ_ITEM_PET_FOOD, 10); player->AddItem(ZQ_ITEM_RUNE_STONE, 2);//Pearls
 			}
 			else if (vip_level == 5)
 			{
-				player->AddItem(ZQ_ITEM_VOUCHER, 100);  player->AddItem(ZQ_ITEM_FRAGMENTS, 15); player->AddItem(ZQ_ITEM_PET_FOOD, 15); player->AddItem(ZQ_ITEM_RUNE_STONE, 3);//Pearls
+				player->AddItem(ZQ_ITEM_VOUCHER, 200);  player->AddItem(ZQ_ITEM_FRAGMENTS, 20); player->AddItem(ZQ_ITEM_PET_FOOD, 20); player->AddItem(ZQ_ITEM_RUNE_STONE, 5);//Pearls
 			}
 
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -140,13 +140,17 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 		text.append(__STR(__NSTR(vip_level)));
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, text.c_str(), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		//display next player's vip level
-		text = __STR(__BLUE("＝＝＝＞　下等级需要金币：　"));
-		text.append(__STR(__NSTR(vip_gold)));
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, text.c_str(), GOSSIP_SENDER_MAIN, __MENU_NONE);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+		if(vip_level < 5)
+		{
+			text = __STR(__BLUE("＝＝＝＞　下等级需要金币：　"));
+			text.append(__STR(__NSTR(vip_gold)));
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, text.c_str(), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-		text = __STR(__BLUE("＝＝＝＞　点击升级 ＜＝＝　"));
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_LOGIN + __SUBMENU_LOGIN_VIP_LEVELUP);
+			text = __STR(__BLUE("＝＝＝＞　点击升级 ＜＝＝　"));
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_LOGIN + __SUBMENU_LOGIN_VIP_LEVELUP);
+		}
 
 	}
 	else if (abs_action == __SUBMENU_LOGIN_VIP_LEVELUP)

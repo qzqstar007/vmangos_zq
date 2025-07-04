@@ -876,9 +876,9 @@ struct CustomHSSpell : SpellScript
 				if (_vipFeature & 0x10) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　队伍召唤　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 80);
 				if (_vipFeature & 0x20)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　全体复活　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 81);
 				if (_vipFeature & 0x40)	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　全体恢复　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 82);
-				if (!(_vipFeature & 0x10)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买队伍召唤（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 80 + 100);
-				if (!(_vipFeature & 0x20)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买全体复活（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 81 + 100);
-				if (!(_vipFeature & 0x40)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买全体恢复（300点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 82 + 100);
+				if (!(_vipFeature & 0x10)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买队伍召唤（500点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 80 + 100);
+				if (!(_vipFeature & 0x20)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买全体复活（500点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 81 + 100);
+				if (!(_vipFeature & 0x40)) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞购买全体恢复（500点券）＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SUISHEN_MAIN + 82 + 100);
 
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				
@@ -929,13 +929,13 @@ struct CustomHSSpell : SpellScript
 			{
 				//Team action buy
 				//check if player has enough vouchers
-				if(!pPlayer->HasItemCount(ZQ_ITEM_VOUCHER, 300))
+				if(!pPlayer->HasItemCount(ZQ_ITEM_VOUCHER, 500))
 				{
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　点券不够，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MAIN);	
 				}
 				else
 				{
-					pPlayer->DestroyItemCount(ZQ_ITEM_VOUCHER, 300, true, true);
+					pPlayer->DestroyItemCount(ZQ_ITEM_VOUCHER, 500, true, true);
 					switch (action - __MENU_SUISHEN_MAIN - 180)
 					{
 						case 0: sQZAchievements.SetVIPFeatures(pPlayer, VIP_TEAM_SUMMON);  		break;
@@ -1060,7 +1060,7 @@ struct CustomHSSpell : SpellScript
 
 				}
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　消耗１点券冷却偷取技能　＝＝")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE + 400);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　消耗２点券冷却偷取技能　＝＝")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE + 400);
 			}
 
 			else if(action >= __MENU_SKILL_STOLE + 100 && action <= __MENU_SKILL_STOLE + 103)
@@ -1111,13 +1111,13 @@ struct CustomHSSpell : SpellScript
 			else if(action == __MENU_SKILL_STOLE + 400)
 			{
 				//cooldown, need 1 voucher
-				if(!pPlayer->HasItemCount(ZQ_ITEM_VOUCHER, 1))	
+				if(!pPlayer->HasItemCount(ZQ_ITEM_VOUCHER, 2))	
 				{
-					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　需要1点券，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);	
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　需要２点券，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);	
 				}
 				else
 				{
-					pPlayer->DestroyItemCount(ZQ_ITEM_VOUCHER, 1, true, true);
+					pPlayer->DestroyItemCount(ZQ_ITEM_VOUCHER, 2, true, true);
 					//todo 
 					// immediately finishes cooldown of stole and cast
 					auto cdCheck = [](SpellEntry const & spellEntry) -> bool
@@ -1143,7 +1143,7 @@ struct CustomHSSpell : SpellScript
 			std::string _str = "";
 
 			#define _FREE_SLOTS  		(4)
-			#define _NEED_VOUCHER(X)   (100*((X) - _FREE_SLOTS + 1))
+			#define _NEED_VOUCHER(X)   (200*((X) - _FREE_SLOTS + 1))
 
 			uint32 spell_id[8];
 
