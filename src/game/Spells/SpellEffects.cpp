@@ -1122,15 +1122,18 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					} while (0);
 
 
+                    
                     do{
                         if(player->HasSpell(ZQ_SPELL_VIP_HASTE))
                         {
                             //check if player's near to others
-                            auto p = player->FindNearestPlayer(20);
-                            if (p)
+                            //auto p = player->FindNearestPlayer(10);
+                            if (player->GetMapId() < 2)
                             {
                                 player->RemoveSpell(ZQ_SPELL_VIP_HASTE);
-                                ChatHandler(player).PSendSysMessage(((std::string)(">>>周围有其他玩家，关闭急速技能。<<<")).c_str());
+                                ChatHandler(player).PSendSysMessage(((std::string)(">>>不在副本里，关闭急速技能。<<<")).c_str());
+                                player->M_Leech_Phy = 5;
+                                player->M_Leech_Spell = 5;
                             }
 
                         }
@@ -6577,7 +6580,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
     {
         int32 _critterInfo = sQZAchievements.GetActivePetInfo(player);
         int32 _critterLevel = _critterInfo % 100000 / 10000;
-        critter->SetTransformScale( 0.4f + _critterLevel * 0.05f);
+        critter->SetTransformScale( 0.4f + _critterLevel * 0.01f);
     }
 
     critter->SetOwnerGuid(m_caster->GetObjectGuid());

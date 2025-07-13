@@ -267,12 +267,21 @@ void Creature::AddToWorld()
             if(pInstanceData->CustomDifficulty > 0 && pInstanceData->CustomDifficulty < 4)
             {
                 //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Creature:%s id:%u created!", GetName(), GetGUID());
-                SetMaxHealth(GetMaxHealth() * (1 + pInstanceData->CustomDifficulty * pInstanceData->CustomDifficulty)); 
-                SetHealthPercent(100.0f);
+                //SetMaxHealth(GetMaxHealth() * (1 + pInstanceData->CustomDifficulty * pInstanceData->CustomDifficulty)); 
+                
                 SetNativeScale(GetNativeScale()*(1.0f + pInstanceData->CustomDifficulty/10.0f));
                 CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1 - 1 + pInstanceData->CustomDifficulty, true);
+                //SetHealth(GetMaxHealth());
+                //UpdateAllStats();
+				//UpdateMaxHealth();
+                CastSpell(this, 31046, true); //Restore health
             }
         }
+    }
+    else if (GetLevel() >= 55  && GetMapId() < 2)
+    {
+		CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1, true);
+		CastSpell(this, 31046, true); //Restore health
     }
 }
 
@@ -1658,10 +1667,13 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
             }
         }
 
+        //if(_dg_info > 1) _dg_info = urand(1, _dg_info);
+
 		__goldMux = _dg_info == 1 ? 2
 			: _dg_info == 2 ? 3
 			: _dg_info == 3 ? 5
 			: 0;
+
 
         //iterate the loot.items
         for (auto it = loot.items.begin(); it != loot.items.end(); ++it)

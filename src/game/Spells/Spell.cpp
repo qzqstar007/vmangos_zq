@@ -1663,6 +1663,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             {
                 uint32 enchant_id = item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT);
                 SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+
+                //qzqstar, todo, windfury with Stormstrike
                 if (pEnchant && roll_chance_f(20.0f))
                     if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(pEnchant->spellid[0]))
                         if (spellInfo->IsFitToFamily<SPELLFAMILY_SHAMAN, CF_SHAMAN_WINDFURY_WEAPON>())

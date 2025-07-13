@@ -46,6 +46,8 @@
 #define __MENU_BG_MAIN_AV				 (30)
 #define	__MENU_BG_RW_OFFSET				(100)
 
+#define	__MENU_BG_ENCHANT   			(900)
+
 bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 {
 	std::string text = "";
@@ -54,7 +56,7 @@ bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 	if (action == __MENU_BG_MAIN)
 	{
 		//Add to join the battlegrounds
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝选择战场＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝　选择战场　＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
 
 		if (player->GetLevel() >= 10)
 		{
@@ -73,13 +75,63 @@ bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR("③－奥特兰克山谷　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_MAIN_AV);
 		else
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__RED("③－奥山５０级可用。　")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝奖章兑换＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR("①－战歌奖章　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_MAIN_WS + __MENU_BG_RW_OFFSET);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR("②－阿拉希奖章　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_MAIN_AB + __MENU_BG_RW_OFFSET);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR("③－奥特兰克奖章　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_MAIN_AV + __MENU_BG_RW_OFFSET);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝　击杀奖励　＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR("①－战歌奖章　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_MAIN_WS + __MENU_BG_RW_OFFSET);
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR("②－阿拉希奖章　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_MAIN_AB + __MENU_BG_RW_OFFSET);
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR("③－奥特兰克奖章　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_MAIN_AV + __MENU_BG_RW_OFFSET);
+ 
+		//add player killers 
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+		uint32 _rawpoints = sQZAchievements.GetSocialPointsPVP(player);
+		uint32 _weekpoints = _rawpoints % 10000;
+		uint32 _totalpoints = _rawpoints / 10000;
 
+		uint32 _rewardpoints = (_weekpoints/5 > player->GetLevel()*10 ?  player->GetLevel() * 10 : _weekpoints/5);
+		text = __STR("|cff0000ff总击杀数：  ");
+		text.append(__NSTR(_totalpoints));
+		text.append(__STR("  |r"));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+
+		text = __STR("|cff0000ff已获得称号：  ");
+		uint32 _title = 0;
+		if (_totalpoints >= 10000) { text.append(__STR("【万人斩】　")); _title = 4; }
+		else if (_totalpoints >= 1000) { text.append(__STR("【千人斩】　")); _title = 3; }
+		else if (_totalpoints >= 100) { text.append(__STR("【百人斩】　")); _title = 2; }
+		else if (_totalpoints >= 10) { text.append(__STR("【十人斩】　")); _title = 1; }
+		else  text.append(__STR("无　"));
+		text.append(__STR("  |r"));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+
+		if(_title >= 1)
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　将此称号附魔至战袍　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_ENCHANT + _title);
+		}
+
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+
+		text = __STR("|cff0000ff本周击杀数：  ");
+		text.append(__NSTR(_weekpoints));
+		text.append(__STR("  |r"));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+
+		uint32 __custom_settings = sQZAchievements.GetCustomSettings(player);
+		uint32 __apsp_method = __custom_settings & 0x03;
+		uint32 __ap_value = _rewardpoints;
+		uint32 __sp_value = _rewardpoints/2;
+
+		if (__apsp_method == 1) { __ap_value = __ap_value + __sp_value ;  __sp_value = 0;}
+		else if (__apsp_method == 2) { __sp_value = __sp_value/2 + __ap_value; __ap_value = 0; }
+
+
+		text = __STR("|cff0000ff本周奖励攻强：  ");
+		text.append(__NSTR(__ap_value));
+		text.append(__STR("  |r"));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+		text = __STR("|cff0000ff本周奖励法伤：  ");
+		text.append(__NSTR(__sp_value));
+		text.append(__STR("  |r"));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
 
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 		return true;
@@ -98,7 +150,7 @@ bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 		player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 		player->GetSession()->SendBattleGroundList(_Creature->GetGUID(), bgType);
 	}
-	else if (action >= __MENU_BG_MAIN + __MENU_BG_RW_OFFSET)
+	else if (action >= __MENU_BG_MAIN + __MENU_BG_RW_OFFSET && action < __MENU_BG_MAIN + __MENU_BG_RW_OFFSET + 100)
 	{
 		action -= (__MENU_BG_MAIN + __MENU_BG_RW_OFFSET);
 		auto bgType = action == __MENU_BG_MAIN_WS ? BATTLEGROUND_WS : action == __MENU_BG_MAIN_AB ? BATTLEGROUND_AB : BATTLEGROUND_AV;
@@ -107,7 +159,33 @@ bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s is trying to RW BG %u", player->GetName(), bgType);
 		
 		//each Mark of Honor can be used to reward 100 reputaion
+	}
+	else if (action > __MENU_BG_MAIN + __MENU_BG_ENCHANT)
+	{
+		uint32 absAction = action - __MENU_BG_MAIN - __MENU_BG_ENCHANT;
 
+		//check the player's slot of chest
+		if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TABARD))
+		{
+			if (pItem->GetProto()->ItemId != ZQ_ITEM_ZHANPAO)
+			{
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　请确认战袍是否已装备。　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+			}else if(absAction >= 1 && absAction <= 4)
+			{
+				pItem->SetItemRandomProperties(ZQ_ENCHANT_KILLERS + absAction);
+				//pItem->SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_0), ZQ_ENCHANT_KILLERS + absAction, 0, 0);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　称号已附魔至战袍　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+				pItem->SendForcedObjectUpdate();
+			}else 
+			{
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　出错，速度联系ＧＭ。　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+			}
+		}
+		else
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　请确认战袍是否已装备。　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+		}
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 	}
 
 	return true;

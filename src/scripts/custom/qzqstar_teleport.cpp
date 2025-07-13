@@ -111,8 +111,8 @@ const Teleport_Point_t TP_MainLand_Kalimdor[] = {
 };
 
 const Teleport_Point_t TP_Dungeons[] = {
-	{ 0, MAP_RAGEFIRE_CHASM,    __XSTR("怒焰裂谷　"), 1, 1815,-4419,-18.7,5.2, {11518,11520,11517,4,5,6,7,8,30071,1}},
-	{ 1, MAP_WAILING_CAVERNS,   __XSTR("哀嚎洞穴　"), 1, -731.607f,-2218.39f,17.0281f,2.78486f, {3653,3654,3671,3674,3673,3670,7,8,30071,1}},
+	{ 0, MAP_RAGEFIRE_CHASM,    __XSTR("怒焰裂谷　"), 1, 1815,-4419,-18.7,5.2, {11518,11520,11517,4,5,6,7,8,0,1}},
+	{ 1, MAP_WAILING_CAVERNS,   __XSTR("哀嚎洞穴　"), 1, -731.607f,-2218.39f,17.0281f,2.78486f, {3653,3654,3671,3674,3673,3670,7,8,0,1}},
 	{ 2, MAP_DEADMINES,         __XSTR("死亡矿井　"), 0, -11208.7f,1673.52f,24.6361f,1.51067f, {644,1763,646,639,645,6,7,8,30071,1}},
 	{ 3, MAP_SHADOWFANG_KEEP,   __XSTR("影牙城堡　"), 0, -234.675,1561.63,76.8921,1.24031, {4274,4279,4275,3886,3887,4278,7,8,30071,1}},
 	{ 4, MAP_BLACKFATHOM_DEEPS, __XSTR("黑暗深渊　"), 1, 4249.99,740.102,-25.671,1.34062, {4887,4831,6243,4829,4832,6,7,8,30071,1}},
@@ -464,7 +464,7 @@ bool Menus_teleport_Common(Player *player, Creature *_cr, uint32 sender, uint32 
 
 		else return false;
 
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝请选择要传送的地图＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝　请选择要传送的地图　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 		for (auto i = 0; i < counts ; i++)
 		{
@@ -475,10 +475,16 @@ bool Menus_teleport_Common(Player *player, Creature *_cr, uint32 sender, uint32 
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_EASTKINGDOM + offset + i); 
 		}
 
+		if(player->GetLevel() > 30 && action == __MENU_TELEPORT_TRAINERS)
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　使用点券直升专业　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_EASTKINGDOM + 800);
+		}
+
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _cr->GetGUID());
 	}
 
-	else if (action >= __MENU_TELEPORT_EASTKINGDOM + 100 )
+	else if (action >= __MENU_TELEPORT_EASTKINGDOM + 100 && action < __MENU_TELEPORT_EASTKINGDOM + 800)
 	{
 		
 		auto _acID = action - __MENU_TELEPORT_EASTKINGDOM - 100;
@@ -504,6 +510,124 @@ bool Menus_teleport_Common(Player *player, Creature *_cr, uint32 sender, uint32 
 		//sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Teleport to id %d", action);
 
 		if(pPoints) player->TeleportTo(pPoints[_acID].tele_mapid, pPoints[_acID].tele_x, pPoints[_acID].tele_y, pPoints[_acID].tele_z, pPoints[_acID].tele_o, TELE_TO_FORCE_MAP_CHANGE);
+	}
+
+	else if (action >= __MENU_TELEPORT_EASTKINGDOM + 800 && action < __MENU_TELEPORT_EASTKINGDOM + 800 + __MENU_SUB_SIZE)
+	{
+		//get the real actions = acID
+		uint32 _absAction = action - __MENU_TELEPORT_EASTKINGDOM - 800;
+		bool __upgrade_skill = false;
+		uint32 _abs_skill = 0;
+
+		if(_absAction == 0)
+		{
+			//display the main menus of professions
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝　花费点券或金币直升专业　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			if(player->HasSkill(SKILL_HERBALISM) && player->GetSkillMax(SKILL_HERBALISM) < 300)	
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　采　药　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 1);
+			if (player->HasSkill(SKILL_ALCHEMY) && player->GetSkillMax(SKILL_ALCHEMY) < 300)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　炼　金　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 2);
+			if (player->HasSkill(SKILL_MINING) && player->GetSkillMax(SKILL_MINING) < 300)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　采　矿　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 3);
+			if (player->HasSkill(SKILL_BLACKSMITHING) && player->GetSkillMax(SKILL_BLACKSMITHING) < 300)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　锻　造　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 4);
+			if (player->HasSkill(SKILL_SKINNING) && player->GetSkillMax(SKILL_SKINNING) < 300)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　剥　皮　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 5);
+			if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetSkillMax(SKILL_LEATHERWORKING) < 300)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　制　皮　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 6);
+			if (player->HasSkill(SKILL_TAILORING) && player->GetSkillMax(SKILL_TAILORING) < 300)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　裁　缝　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 7);
+			if (player->HasSkill(SKILL_ENCHANTING) && player->GetSkillMax(SKILL_ENCHANTING) < 300)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　附　魔　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 8);
+			if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillMax(SKILL_ENGINEERING) < 300)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　工　程　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 9);
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("＝注意：需要先学习该技能才能直升。＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		}
+		else if (_absAction >= 1 && _absAction <= 9)
+		{
+			//check if the player has enough money to teleport to the profession
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, 
+				_absAction == 1? __STR(__BLUE("＝＝＞　　直　升　采　药　　＜＝＝　")) :
+				_absAction == 2? __STR(__BLUE("＝＝＞　　直　升　炼　金　　＜＝＝　")) :
+				_absAction == 3? __STR(__BLUE("＝＝＞　　直　升　采　矿　　＜＝＝　")) :
+				_absAction == 4? __STR(__BLUE("＝＝＞　　直　升　锻　造　　＜＝＝　")) :
+				_absAction == 5? __STR(__BLUE("＝＝＞　　直　升　剥　皮　　＜＝＝　")) :
+				_absAction == 6? __STR(__BLUE("＝＝＞　　直　升　制　皮　　＜＝＝　")) :
+				_absAction == 7? __STR(__BLUE("＝＝＞　　直　升　裁　缝　　＜＝＝　")) :
+				_absAction == 8? __STR(__BLUE("＝＝＞　　直　升　附　魔　　＜＝＝　")) :
+				_absAction == 9? __STR(__BLUE("＝＝＞　　直　升　工　程　　＜＝＝　")) :
+				__STR(__BLUE("＝＝＝＞　　未知　　＜＝＝　"))
+				, GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＞　　花费２００金币　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 10);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＞　　花费１００点券　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 20);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＞　　返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_EASTKINGDOM + 800);
+		}
+		/*
+		
+		case 30875:	//	草药、炼金专业速升。11994	11612// 171 182
+		case 30873:	//	采矿、锻造专业速升。10249	9786 // 164, 186
+		case 30874:	//	剥皮、制皮专业速升。10769	10663// 393 165
+		case 30876:	//	裁缝、附魔专业速升。12181	13921// 197 333
+		case 30878:	//	急救、工程专业速升。10847//  202
+		*/
+		else if (_absAction >= 11 && _absAction <= 19)
+		{
+			//check if the player has enough money to gain profession
+			if(player->GetMoney() < 200*10000)
+			{
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　　金币不足　　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_EASTKINGDOM + 800);
+			}	
+
+			else
+			{
+				//remove the money from the player
+				player->ModifyMoney(-200 * 10000);
+				__upgrade_skill = true;
+				_abs_skill = _absAction - 10;
+			}
+		}
+		else if (_absAction >= 21 && _absAction <= 29)
+		{
+			//check if the player has enough voucher to gain profession
+			if(player->HasItemCount(ZQ_ITEM_VOUCHER, 100) == false)
+			{
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　　点券不足　　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_EASTKINGDOM + 800);
+			}
+
+			else
+			{
+				//remove the voucher from the player
+				player->DestroyItemCount(ZQ_ITEM_VOUCHER, 100, true, false);
+				__upgrade_skill = true;
+				_abs_skill = _absAction - 20;
+			}
+		}
+
+		if((__upgrade_skill = true) && (_abs_skill > 0))
+		{
+			auto spell_id1 = 0, skill_id1 = 0;
+			if(_abs_skill == 1) 		{spell_id1 = 11994; skill_id1 = SKILL_HERBALISM;}
+			else if(_abs_skill == 2) 	{spell_id1 = 11612; skill_id1 = SKILL_ALCHEMY;}
+			else if(_abs_skill == 3) 	{spell_id1 = 10249; skill_id1 = SKILL_MINING;}
+			else if(_abs_skill == 4) 	{spell_id1 = 9786;  skill_id1 = SKILL_BLACKSMITHING;}
+			else if(_abs_skill == 5) 	{spell_id1 = 10769; skill_id1 = SKILL_SKINNING;}
+			else if(_abs_skill == 6) 	{spell_id1 = 10663; skill_id1 = SKILL_LEATHERWORKING;}
+			else if(_abs_skill == 7) 	{spell_id1 = 12181; skill_id1 = SKILL_TAILORING;}
+			else if(_abs_skill == 8) 	{spell_id1 = 13921; skill_id1 = SKILL_ENCHANTING;}
+			else if(_abs_skill == 9) 	{spell_id1 = 12657; skill_id1 = SKILL_ENGINEERING;}
+			player->LearnSpell(spell_id1, false);
+			player->SetSkill(skill_id1, 300, 300, 4);
+
+			//chathandler...
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　专业升级成功　　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_EASTKINGDOM + 800);
+		}
+
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _cr->GetGUID());
 	}
 
 	return true;

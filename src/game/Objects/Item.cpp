@@ -826,8 +826,7 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
 
     // qzqstar, 250602, all item should have random property id
     // id range : 3301,3302,3303,3304,3305,3306,3307,3308,3309,3310,3311,3312,3313,3314,3315,3316,3317,3318,3319,3320
-
-    if( ((itemProto->Class == ITEM_CLASS_WEAPON) ||(itemProto->Class == ITEM_CLASS_ARMOR) ) && (itemProto->Quality > 1) && roll_chance_i(30) )
+    if( ((itemProto->Class == ITEM_CLASS_WEAPON) ||(itemProto->Class == ITEM_CLASS_ARMOR) ) && (itemProto->Quality > 1) &&(roll_chance_i(50)) )
     {
         uint32 _randomEnchantID = 0;
         if(itemProto->ItemLevel < 20) _randomEnchantID = 3301 + difficulty * 5;

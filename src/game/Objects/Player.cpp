@@ -7728,6 +7728,8 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
         else if (chance > 100.0f)
             chance = GetPPMProcChance(WeaponSpeed, 1.0f);   // default to 1 PPM for unknown proc rates
 
+        //qzqstar, todo, magic weapon mastery, chance rate x 2
+
         if (roll_chance_f(chance))
             CastSpell(Target, spellInfo->Id, true, item);
     }
@@ -10152,7 +10154,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, ItemPrototype con
         }
 
 		//qzqstar, 250208, can only equip one hunter's bag
-		if (pProto->ItemId == 30306 || pProto->ItemId == 30307)
+		if (pProto->ItemId == ZQ_ITEM_BAG_HUNTER || pProto->ItemId == 30307)
 		{
 			for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
 			{
@@ -10162,7 +10164,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, ItemPrototype con
 					{
 						if (ItemPrototype const* pBagProto = pBag->GetProto())
 						{
-							if ((pBagProto->ItemId == 30306 || pBagProto->ItemId == 30307) && (!swap || pBag->GetSlot() != eslot))
+							if ((pBagProto->ItemId == ZQ_ITEM_BAG_HUNTER || pBagProto->ItemId == 30307) && (!swap || pBag->GetSlot() != eslot))
 								return EQUIP_ERR_CAN_EQUIP_ONLY1_QUIVER;
 						}
 					}
@@ -12206,6 +12208,12 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
             uint32 enchant_display_type = pEnchant->type[s];
             uint32 enchant_amount = pEnchant->amount[s];
             uint32 enchant_spell_id = pEnchant->spellid[s];
+
+			//qzqstar, 250712, check if two hand weapons.
+			if (item->GetProto()->InventoryType == INVTYPE_2HWEAPON)
+			{
+				enchant_amount = enchant_amount * 2;
+			}
 
             switch (enchant_display_type)
             {
@@ -15255,6 +15263,24 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if (!_LoadHomeBind(holder->TakeResult(PLAYER_LOGIN_QUERY_LOADHOMEBIND)))
         return false;
 
+        
+    // SHALL i reload the achivements here?
+    uint32 __count = sQZAchievements.Load(this); //before calling the spells
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Player:%s Loaded %u Achievements records. ", GetName(), __count);
+
+    // Load achievements here, before spell and talents
+    //get the challenge mode from db
+    //qzqstar, 250411, load from achievements
+    M_Challenge_Mode = sQZAchievements.GetChallengeMode(this);
+    uint32 _Promotions = sQZAchievements.GetPromotions(this);
+    M_Leech_Phy = _Promotions % 10;
+    M_Leech_Spell = (_Promotions / 10)%10;
+    M_TalentPoints = (_Promotions / 100)%10;
+    M_Speed = (_Promotions / 1000)%10;
+    M_WeaponSkill = (_Promotions / 10000)%10;
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= 0x%X, Promotions=%d", GetName(), M_Challenge_Mode, _Promotions);
+        
+
     InitPrimaryProfessions();                               // to max set before any spell loaded
 
     // init saved position, and fix it later if problematic
@@ -15471,8 +15497,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     ClearInCombat();
 
 
-    // SHALL i reload the achivements here?
-    uint32 __count = sQZAchievements.Load(this); //before calling the spells
 
 
     // make sure the unit is considered not in duel for proper loading
@@ -15509,19 +15533,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     _LoadSpells(holder->TakeResult(PLAYER_LOGIN_QUERY_LOADSPELLS));
 
-    // Load achievements here, before spell and talents
-    //get the challenge mode from db
-    //qzqstar, 250411, load from achievements
-    M_Challenge_Mode = sQZAchievements.GetChallengeMode(this);
-    uint32 _Promotions = sQZAchievements.GetPromotions(this);
-    M_Leech_Phy = _Promotions % 10;
-    M_Leech_Spell = (_Promotions / 10)%10;
-    M_TalentPoints = (_Promotions / 100)%10;
-    M_Speed = (_Promotions / 1000)%10;
-    M_WeaponSkill = (_Promotions / 10000)%10;
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= 0x%X, Promotions=%d", GetName(), M_Challenge_Mode, _Promotions);
-
-        
     // after spell load
     InitTalentForLevel();
     LearnDefaultSpells();
@@ -15679,7 +15690,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 	}
 
 	//qzqstar, 241224, team auto balance buff 
-	if (GetLevel() >= 10)
+	//if (GetLevel() >= 10)
+    if(false)
 	{
 		uint32 _count_ali = 0;
 		uint32 _count_horde = 0;
@@ -15757,7 +15769,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     //
     // five differnet break-through?
 #define	__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL (31290)
-	if (GetLevel() > 58)
+	//if (GetLevel() > 58)
+    if (false)
 	{
 		if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 4))		CastSpell(this, 31295 + 4, true);
 		else if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 3))		CastSpell(this, 31295 + 3, true);
@@ -15782,6 +15795,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 	}*/
 
     //get the social points using new method
+    /*
     auto _socialPoints = sQZAchievements.GetSocialPoints(this);
 	if (_socialPoints > 1000)
 	{
@@ -15792,9 +15806,11 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 			: _socialPoints >  5000 ? 30932
 			: 30931
 			, true);
-	}
+	}*/
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Player:%s Loaded %u Achievements records. Social Points:%u. ", GetName(), __count, _socialPoints);
+    if(HasSpell(ZQ_SPELL_MOUNTS_TIGER)) LearnSpell(ZQ_SPELL_MOUNTS_BONUS_TIGER, false);
+    if(HasSpell(ZQ_SPELL_MOUNTS_GRIYP)) LearnSpell(ZQ_SPELL_MOUNTS_BONUS_GRIYP, false);
+
 
     // restore remembered power/health values (but not more max values)
     uint32 savedhealth = fields[46].GetUInt32();
@@ -16530,7 +16546,7 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
                 if (questStatusData.m_rewarded)
                 {
                     //qzqstar, 250405, calculate the quest counts of rewarded.
-                    if (!pQuest->IsRepeatable())
+                    if (!pQuest->IsRepeatable() && quest_id < 10000)
                         __quest_count++;
                     questStatusData.m_reward_choice = fields[13].GetUInt32();
                     LearnQuestRewardedSpells(pQuest); // learn rewarded spell if unknown
@@ -17977,11 +17993,11 @@ bool Player::CheckInstanceCount(uint32 instanceId) const
 {
 	//qzqstar, 250109, ignore instance count for VIP spell 32858
 	//32860, vc special
-	if (HasSpell(32857)) 
-		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 20);
+	//if (HasSpell(32857)) 
+	//	return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 20);
 
-	if (HasSpell(30005))
-		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 10);
+	if (HasSpell(ZQ_SPELL_HS_VIP))
+		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 15);
 
 	//qzqstar, 250228, check if killer mode, MAX_INSTANCE_PER_ACCOUNT_PER_HOUR should be 1
 	//if (HasSpell(__MODE_MA))
@@ -19078,7 +19094,7 @@ void Player::InitDataForForm(bool reapplyMods)
 
 	switch (form)
 	{
-		//qzqstar, todo 250207, modify the attack speed upon the weapon speed....
+		//qzqstar, 250207, modify the attack speed upon the weapon speed....
 		case FORM_CAT:
 		{
 			//qzqstar, 250404, get the 2H hand?
@@ -22752,8 +22768,72 @@ void Player::RewardHonorOnDeath()
                 continue;
 
             uint32 rewPoints = uint32(HonorMgr::HonorableKillPoints(rewItr, this, 1) * honorRate);
-            if (rewPoints)
+            if (rewPoints && (!(rewItr->IsBot())))
+            {
                 rewItr->GetHonorMgr().Add(rewPoints, HONORABLE, this);
+
+                //qzqstar, 250708, add killer points to player
+                uint32 _rawpoints = sQZAchievements.GetSocialPointsPVP(rewItr);
+
+                uint32 _weekpoints = _rawpoints % 10000;
+                uint32 _totalpoints = _rawpoints / 10000;
+
+                _totalpoints ++;
+
+                if(_weekpoints < 9990)
+                {
+                    _weekpoints ++;
+                }
+
+
+                //save to Achievements
+                sQZAchievements.SetSocialPointsPVP(rewItr, _totalpoints * 10000 + _weekpoints);
+
+
+                std::string text = "";
+                bool anncounce = false;
+                if(_totalpoints == 10)
+                {
+                    text = __STR("十人斩　"); anncounce = true;
+                }else if (_totalpoints == 100)
+                {
+                    text = __STR("百人斩　"); anncounce = true;	
+                }else if (_totalpoints == 1000)
+                {
+                    text = __STR("千人斩　"); anncounce = true;
+                }else if (_totalpoints == 10000)
+                {
+                    text = __STR("万人斩　"); anncounce = true;
+                }
+#define	__STR(x)		((std::string)(x)).c_str()
+#define	__NSTR(x)		(std::to_string(x))
+                if(_totalpoints%10 == 0)
+                {
+                    //tell player
+                    std::string text="";
+                    text.append(__STR(">>>>> 你已击杀人数： "));
+                    text.append(__NSTR(_totalpoints));
+                    text.append(__STR(" <<<<<<"));
+                    ChatHandler(rewItr).PSendSysMessage(text.c_str());
+                }
+
+                if(anncounce)
+                {
+                    //announce to the world
+                    auto const& sessions = sWorld.GetAllSessions();
+                    for (const auto& itr : sessions)
+                    {
+                        if (WorldSession* session = itr.second)
+                        {
+                            Player* _pl = session->GetPlayer();
+                            if (_pl && _pl->IsInWorld())
+                            {
+                                ChatHandler(_pl).PSendSysMessage(ZQ_MANGOS_STRING_PVP_KILLERS, rewItr->GetName(), text.c_str());
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

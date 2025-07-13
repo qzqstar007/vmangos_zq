@@ -37,6 +37,7 @@
 #define __MENU_SUISHEN_MAIN				5000
 #define __MENU_SKILL_STOLE				6000
 #define __MENU_ZITIAO_MAIN				7000
+#define __MENU_VIP_TELEPORT_MAIN		10000
 #define __MENU_END						20000
 
 #define	__STR(x)		((std::string)(x)).c_str()
@@ -47,7 +48,6 @@
 #define	__ORANGE(x)		"|cffe85827"##x##"|r"
 #define __RED(x)		"|cfff00019"##x##"|r"
 #define __YELLOW(x)		"|cfff9dc24"##x##"|r"
-
 
 
 void _Main_Menus(Player *player)
@@ -76,7 +76,9 @@ void _Main_Menus(Player *player)
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　技能盗窃　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	}
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　副本内飞　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_VIP_TELEPORT_MAIN);
+
 	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, player->GetGUID());
 }
 
@@ -537,6 +539,60 @@ void Menus_Frag_Main(Player *player, Creature *_Creature, uint32 sender, uint32 
 
 	}
 }
+
+
+#pragma region VIP teleport 
+
+void Menus_Vip_Teleport_Main(Player *player, Creature *_Creature, uint32 sender, uint32 action)
+{
+	if (!player ||!_Creature) return;
+
+	std::string text = "";
+		uint32 __menu_nums = 0;
+
+	if (action == __MENU_VIP_TELEPORT_MAIN)
+	{
+		//Find all of the mapid from _TELEPORT_Locs
+		for (size_t i = 0; i < sizeof(_TELEPORT_Locs) / sizeof(_TELEPORT_Locs[0]); ++i) {
+
+			if (player->GetMapId() == _TELEPORT_Locs[i].map_id)
+			{
+				//add to menu.
+				++ __menu_nums;
+				uint32 vip_level = sQZAchievements.GetVIPLevel(player);
+
+				if( (player->HasSpell(ZQ_SPELL_HS_VIP)) || (_TELEPORT_Locs[i].vip_ind == 0) )
+					player->ADD_GOSSIP_ITEM(5, __STR(_TELEPORT_Locs[i].text), GOSSIP_SENDER_MAIN, __MENU_VIP_TELEPORT_MAIN + _TELEPORT_Locs[i].action_id);
+				else if ( (vip_level>=4) && ((i+1)%3 == 0))
+					player->ADD_GOSSIP_ITEM(5, __STR(_TELEPORT_Locs[i].text), GOSSIP_SENDER_MAIN, __MENU_VIP_TELEPORT_MAIN + _TELEPORT_Locs[i].action_id);
+
+			}
+		}
+
+		if (__menu_nums == 0)
+		{
+			player->ADD_GOSSIP_ITEM(5, __STR(__RED(" ==|　只能在副本使用　|== ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		}
+
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+	}
+	else
+	{
+		auto absAction = action - __MENU_VIP_TELEPORT_MAIN;
+		//Find all of the mapid from _TELEPORT_Locs
+		for (size_t i = 0; i < sizeof(_TELEPORT_Locs) / sizeof(_TELEPORT_Locs[0]); ++i) {
+
+			if (absAction == _TELEPORT_Locs[i].action_id)
+			{
+				//just teleport to the position.
+				player->CLOSE_GOSSIP_MENU();
+				player->TeleportTo(_TELEPORT_Locs[i].map_id, _TELEPORT_Locs[i].pos[0], _TELEPORT_Locs[i].pos[1], _TELEPORT_Locs[i].pos[2], _TELEPORT_Locs[i].pos[3]);
+			}
+		}
+	}
+
+}
+#pragma endregion
 
 #pragma endregion
 #define __TEAM_SUMMON_ACTION		10
@@ -1060,7 +1116,12 @@ struct CustomHSSpell : SpellScript
 
 				}
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　消耗２点券冷却偷取技能　＝＝")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE + 400);
+
+				uint32_t _vip_special = sQZAchievements.GetVIPSpecialFeatures(pPlayer);
+				if(_vip_special & VIP_SPECIAL_FREE_STOLE)
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　超级ＶＩＰ免费冷却技能　＝＝")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE + 401);
+				else
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　消耗２点券冷却偷取技能　＝＝")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE + 400);
 			}
 
 			else if(action >= __MENU_SKILL_STOLE + 100 && action <= __MENU_SKILL_STOLE + 103)
@@ -1129,6 +1190,19 @@ struct CustomHSSpell : SpellScript
 					pPlayer->RemoveSomeCooldown(cdCheck);
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　成功冷却技能，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
 				}
+			}
+
+			else if(action == __MENU_SKILL_STOLE + 401)
+			{
+				//cooldown, need 1 voucher
+				auto cdCheck = [](SpellEntry const & spellEntry) -> bool
+				{
+					if ((spellEntry.Id == ZQ_SPELL_ACHIEVE_STOLE  || spellEntry.Id == ZQ_SPELL_ACHIEVE_CAST ) && spellEntry.GetRecoveryTime() > 0)
+						return true;
+					return false;
+				};
+				pPlayer->RemoveSomeCooldown(cdCheck);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　成功冷却技能，返回　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_SKILL_STOLE);
 			}
 
 			//add menu
@@ -1378,6 +1452,11 @@ struct CustomHSSpell : SpellScript
 		else if(action >= __MENU_FRAG_MAIN && action <= __MENU_FRAG_MAIN + __MENU_SIZE)
 		{
 			Menus_Frag_Main(pPlayer, pCreature, sender, action);
+		}
+
+		else if(action >= __MENU_VIP_TELEPORT_MAIN && action <= __MENU_VIP_TELEPORT_MAIN + 10000)
+		{
+			Menus_Vip_Teleport_Main(pPlayer, pCreature, sender, action);
 		}
 
 	}

@@ -38,6 +38,8 @@
 #define ZQ_ITEM_PET_EGG				30010	//Pet Egg, 宠物蛋，所有玩家出生时获得，跟炉石一样
 #define ZQ_ITEM_PET_FOOD			30011	//Pet Food, 宠物食物
 
+#define ZQ_ITEM_BAG_HUNTER			30012	//Bag Hunter, 猎人背包
+
 //Faction upgrade items
 #define ZQ_ITEM_FACTION_UPGRADE		30020	//Faction Upgrade, 阵营升级
 
@@ -65,11 +67,13 @@
  *  Spell IDs, largest first (33386).
  ********************************************************************/
 #define ZQ_SPELL_HEARTSTONE			33386	//Heart Stone, 炉石修改（Item ID：6948）
-#define ZQ_SPELL_DUNGEON_FLY		33385	//Dungeon Fly, 副本飞行
+#define ZQ_SPELL_HS_VIP     		33385	//Dungeon Fly, 副本爆本，传送
 #define ZQ_SPELL_AUTOPICK   		33384	//Auto Pick, 自动拾取
 #define ZQ_SPELL_BONDING   		    33383	//Bonding, 羁绊系统
 
 #define ZQ_SPELL_VIP_HASTE			33380	//VIP Haste, 会员急速
+#define ZQ_SPELL_VIP_HASTE_ONOFF    33381	//VIP APSP, 会员ONOFF
+#define ZQ_SPELL_VIP_DMG			33379	//VIP APSP, 会员Damage
 
 //summon creature spells, such as critter, pet, mount, etc.
 #define ZQ_SPELL_SUMMON_PET			33370	//Summon Pet, 召唤宠物
@@ -118,7 +122,6 @@
 #define ZQ_SPELL_MOUNTS_TURTLE              32990   //Mounts, 海龟
 #define ZQ_SPELL_MOUNTS_TURTLE_LEARN        32991   //Mounts, 海龟
 
-
 #define ZQ_SPELL_BONUS_APSP         32830   //Bonus, 奖励，例如坐骑之类，被动奖励 50攻强，20法伤
 
 //Promotion Group spells lower id
@@ -128,6 +131,9 @@
 #define ZQ_SPELL_PROMOTION_VOIDAM   32815	//Promotion Haste, 晋升 
 #define ZQ_SPELL_PROMOTION_HASTE    32820	//Promotion Haste, 晋升 
 //Other Promitions from Achievements database
+#define ZQ_SPELL_MOUNTS_BONUS_TIGER         32825   //Mounts, Bonus
+#define ZQ_SPELL_MOUNTS_BONUS_GRIYP         32826   //Mounts, Bonus
+
 
 #define ZQ_SPELL_RAND_ENCHANT_END	    32733//随机附魔
 #define ZQ_SPELL_RAND_ENCHANT_START	    32690//随机附魔
@@ -198,6 +204,7 @@
 #define ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT		9010	//Dungeon Player Teleport, 副本玩家传送
 #define ZQ_MANGOS_STRING_DUNGEON_PLAYER_CPLT_NPCS		9011	//Dungeon Player Finish Level, 副本玩家完成等级
 #define ZQ_MANGOS_STRING_CHALLENGE_BREAKTHROUGH     	9021	//Dungeon Player Finish Teleport, 副本玩家完成传送
+#define ZQ_MANGOS_STRING_PVP_KILLERS            		9022	//Pvp Killers, 玩家击杀
 
 /******************************************************************** 
  *  Random properties.
@@ -207,6 +214,10 @@
 #define ZQ_RANDOM_DIFFICULTY_HELL		3311	//Hell, 地狱
 #define ZQ_RANDOM_DIFFICULTY_NIGHTMARE	3316	//Nightmare, 噩梦
 #define ZQ_RANDOM_DIFFICULTY_END        3320
+
+#define ZQ_ENCHANT_KILLERS		        3350   //Begin need +1 
+
+
 
 #endif	//_QZQSTAR_CPP_IDS_H
 
@@ -268,6 +279,14 @@ poison clounde
 7102 腐化传染
 血之诅咒 ID: 8282
 玛格拉姆灵魂诅咒 ID: 18159
+
+
+//update the creatures in raid maps .. ruins of anqiraj 
+
+
+
+
+
 */
 
 

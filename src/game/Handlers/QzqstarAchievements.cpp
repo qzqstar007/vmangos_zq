@@ -166,7 +166,7 @@ uint32 QzqstarAchievements::GetVIPLevel(Player * _player)
 		AchievementsEntry e = *it;
 		if (e.type == ACHIEVEMENT_VIP)
 		{
-			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::GetVIPLevel] Player:%s GetVIPLevel: %u", _player->GetName(), e.data1);
+			//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::GetVIPLevel] Player:%s GetVIPLevel: %u", _player->GetName(), e.data1);
 			return e.data1;
 		}	
 	}
@@ -290,6 +290,43 @@ void QzqstarAchievements::SetChallengeMode(Player * _player, uint32 mode)
 	}	
 }
 
+//e.data4 used as player's custom settings, bit 0-1 as APSP caclation method
+uint32 QzqstarAchievements::GetCustomSettings(Player * _player)
+{
+	//check _player if none
+	if (!_player) return 0;
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry e = *it;
+		if (e.type == ACHIEVEMENT_VIP)
+		{
+			return e.data4;
+		}	
+	}
+	//add one VIP level to the _playerAchievements vector map of this player if not found
+	__init_VIP_Entry(_player);
+	return 0;
+}
+//set the player's custom settings and add the custom settings to the player's achievements vector
+void QzqstarAchievements::SetCustomSettings(Player * _player, uint32 settings)
+{
+	//check _player if none
+	if (!_player) return;
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_VIP)
+		{
+			e.data4 = settings;
+			break;
+		}	
+	}
+}
+
 //get set social points for player, if the player has not got any social points, return 0.
 uint32 QzqstarAchievements::GetSocialPoints(Player * _player)
 {
@@ -369,6 +406,28 @@ void QzqstarAchievements::SetPromotions(Player * _player, uint32 promotions)
 	}	
 }
 
+
+
+
+//vip special features, in data8
+uint32  QzqstarAchievements::GetVIPSpecialFeatures(Player * _player)
+{
+	//check _player if none
+	if (!_player) return 0;
+
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry e = *it;
+		if (e.type == ACHIEVEMENT_VIP)
+		{
+			return e.data8;
+		}	
+	}
+
+	return 0;
+}
+
 #pragma endregion
 
 
@@ -403,11 +462,8 @@ uint32 QzqstarAchievements::GetRuneSlots(Player * _player)
 	e.guid = _player->GetGUID();
 	e.type = ACHIEVEMENT_RUNE;
 	e.subType = 0;
-	e.data1 = 2;
-	e.data2 = 0;
-	e.data3 = 0;
-	e.data4 = 0;
-	e.note = "";
+	e.data1 = 2; 	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;	e.note = "";
+	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;   //becareful, data 5 - 8 is not inited before.
 	_playerAchievements[_player->GetGUID()].push_back(e);
 
 	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::GetRuneSlots] Not found but init one Rune Entry: %u", _player->GetGUID());
@@ -599,6 +655,70 @@ void QzqstarAchievements::SetNormalQuestDoneNum(Player * _player, uint32 counter
 }
 
 #pragma endregion
+
+/* ================================================================================================================== */
+/* ========================= Social Points system  ============================================================================ */
+/* ================================================================================================================== */
+void QzqstarAchievements::__init_SocialPoints_Entry(Player * _player)
+{
+	//check _player if none
+	if (!_player)
+		return;
+
+	//add one VIP level to the _playerAchievements vector map of this player if not found
+	AchievementsEntry e;
+	e.guid = _player->GetGUID();
+	e.type = ACHIEVEMENT_SOCIAL_POINTS;
+	e.subType = 0;
+	e.data1 = 0;
+	e.data2 = 0;
+	e.data3 = 0;
+	e.data4 = 0;
+	e.note = "";
+	e.data5 = 0;	// for use of PVP killer points
+	e.data6 = 0;
+	e.data7 = 0;
+	e.data8 = 0;
+	_playerAchievements[_player->GetGUID()].push_back(e);
+	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::GetVIPLevel] Not found but init one VIP Entry: %u", _player->GetGUID());
+}
+
+uint32_t QzqstarAchievements::GetSocialPointsPVP(Player * _player)
+{
+	//check _player if none
+	if (!_player) return 0;
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry e = *it;
+		if (e.type == ACHIEVEMENT_SOCIAL_POINTS)
+		{
+			return e.data5; //we use the lower 9999 as weekly, and higher 99999 as total
+		}
+	}
+
+	//non
+	__init_SocialPoints_Entry(_player);
+	return 0;
+}
+void     QzqstarAchievements::SetSocialPointsPVP(Player * _player, uint32_t _points)
+{
+	//check _player if none
+	if (!_player) return;
+	//iterate the _playerAchievements vector map of this player to find the VIP level the player has got
+	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it!= _playerAchievements[_player->GetGUID()].end(); ++it)
+	{
+		AchievementsEntry& e = *it;
+		if (e.type == ACHIEVEMENT_SOCIAL_POINTS)
+		{
+			e.data5 = _points;
+			return;
+		}
+	}
+	//none	
+	__init_SocialPoints_Entry(_player);
+}
+
 
 /* ================================================================================================================== */
 /* ========================= Pet system  ============================================================================ */

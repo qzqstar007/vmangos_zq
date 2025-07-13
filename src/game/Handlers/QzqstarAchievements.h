@@ -52,6 +52,8 @@ enum Achievement_t
 #define VIP_TEAM_REVIVE		(0x20)
 #define VIP_TEAM_FULLFILL	(0x40)
 
+#define VIP_SPECIAL_FREE_STOLE	(0x01)		//stored in data8
+
 //Challenging Mode
 #define CHALLENGING_MODE_ONELIFE		(0x01)
 #define CHALLENGING_MODE_MANUFACT		(0x02)
@@ -127,6 +129,10 @@ public:
 	uint32 	GetChallengeMode(Player *player);
 	void 	SetChallengeMode(Player *player, uint32 mode);
 
+	// Get & Set player's custom settings using data4
+	uint32 GetCustomSettings(Player * _player);
+	void   SetCustomSettings(Player * _player, uint32 _settings);
+
 	// Social points system functions, data5
 	uint32 	GetSocialPoints(Player * _player);
 	void 	SetSocialPoints(Player * _player, uint32 _points);
@@ -134,6 +140,9 @@ public:
 	// Promotions for the player, data6
 	uint32  GetPromotions(Player * _player);
 	void    SetPromotions(Player * _player, uint32 _promotions);
+
+	// VIP special features, data8, bit 0 means free stole etc
+	uint32  GetVIPSpecialFeatures(Player * _player);
 
 	/*****************************************************
 	 *
@@ -176,6 +185,17 @@ public:
 
 	//set the normal quest done counters
 	void   SetNormalQuestDoneNum(Player * _player, uint32 _counters);
+
+
+	/*****************************************************
+	 *
+	 *		Social Points Functions
+	 *
+	 *****************************************************/
+	 //data5, pvp killer counts
+	 void 	  __init_SocialPoints_Entry(Player * _player);
+	 uint32_t GetSocialPointsPVP(Player * _player);
+	 void     SetSocialPointsPVP(Player * _player, uint32_t _points);
 	
 
 	/*****************************************************

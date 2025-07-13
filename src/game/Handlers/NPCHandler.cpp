@@ -440,7 +440,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
 		_player->PlayerTalkClass->ClearMenus();
 		if (_player->M_Gossip_Spell_Ind == 1999)		//vip spell
 		{
-			if (const SpellEntry * spell_info = sSpellMgr.GetSpellEntry(30005))
+			if (const SpellEntry * spell_info = sSpellMgr.GetSpellEntry(33378))
 			{
 				if(SpellScript* pTempScript = sScriptMgr.GetSpellScript(spell_info))
 					pTempScript->OnGossipSelect(_player, (Creature *)_player, sender, action);
@@ -449,7 +449,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
 		
         if (_player->M_Gossip_Spell_Ind == 1998)		//HS spell
 		{
-			if (const SpellEntry * spell_info = sSpellMgr.GetSpellEntry(33386))
+			if (const SpellEntry * spell_info = sSpellMgr.GetSpellEntry(33386)) //hardcoded 250705, 33386
 			{
 				if(SpellScript* pTempScript = sScriptMgr.GetSpellScript(spell_info))
 					pTempScript->OnGossipSelect(_player, (Creature *)_player, sender, action);

@@ -1388,10 +1388,13 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
                                     std::string _diffDesc = _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 ");
                                     ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_CPLT_NPCS, TP_Dungeons[_acmapID].name, _diffDesc);
 
-                                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, difficulty: %u, Need Reward ....", player->GetName(), TP_Dungeons[_acmapID].name, _difficulty&3);
-
-                                    player->AddItem(TP_Dungeons[_acmapID].npc_list[8] + (_dungeonInfo&3), TP_Dungeons[_acmapID].npc_list[9]);
-
+                                    
+                                    if(TP_Dungeons[_acmapID].npc_list[8] > 10)
+                                    {
+                                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, difficulty: %u, Need Reward ....", player->GetName(), TP_Dungeons[_acmapID].name, _difficulty&3);
+                                        player->AddItem(TP_Dungeons[_acmapID].npc_list[8] + (_dungeonInfo&3), TP_Dungeons[_acmapID].npc_list[9]);
+                                    }
+                                        
                                 }
                             }
 

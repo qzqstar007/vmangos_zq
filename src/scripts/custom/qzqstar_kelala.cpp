@@ -215,6 +215,7 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 #define	__MENU_TASK_ACT_COMPLET						(200)
 #define	__MENU_TASK_ACT_COMPLET_BY_COST				(220)
 #define	__MENU_TASK_ACT_REGET						(300)
+#define __MENU_TASK_MODIFY_APSP						(500)
 
 static int32 _Quest_Counter = 12001;
 bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint32 action)
@@ -222,30 +223,44 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 	std::string text = "";
 	uint32 __menu_nums = 0;
 
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝万环任务系统＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
-	uint32 _doneCounter = sQZAchievements.GetQuestDoneCounters(player);
-	text = __STR("｜　　今日完成：|cff007733");
-	text.append(__NSTR(PAIR32_LOPART(_doneCounter)));
-	text.append(__STR(" |r / 100 "));
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
-	text = __STR("｜　　总共完成：|cff007733");
-	text.append(__NSTR(PAIR32_HIPART(_doneCounter)));
-	text.append(__STR(" |r / 10000 "));
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
-	text = __STR("｜　　攻强增加：|cff007733");
-	text.append(__NSTR(PAIR32_HIPART(_doneCounter)/2));
-	text.append(__STR(" |r 点 "));
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
-	text = __STR("｜　　法伤增加：|cff007733");
-	text.append(__NSTR(PAIR32_HIPART(_doneCounter)/4));
-	text.append(__STR(" |r 点 "));
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
-
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
-
 	auto	_currentQuestID = sQZAchievements.GetCustomQuestID(player);
 	uint32	__reset_gold = player->GetLevel() * player->GetLevel() / 610 + 1;		//TODO NEXT SEASON
 
+	//get custom settings
+	uint32 __custom_settings = sQZAchievements.GetCustomSettings(player);
+	uint32 __apsp_method = __custom_settings & 0x03;
+
+	uint32 _doneCounter = sQZAchievements.GetQuestDoneCounters(player);
+	uint32 _apBonus = PAIR32_HIPART(_doneCounter)/2;
+	uint32 _spBonus = PAIR32_HIPART(_doneCounter)/4;
+	if(__apsp_method == 1)  { _apBonus = _apBonus + _spBonus; _spBonus = 0; }
+	else if(__apsp_method == 2) { _spBonus = _spBonus + _apBonus/2; _apBonus = 0; }
+
+	if(action >= __MENU_TASK_MAIN && action < __MENU_TASK_MAIN + __MENU_TASK_MODIFY_APSP)
+	{	
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝万环任务系统＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+		text = __STR("｜　　今日完成：|cff007733");
+		text.append(__NSTR(PAIR32_LOPART(_doneCounter)));
+		text.append(__STR(" |r / 100 "));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		text = __STR("｜　　总共完成：|cff007733");
+		text.append(__NSTR(PAIR32_HIPART(_doneCounter)));
+		text.append(__STR(" |r / 10000 "));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		text = __STR("｜　　攻强增加：|cff007733");
+		text.append(__NSTR(_apBonus));
+		text.append(__STR(" |r 点 "));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		text = __STR("｜　　法伤增加：|cff007733");
+		text.append(__NSTR(_spBonus));
+		text.append(__STR(" |r 点 "));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝【切换加成方式】＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN + __MENU_TASK_MODIFY_APSP);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+	}
+
+
+	
 	if (action == __MENU_TASK_MAIN)
 	{
 
@@ -274,7 +289,7 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("　"), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
 
 
-			if (__qStatus != QUEST_STATUS_COMPLETE)	 
+			if ( (__qStatus != QUEST_STATUS_COMPLETE) && (player->GetLevel() > 10))	 
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("== 消耗５点券直接完成任务 == ")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN + __MENU_TASK_ACT_COMPLET_BY_COST);
 			
 
@@ -313,12 +328,12 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 		//__qIDBegin = 6502;
 		_origQuestID = _qEntity.questID;
 
-		/*
 		if (player->IsGameMaster())
 		{
-			_origQuestID = player->GetReputationMgr().GetReputation(967);
-			if (_origQuestID > 9300) _origQuestID = 5083;
-		}*/
+			// if 967 is less than 10, pick random quest otherwise, pick the quest
+			auto _testQuestID = player->GetReputationMgr().GetReputation(966);
+			if (_testQuestID > 10) _origQuestID = _testQuestID;
+		}
 
 		ObjectMgr::QuestMap const& qTemplates = sObjectMgr.GetQuestTemplates();
 
@@ -554,6 +569,36 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 		}
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 		return true;
+	}
+
+	else if (action >= __MENU_TASK_MAIN + __MENU_TASK_MODIFY_APSP)
+	{
+		uint32 _absAction = action - __MENU_TASK_MAIN - __MENU_TASK_MODIFY_APSP;
+
+		if(_absAction == 0)
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝【当前加成方式】＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+			if (__apsp_method == 0) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝　１．平均转化攻强和法伤　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+			else if (__apsp_method == 1) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝　２．全部转化为攻强　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+			else if (__apsp_method == 2) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝　３．全部转化为法伤　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("点击下方更换计算方式，小退生效。　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("－＞　１．平均转化攻强和法伤　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN + __MENU_TASK_MODIFY_APSP + 1);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("－＞　２．全部转化为攻强　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN + __MENU_TASK_MODIFY_APSP + 2);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("－＞　３．全部转化为法伤　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN + __MENU_TASK_MODIFY_APSP + 3);
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝　返回　＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+		}
+		else if (_absAction >= 1 && _absAction <= 3)
+		{
+			__custom_settings = __custom_settings & 0xFFFFFFFC;
+			__custom_settings = __custom_settings | (_absAction - 1);
+			sQZAchievements.SetCustomSettings(player, __custom_settings);	
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝加成方式已改变，小退生效。＝　")), GOSSIP_SENDER_MAIN, __MENU_TASK_MAIN);
+		}
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 	}
 
 	return true;
@@ -861,11 +906,10 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			if (_curEQLevel >= _needEQLevel && pLevel<60 )
 			{
 				
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__GREEN("＝＝满足装等要求，可以突破等级＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝满足装等要求，可以突破等级＝＝ ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				text = "|cff0829C9 并获得点券数量：";
 				text.append(__NSTR(_curEQLevel - _needEQLevel));
 				text.append("。|r");
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("==|确定突破|===")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_31_ACT_1);
 			}
@@ -951,7 +995,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			
 			if (_Ranks_Now < 5 && _curEQLevel >= _needEQLevel && pLevel>58)
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__GREEN("===|满足装等要求，已提升至新等级，小退生效。|===")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("===|满足装等要求，已提升至新等级，小退生效。|===")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 				//learn spell
 				player->LearnSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + _Ranks_Now, false);
@@ -1491,6 +1535,13 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 	if (action == __MENU_KELALA_EQUIP_COLLECTS)
 	{
 		uint32 _EQBonus = sQZAchievements.GetEQCollectBonus(player);
+		uint32 __custom_settings = sQZAchievements.GetCustomSettings(player);
+		uint32 __apsp_method = __custom_settings & 0x03;
+		uint32 _apBonus = _EQBonus;
+		uint32 _spBonus = _EQBonus/2;
+		if(__apsp_method == 1)  { _apBonus = _apBonus + _spBonus; _spBonus = 0; }
+		else if(__apsp_method == 2) { _spBonus = _spBonus + _apBonus/2; _apBonus = 0; }
+
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -1503,14 +1554,17 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　专业制造收益　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_PROFESSIONAL);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		
+
+
 
 		std::string text = "";
 		text.append(__STR("|cff0000ff＝＞　当前攻强加成：　"));
-		text.append(__NSTR(_EQBonus));
+		text.append(__NSTR(_apBonus));
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
 		text = "";
 		text.append(__STR("|cff0000ff＝＞　当前法伤加成：　"));
-		text.append(__NSTR(_EQBonus/2));
+		text.append(__NSTR(_spBonus));
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＞　返回　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
@@ -1771,7 +1825,8 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 				
 				auto pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START);
 
-				if( (pItem && pItem->GetProto()->ItemId == _equipID) && ( (_difficulty==0)||((pItem->GetItemRandomPropertyId()  >3300 + _difficulty * 5) && (pItem->GetItemRandomPropertyId() <3305 + _difficulty * 5) ) ))	
+				//high level can be replaced by lower levels
+				if( (pItem && pItem->GetProto()->ItemId == _equipID) && ( (_difficulty==0)||((pItem->GetItemRandomPropertyId()  >3300 + _difficulty * 5) && (pItem->GetItemRandomPropertyId() <3321) ) ))	
 				{
 					//take the item and add the achievement
 					player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);

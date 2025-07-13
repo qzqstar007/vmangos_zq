@@ -276,7 +276,27 @@ struct APSPSpellScript : public SpellScript
 				basePoints0 += _EQBonus;
 				basePoints1 += (_EQBonus/2);
 
-                ChatHandler(player).PSendSysMessage(((std::string)("你因为收集（如坐骑、专业、装备、任务等）而获得了[%d]点攻强和 [%d]点法伤。  ")).c_str(), basePoints0, basePoints1);
+                uint32 _rawpoints = sQZAchievements.GetSocialPointsPVP(player);
+
+                uint32 _weekpoints = _rawpoints % 10000;
+                uint32 _totalpoints = _rawpoints / 10000;
+
+                if(_weekpoints >= 5)
+                {
+                    uint32 _rewardpoints = (_weekpoints/5 > player->GetLevel()*10 ?  player->GetLevel() * 10 : _weekpoints/5);
+                    basePoints0 += _rewardpoints;
+                    basePoints1 += (_rewardpoints/2);
+                }
+
+
+                //now get the custom settings of the player
+                uint32 __custom_settings = sQZAchievements.GetCustomSettings(player);
+                uint32 __apsp_method = __custom_settings & 0x03;        
+                if (__apsp_method == 1) { basePoints0 = basePoints0 + basePoints1 ;  basePoints1 = 0;}
+                else if (__apsp_method == 2) { basePoints1 = basePoints0/2 + basePoints1; basePoints0 = 0; }
+        
+
+                ChatHandler(player).PSendSysMessage(((std::string)("你因为收集（如坐骑、专业、装备、任务、战场等）而获得了[%d]点攻强和 [%d]点法伤。  ")).c_str(), basePoints0, basePoints1);
 
                 spell->m_currentBasePoints[0] = basePoints0;
                 spell->m_currentBasePoints[1] = basePoints0;
@@ -475,16 +495,17 @@ struct SpellCastingScript : public SpellScript
                 {
                 	if(spellInfo->EffectImplicitTargetA[0] == TARGET_UNIT_CASTER)	
                     {
-                        player->CastSpell(player, spell_id, true);
+                        if(player->HasAura(spell_id) == false)
+                            player->CastSpell(player, spell_id, true);
                     }
                     else
                     {
-                        player->CastSpell(spell->GetUnitTarget(), spell_id, true);	
+                        if(spell->GetUnitTarget()->HasAura(spell_id) == false)
+                            player->CastSpell(spell->GetUnitTarget(), spell_id, true);	
                     }
                 }
             }
         }	
-
 
         return true;
     }	
@@ -507,8 +528,17 @@ struct SpellVIPHasteScript : public SpellScript
                 }
                 else
                 {
-                    player->LearnSpell(ZQ_SPELL_VIP_HASTE, false);
-                    ChatHandler(player).PSendSysMessage(((std::string)(">>>急速技能：打开<<<")).c_str());
+                    if(player->GetMapId() > 2)
+                    {
+                        player->LearnSpell(ZQ_SPELL_VIP_HASTE, false);
+                        ChatHandler(player).PSendSysMessage(((std::string)(">>>急速技能：打开，额外增加吸血。<<<")).c_str());
+                        player->M_Leech_Phy = 10;
+                        player->M_Leech_Spell = 10;
+                    }
+                    else
+                    {
+                        ChatHandler(player).PSendSysMessage(((std::string)(">>>你只能在副本里使用。<<<")).c_str());
+                    }
                 }
             }
         }	
