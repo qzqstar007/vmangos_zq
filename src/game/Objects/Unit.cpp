@@ -712,7 +712,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 	//qzqstar, 250207, reduce the damage for pvp
 	if (this->IsPlayer() && pVictim->IsPlayer())
 	{
-		damage /= 2;
+		damage /= 3;
 	}
 
     if (!damage)
@@ -967,7 +967,9 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
                 {
                     if (spell->getState() == SPELL_STATE_CASTING)
                     {
-                        if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION))
+                        //qzqstar, 250719, some channels with unique target cannot be delayed, such as mind fray
+                        //if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION))
+                        if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION) && (spell->m_spellInfo->EffectImplicitTargetA[0] != TARGET_UNIT_ENEMY))
                         {
                             if (pVictim != this)                //don't shorten the duration of channeling if you damage yourself
                                 spell->DelayedChannel();

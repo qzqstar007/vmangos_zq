@@ -7729,6 +7729,7 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
             chance = GetPPMProcChance(WeaponSpeed, 1.0f);   // default to 1 PPM for unknown proc rates
 
         //qzqstar, todo, magic weapon mastery, chance rate x 2
+        if(HasSpell(31058)) chance = chance * 2;
 
         if (roll_chance_f(chance))
             CastSpell(Target, spellInfo->Id, true, item);
@@ -7766,6 +7767,13 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
             ApplySpellMod(spellInfo->Id, SPELLMOD_CHANCE_OF_SUCCESS, chance);
 
 			//qzqstar, todo, magic weapon mastery, chance rate x 2
+            if(HasSpell(31058)) chance = chance * 2;
+
+            //shaman's windfury
+            if (spellInfo->IsFitToFamily<SPELLFAMILY_SHAMAN, CF_SHAMAN_WINDFURY_WEAPON>() && HasSpell(31169))  
+            {
+                chance = 40.0f;
+            }
 
             if (roll_chance_f(chance) || HasCheatOption(PLAYER_CHEAT_ALWAYS_PROC))
             {

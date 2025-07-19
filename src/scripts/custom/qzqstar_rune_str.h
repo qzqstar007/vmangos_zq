@@ -48,7 +48,7 @@ typedef struct __rune_spell_menu {
 	std::string		desc;
 }Rune_Spell_Menu_t;
 
-#define	RUNE_SPELLS_NUM				(9)
+#define	RUNE_SPELLS_NUM				(10)
 extern const Rune_Spell_Menu_t _Spells_Menu_Warrior[RUNE_SPELLS_NUM];
 extern const Rune_Spell_Menu_t _Spells_Menu_Paladin[RUNE_SPELLS_NUM];
 extern const Rune_Spell_Menu_t _Spells_Menu_Hunter[RUNE_SPELLS_NUM];

@@ -440,6 +440,16 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
     {
         weapon_mindamage += GetAmmoDPS() * att_speed;
         weapon_maxdamage += GetAmmoDPS() * att_speed;
+
+        //荷枪实弹
+        if(HasSpell(31112))
+        {
+            auto _level = GetLevel();
+            _level = _level /10 + 2;
+
+            weapon_mindamage += GetAmmoDPS() * att_speed * _level;
+            weapon_maxdamage += GetAmmoDPS() * att_speed * _level;
+        }
     }
 	//qzqstar add ammon dps to local attack
 	else if (attType == BASE_ATTACK && index == 0)    // add ammo DPS to ranged damage

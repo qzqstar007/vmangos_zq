@@ -18,6 +18,7 @@
 
 #include "QzqstarAchievements.h"
 #include "Chat.h"
+#include "../custom/qzqstar_id.h"
 
 // 24340, 26558, 28884 - Meteor
 // 26789 - Shard of the Fallen Star
@@ -111,7 +112,7 @@ struct PetTrigSpellScript : public SpellScript
                     int _petHappiness = (petValues % 10000) / 100; // --CD--
                     int _petRelationship = (petValues % 100); // ----EF
 
-                    if(spell->m_spellInfo->Id == (33327)) // Weapon Damage
+                    if(spell->m_spellInfo->Id == (ZQ_SPELL_PET_TRIGGERED + 6)) // Weapon Damage
                     {
 						//weapon damage
                         _multiple = (1.0f + _petLevel / 20.0f) * ( 1.0f + _petHappiness/500.0f + _petRelationship/500.0f) ; // 10% of the pet level
@@ -244,7 +245,7 @@ struct APSPSpellScript : public SpellScript
                 //update the AP and SP buff for the player
                 basePoints0 = 0;
                 basePoints1 = 0;
-
+/*
 #define ZQ_SPELL_MOUNTS_REINDEER            32980   //Mounts, 麋鹿新手坐骑
 #define ZQ_SPELL_MOUNTS_REINDEER_LEARN      32981   //Mounts, 麋鹿新手坐骑
 #define ZQ_SPELL_MOUNTS_LAND                32982   //Mounts, 坐骑100%
@@ -257,6 +258,11 @@ struct APSPSpellScript : public SpellScript
 #define ZQ_SPELL_MOUNTS_GRIYP_LEARN         32989   //Mounts, 幽灵狮鹫
 #define ZQ_SPELL_MOUNTS_TURTLE              32990   //Mounts, 海龟
 #define ZQ_SPELL_MOUNTS_TURTLE_LEARN        32991   //Mounts, 海龟
+
+
+#define ZQ_SPELL_BONUS_AP         32830   //Bonus, 奖励，例如坐骑之类，被动奖励 攻强
+#define ZQ_SPELL_BONUS_SP         32831   //Bonus, 奖励，例如坐骑之类，被动奖励 法强
+*/
 
                 if(player->HasSpell(ZQ_SPELL_MOUNTS_REINDEER)) { basePoints0 += 10; basePoints1 += 5; } // 麋鹿新手坐骑 10攻强，5法伤
                 if(player->HasSpell(ZQ_SPELL_MOUNTS_LAND)) { basePoints0 += 30; basePoints1 += 15; } // 坐骑100% 10攻强，5法伤
@@ -296,11 +302,18 @@ struct APSPSpellScript : public SpellScript
                 else if (__apsp_method == 2) { basePoints1 = basePoints0/2 + basePoints1; basePoints0 = 0; }
         
 
-                ChatHandler(player).PSendSysMessage(((std::string)("你因为收集（如坐骑、专业、装备、任务、战场等）而获得了[%d]点攻强和 [%d]点法伤。  ")).c_str(), basePoints0, basePoints1);
+                if(spell->m_spellInfo->Id == ZQ_SPELL_BONUS_AP)
+                    ChatHandler(player).PSendSysMessage(((std::string)("你因为收集（如坐骑、专业、装备、任务、战场等）而获得了[%d]点攻强和 [%d]点法强。  ")).c_str(), basePoints0, basePoints1);
 
-                spell->m_currentBasePoints[0] = basePoints0;
-                spell->m_currentBasePoints[1] = basePoints0;
-                spell->m_currentBasePoints[2] = basePoints1;
+                if(spell->m_spellInfo->Id == ZQ_SPELL_BONUS_AP)
+                {
+                    spell->m_currentBasePoints[0] = basePoints0;
+                    spell->m_currentBasePoints[1] = basePoints0;
+                }else if (spell->m_spellInfo->Id == ZQ_SPELL_BONUS_SP)
+                {
+                    spell->m_currentBasePoints[0] = basePoints1;
+                    spell->m_currentBasePoints[1] = basePoints1;
+                }
             }	
         }	
 
@@ -395,6 +408,12 @@ struct SpellStealScript : public SpellScript
                 else if (!spell->GetUnitTarget()->IsCreature()) {
                     //tell the player that he cannot stole the spell from the target
                     ChatHandler(player).PSendSysMessage(((std::string)(">>>你只能从怪物身上偷取技能。<<<")).c_str());
+                    return false;
+                }
+                //check the target if it's a totem or a creature with level less than 3
+                else if (spell->GetUnitTarget()->GetLevel() < 3 || spell->GetUnitTarget()->ToCreature()->IsTotem()) {
+                    //tell the player that he cannot stole the spell from the target
+                    ChatHandler(player).PSendSysMessage(((std::string)(">>>你无法从该目标偷取技能。<<<")).c_str());
                     return false;
                 }
 

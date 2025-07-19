@@ -1104,10 +1104,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
                             if (_apply)
                             {
-                                if (!player->HasAura(_auraID))
-                                {
-                                    player->CastCustomSpell(player, _auraID, _points0, _points1, _points2, true, nullptr);
-                                }
+                                player->CastCustomSpell(player, _auraID, _points0, _points1, _points2, true, nullptr);
                             }
                             else
                             {
@@ -1161,9 +1158,11 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						//further zandalar
 						if (m_caster->GetLevel() > 44 && unitTarget->GetLevel() > 44)	m_caster->CastSpell(unitTarget, ZQ_SPELL_BUFF_ZANDALA, true, nullptr);
                         
+                        //blessing of kings
+                        //if (m_caster->GetLevel() > 54 && unitTarget->GetLevel() > 54)	m_caster->CastSpell(unitTarget, 20217, true, nullptr);						
+						
                         /*
 						//55 using the zandalar
-						if (m_caster->GetLevel() > 54 && unitTarget->GetLevel() > 54)	m_caster->CastSpell(unitTarget, 32067, true, nullptr);						
 						
 						//60 using the diremaul
 						if (m_caster->GetLevel() > 59 && unitTarget->GetLevel() > 59)
@@ -4039,6 +4038,17 @@ void Spell::EffectEnchantItemTmp(SpellEffectIndex effIdx)
 
     // remove old enchant before applying new
     pItemOwner->ApplyEnchantment(itemTarget, TEMP_ENCHANTMENT_SLOT, false);
+
+    //check the player if it's shaman and has spell of winfury 
+    if ( pCaster->HasSpell(31169)
+        && (enchantId ==  284 || enchantId == 283 || enchantId == 525 || enchantId == 1669)
+        && (pCaster->GetClass() == CLASS_SHAMAN) 
+       )
+    {
+        damage += 1500;
+    }
+
+    //check player of rogue for this as well
 
     itemTarget->SetEnchantment(TEMP_ENCHANTMENT_SLOT, enchantId, damage * 1000, charges, m_caster->GetObjectGuid());
 

@@ -1428,6 +1428,8 @@ uint32    QzqstarAchievements::GetSkillsCollectActiveID(Player *player)
 			return (e.subType); //Active ID
 		}	
 	}
+
+	return 0;
 }
 void      QzqstarAchievements::SetSkillsCollectInfo(Player *player, uint32_t spellId, uint32_t pos)
 {

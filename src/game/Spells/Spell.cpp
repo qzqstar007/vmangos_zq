@@ -1665,7 +1665,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                 SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
 
                 //qzqstar, todo, windfury with Stormstrike
-                if (pEnchant && roll_chance_f(20.0f))
+                float _wf_chance = 20.0f;
+                if(pPlayer->HasSpell(31172)) _wf_chance = 100.0f;
+                if (pEnchant && roll_chance_f(_wf_chance))
                     if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(pEnchant->spellid[0]))
                         if (spellInfo->IsFitToFamily<SPELLFAMILY_SHAMAN, CF_SHAMAN_WINDFURY_WEAPON>())
                             pPlayer->CastSpell(unitTarget, pEnchant->spellid[0], true, item);
@@ -5569,10 +5571,15 @@ void Spell::TakeAmmo()
 				*/
 			}
 		}
-		/*
+		
+        //qzqstar, 250713, will not remove the ammo if has spell 31112 荷枪实弹
 		else if (uint32 ammo = pCaster->GetUInt32Value(PLAYER_AMMO_ID))
-		pCaster->DestroyItemCount(ammo, 1, true);
-		*/
+        {
+            if(!pCaster->HasSpell(31112))
+                pCaster->DestroyItemCount(ammo, 1, true);
+        }
+		
+		
     }
 }
 

@@ -280,7 +280,7 @@ void Creature::AddToWorld()
     }
     else if (GetLevel() >= 55  && GetMapId() < 2)
     {
-		CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1, true);
+		CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY0, true);
 		CastSpell(this, 31046, true); //Restore health
     }
 }

@@ -9,6 +9,8 @@
 
 #include "QzqstarAchievements.h"
 
+#include "PlayerBotMgr.h"
+
 INSTANTIATE_SINGLETON_1(AutoBroadCastMgr);
 
 AutoBroadCastMgr::AutoBroadCastMgr()
@@ -137,6 +139,35 @@ void AutoBroadCastMgr::Update(uint32 diff)
 
 		//1. update pets
 		UpdatePetStatus();
+
+
+        //2. add battlebots only once.
+        if(_lastBroadCast10Min == 2)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Battle Ground ...] Add only once .....................");
+            uint32 _maxlevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+
+            for(int i = 0; i < 5; i++)
+            {
+				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_WS, ALLIANCE, _maxlevel, false);
+				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_WS, HORDE, _maxlevel, false);
+            }
+
+            for(int i = 0; i < 10; i++)
+            {
+				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AB, ALLIANCE, _maxlevel, false);
+				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AB, HORDE, _maxlevel, false);
+            }
+
+            for(int i = 0; i < 20; i++)
+            {
+				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AV, ALLIANCE, _maxlevel, false);
+				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AV, HORDE, _maxlevel, false);
+            }         
+
+
+            //sWorld.SendWorldText(BCT_BG_AV_START_ONE_MINUTE);
+        }
     }
 
     //60min section

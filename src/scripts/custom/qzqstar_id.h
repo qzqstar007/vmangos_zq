@@ -93,6 +93,7 @@
 #define ZQ_SPELL_SPELL_CHUAN_HASTE	    33367	//Spell Chuan Haste, 传家宝急速
 #define ZQ_SPELL_SPELL_RICH_BONUS	    33368	//Spell Rich Bonus, 富豪奖励
 
+#define ZQ_SPELL_SPELL_DIFFICULTY0  33350	//Spell Difficulty 0, Wolrd Difficutly 0
 #define ZQ_SPELL_SPELL_DIFFICULTY1	33351	//Spell Difficulty 1, 副本难度1
 #define ZQ_SPELL_SPELL_DIFFICULTY2	33352	//Spell Difficulty 2, 副本难度2
 #define ZQ_SPELL_SPELL_DIFFICULTY3	33353	//Spell Difficulty 3, 副本难度3
@@ -122,7 +123,8 @@
 #define ZQ_SPELL_MOUNTS_TURTLE              32990   //Mounts, 海龟
 #define ZQ_SPELL_MOUNTS_TURTLE_LEARN        32991   //Mounts, 海龟
 
-#define ZQ_SPELL_BONUS_APSP         32830   //Bonus, 奖励，例如坐骑之类，被动奖励 50攻强，20法伤
+#define ZQ_SPELL_BONUS_AP         32830   //Bonus, 奖励，例如坐骑之类，被动奖励 攻强
+#define ZQ_SPELL_BONUS_SP         32831   //Bonus, 奖励，例如坐骑之类，被动奖励 法强
 
 //Promotion Group spells lower id
 #define ZQ_SPELL_PROMOTION_STAT     32800	//Promotion Stat, 晋升 
@@ -284,7 +286,12 @@ poison clounde
 //update the creatures in raid maps .. ruins of anqiraj 
 
 
+update the items sell price to 1 silver
+update item_template set sell_price=100,bonding=0,max_count=0 where entry in (11754,18335,12219, 12735);
 
+11754
+18335
+12219
 
 
 */
