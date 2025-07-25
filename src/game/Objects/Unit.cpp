@@ -3485,6 +3485,7 @@ float Unit::GetTotalAuraMultiplierByMiscMask(AuraType auratype, uint32 misc_mask
                 }
                 break;
             case (1<<(CREATURE_TYPE_BEAST-1)):
+            case (1<<(CREATURE_TYPE_DRAGONKIN-1)):
                 if (player->M_Challenge_Mode & CHALLENGING_MODE_KILLER_BEAST)    
                 {
                     multiplier *= 1.2f;

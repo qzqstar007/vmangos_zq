@@ -40,6 +40,9 @@
 
 #define ZQ_ITEM_BAG_HUNTER			30012	//Bag Hunter, 猎人背包
 
+#define ZQ_ITEM_GOLD_COIN           30016   //Gold Bar, 金条
+#define ZQ_ITEM_GOLD_BAR            30018   //Gold Bar, 金砖
+
 //Faction upgrade items
 #define ZQ_ITEM_FACTION_UPGRADE		30020	//Faction Upgrade, 阵营升级
 
@@ -60,6 +63,7 @@
 #define ZQ_ITEM_CHENYI		        30048	//Chenyi Zhanpao, 陈怡之杖
 #define ZQ_ITEM_ZHANPAO		        30049	//Chenyi Zhanpao, 陈怡之杖
 
+#define ZQ_ITEM_TURTLE              30066   //Turtle, 乌龟
 //Bonus Box
 #define ZQ_ITEM_BONUS_BOX			30088	//Bonus Box, 奖励宝箱 ~ 30061
 
@@ -286,13 +290,27 @@ poison clounde
 //update the creatures in raid maps .. ruins of anqiraj 
 
 
-update the items sell price to 1 silver
-update item_template set sell_price=100,bonding=0,max_count=0 where entry in (11754,18335,12219, 12735);
+update the items sell price to 1 silver //盛典
+update item_template set sell_price=100,bonding=0,max_count=0 where entry in (11754,18335,12219, 12735, 22526,22527, 22528, 11078, 22525, 22529);
+update item_template set sell_price=1000,bonding=0,max_count=0 where entry in (11732, 11733, 11734, 11736, 11737, 18332, 18333, 18334);
 
-11754
-18335
-12219
 
+update item_template set bonding=2
+where (quality > 2 and quality < 5)  and (class = 4 or class = 2);
+
+
+//update spell_template recovery time
+update spell_template set recoveryTime = 7200000 where recoveryTime > 7200000;
+update spell_template set recoveryTime = 7200000 where recoveryTime > 7200000;
+update spell_template set categoryRecoveryTime = 7200000 where categoryRecoveryTime > 7200000;
+
+//所有掉落图纸不限制专业分支。
+update item_template set required_spell = 0 where required_spell > 0;
+
+
+//制造类的法术释放时间降低
+update spell_template set castingTimeIndex=5 where effect1=24 and castingTimeIndex>5;
+update spell_template set startRecoveryTime=1100 where startRecoveryTime=1500;
 
 */
 

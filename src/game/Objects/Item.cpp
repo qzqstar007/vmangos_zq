@@ -839,7 +839,11 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
         if(roll_chance_i(20)) 
         {
             //3321 starting from ... 
-            if(itemProto->Class == ITEM_CLASS_WEAPON) _randomEnchantID += 20;
+            if(itemProto->Class == ITEM_CLASS_WEAPON) 
+            {
+                _randomEnchantID += 20;
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">>>> Add nice weapon enchant id:%d", _randomEnchantID);
+            }
 
             else if (itemProto->Class == ITEM_CLASS_ARMOR) 
             {

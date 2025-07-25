@@ -3075,7 +3075,7 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
 	//if (HasAura(30966)) xp *= 2;
 
     //qzqstar, 250509, mode of the killer according to crature types
-    if (victim && victim->IsCreature())
+    if (GetLevel() < 60 && victim && victim->IsCreature())
     {
 		const Creature* _creature = victim->ToCreature();
         if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_HUMAN)
@@ -15654,8 +15654,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_BEAST)  { _ModeText.append(__STR("杀手模式（野兽）、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_UNDEAD)  { _ModeText.append(__STR("杀手模式（亡灵）、、 ")); __xpRate = 1.0f;}
 
-    if(M_Challenge_Mode > 0) PSendSysMessage("【注意】你已经开启以下挑战模式：%s 。 ", _ModeText.c_str());
-    else PSendSysMessage("【注意】你没有开启任何挑战模式，只能一级开启。 ");
+    if(M_Challenge_Mode > 0 && GetLevel() < 60) PSendSysMessage("【注意】你已经开启以下挑战模式：%s 。 ", _ModeText.c_str());
+    else if(GetLevel() <= 50 ) PSendSysMessage("【注意】你没有开启任何挑战模式，只能一级开启。 ");
 
 	SetPersonalXpRate(__xpRate);
     UpdateSpeed(MOVE_RUN, false);
@@ -19264,7 +19264,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
 
     //qzqstar, 250501, add support for the vouchers.
-    if (vendorGuid.GetEntry() == 30000)
+    if (vendorGuid.GetEntry() == ZQ_NPC_KELALA)
     {
         //skip the item those has price in gold
         if(pProto->BuyPrice == 0)
@@ -21378,6 +21378,12 @@ uint32 Player::CalculateTalentsPoints() const
 	//if (HasSpell(__SPELL_VIP))   talentPointsForLevel += 5;
 	//if (HasSpell(30010))         talentPointsForLevel += 5; //shanshan special
     //if (HasSpell(30851))         talentPointsForLevel += 5; //collect bonus
+
+    if((M_Challenge_Mode & CHALLENGING_MODE_DONE_TASK) == CHALLENGING_MODE_DONE_TASK)
+    {
+        talentPointsForLevel += 5;
+    }
+
 	return talentPointsForLevel;
 }
 

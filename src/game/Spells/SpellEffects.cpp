@@ -865,7 +865,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					//Check Mage
 					else if (player->GetClass() == CLASS_MAGE)
 					{
-						//check if has glass cannon
+						//check if has glass canon
 						if (player->HasSpell(31051))
 						{
 							//int32 maxMana = player->GetMaxPower(POWER_MANA);
@@ -1318,33 +1318,9 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						return;
 					}
 
-					if (itemTarget->GetProto()->Quality == 3)
+					if (itemTarget->GetProto()->Quality < 2)
 					{
-						// blues quality
-					}
-					else if (itemTarget->GetProto()->Quality == 4)
-					{
-						// purple quality
-						// need extra Nexus Crystal 20725
-						/*
-						if ((m_caster->ToPlayer())->GetItemCount(20725) == 0)
-						{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage("Not enought materials!");
-						return;
-						}
-
-						//remove one Nexus Crystal
-						auto __item = (m_caster->ToPlayer())->GetItemByGuid()
-						(m_caster->ToPlayer())->RemoveItem()*/
-					}
-					else if (itemTarget->GetProto()->Quality == 5)
-					{
-						// yellow quality
-						// need extra Nexus Crystal 20725 and dq ZQ_ITEM_VOUCHER
-					}
-					else
-					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>装备等级太低!<<<")).c_str());
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>装备品质太低!<<<")).c_str());
 						return;
 					}
 

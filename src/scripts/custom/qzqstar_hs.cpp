@@ -121,7 +121,8 @@ uint32 __rune_need_num(Player *player)
 {
 	auto needNum = 0;
 	auto freeNum = 2;
-	//if (player->HasSpell(__MODE_KILLER) || player->HasSpell(__MODE_KILLER_REWARD)) freeNum += 1;
+	
+	if (player->GetLevel()==60 && ( (player->M_Challenge_Mode & CHALLENGING_MODE_DONE_MANUFACT) == CHALLENGING_MODE_DONE_MANUFACT)) freeNum += 1;
 
 	int32 curslots = __rune_slot_numbers(player);
 
@@ -647,6 +648,12 @@ bool static __localHandleGroupCommand(Player *pPlayer, uint32 action)
 					//fufill request
 					if (pMember->IsAlive())
 					{
+
+						if(pMember->HasAura(15007))
+						{
+							pMember->RemoveAurasDueToSpell(15007);
+						}
+
 						pMember->SetHealth(pMember->GetMaxHealth());
 						if (pMember->GetPowerType() == POWER_MANA)
 							pMember->SetPower(POWER_MANA, pMember->GetMaxPower(POWER_MANA));

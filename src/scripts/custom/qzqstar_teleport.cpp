@@ -524,23 +524,23 @@ bool Menus_teleport_Common(Player *player, Creature *_cr, uint32 sender, uint32 
 			//display the main menus of professions
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝　花费点券或金币直升专业　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
-			if(player->HasSkill(SKILL_HERBALISM) && player->GetSkillMax(SKILL_HERBALISM) < 300)	
+			if(player->HasSkill(SKILL_HERBALISM) && player->GetSkillValuePure(SKILL_HERBALISM) < 300)	
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　采　药　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 1);
-			if (player->HasSkill(SKILL_ALCHEMY) && player->GetSkillMax(SKILL_ALCHEMY) < 300)
+			if (player->HasSkill(SKILL_ALCHEMY) && player->GetSkillValuePure(SKILL_ALCHEMY) < 300)
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　炼　金　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 2);
-			if (player->HasSkill(SKILL_MINING) && player->GetSkillMax(SKILL_MINING) < 300)
+			if (player->HasSkill(SKILL_MINING) && player->GetSkillValuePure(SKILL_MINING) < 300)
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　采　矿　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 3);
-			if (player->HasSkill(SKILL_BLACKSMITHING) && player->GetSkillMax(SKILL_BLACKSMITHING) < 300)
+			if (player->HasSkill(SKILL_BLACKSMITHING) && player->GetSkillValuePure(SKILL_BLACKSMITHING) < 300)
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　锻　造　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 4);
-			if (player->HasSkill(SKILL_SKINNING) && player->GetSkillMax(SKILL_SKINNING) < 300)
+			if (player->HasSkill(SKILL_SKINNING) && player->GetSkillValuePure(SKILL_SKINNING) < 300)
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　剥　皮　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 5);
-			if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetSkillMax(SKILL_LEATHERWORKING) < 300)
+			if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetSkillValuePure(SKILL_LEATHERWORKING) < 300)
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　制　皮　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 6);
-			if (player->HasSkill(SKILL_TAILORING) && player->GetSkillMax(SKILL_TAILORING) < 300)
+			if (player->HasSkill(SKILL_TAILORING) && player->GetSkillValuePure(SKILL_TAILORING) < 300)
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　裁　缝　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 7);
-			if (player->HasSkill(SKILL_ENCHANTING) && player->GetSkillMax(SKILL_ENCHANTING) < 300)
+			if (player->HasSkill(SKILL_ENCHANTING) && player->GetSkillValuePure(SKILL_ENCHANTING) < 300)
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　附　魔　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 8);
-			if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillMax(SKILL_ENGINEERING) < 300)
+			if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValuePure(SKILL_ENGINEERING) < 300)
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　工　程　　＜＝＝　")), GOSSIP_SENDER_MAIN, action + 9);
 
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("＝注意：需要先学习该技能才能直升。＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);

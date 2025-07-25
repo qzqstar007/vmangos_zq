@@ -651,6 +651,8 @@ bool Menus_Kelala_Shop(Player *player, Creature *_Creature, uint32 sender, uint3
 #define __MENU_MODE_SUB_5_ACT_1					(__MENU_MODE_SUB_5 + 1)
 #define __MENU_MODE_SUB_5_SPELL					(30849)
 
+#define __MENU_MODE_SUB_6						(__MENU_MODE_SUB_5 + 10)
+
 //Mode function
 #define __MENU_MODE_SUB_31						(__MENU_MODE_MAIN + 100)
 #define	__MENU_MODE_SUB_31_NAME					"[装等模式：查看装等，突破等级]"
@@ -684,14 +686,29 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		case __MENU_MODE_MAIN:
 		{
 			player->ADD_GOSSIP_ITEM(5, __STR("＝＝满级退出挑战，领取奖励＝＝"), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Mode main] player:%s, M_Mode:0x%X", player->GetName(), player->M_Challenge_Mode);
+
 			//Five Modes Exit
-			if (player->GetLevel() == 60 && player->HasSpell(__MENU_MODE_SUB_1_SPELL)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_1_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_1);
-			if (player->GetLevel() == 60 && player->HasSpell(__MENU_MODE_SUB_2_SPELL)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_2_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_2);
-			if (player->GetLevel() == 60 && player->HasSpell(__MENU_MODE_SUB_3_SPELL)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_3_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_3);
-			if (player->GetLevel() == 60 && player->HasSpell(__MENU_MODE_SUB_4_SPELL)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_4_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_4);
-			if (player->GetLevel() == 60 && player->HasSpell(__MENU_MODE_SUB_5_SPELL)) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_5_NAME)), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_5);
-
-
+			/*					case 1:	 _Mode |= CHALLENGING_MODE_ONELIFE; break;
+					case 2:	 _Mode |= CHALLENGING_MODE_MANUFACT; break;
+					case 3:	 _Mode |= CHALLENGING_MODE_TASK; break;
+					case 4:	 _Mode |= CHALLENGING_MODE_EQUIPMENT; break;
+					case 5:	 _Mode |= CHALLENGING_MODE_RICH; break;*/
+			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_ONELIFE) && ( (player->M_Challenge_Mode & CHALLENGING_MODE_DONE_ONELIFE) == 0) ) 
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出一命模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_1);
+			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_MANUFACT) && ( (player->M_Challenge_Mode & CHALLENGING_MODE_DONE_MANUFACT) == 0) ) 
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出工匠模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_2);
+			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_TASK) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_TASK) == 0) )
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出任务模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_3);
+			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_EQUIPMENT) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_EQUIPMENT) == 0) )
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出装等模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_4);
+			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_RICH) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_RICH) == 0) )
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出富豪模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_5);
+			if (player->GetLevel() == 60 
+				&& ((player->M_Challenge_Mode & CHALLENGING_MODE_KILLER_MASK) != 0)
+				&& ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_KILLER) == 0) )
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　领取杀手模式奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_6);
+			
 			player->ADD_GOSSIP_ITEM(5, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->ADD_GOSSIP_ITEM(5, __STR("＝＝＝＝模式功能＝＝＝＝"), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			
@@ -708,85 +725,60 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		}
 
 		case __MENU_MODE_SUB_1: 
-		{	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_1_NAME)), GOSSIP_SENDER_MAIN, __MENU_NONE);
-			player->ADD_GOSSIP_ITEM(5, __STR(__RED("==|确定退出|===")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_1+1);
-			/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==取消===", GOSSIP_SENDER_MAIN, __MENU_NONE); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
-		}
-		case __MENU_MODE_SUB_1 + 1:
-		{	if (player->HasSpell(__MENU_MODE_SUB_1_SPELL))
-			{
-				//One Life mode
-				player->AddItem(30106);
-				player->AddItem(ZQ_ITEM_VOUCHER, 600);
-				player->RemoveSpell(__MENU_MODE_SUB_1_SPELL, false, false);
-			}
-			/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
-		}
-
-		case __MENU_MODE_SUB_2:
-		{	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_2_NAME)), GOSSIP_SENDER_MAIN, __MENU_NONE);
-		player->ADD_GOSSIP_ITEM(5, __STR(__RED("==|确定退出|===")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_2 + 1);
-		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==取消===", GOSSIP_SENDER_MAIN, __MENU_NONE); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
-		}
-		case __MENU_MODE_SUB_2 + 1:
-		{	if (player->HasSpell(__MENU_MODE_SUB_2_SPELL))
-			{
-				//ZQ mode, 5 talents
-				player->LearnSpell(30851, false);
-				player->AddItem(ZQ_ITEM_VOUCHER, 300);
-				player->RemoveSpell(__MENU_MODE_SUB_2_SPELL, false, false);
-			}
-		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，小退生效，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
-		}
-
-		case __MENU_MODE_SUB_3:
-		{	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_3_NAME)), GOSSIP_SENDER_MAIN, __MENU_NONE);
-		player->ADD_GOSSIP_ITEM(5, __STR(__RED("==|确定退出|===")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_3 + 1);
-		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==取消===", GOSSIP_SENDER_MAIN, __MENU_NONE); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
-		}
-		case __MENU_MODE_SUB_3 + 1:
 		{	
-			if (player->HasSpell(__MENU_MODE_SUB_3_SPELL))
-			{
-				//ZQ mode, 5 talents
-				player->LearnSpell(30853, false);
-				player->AddItem(ZQ_ITEM_VOUCHER, 300);
-				player->RemoveSpell(__MENU_MODE_SUB_3_SPELL, false, false);
-			}
-		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
+			//One Life mode
+			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_ONELIFE;
+			player->M_Challenge_Mode &= ~CHALLENGING_MODE_ONELIFE;
+			player->AddItem(ZQ_ITEM_TURTLE);
+			player->AddItem(ZQ_ITEM_VOUCHER, 600);
+			player->ADD_GOSSIP_ITEM(5, "<==成功退出一命模式，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
+			break;
 		}
 
-		case __MENU_MODE_SUB_4:
-		{	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_4_NAME)), GOSSIP_SENDER_MAIN, __MENU_NONE);
-		player->ADD_GOSSIP_ITEM(5, __STR(__RED("==|确定退出|===")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_4 + 1);
-		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==取消===", GOSSIP_SENDER_MAIN, __MENU_NONE); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
+		case __MENU_MODE_SUB_2: //manufact
+		{	
+			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_MANUFACT;
+			player->AddItem(ZQ_ITEM_VOUCHER, 300);
+			player->ADD_GOSSIP_ITEM(5, "<==成功获取工匠奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
+			break;
 		}
-		case __MENU_MODE_SUB_4 + 1:
-		{	//if (player->HasSpell(__MENU_MODE_SUB_4_SPELL)) player->RemoveSpell(__MENU_MODE_SUB_4_SPELL, false, false);
-			if (player->HasSpell(__MENU_MODE_SUB_4_SPELL))
-			{
-				//ZQ mode, 5 talents
-				player->AddItem(30522, 10);
-				player->AddItem(ZQ_ITEM_VOUCHER, 300);
-				player->RemoveSpell(__MENU_MODE_SUB_4_SPELL, false, false);
-			}
-		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
+
+		case __MENU_MODE_SUB_3: //Task
+		{	
+			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_TASK;
+			player->AddItem(ZQ_ITEM_VOUCHER, 300);
+			player->ADD_GOSSIP_ITEM(5, "<==成功获取任务奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
+			break;
+		}
+		case __MENU_MODE_SUB_4: //Equipment
+		{	
+			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_EQUIPMENT;
+			player->AddItem(ZQ_ITEM_VOUCHER, 300);
+			player->ADD_GOSSIP_ITEM(5, "<==成功获取装等奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
+			break;
 		}
 		
 		case __MENU_MODE_SUB_5:
-		{	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE(__MENU_MODE_SUB_5_NAME)), GOSSIP_SENDER_MAIN, __MENU_NONE);
-		player->ADD_GOSSIP_ITEM(5, __STR(__RED("==|确定退出|===")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_5 + 1);
-		/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==取消===", GOSSIP_SENDER_MAIN, __MENU_NONE); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
+		{	
+			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_RICH;
+			player->M_Challenge_Mode &= ~CHALLENGING_MODE_RICH;
+			player->AddItem(ZQ_ITEM_GOLD_BAR, 5);
+			player->ADD_GOSSIP_ITEM(5, "<==成功获取富豪奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
+			break;
 		}
-		case __MENU_MODE_SUB_5 + 1:
-		{	if (player->HasSpell(__MENU_MODE_SUB_5_SPELL))
-			{
-				//Killer mode, free run slots
-				player->LearnSpell(30852, false);
-				player->AddItem(ZQ_ITEM_VOUCHER, 300);
-				player->RemoveSpell(__MENU_MODE_SUB_5_SPELL, false, false);
-			}
-			/*FIX*/player->ADD_GOSSIP_ITEM(5, "<==成功退出，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); break;
+
+		case __MENU_MODE_SUB_6:
+		{	
+			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_KILLER;
+			player->AddItem(ZQ_ITEM_VOUCHER, 300);
+			player->ADD_GOSSIP_ITEM(5, "<==成功获取杀手奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
+			break;
 		}
 
 		//Advanced the level

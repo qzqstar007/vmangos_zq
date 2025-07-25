@@ -497,6 +497,10 @@ struct SpellCastingScript : public SpellScript
             if (!spell->GetUnitTarget())
                 return false;
 
+
+            //disable the casting of cast
+            //return false;
+
             if (Player* player = spell->GetCaster()->ToPlayer())
             {
                 uint32_t spell_id = sQZAchievements.GetSkillsCollectActiveID(player);
@@ -512,6 +516,19 @@ struct SpellCastingScript : public SpellScript
 
                 if (spellInfo)
                 {
+
+					if (spellInfo->DurationIndex == 21)
+					{
+						ChatHandler(player).PSendSysMessage(((std::string)(">>>该技能为永久型，无法使用。<<<")).c_str());
+						return false;
+					}
+
+					if (spellInfo->Effect[0] == SPELL_EFFECT_APPLY_AURA  && spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOD_CHARM)
+					{
+						ChatHandler(player).PSendSysMessage(((std::string)(">>>禁用占据、心控类技能。<<<")).c_str());
+						return false;
+					}
+
                 	if(spellInfo->EffectImplicitTargetA[0] == TARGET_UNIT_CASTER)	
                     {
                         if(player->HasAura(spell_id) == false)

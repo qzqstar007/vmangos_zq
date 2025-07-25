@@ -46,7 +46,8 @@
 #define __MENU_BG_MAIN_AV				 (30)
 #define	__MENU_BG_RW_OFFSET				(100)
 
-#define	__MENU_BG_ENCHANT   			(900)
+#define	__MENU_BG_ENCHANT   			(800)
+#define	__MENU_BG_RANDOMPROP 			(900)
 
 bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 {
@@ -82,7 +83,6 @@ bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR("③－奥特兰克奖章　"), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_MAIN_AV + __MENU_BG_RW_OFFSET);
  
 		//add player killers 
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
 		uint32 _rawpoints = sQZAchievements.GetSocialPointsPVP(player);
 		uint32 _weekpoints = _rawpoints % 10000;
 		uint32 _totalpoints = _rawpoints / 10000;
@@ -105,7 +105,8 @@ bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 
 		if(_title >= 1)
 		{
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　将此称号附魔至战袍　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_ENCHANT + _title);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("＝＞　将此称号附魔至战袍　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_ENCHANT + _title);
+			//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("＞　战场牌子重置衬衣、战袍随机附魔　＜")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_RANDOMPROP);
 		}
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
@@ -160,7 +161,7 @@ bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 		
 		//each Mark of Honor can be used to reward 100 reputaion
 	}
-	else if (action > __MENU_BG_MAIN + __MENU_BG_ENCHANT)
+	else if (action > __MENU_BG_MAIN + __MENU_BG_ENCHANT && action < __MENU_BG_MAIN + __MENU_BG_RANDOMPROP)
 	{
 		uint32 absAction = action - __MENU_BG_MAIN - __MENU_BG_ENCHANT;
 
@@ -187,6 +188,53 @@ bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 		}
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 	}
+	else if (action >= __MENU_BG_MAIN + __MENU_BG_RANDOMPROP)
+	{
+		uint32 absAction = action - __MENU_BG_MAIN - __MENU_BG_RANDOMPROP;
+
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　将衬衣战袍放于行囊第一格。　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_RANDOMPROP + 1);
+
+		if(absAction == 0)
+		{
+			//display the menu
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　重置　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_RANDOMPROP + 1);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　随机属性　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_RANDOMPROP + 2);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　随机属性　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN + __MENU_BG_RANDOMPROP + 3);
+
+		}
+		//check the player's slot of chest
+		if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TABARD))
+		{
+			if (pItem->GetProto()->ItemId != ZQ_ITEM_ZHANPAO)
+			{
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　请确认战袍是否已装备。　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+			}else if(absAction >= 1 && absAction <= 4)
+			{
+				pItem->SetItemRandomProperties(ZQ_ENCHANT_KILLERS + absAction);
+				//pItem->SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_0), ZQ_ENCHANT_KILLERS + absAction, 0, 0);	
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　称号已随机附魔至战袍　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+				pItem->SendForcedObjectUpdate();
+			}else 
+			{
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　出错，速度联系ＧＭ。　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+			}
+		}
+		else
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　请确认战袍是否已装备。　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+		}
+
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__RED("＝＞　继续重置　＜＝")), GOSSIP_SENDER_MAIN, action);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＞　返回主页　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
+
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+	}
+
+
+
+
 
 	return true;
 }

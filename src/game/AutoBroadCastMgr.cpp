@@ -140,34 +140,95 @@ void AutoBroadCastMgr::Update(uint32 diff)
 		//1. update pets
 		UpdatePetStatus();
 
-
-        //2. add battlebots only once.
+        // init the battle bot 
         if(_lastBroadCast10Min == 2)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Battle Ground ...] Add only once .....................");
             uint32 _maxlevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+            
+            std::string str = "【注意】三大战场已经开启！！  ";
+            sWorld.SendServerMessage(SERVER_MSG_CUSTOM, str.c_str(), nullptr);
 
-            for(int i = 0; i < 5; i++)
+            if(_maxlevel > 10)
             {
-				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_WS, ALLIANCE, _maxlevel, false);
-				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_WS, HORDE, _maxlevel, false);
+                for(int i = 0; i < 4; i++)
+                {
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_WS, ALLIANCE, _maxlevel, false);
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_WS, HORDE, _maxlevel, false);
+                }
             }
 
-            for(int i = 0; i < 10; i++)
+            if(_maxlevel > 30)
             {
-				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AB, ALLIANCE, _maxlevel, false);
-				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AB, HORDE, _maxlevel, false);
+                for(int i = 0; i < 8; i++)
+                {
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AB, ALLIANCE, _maxlevel, false);
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AB, HORDE, _maxlevel, false);
+                }
             }
 
-            for(int i = 0; i < 20; i++)
+            
+            if(_maxlevel > 50)
             {
-				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AV, ALLIANCE, _maxlevel, false);
-				sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AV, HORDE, _maxlevel, false);
-            }         
-
-
+                for(int i = 0; i < 15; i++)
+                {
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AV, ALLIANCE, _maxlevel, false);
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AV, HORDE, _maxlevel, false);
+                }      
+            }   
+            
             //sWorld.SendWorldText(BCT_BG_AV_START_ONE_MINUTE);
         }
+        //2. add battlebots only once.
+        /*
+        if(_lastBroadCast10Min % 6 == 2)
+        {
+            uint32 _maxlevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+            
+            if((_maxlevel > 10) && ((_lastBroadCast10Min/6)%3 == 0))
+            {
+                std::string str = "【注意】战场：战歌峡谷已经开启！！  ";
+			    sWorld.SendServerMessage(SERVER_MSG_CUSTOM, str.c_str(), nullptr);
+                for(int i = 0; i < 4; i++)
+                {
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_WS, ALLIANCE, _maxlevel, true);
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_WS, HORDE, _maxlevel, true);
+                }
+            }
+
+            if((_maxlevel > 30) && ((_lastBroadCast10Min/6)%3 == 1))
+            {
+                std::string str = "【注意】战场：阿拉希盆地已经开启！！  ";
+			    sWorld.SendServerMessage(SERVER_MSG_CUSTOM, str.c_str(), nullptr);
+                for(int i = 0; i < 8; i++)
+                {
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AB, ALLIANCE, _maxlevel, true);
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AB, HORDE, _maxlevel, true);
+                }
+            }
+
+            
+            if((_maxlevel > 50) && ((_lastBroadCast10Min/6)%3 == 2))
+            {
+                std::string str = "【注意】战场：奥山已经开启！！  ";
+			    sWorld.SendServerMessage(SERVER_MSG_CUSTOM, str.c_str(), nullptr);
+                for(int i = 0; i < 15; i++)
+                {
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AV, ALLIANCE, _maxlevel, true);
+                    sPlayerBotMgr.AddBattleBot(BATTLEGROUND_QUEUE_AV, HORDE, _maxlevel, true);
+                }      
+            }   
+            
+            //sWorld.SendWorldText(BCT_BG_AV_START_ONE_MINUTE);
+        }*/
+/*
+        if(_lastBroadCast10Min % 6 == 5)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Battle Ground ...] Remove all bots .....................");
+            sPlayerBotMgr.DeleteBattleBots();
+
+            std::string str = "注意，战场已经关闭，稍后重新开启下一战场，请关注系统消息。  ";
+			sWorld.SendServerMessage(SERVER_MSG_CUSTOM, str.c_str(), nullptr);
+        }*/
     }
 
     //60min section
