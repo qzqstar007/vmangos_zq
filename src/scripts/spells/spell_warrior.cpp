@@ -60,9 +60,12 @@ struct WarriorShieldSlamScript : SpellScript
 {
     bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
+        //qzqstar, 250728, more damge of shiled slam
         if (effIdx == EFFECT_INDEX_1 && spell->m_casterUnit)
         {
-            spell->damage += spell->m_casterUnit->GetShieldBlockValue();
+            uint32_t multiplier = 1;
+            if(spell->m_casterUnit->HasSpell(31033)) multiplier = 50;
+            spell->damage += spell->m_casterUnit->GetShieldBlockValue() * multiplier;
         }
         return true;
     }

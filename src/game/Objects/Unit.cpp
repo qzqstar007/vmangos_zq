@@ -1357,7 +1357,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
 							_insData->CustomDifficultyMask &= 0xFFFE;
                             uint32_t _acmapID = QZQSTAR_GET_AC_MAPID(pCreatureVictim->GetMapId());
 
-                            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "!!! Complete the %s dungeon, need send rewards.", TP_Dungeons[_acmapID].name);
+                            //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "!!! Complete the %s dungeon, need send rewards.", TP_Dungeons[_acmapID].name);
 
 							Achievement_t _mapType = ACHIEVEMENTS_DUNGEONS;
 							if (GetMap()->IsRaid())
@@ -1378,8 +1378,15 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
                                     if( ((_dungeonInfo >> 2) <= (_difficulty&3) ) && ( (_dungeonInfo>>2) < 3))
                                     {
                                         sQZAchievements.SetDungeonsInfo(_mapType, player, _acmapID, ((_dungeonInfo>>2) + 1) << 2 | (_difficulty&3) );
-                                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, from %u to %u.", player->GetName(), TP_Dungeons[_acmapID].name, _dungeonInfo>>2, (_dungeonInfo>>2) +1);
+                                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, from %u to %u.", player->GetName(), 
+                                            GetMap()->IsRaid()? TP_Raids[_acmapID].name:TP_Dungeons[_acmapID].name, _dungeonInfo>>2, (_dungeonInfo>>2) +1);
                                         //First break through
+
+                                        if(GetMap()->IsRaid())
+                                        {
+                                            //add reset raid scroll
+                                            player->AddItem(TP_Raids[_acmapID].npc_list[8], 1);
+                                        }
                                     }
 
                                     #ifndef __STR
@@ -1388,10 +1395,11 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
 
                                     
                                     std::string _diffDesc = _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 ");
-                                    ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_CPLT_NPCS, TP_Dungeons[_acmapID].name, _diffDesc);
+                                    ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_CPLT_NPCS, 
+                                        GetMap()->IsRaid()? TP_Raids[_acmapID].name:TP_Dungeons[_acmapID].name, _diffDesc);
 
                                     
-                                    if(TP_Dungeons[_acmapID].npc_list[8] > 10)
+                                    if(GetMap()->IsDungeon() && TP_Dungeons[_acmapID].npc_list[8] > 10)
                                     {
                                         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, difficulty: %u, Need Reward ....", player->GetName(), TP_Dungeons[_acmapID].name, _difficulty&3);
                                         player->AddItem(TP_Dungeons[_acmapID].npc_list[8] + (_dungeonInfo&3), TP_Dungeons[_acmapID].npc_list[9]);

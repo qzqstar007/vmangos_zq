@@ -829,13 +829,13 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     if( ((itemProto->Class == ITEM_CLASS_WEAPON) ||(itemProto->Class == ITEM_CLASS_ARMOR) ) && (itemProto->Quality > 1) &&(roll_chance_i(50)) )
     {
         uint32 _randomEnchantID = 0;
-        if(itemProto->ItemLevel < 20) _randomEnchantID = 3301 + difficulty * 5;
-        else if(itemProto->ItemLevel < 35) _randomEnchantID = 3302 + difficulty * 5;
-        else if(itemProto->ItemLevel < 55) _randomEnchantID = 3303 + difficulty * 5;
-        else if(itemProto->ItemLevel < 68) _randomEnchantID = 3304 + difficulty * 5;
+        if(itemProto->ItemLevel < 40) _randomEnchantID = 3301 + difficulty * 5;
+        else if(itemProto->ItemLevel < 63) _randomEnchantID = 3302 + difficulty * 5;
+        else if(itemProto->ItemLevel < 70) _randomEnchantID = 3303 + difficulty * 5;
+        else if(itemProto->ItemLevel < 78) _randomEnchantID = 3304 + difficulty * 5;
         else _randomEnchantID = 3305 + difficulty * 5;
 
-
+        /*
         if(roll_chance_i(20)) 
         {
             //3321 starting from ... 
@@ -850,7 +850,7 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
                 //
                 //if(itemProto->InventoryType == )
             }
-        }
+        }*/
 
         return _randomEnchantID;
     }
@@ -934,7 +934,8 @@ void Item::SetItemRandomProperties(int32 randomPropId)
         ItemRandomPropertiesEntry const* item_rand = sItemRandomPropertiesStore.LookupEntry(randomPropId);
         if (item_rand)
         {
-            if (GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) != int32(item_rand->ID))
+            //if (GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) != int32(item_rand->ID))
+            if(true)
             {
                 SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, item_rand->ID);
                 SetState(ITEM_CHANGED);

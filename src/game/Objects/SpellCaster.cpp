@@ -1088,7 +1088,15 @@ float SpellCaster::MeleeDamageBonusDone(Unit const* pVictim, float pdamage, Weap
     float DonePercent   = 1.0f;
 
     if (!isWeaponDamageBasedSpell && GetTypeId() == TYPEID_UNIT && !(IsPet() && ((Creature*)this)->GetOwnerGuid().IsPlayer()))
-        DonePercent *= Creature::_GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
+    {
+        //ZG BOSS entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
+        uint32_t _cEntry = ((Creature*)this)->GetCreatureInfo()->entry;
+        if( _cEntry == 14510 || _cEntry == 14509 || _cEntry == 14507 ||   //14517 Jeklik
+            _cEntry == 14515 || _cEntry == 11382 || _cEntry == 14834 || _cEntry == 11380)
+            DonePercent *= 2.1f; //8.1f
+        else 
+            DonePercent *= Creature::_GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
+    }
 
     // ..done pct, already included in weapon damage based spells
     if (pUnit && !isWeaponDamageBasedSpell)
@@ -1333,7 +1341,15 @@ float SpellCaster::SpellDamageBonusDone(Unit const* pVictim, SpellEntry const* s
 
     // Creature damage
     if (GetTypeId() == TYPEID_UNIT && !(IsPet() && ((Creature*)this)->GetOwnerGuid().IsPlayer()))
-        DoneTotalMod *= Creature::_GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
+    {
+        uint32_t _cEntry = ((Creature*)this)->GetCreatureInfo()->entry;
+        //ZG BOSS entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
+        if(_cEntry == 14510 || _cEntry == 14509 || _cEntry == 14507 || //_cEntry == 14517 ||  14517 remove jelik
+            _cEntry == 14515 || _cEntry == 11382 || _cEntry == 14834 || _cEntry == 11380)
+            DoneTotalMod *= 2.1f; //8.1f
+        else 
+            DoneTotalMod *= Creature::_GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
+    }
 
     if (pUnit)
     {

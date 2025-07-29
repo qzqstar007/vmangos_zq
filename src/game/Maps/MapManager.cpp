@@ -515,7 +515,8 @@ Map* MapManager::CreateInstance(uint32 id, Player* player)
     if (entry && entry->IsRaid()) //Attention Null ptr!
         _mapType = ACHIEVEMENTS_RAIDS;
     uint32 _map_difficulty = sQZAchievements.GetDungeonsInfo(_mapType, player, ac_mapid) & 0x03;
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MapManager::CreateInstance: Player:%s, mapid %d, ac_mapid %d, difficulty %d", player->GetName(), id, ac_mapid, _map_difficulty);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "MapManager::CreateInstance: Player:%s, mapid %d, ac_mapid %d, difficulty %d", player->GetName(), id, ac_mapid, _map_difficulty);
+
 
     if (entry->IsBattleGround())
     {
@@ -628,7 +629,14 @@ DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPe
         //init the NPC list of this map
         for(int i=0; i<10; i++)
         {
-            pInstanceData->CustomDifficulty_NPC[i] = TP_Dungeons[QZQSTAR_GET_AC_MAPID(id)].npc_list[i]; //inited
+			if (map->IsRaid())
+			{
+				pInstanceData->CustomDifficulty_NPC[i] = TP_Raids[QZQSTAR_GET_AC_MAPID(id)].npc_list[i]; //inited
+			}else
+			{
+
+				pInstanceData->CustomDifficulty_NPC[i] = TP_Dungeons[QZQSTAR_GET_AC_MAPID(id)].npc_list[i]; //inited
+			}
         }
     }
 

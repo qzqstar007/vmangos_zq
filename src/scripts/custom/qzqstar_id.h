@@ -67,6 +67,15 @@
 //Bonus Box
 #define ZQ_ITEM_BONUS_BOX			30088	//Bonus Box, 奖励宝箱 ~ 30061
 
+//raid Reset 
+#define ZQ_ITEM_RAID_ZG             30091   //Raid ZG, 副本重置
+#define ZQ_ITEM_RAID_MC             30092   //Raid HL, 副本重置黑龙MM
+#define ZQ_ITEM_RAID_HL             30093   //Raid MC, 副本重置MC
+#define ZQ_ITEM_RAID_FX             30094   //Raid BWL, 副本重置BWL
+#define ZQ_ITEM_RAID_BWL            30095   //Raid FX, 副本废墟
+#define ZQ_ITEM_RAID_TAQ            30096   //Raid TAQ, 副本TZQ
+#define ZQ_ITEM_RAID_NAXX           30097   //Raid NAXX, 副本NAXX
+
 /******************************************************************** 
  *  Spell IDs, largest first (33386).
  ********************************************************************/
@@ -92,6 +101,7 @@
 #define ZQ_SPELL_ACHIEVE_STOLE		33363	//Achieve Stolen, 偷取
 #define ZQ_SPELL_ACHIEVE_CAST		33364	//Achieve Cast, 施法
 
+
 #define ZQ_SPELL_SPELL_CHUAN_PROPERTY	33365	//Spell Chuan Property, 传家宝属性
 #define ZQ_SPELL_SPELL_CHUAN_APSP   	33366	//Spell Chuan APSP, 传家宝法强攻强
 #define ZQ_SPELL_SPELL_CHUAN_HASTE	    33367	//Spell Chuan Haste, 传家宝急速
@@ -107,12 +117,15 @@
 #define ZQ_SPELL_BUFF_WARCHIEF      33357   //Call of Warchief
 #define ZQ_SPELL_BUFF_ZANDALA       33358   //Call of ZANDALA
 
-
+#define ZQ_SPELL_RERANDOM			33348	//Rerandom, 随机附魔重置
 
 
 #define ZQ_SPELL_PET_AURA           33311   //Pet Aura, 宠物光环 33311-33317
 #define ZQ_SPELL_PET_TRIGGERED      33321   //Pet Triggered Spell, 宠物触发技能 33321-33327, never forget the spell_Proc
 
+#define SPELL_ENCHANT_WEAPON_BEGIN      32511
+#define SPELL_ENCHANT_ARMOR_BEGIN       32521
+#define SPELL_ENCHANT_JEWELRY_BEGIN     32526
 
 #define ZQ_SPELL_MOUNTS_REINDEER            32980   //Mounts, 麋鹿新手坐骑
 #define ZQ_SPELL_MOUNTS_REINDEER_LEARN      32981   //Mounts, 麋鹿新手坐骑
@@ -311,6 +324,22 @@ update item_template set required_spell = 0 where required_spell > 0;
 //制造类的法术释放时间降低
 update spell_template set castingTimeIndex=5 where effect1=24 and castingTimeIndex>5;
 update spell_template set startRecoveryTime=1100 where startRecoveryTime=1500;
+
+//掉落G
+update creature_template set gold_min = gold_min/20, gold_max=gold_max/20 where gold_max > 50000;
+
+//ZG BOSS
+14510 update creature_template set health_multiplier=2000, damage_multiplier=50 where entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
+14509 
+14507
+14517
+14515
+11382
+14834
+11380
+
+
+                    ChatHandler(m_caster->ToPlayer()).HandleInstanceUnbindHelper(m_caster->ToPlayer(), false, 0);
 
 */
 

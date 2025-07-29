@@ -134,8 +134,9 @@ const Teleport_Point_t TP_Dungeons[] = {
 
 const Teleport_Point_t TP_Raids[] = {
 	// Makeup from upper comment, reverse order
-	{0, MAP_ZUL_GURUB,      	__XSTR("祖尔格拉布　"), 	MAP_ZUL_GURUB, 		-11916.9f,-1248.36f,92.5334f,4.72417f, {0}},
-	{1, MAP_MOLTEN_CORE,    	__XSTR("熔火之心　"), 		MAP_MOLTEN_CORE, 		1082.04f,-474.596f,-107.762f,5.02623f, {0}},
+	{0, MAP_ZUL_GURUB,      	__XSTR("祖尔格拉布　"), 	MAP_ZUL_GURUB, 		-11916.9f,-1248.36f,92.5334f,4.72417f, {14507,14517,14515,11382,11380,14834,7,8,30091,1}},
+	//{0, MAP_ZUL_GURUB,      	__XSTR("祖尔格拉布　"), 	MAP_ZUL_GURUB, 		-11916.9f,-1248.36f,92.5334f,4.72417f, {14507,14517,3,4,5,6,7,8,30091,1}},
+	{1, MAP_MOLTEN_CORE,    	__XSTR("熔火之心　"), 		MAP_MOLTEN_CORE, 	1082.04f,-474.596f,-107.762f,5.02623f, {0}},
 	{2, MAP_ONYXIAS_LAIR,   	__XSTR("奥妮克希亚　"), 	MAP_ONYXIAS_LAIR, 29.1607f,-71.3372f,-8.18032f,4.43584f, {0}},
 	{3, MAP_AHN_QIRAJ_RUINS, 	__XSTR("安其拉废墟　"), 	MAP_AHN_QIRAJ_RUINS, -8437.74f,1516.91f,31.9074f,2.73319f, {0}},
 	{4, MAP_BLACKWING_LAIR, 	__XSTR("黑翼之巢　"), 		MAP_BLACKWING_LAIR, -7664.76f,-1100.87f,399.679f,0.561981f, {0}},
@@ -311,6 +312,7 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 
 #pragma region Teleport Raids
 #define __MENU_TELEPORT_RAIDS_MAIN		(__MENU_TELEPORT_RAIDS)
+#define __MENU_TELEPORT_RAIDS_RESET		(10)
 #define __MENU_TELEPORT_RAIDS_ACT1		(100)
 #define __MENU_TELEPORT_RAIDS_ACT2		(200)
 
@@ -346,6 +348,34 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 		}
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+
+		//check reset scroll
+		if(player->HasItemCount(ZQ_ITEM_RAID_ZG, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置祖尔格拉布　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 1);	
+		if(player->HasItemCount(ZQ_ITEM_RAID_MC, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置奥妮克希亚　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 2);	
+		if(player->HasItemCount(ZQ_ITEM_RAID_HL, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置熔火之心　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 3);	
+		if(player->HasItemCount(ZQ_ITEM_RAID_FX, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置黑翼之巢　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 4);	
+		if(player->HasItemCount(ZQ_ITEM_RAID_BWL, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置安其拉废墟　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 5);	
+		if(player->HasItemCount(ZQ_ITEM_RAID_TAQ, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置安其拉神庙　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 6);	
+		if(player->HasItemCount(ZQ_ITEM_RAID_NAXX, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置纳克萨玛斯　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 7);	
+	}
+	else if ( (action > __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_RESET) && (action < __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_RESET*2))
+	{
+		auto absAction = action - __MENU_TELEPORT_RAIDS_MAIN - __MENU_TELEPORT_RAIDS_RESET - 1;
+
+		uint32_t needItemID = ZQ_ITEM_RAID_ZG + absAction;
+
+		if(player->HasItemCount(needItemID, 1) && (player->GetGroup() == nullptr))
+		{
+			//destroy and reset
+			player->DestroyItemCount(needItemID, 1, true, false);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("重置地图成功。 ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+			ChatHandler(player).HandleInstanceUnbindHelper(player, true, TP_Raids[absAction].tele_mapid);
+			
+		}else
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("需要退组才能使用。 ")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+		}
 	}
 	else if (action >= __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT1 && action < __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT1 + __MENU_SUB_SIZE)
 	{	
@@ -407,7 +437,9 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 
 		player->CLOSE_GOSSIP_MENU();
 		//chathandler ...
-		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Raids[_acID].name, _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "));
+		std::string monsterName = "所有BOSS";
+		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Raids[_acID].name.c_str(), _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "), monsterName.c_str());
+		
 		//teleport to the dungeon.
 		player->TeleportTo(TP_Raids[_acID].tele_mapid, TP_Raids[_acID].tele_x, TP_Raids[_acID].tele_y, TP_Raids[_acID].tele_z, TP_Raids[_acID].tele_o, TELE_TO_FORCE_MAP_CHANGE);
 

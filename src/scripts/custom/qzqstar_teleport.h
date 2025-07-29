@@ -40,6 +40,7 @@ typedef struct _teleport_point_t {
 }Teleport_Point_t;
 
 extern const Teleport_Point_t TP_Dungeons[18];
+extern const Teleport_Point_t TP_Raids[7];
 
 extern uint32 QZQSTAR_GET_AC_MAPID(uint32 mapid);
 

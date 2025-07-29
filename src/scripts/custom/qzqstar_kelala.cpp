@@ -233,6 +233,9 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 	uint32 _doneCounter = sQZAchievements.GetQuestDoneCounters(player);
 	uint32 _apBonus = PAIR32_HIPART(_doneCounter)/2;
 	uint32 _spBonus = PAIR32_HIPART(_doneCounter)/4;
+	//if(_apBonus > 5000) _apBonus = 5000;
+	//if(_spBonus > 2500) _spBonus = 2500;
+
 	if(__apsp_method == 1)  { _apBonus = _apBonus + _spBonus; _spBonus = 0; }
 	else if(__apsp_method == 2) { _spBonus = _spBonus + _apBonus/2; _apBonus = 0; }
 
@@ -697,13 +700,13 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_ONELIFE) && ( (player->M_Challenge_Mode & CHALLENGING_MODE_DONE_ONELIFE) == 0) ) 
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出一命模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_1);
 			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_MANUFACT) && ( (player->M_Challenge_Mode & CHALLENGING_MODE_DONE_MANUFACT) == 0) ) 
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出工匠模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_2);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出工匠（保留减半），领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_2);
 			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_TASK) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_TASK) == 0) )
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出任务模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_3);
 			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_EQUIPMENT) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_EQUIPMENT) == 0) )
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出装等模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_4);
 			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_RICH) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_RICH) == 0) )
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出富豪模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_5);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出富豪（退后无属性加成、考虑好）　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_5);
 			if (player->GetLevel() == 60 
 				&& ((player->M_Challenge_Mode & CHALLENGING_MODE_KILLER_MASK) != 0)
 				&& ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_KILLER) == 0) )
@@ -729,6 +732,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			//One Life mode
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_ONELIFE;
 			player->M_Challenge_Mode &= ~CHALLENGING_MODE_ONELIFE;
+			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_TURTLE);
 			player->AddItem(ZQ_ITEM_VOUCHER, 600);
 			player->ADD_GOSSIP_ITEM(5, "<==成功退出一命模式，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
@@ -739,6 +743,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		case __MENU_MODE_SUB_2: //manufact
 		{	
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_MANUFACT;
+			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_VOUCHER, 300);
 			player->ADD_GOSSIP_ITEM(5, "<==成功获取工匠奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
@@ -748,6 +753,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		case __MENU_MODE_SUB_3: //Task
 		{	
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_TASK;
+			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_VOUCHER, 300);
 			player->ADD_GOSSIP_ITEM(5, "<==成功获取任务奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
@@ -756,6 +762,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		case __MENU_MODE_SUB_4: //Equipment
 		{	
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_EQUIPMENT;
+			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_VOUCHER, 300);
 			player->ADD_GOSSIP_ITEM(5, "<==成功获取装等奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
@@ -766,6 +773,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		{	
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_RICH;
 			player->M_Challenge_Mode &= ~CHALLENGING_MODE_RICH;
+			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_GOLD_BAR, 5);
 			player->ADD_GOSSIP_ITEM(5, "<==成功获取富豪奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
@@ -775,6 +783,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		case __MENU_MODE_SUB_6:
 		{	
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_KILLER;
+			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_VOUCHER, 300);
 			player->ADD_GOSSIP_ITEM(5, "<==成功获取杀手奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
@@ -1718,6 +1727,7 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 
 		else if(_absAction >= 100 && _absAction % 100 == 0)		//main menus of the map
 		{
+			std::string text = "";
 			//the detail info of the dungeon
 			//get the mapid
 			//the action should be 100 to 1800
@@ -1846,8 +1856,48 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 
 	else if (action >= __MENU_KELALA_EQUIP_COLLECTS_RAID && action < __MENU_KELALA_EQUIP_COLLECTS_PROFESSIONAL)
 	{
+		std::string text = "";
 		//raid equip collects
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝尚未开放＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝尚未开放＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+		auto abs_action = action - __MENU_KELALA_EQUIP_COLLECTS_RAID;
+		if(abs_action == 0)
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝团本所需均为【梦魇】＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+			for (size_t i = 0; i < sizeof(TP_Raids) / sizeof(TP_Raids[0]); i++)
+			{
+				auto _raid = TP_Raids[i];	
+
+				//make up the text
+				text = __STR("|cff0000ff＝＞　");
+				text.append(_raid.name);
+				//get the player achievement info and check if the player has the achievement
+				uint32_t _achive_info = sQZAchievements.GetEquipCollectCommon(player,  ACHIEVEMENTS_COLLECTIONS_RAID, i);
+				if(_achive_info >= 0xFFF) text.append(__STR("|r ｜　|cff00bb00＜已完成＞　|r "));	
+				else text.append(__STR("|r ｜　|cffbb0000＜未完成＞　|r "));	
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS_RAID + (i+1) * 100);	
+			}
+		}
+		else if (abs_action >100)
+		{
+			if(abs_action % 100 == 0)
+			{
+				//display the raid equip info of the raid
+				auto _raid = TP_Raids[(abs_action / 100) - 1];
+
+				text = __STR("＝＝＞　|cff0000ff 地图：： ");
+				text.append(_raid.name);
+				text.append(__STR("|r　　"));
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　　尚未开放　　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			}
+		}
+
+
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+		return true;
 	}
 
 	else if (action >= __MENU_KELALA_EQUIP_COLLECTS_PROFESSIONAL && action < __MENU_KELALA_EQUIP_COLLECTS_END)

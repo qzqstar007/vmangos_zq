@@ -531,7 +531,7 @@ int32 QzqstarAchievements::GetCustomQuestID(Player * _player)
 		AchievementsEntry e = *it;
 		if (e.type == ACHIEVEMENT_CUSTOM_QUEST)
 		{
-			sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s GetCustomQuestID: %u", _player->GetName(), e.data1);
+			//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s GetCustomQuestID: %u", _player->GetName(), e.data1);
 
 			found = true;
 			return e.data1;
@@ -808,7 +808,7 @@ int32 QzqstarAchievements::GetActivePetInfo(Player * _player)
 	e.data8 = 0;
 	_playerAchievements[_player->GetGUID()].push_back(e);
 
-	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Pet: %u", _player->GetName(), e.subType);
+	//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Pet: %u", _player->GetName(), e.subType);
 
 	//default return code, means level=1, happy and relation to be zero.
 	return 110000;
@@ -1160,7 +1160,7 @@ uint32_t QzqstarAchievements::GetCollectAchiveInfo(Player *player, uint32_t item
 	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
 	_playerAchievements[player->GetGUID()].push_back(e);
 
-	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Collections: %u", player->GetName(), e.subType);
+	//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Collections: %u", player->GetName(), e.subType);
 
 	return 0;
 }
@@ -1193,7 +1193,7 @@ void QzqstarAchievements::SetCollectAchiveInfo(Player *player, uint32_t itemSetT
 	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
 	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
 	_playerAchievements[player->GetGUID()].push_back(e);
-	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Collections: %u", player->GetName(), e.subType);
+	//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Collections: %u", player->GetName(), e.subType);
 }
 
 /* ================================================================================================================== */

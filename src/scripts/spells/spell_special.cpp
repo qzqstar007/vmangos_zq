@@ -272,6 +272,7 @@ struct APSPSpellScript : public SpellScript
                 if(player->HasSpell(ZQ_SPELL_MOUNTS_TURTLE)) { basePoints0 += 30; basePoints1 += 15; }                
 
                 uint32 _doneCounter = PAIR32_HIPART(  sQZAchievements.GetQuestDoneCounters(player)  ); //each quest add 1 AP and 0.5 SP
+                //if(_doneCounter > 10000) _doneCounter = 10000;
                 basePoints0 += _doneCounter/2;
                 basePoints1 += (_doneCounter/4);
 
@@ -517,11 +518,12 @@ struct SpellCastingScript : public SpellScript
                 if (spellInfo)
                 {
 
+                    /*
 					if (spellInfo->DurationIndex == 21)
 					{
 						ChatHandler(player).PSendSysMessage(((std::string)(">>>该技能为永久型，无法使用。<<<")).c_str());
 						return false;
-					}
+					}*/
 
 					if (spellInfo->Effect[0] == SPELL_EFFECT_APPLY_AURA  && spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOD_CHARM)
 					{

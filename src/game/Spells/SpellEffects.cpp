@@ -497,9 +497,8 @@ bool Spell::OneKeyPickall(Player* caster)
 
 void Spell::EffectDummy(SpellEffectIndex effIdx)
 {
-	//qzqstar skip the 32999
-	if (!unitTarget && !gameObjTarget && !itemTarget && !corpseTarget && (m_spellInfo->Id != 32999))
-		return;
+    if (!unitTarget && !gameObjTarget && !itemTarget && !corpseTarget)
+    return;
 
     // selection by spell family
     switch (m_spellInfo->SpellFamilyName)
@@ -1263,34 +1262,52 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					return;
 				}
 
-				case 32985:
+                //33348
+				case ZQ_SPELL_RERANDOM:
 				{
 					//qzqstar, 250218, slot diamond
 					if (m_caster->GetTypeId() != TYPEID_PLAYER)
 						return;
 
+					Player *player = m_caster->ToPlayer();
+
 					itemTarget = m_targets.getItemTarget();
 					if (!itemTarget
 						|| itemTarget->GetProto()->Quality < 3
 						|| (itemTarget->GetProto()->Class != ITEM_CLASS_WEAPON && itemTarget->GetProto()->Class != ITEM_CLASS_ARMOR)
-						|| (itemTarget->GetProto()->ItemId >30400 && itemTarget->GetProto()->ItemId < 30519) /*ignore chenyi, zhanpao*/
 						)
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(">>>|只能对蓝色以上品质武器或者护甲使用|<<<!");
+                        ChatHandler(player).PSendSysMessage(((std::string)(">>>|只能对蓝色以上品质武器或者护甲使用|<<<!")).c_str());
 						return;
 					}
+
+                    if(itemTarget->GetProto()->ItemId == ZQ_ITEM_CHENYI || itemTarget->GetProto()->ItemId == ZQ_ITEM_ZHANPAO)
+                    {
+                        ChatHandler(player).PSendSysMessage(((std::string)(">>>衬衣、战袍暂时不能重新随机附魔，后续开放<<<")).c_str());
+						return;
+                    }
 
 					if (itemTarget->IsEquipped())
 					{
-						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>请注意：装备必须放在背包中！只能给自己使用！<<<")).c_str());
+						ChatHandler(player).PSendSysMessage(((std::string)(">>>请注意：装备必须放在背包中！只能给自己使用！<<<")).c_str());
 						return;
 					}
 
-					itemTarget->SetEnchantment(PROP_ENCHANTMENT_SLOT_3, 3500, 0, 0);
+                    uint32_t needMoney = itemTarget->GetProto()->ItemLevel * 1000;
 
-					//set bind
-					itemTarget->SendForcedObjectUpdate();
-					itemTarget->SetBinding(true);
+                    if(player->GetMoney() > needMoney)
+                    {
+                        player->ModifyMoney(-needMoney);
+                        itemTarget->SetItemRandomProperties(itemTarget->GetItemRandomPropertyId());
+                        //set bind
+                        itemTarget->SendForcedObjectUpdate();
+                      
+                        ChatHandler(player).PSendSysMessage(((std::string)(">>>你已经成功刷新随机附魔。<<<")).c_str());
+                    }
+                    else 
+                    {
+                        ChatHandler(player).PSendSysMessage(((std::string)(">>>你没有足够的金币，使用需要装等／１０的金币。<<<")).c_str());
+                    }
 					return;
 				}
 

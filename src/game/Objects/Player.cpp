@@ -4897,7 +4897,7 @@ void Player::KillPlayer()
 		//1. one-life, lose half of the money, exit the one-life mode 
 		//1.1 if has item - gold modal, remove it and escape the death. - item:39978
 		//if (HasSpell(__MODE_ONE_LIFE))
-        if(M_Challenge_Mode & CHALLENGING_MODE_ONELIFE)
+        if( (M_Challenge_Mode & CHALLENGING_MODE_ONELIFE) && (M_Challenge_Mode & CHALLENGING_MODE_DONE_ONELIFE) != CHALLENGING_MODE_DONE_ONELIFE)
 		{
 			//safe if full level
 			if (   (__oldLevel == 60) 
@@ -12211,17 +12211,62 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
     if (item->IsEquipped() && !item->IsBroken() || (item->GetProto()->Class == ITEM_CLASS_KEY) )
     // Process modifiers to Player stats
     {
+        //qzqstar, 250727, check the item enchantment, and apply bonus spell as well, 3316 to 3320
+        if(apply_dur && pEnchant->ID >= ZQ_RANDOM_DIFFICULTY_NIGHTMARE && pEnchant->ID <= ZQ_RANDOM_DIFFICULTY_END)
+        {
+            //Mannual set the enchantment for them
+            //need 5 x 3 spells
+            //dmg incr: 1,2,4,6,8,   12,16  - 2hand bonus  .. 33001,333002 ...
+            //avoid dmg: 1,1,2,2,3                            33011
+            //resistance, 5,8,10,15,20                       33016
+            uint32_t _enchantLevel = pEnchant->ID - ZQ_RANDOM_DIFFICULTY_NIGHTMARE; //0,1,2,3,4
+            uint32_t _enchant_spellID = 0;
+            if(item->GetProto()->Class == ITEM_CLASS_WEAPON)
+            {
+                _enchant_spellID = SPELL_ENCHANT_WEAPON_BEGIN + _enchantLevel;
+
+                if(item->GetProto()->InventoryType == INVTYPE_2HWEAPON) _enchant_spellID += 2;
+            }
+
+            else if (item->GetProto()->Class == ITEM_CLASS_ARMOR)
+            {
+                switch(item->GetSlot())
+                {
+                    case EQUIPMENT_SLOT_NECK:
+                    case EQUIPMENT_SLOT_FINGER1:
+                    case EQUIPMENT_SLOT_FINGER2:
+                    case EQUIPMENT_SLOT_TRINKET1:
+                    case EQUIPMENT_SLOT_TRINKET2:
+                    {
+                        _enchant_spellID = SPELL_ENCHANT_JEWELRY_BEGIN + _enchantLevel;
+                        break;
+                    }
+
+                    default:
+                    {
+                        _enchant_spellID = SPELL_ENCHANT_ARMOR_BEGIN + _enchantLevel;
+                        break;
+                    }
+                }
+            }
+
+            if(_enchant_spellID)
+            {
+                if (apply)
+                    CastSpell(this, _enchant_spellID, true, item);
+                else
+                    RemoveAurasDueToItemSpell(item, _enchant_spellID);
+            }
+
+            //LOG info
+			//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CLASS:%d apply=%d _enchant_spellID:%u, ", item->GetProto()->Class, apply, _enchant_spellID);
+        }
+
         for (int s = 0; s < 3; ++s)
         {
             uint32 enchant_display_type = pEnchant->type[s];
             uint32 enchant_amount = pEnchant->amount[s];
             uint32 enchant_spell_id = pEnchant->spellid[s];
-
-			//qzqstar, 250712, check if two hand weapons.
-			if (item->GetProto()->InventoryType == INVTYPE_2HWEAPON)
-			{
-				enchant_amount = enchant_amount * 2;
-			}
 
             switch (enchant_display_type)
             {
@@ -16643,8 +16688,7 @@ void Player::_LoadBoundInstances(std::unique_ptr<QueryResult> result)
                 CharacterDatabase.PExecute("DELETE FROM `character_instance` WHERE `guid` = '%u' AND `instance` = '%u'", GetGUIDLow(), instanceId);
 
 				//qzqstar, 250302, avoid do CD clear.
-				sWorld.BanAccount(GetSession()->GetAccountId(), 12 * 3600, "Cannot CD bug.", "");
-
+				//sWorld.BanAccount(GetSession()->GetAccountId(), 300, "Cannot CD bug.", "");
                 continue;
             }
 
