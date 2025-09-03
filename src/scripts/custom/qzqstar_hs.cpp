@@ -79,6 +79,7 @@ void _Main_Menus(Player *player)
 	
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　副本内飞　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_VIP_TELEPORT_MAIN);
 
+
 	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, player->GetGUID());
 }
 
@@ -1292,7 +1293,7 @@ struct CustomHSSpell : SpellScript
 				{
 					//Means this is a empty slot, so player can add a spell to this slot
 
-					if(_spells_num_have >= _aEntry.subType)
+					if(_spells_num_have >= (uint32)_aEntry.subType)
 					{
 						pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＞　已达到最大提取数量　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 						_str = __STR("|cfff00019点击开启额外空槽，花费点券： ");

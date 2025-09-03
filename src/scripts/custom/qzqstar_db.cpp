@@ -8796,6 +8796,7 @@ const std::vector<Level_ItemEqID_t> _Items_Eq_Rank3 =
 
 #pragma region Common Data Processing Area
 
+/*
 template <typename T, typename ValueGetter>
 auto DBHelperGetRandomElementInRangeOptimized(
 	const std::vector<T>& elements,
@@ -8829,6 +8830,27 @@ auto DBHelperGetRandomElementInRangeOptimized(
 	}
 
 	return getValue(*it);
+}*/
+
+template <typename T, typename ValueGetter>
+auto DBHelperGetRandomElementInRangeOptimized(
+    const std::vector<T>& elements,
+    int minValue, int maxValue, 
+    ValueGetter getValue)
+{
+    std::vector<std::reference_wrapper<const T>> filtered;
+    for (const auto& elem : elements) {
+        if (elem.reqLevel >= minValue && elem.reqLevel <= maxValue) {
+            filtered.push_back(std::cref(elem));
+        }
+    }
+    
+    if (filtered.empty()) {
+        return decltype(getValue(std::declval<T>()))();
+    }
+    
+    size_t selected = urand(0, filtered.size() - 1);
+    return getValue(filtered[selected].get());
 }
 
 //Get the Quest by level
@@ -9094,6 +9116,9 @@ int COUNT_ONES(uint32_t x) {
 
 bool isCollectionItem(uint32_t eqItemID)
 {
+	//S8: season 8th, remove the collection items
+	return false;
+
 	//check world, dungeons, and profession
 	for (auto& eq : _EQ_Collections_World)
 	{

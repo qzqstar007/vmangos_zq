@@ -31,7 +31,7 @@
 #define DEFAULT_VISIBILITY_INSTANCE 170.0f             // default visible distance in instances, used to be 120 yards
 #define DEFAULT_VISIBILITY_BG       533.0f             // default visible distance in BG, used to be 180 yards
 #define DEFAULT_VISIBILITY_MODIFIER 0.0f               // default visibility modifier on some units that should be seen beyond normal visibility distances
-#define DEFAULT_CREATURE_SUMMON_LIMIT  100             // default maximum number of creatures an object can have summoned at once
+#define DEFAULT_CREATURE_SUMMON_LIMIT  5             // default maximum number of creatures an object can have summoned at once
 
 #define VISIBILITY_DISTANCE_GIGANTIC    400.0f
 #define VISIBILITY_DISTANCE_LARGE       200.0f

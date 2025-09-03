@@ -27,6 +27,13 @@
 /******************************************************************** 
  *  Item IDs, least first (30000).
  ********************************************************************/
+// ID plans
+// 30000 - 30009 basic items or must have during several seasons
+
+// 30100 - Season 7
+// 30200 - season 8
+
+
 #define ZQ_ITEM_VOUCHER				30000	//Voucher, 点券
 #define ZQ_ITEM_BUFF           		30001	//Buff, 一键BUFF
 #define ZQ_ITEM_FRAGMENTS   		30002	//Fragments, 提升碎片
@@ -152,6 +159,12 @@
 //Other Promitions from Achievements database
 #define ZQ_SPELL_MOUNTS_BONUS_TIGER         32825   //Mounts, Bonus
 #define ZQ_SPELL_MOUNTS_BONUS_GRIYP         32826   //Mounts, Bonus
+#define ZQ_SPELL_MOUNTS_BONUS_DKM           32827   //Mounts, Bonus
+#define ZQ_SPELL_MOUNTS_BONUS_ZGH           32828   //Mounts, Bonus
+#define ZQ_SPELL_MOUNTS_BONUS_ZGL           32829   //Mounts, Bonus
+#define ZQ_ITEM_MOUNTS_DKM                  13335
+#define ZQ_ITEM_MOUNTS_ZGH                  19902
+#define ZQ_ITEM_MOUNTS_ZGL                  19872
 
 
 #define ZQ_SPELL_RAND_ENCHANT_END	    32733//随机附魔
@@ -329,7 +342,7 @@ update spell_template set startRecoveryTime=1100 where startRecoveryTime=1500;
 update creature_template set gold_min = gold_min/20, gold_max=gold_max/20 where gold_max > 50000;
 
 //ZG BOSS
-14510 update creature_template set health_multiplier=2000, damage_multiplier=50 where entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
+14510 update creature_template set health_multiplier=1500, damage_multiplier=50 where entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
 14509 
 14507
 14517
@@ -338,8 +351,92 @@ update creature_template set gold_min = gold_min/20, gold_max=gold_max/20 where 
 14834
 11380
 
+//MC BOSS, and ONYKIA
+11988 12057 12259 11502 12264 11982 12098 12056 12118
+update creature_template set health_multiplier=2000, damage_multiplier=60 where entry in (11988, 12057, 12259, 11502, 12264, 11982, 12098, 12056, 12118, 10184);
+-- alians 12099 11673 11661 11663 11662 12119 11664 11672 11659 11658, 12129
+update creature_template set health_multiplier=500, damage_multiplier=30 where entry in (12099, 11673, 11661, 11663, 11662, 12119, 11664, 11672, 11659, 11658, 12129);
+-- ONY
+update creature_template set health_multiplier=2000, damage_multiplier=100 where entry in (10184, 12129);
 
-                    ChatHandler(m_caster->ToPlayer()).HandleInstanceUnbindHelper(m_caster->ToPlayer(), false, 0);
+
+-- BWL BOSS
+-- 14020, 14601 13020 11583 11981 12435 11983 12017
+update creature_template set health_multiplier=2500, damage_multiplier=70 where entry in (14020, 14601, 13020, 11583, 11981, 12435, 11983, 12017);
+-- some spell 19873, destroy eggs
+update spell_template set castingTimeIndex=1, recoveryTime=1000 where entry = 19873;
+
+-- AQ boss
+-- 15339, 15370, 15369, 15348, 15341, 15340
+update creature_template set health_multiplier=3000, damage_multiplier=80 where entry in (15339, 15370, 15369, 15348, 15341, 15340);
+-- 15510, 15543,15727,15511,15509,15517,15516,15275,15276,15544,15299,15263
+update creature_template set health_multiplier=3500, damage_multiplier=90 where entry in (15510, 15543,15727,15511,15509,15517,15516,15275,15276,15544,15299,15263);
+
+-- NAXX BOSS
+-- 15936 16060  15954 15930 15990 15932 15928 15953 16062 16064 16065 16028 15929 16063 15952 16011 15989 15931 16061 15956
+
+
+-- T2.5
+start from 21329 to  21418
+
+
+
+ChatHandler(m_caster->ToPlayer()).HandleInstanceUnbindHelper(m_caster->ToPlayer(), false, 0);
+
+
+//Mounts descriptions
+#define ZQ_ITEM_MOUNTS_ZGH                  19902
+#define ZQ_ITEM_MOUNTS_ZGL                  19872
+update locales_item set description_loc4="此物品放在背包或者银行里生效。" where entry in (13335,19902, 19872 );
+17481, 24252, 24242
+update spell_template set castingTimeIndex=1 where entry in (17481, 24252, 24242);
+
+
+
+
+
+
+
+
+
+//BAGS Modify
+//slot 4-6
+//1537	11845	805	828	2082	4238	4496	4957	5081	5571	5572	5762	6756	184	2115	4930
+//spell id 9139,9394
+update item_template set container_slots=12,spellid_1=9139,spelltrigger_1=1, spellid_2=9394,spelltrigger_2=1 where entry in (1537,11845,805,828,2082,4238,4496,4957,5081,5571,5572,5762,6756,184,2115,4930);
+
+//Slot 8 -> 14
+//856	2657	3233	3343	4240	4241	4498	5573	5574	5763	806	855	965	3298	3568	5603	6754
+//spelldi 9141,9396
+update item_template set container_slots=14,spellid_1=9141,spelltrigger_1=1, spellid_2=9396,spelltrigger_2=1 where entry in (856,2657,3233,3343,4240,4241,4498,5573,5574,5763,806,855,965,3298,3568,5603,6754);
+
+//Slot 10 -> 16
+//804	857	918	932	933	1470	1729	3352	4245	4497	5575	5576	5764	5765	6446	930	931	1014	1724
+//spellid 9329,9398
+update item_template set container_slots=16,spellid_1=9329,spelltrigger_1=1, spellid_2=9398,spelltrigger_2=1 where entry in (804,857,918,932,933,1470,1729,3352,4245,4497,5575,5576,5764,5765,6446,930,931,1014,1724);
+
+//Slot 12 -> 18
+//1652	1725	4499	10050	10051	16057	1623	3762	4981
+//spellid 9331,9416
+update item_template set container_slots=18,spellid_1=9331,spelltrigger_1=1, spellid_2=9416,spelltrigger_2=1 where entry in (1652,1725,4499,10050,10051,16057,1623,3762,4981);
+
+//Slot 14 -> 20
+//1685	3914	9587	11324	14046	19291
+//spellid 14027,9417
+update item_template set container_slots=20,spellid_1=14027,spelltrigger_1=1, spellid_2=9417,spelltrigger_2=1 where entry in (1685,3914,9587,11324,14046,19291);
+
+//Slot 16 -> 22
+//4500	10959	11742	14155	17966	20400	4501	10683	22233	4500	10959	11742	14155
+//spellid 9335,9343
+update item_template set container_slots=22,spellid_1=9335,spelltrigger_1=1, spellid_2=9343,spelltrigger_2=1 where entry in (4500,10959,11742,14155,17966,20400,4501,10683,22233,4500,10959,11742,14155);
+
+//Slot 18 - > 24
+//14156	19914	22679	17966	13330	1977	
+//spellid 15807,9345
+update item_template set container_slots=24,spellid_1=15807,spelltrigger_1=1, spellid_2=9345,spelltrigger_2=1 where entry in (14156,19914,22679,17966,13330,1977);
+
+
+
 
 */
 

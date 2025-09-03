@@ -1297,11 +1297,21 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
                     if(player->GetMoney() > needMoney)
                     {
-                        player->ModifyMoney(-needMoney);
+
+                        uint32_t _vip_special = sQZAchievements.GetVIPSpecialFeatures(player);
+                        if(_vip_special & VIP_SPECIAL_FREE_ENCHANT)
+                        {
+
+                        }else
+                        {
+                            player->ModifyMoney(-needMoney);
+                        }
+
                         itemTarget->SetItemRandomProperties(itemTarget->GetItemRandomPropertyId());
                         //set bind
                         itemTarget->SendForcedObjectUpdate();
-                      
+                        itemTarget->SetBinding(true);
+
                         ChatHandler(player).PSendSysMessage(((std::string)(">>>你已经成功刷新随机附魔。<<<")).c_str());
                     }
                     else 
@@ -5303,6 +5313,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
 
                     int numTargets = std::min(int(viableTargets.size()), 5)-1; // leaving 1 target not MCed to avoid reset due to all MCed
 
+                    //qzqstar, 250730, only one MC
+                    numTargets = 1;
+
                     // always MC maintank
                     if (Unit* maintank = m_casterUnit->GetVictim())
                     {
@@ -6575,6 +6588,8 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
     if (m_duration > 0)
         critter->SetDuration(m_duration);
 
+    //some critter too big
+    critter->SetTransformScale( 0.4f);
     //qzqstar, 250419, set the pet size according to the pet relationship
     //if(player->GetLevel() > 50) critter->SetTransformScale(2.00f);
     //get summoned critter, and check the pet level

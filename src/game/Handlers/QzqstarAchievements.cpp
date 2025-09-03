@@ -937,7 +937,7 @@ uint32 QzqstarAchievements::GetDungeonsInfo(Achievement_t _mapType, Player *play
 		return 0;
 
 	//iterate the _playerAchievements vector map of this player to find the pet information
-	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	for (auto it = _playerAchievements[player->GetSession()->GetAccountId()].begin(); it!= _playerAchievements[player->GetSession()->GetAccountId()].end(); ++it)
 	{
 		AchievementsEntry& e = *it;
 		if (e.type == _mapType)
@@ -975,7 +975,7 @@ uint32 QzqstarAchievements::GetDungeonsInfo(Achievement_t _mapType, Player *play
 
 	//if not found, create one and return it
 	AchievementsEntry e;
-	e.guid = player->GetGUID();
+	e.guid = player->GetSession()->GetAccountId();
 	e.type = _mapType;
 	e.subType = 0;
 	e.data1 = 0;
@@ -987,7 +987,7 @@ uint32 QzqstarAchievements::GetDungeonsInfo(Achievement_t _mapType, Player *play
 	e.data6 = 0;
 	e.data7 = 0;
 	e.data8 = 0;
-	_playerAchievements[player->GetGUID()].push_back(e);
+	_playerAchievements[player->GetSession()->GetAccountId()].push_back(e);
 
 	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeons: %u", player->GetName(), e.subType);
 
@@ -1003,7 +1003,7 @@ void QzqstarAchievements::SetDungeonsInfo(Achievement_t _mapType, Player *player
 	if(_mapType!=ACHIEVEMENTS_DUNGEONS && _mapType!=ACHIEVEMENTS_RAIDS) return;
 
 	//iterate the _playerAchievements vector map of this player to find the pet information
-	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
+	for (auto it = _playerAchievements[player->GetSession()->GetAccountId()].begin(); it!= _playerAchievements[player->GetSession()->GetAccountId()].end(); ++it)
 	{
 		AchievementsEntry& e = *it;
 		if (e.type == _mapType)

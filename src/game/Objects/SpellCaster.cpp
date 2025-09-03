@@ -1093,7 +1093,18 @@ float SpellCaster::MeleeDamageBonusDone(Unit const* pVictim, float pdamage, Weap
         uint32_t _cEntry = ((Creature*)this)->GetCreatureInfo()->entry;
         if( _cEntry == 14510 || _cEntry == 14509 || _cEntry == 14507 ||   //14517 Jeklik
             _cEntry == 14515 || _cEntry == 11382 || _cEntry == 14834 || _cEntry == 11380)
-            DonePercent *= 2.1f; //8.1f
+            DonePercent *= 1.2f; //8.1f
+
+        //MC BOSS in 11988 12057 12259 11502 12264 11982 12098 12056 12118, ony 10184
+        else if (_cEntry == 11988 || _cEntry == 12057 || _cEntry == 12259 || _cEntry == 11502 ||
+            _cEntry == 12264 || _cEntry == 11982 || _cEntry == 12098 || _cEntry == 12056 || _cEntry == 12118 ||
+            _cEntry == 10184)
+            DonePercent *= 1.3f;
+
+        //BWL boss -- 14020, 14601 13020 11583 11981 12435 11983 12017
+        else if (_cEntry == 14020 || _cEntry == 14601 || _cEntry == 13020 || _cEntry == 11583 ||
+            _cEntry == 11981 || _cEntry == 12435 || _cEntry == 11983 || _cEntry == 12017)
+            DonePercent *= 1.4f;
         else 
             DonePercent *= Creature::_GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
     }
@@ -1346,7 +1357,16 @@ float SpellCaster::SpellDamageBonusDone(Unit const* pVictim, SpellEntry const* s
         //ZG BOSS entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
         if(_cEntry == 14510 || _cEntry == 14509 || _cEntry == 14507 || //_cEntry == 14517 ||  14517 remove jelik
             _cEntry == 14515 || _cEntry == 11382 || _cEntry == 14834 || _cEntry == 11380)
-            DoneTotalMod *= 2.1f; //8.1f
+            DoneTotalMod *= 1.2f; //8.1f
+        //MC BOSS in 11988 12057 12259 11502 12264 11982 12098 12056 12118 ony 10184
+        else if (_cEntry == 11988 || _cEntry == 12057 || _cEntry == 12259 || _cEntry == 11502 ||
+            _cEntry == 12264 || _cEntry == 11982 || _cEntry == 12098 || _cEntry == 12056 || _cEntry == 12118 ||
+            _cEntry == 10184)
+			DoneTotalMod *= 1.3f;
+        //BWL boss -- 14020, 14601 13020 11583 11981 12435 11983 12017
+        else if (_cEntry == 14020 || _cEntry == 14601 || _cEntry == 13020 || _cEntry == 11583 ||
+            _cEntry == 11981 || _cEntry == 12435 || _cEntry == 11983 || _cEntry == 12017)
+			DoneTotalMod *= 1.4f;
         else 
             DoneTotalMod *= Creature::_GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
     }

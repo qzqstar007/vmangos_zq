@@ -1141,11 +1141,11 @@ uint32 __getSocialPointsBySeq(int seq)
 
 bool Menus_Kelala_Social(Player *player, Creature *_Creature, uint32 action)
 {
-	int _socialPoints = 0;
+	uint32 _socialPoints = 0;
 	std::string text;
 	auto localIdx = player->GetSession()->GetSessionDbLocaleIndex();
 	//_socialPoints = player->GetReputationMgr().GetReputation(967);
-	int ITEM_COUNTS = sizeof(__item_list) / sizeof(__item_list[0]);
+	uint32 ITEM_COUNTS = sizeof(__item_list) / sizeof(__item_list[0]);
 
 	_socialPoints = sQZAchievements.GetSocialPoints(player);
 
@@ -1302,7 +1302,7 @@ bool Menus_Kelala_Social(Player *player, Creature *_Creature, uint32 action)
 		else
 		{
 
-			auto __canSeeRange = 3;
+			uint32 __canSeeRange = 3;
 			if (_socialPoints < 5000 || player->GetLevel() < 42) __canSeeRange = _ITEM_BUY_RANGE_1;
 			else if (_socialPoints < 10000 || player->GetLevel() < 50) __canSeeRange = _ITEM_BUY_RANGE_2;
 			else if (_socialPoints < 15000 || player->GetLevel() < 60) __canSeeRange = _ITEM_BUY_RANGE_3;
@@ -1373,7 +1373,7 @@ bool Menus_Kelala_Social(Player *player, Creature *_Creature, uint32 action)
 			else
 			{
 				//Buy something
-				int32 _buy_item_seq = action - __MENU_SOCIAL_BUY - 10;
+				uint32 _buy_item_seq = action - __MENU_SOCIAL_BUY - 10;
 
 				if (_buy_item_seq >= 0 && _buy_item_seq < __canSeeRange && _socialPoints > __getSocialPointsBySeq(_buy_item_seq))
 				{

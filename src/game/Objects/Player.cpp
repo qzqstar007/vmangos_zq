@@ -15796,7 +15796,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 	}
 
 	// qzqstar, 241229, cast shield on login to avoid death
-	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[LOG IN] Player:%s enter map:%u, Area ID:%u", GetName(), GetMapId(), GetAreaId());
+	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[LOG IN] Player:%s GUID:%u  AccountID:%u enter map:%u, Area ID:%u", 
+        GetName(), GetGUID(), GetSession()->GetAccountId(), GetMapId(), GetAreaId());
 	if (GetAreaId() != 976)
 		CastSpell(this, 13874, true);
 
@@ -15864,7 +15865,13 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if(HasSpell(ZQ_SPELL_MOUNTS_TIGER)) LearnSpell(ZQ_SPELL_MOUNTS_BONUS_TIGER, false);
     if(HasSpell(ZQ_SPELL_MOUNTS_GRIYP)) LearnSpell(ZQ_SPELL_MOUNTS_BONUS_GRIYP, false);
 
-
+    if(HasItemCount(ZQ_ITEM_MOUNTS_DKM, 1, true) && (!HasSpell(ZQ_SPELL_MOUNTS_BONUS_DKM)))  LearnSpell(ZQ_SPELL_MOUNTS_BONUS_DKM, false);
+    else if (HasSpell(ZQ_SPELL_MOUNTS_BONUS_DKM) && (!HasItemCount(ZQ_ITEM_MOUNTS_DKM, 1, true))) RemoveSpell(ZQ_ITEM_MOUNTS_DKM);
+    if(HasItemCount(ZQ_ITEM_MOUNTS_ZGH, 1, true) && (!HasSpell(ZQ_SPELL_MOUNTS_BONUS_ZGH)))  LearnSpell(ZQ_SPELL_MOUNTS_BONUS_ZGH, false);
+    else if (HasSpell(ZQ_SPELL_MOUNTS_BONUS_ZGH) && (!HasItemCount(ZQ_ITEM_MOUNTS_ZGH, 1, true))) RemoveSpell(ZQ_SPELL_MOUNTS_BONUS_ZGH);
+    if(HasItemCount(ZQ_ITEM_MOUNTS_ZGL, 1, true) && (!HasSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL)))  LearnSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL, false);
+    else if (HasSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL) && (!HasItemCount(ZQ_ITEM_MOUNTS_ZGL, 1, true))) RemoveSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL);
+    
     // restore remembered power/health values (but not more max values)
     uint32 savedhealth = fields[46].GetUInt32();
     SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);

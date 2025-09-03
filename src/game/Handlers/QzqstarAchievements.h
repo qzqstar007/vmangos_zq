@@ -25,6 +25,7 @@ struct AchievementsEntry
 
 enum Achievement_t
 {
+	ACHIEVEMENT_ACCOUNT			= 	11,	//We use this as Account Achievement, shared the characters in this account
 	ACHIEVEMENT_VIP 		  	= 	66,
 	ACHIEVEMENT_RUNE 		  	= 	88,
 	ACHIEVEMENT_CUSTOM_QUEST 	= 	100,
@@ -52,7 +53,8 @@ enum Achievement_t
 #define VIP_TEAM_REVIVE		(0x20)
 #define VIP_TEAM_FULLFILL	(0x40)
 
-#define VIP_SPECIAL_FREE_STOLE	(0x01)		//stored in data8
+#define VIP_SPECIAL_FREE_STOLE	 (0x01)		//stored in data8
+#define VIP_SPECIAL_FREE_ENCHANT (0x02)		//stored in data8
 
 //Challenging Mode
 #define CHALLENGING_MODE_ONELIFE		(0x01)
@@ -111,6 +113,27 @@ public:
 
 	//get the player's achievements vector
 	std::vector<AchievementsEntry> GetAchievements(Player *player);
+
+	/*****************************************************
+	 *
+	 *		Account Achievement Functions
+	 *
+	 *****************************************************/
+	//Data1: Pet Collections
+	//Data2: Reputation list
+	//Data3: Collection Herb/Ore/Feather Nums
+	//Data4: Tasks:9999 Explore Area:9999 
+	//Data5: 12 Professions - 300
+	//Data6:
+	//Data7: Killing numbers: 99999 9999
+	//Data8: Gold collect
+	AchievementsEntry GetAccountAchievementEntry(Player *player);
+
+
+	uint32 GetAccountAchievement(Player *player);
+	bool SetAccountAchievement(Player *player, uint32 achievement);
+	// Check if the player has achieved the account achievement
+	bool CheckAccountAchievement(Player *player, uint32 achievement);
 
 
 	/*****************************************************

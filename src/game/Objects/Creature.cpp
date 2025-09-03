@@ -264,13 +264,13 @@ void Creature::AddToWorld()
         if(pInstanceData)
         {
             //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Init Creatures for CustomDifficulty = %u!", pInstanceData->CustomDifficulty);
-            if(pInstanceData->CustomDifficulty > 0 && pInstanceData->CustomDifficulty < 4)
+            if(pInstanceData->CustomDifficulty  == 1)
             {
                 //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Creature:%s id:%u created!", GetName(), GetGUID());
                 //SetMaxHealth(GetMaxHealth() * (1 + pInstanceData->CustomDifficulty * pInstanceData->CustomDifficulty)); 
                 
-                SetNativeScale(GetNativeScale()*(1.0f + pInstanceData->CustomDifficulty/10.0f));
-                CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1 - 1 + pInstanceData->CustomDifficulty, true);
+                //SetNativeScale(GetNativeScale()*(1.0f + pInstanceData->CustomDifficulty/10.0f));
+                CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY0, true);
                 //SetHealth(GetMaxHealth());
                 //UpdateAllStats();
 				//UpdateMaxHealth();
@@ -1648,14 +1648,6 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
 	auto __goldMux = 0;
 	if ( (!loot.items.empty()) && (__mapid > 1) && (looter) )
 	{
-         /*
-		auto _ac_mapid = QZQSTAR_GET_AC_MAPID(__mapid);
-       
-        Achievement_t _mapType = ACHIEVEMENTS_DUNGEONS;
-        if (GetMap()->IsRaid())
-            _mapType = ACHIEVEMENTS_RAIDS;
-		uint32 _dg_info = sQZAchievements.GetDungeonsInfo(_mapType, looter, _ac_mapid) & 0x03;
-        */
         uint32 _dg_info = 0;
         InstanceData* const pInstanceData = GetMap()->GetInstanceData();
         if(pInstanceData)
@@ -1666,9 +1658,6 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
                 _dg_info = pInstanceData->CustomDifficulty;
             }
         }
-
-        //if(_dg_info > 1) _dg_info = urand(1, _dg_info);
-
 		__goldMux = _dg_info == 1 ? 2
 			: _dg_info == 2 ? 3
 			: _dg_info == 3 ? 5
@@ -3652,10 +3641,15 @@ void Creature::ResetHomePosition()
 
 void Creature::RemoveAurasAtReset()
 {
+    //qzqstar, 250801, keep positive auras on evade
+
     if (HasExtraFlag(CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE))
     {
-        RemoveAllNegativeAuras(AURA_REMOVE_BY_DEFAULT);
+        //keep positive auras on evade
         return;
+
+        //RemoveAllNegativeAuras(AURA_REMOVE_BY_DEFAULT);
+        //return;
     }
 
     for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end();)

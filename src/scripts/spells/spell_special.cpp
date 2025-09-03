@@ -391,7 +391,7 @@ struct SpellStealScript : public SpellScript
             if (Player* player = spell->GetCaster()->ToPlayer())
             {
                 //check the player's map
-                if(player->GetMap()->IsRaid())
+                /*if(player->GetMap()->IsRaid())
                 {
                     //tell the player that he cannot stole the spell from the target
                     ChatHandler(player).PSendSysMessage(((std::string)(">>>你不能在团本中使用偷取技能。<<<")).c_str());
@@ -399,14 +399,31 @@ struct SpellStealScript : public SpellScript
                 }
 
                 //check the target level
+                
                 if (spell->GetUnitTarget()->GetLevel() > 60 ||  spell->GetUnitTarget()->GetLevel() > player->GetLevel())
                 {
                     //tell the player that he cannot stole the spell from the target
                     ChatHandler(player).PSendSysMessage(((std::string)(">>>目标等级太高，你无法从该目标身上偷取技能。<<<")).c_str());
                     return false;
                 }
+
+                if ( (spell->GetUnitTarget()->GetLevel() > 62) && (player->GetMapId() < 2) )
+                {
+                    //tell the player that he cannot stole the spell from the target
+                    ChatHandler(player).PSendSysMessage(((std::string)(">>>目标等级太高，你无法从该目标身上偷取技能。<<<")).c_str());
+                    return false;
+                }
+
+                if ( (spell->GetUnitTarget()->GetLevel() > 62) )
+                {
+                    //tell the player that he cannot stole the spell from the target
+                    ChatHandler(player).PSendSysMessage(((std::string)(">>>目标等级太高，你无法从该目标身上偷取技能。<<<")).c_str());
+                    return false;
+                }
+
                 //check the target is a player or a creature
-                else if (!spell->GetUnitTarget()->IsCreature()) {
+                else */
+                if (!spell->GetUnitTarget()->IsCreature()) {
                     //tell the player that he cannot stole the spell from the target
                     ChatHandler(player).PSendSysMessage(((std::string)(">>>你只能从怪物身上偷取技能。<<<")).c_str());
                     return false;

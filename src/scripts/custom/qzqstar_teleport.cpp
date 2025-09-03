@@ -136,12 +136,13 @@ const Teleport_Point_t TP_Raids[] = {
 	// Makeup from upper comment, reverse order
 	{0, MAP_ZUL_GURUB,      	__XSTR("祖尔格拉布　"), 	MAP_ZUL_GURUB, 		-11916.9f,-1248.36f,92.5334f,4.72417f, {14507,14517,14515,11382,11380,14834,7,8,30091,1}},
 	//{0, MAP_ZUL_GURUB,      	__XSTR("祖尔格拉布　"), 	MAP_ZUL_GURUB, 		-11916.9f,-1248.36f,92.5334f,4.72417f, {14507,14517,3,4,5,6,7,8,30091,1}},
-	{1, MAP_MOLTEN_CORE,    	__XSTR("熔火之心　"), 		MAP_MOLTEN_CORE, 	1082.04f,-474.596f,-107.762f,5.02623f, {0}},
-	{2, MAP_ONYXIAS_LAIR,   	__XSTR("奥妮克希亚　"), 	MAP_ONYXIAS_LAIR, 29.1607f,-71.3372f,-8.18032f,4.43584f, {0}},
-	{3, MAP_AHN_QIRAJ_RUINS, 	__XSTR("安其拉废墟　"), 	MAP_AHN_QIRAJ_RUINS, -8437.74f,1516.91f,31.9074f,2.73319f, {0}},
-	{4, MAP_BLACKWING_LAIR, 	__XSTR("黑翼之巢　"), 		MAP_BLACKWING_LAIR, -7664.76f,-1100.87f,399.679f,0.561981f, {0}},
-	{5, MAP_AHN_QIRAJ_TEMPLE, 	__XSTR("安其拉神殿　"), 	MAP_AHN_QIRAJ_TEMPLE, -8213.48f,2016.0f,129.072f,1.28414f, {0}},
-	{6, MAP_NAXXRAMAS,       	__XSTR("纳克萨玛斯　"), 	MAP_NAXXRAMAS, 3021.64f,-3402.99f,298.22f,2.97352f, {0}},
+	{1, MAP_MOLTEN_CORE,    	__XSTR("熔火之心　"), 		MAP_MOLTEN_CORE, 	1082.04f,-474.596f,-107.762f,5.02623f, {1,2,3,4,5,6,7,8,30092,1}},
+	{2, MAP_ONYXIAS_LAIR,   	__XSTR("奥妮克希亚　"), 	MAP_ONYXIAS_LAIR, 29.1607f,-71.3372f,-8.18032f,4.43584f, {1,2,3,4,5,6,7,8,30093,1}},
+	{3, MAP_AHN_QIRAJ_RUINS, 	__XSTR("安其拉废墟　"), 	MAP_AHN_QIRAJ_RUINS, -8437.74f,1516.91f,31.9074f,2.73319f, {1,2,3,4,5,6,7,8,30094,1}},
+	{4, MAP_BLACKWING_LAIR, 	__XSTR("黑翼之巢　"), 		MAP_BLACKWING_LAIR, -7664.76f,-1100.87f,399.679f,0.561981f, {1,2,3,4,5,6,7,8,30095,1}},
+	{5, MAP_AHN_QIRAJ_TEMPLE, 	__XSTR("安其拉神殿　"), 	MAP_AHN_QIRAJ_TEMPLE, -8213.48f,2016.0f,129.072f,1.28414f, {1,2,3,4,5,6,7,8,30096,1}},
+	{6, MAP_NAXXRAMAS,       	__XSTR("纳克萨玛斯　"), 	MAP_NAXXRAMAS, 3021.64f,-3402.99f,298.22f,2.97352f, {1,2,3,4,5,6,7,8,30097,1}},
+
 };
 
 
@@ -152,9 +153,9 @@ const Teleport_Point_t TP_Raids[] = {
 
 #define __DUNGEONS_NUM_PER_PAGE				(9) //display slots per page
 
-const std::string __DUNGEONS_DIFFICULTY_MINIMUM[4] = { __STR(__BLUE("普通　")), __STR(__BLUE("试炼　")), __STR(__BLUE("地狱　")), __STR(__BLUE("梦魇　")) };
-const std::string __DUNGEONS_DIFFICULTY[4] = {__STR(__BLUE("＝＝＞普通＜＝＝＝ ")), __STR(__BLUE("＝＝＞试炼＜＝＝＝ ")), __STR(__BLUE("＝＝＞地狱＜＝＝＝ ")), __STR(__BLUE("＝＝＞梦魇＜＝＝＝ "))};
-const std::string __DUNGEONS_DIFFICULTY_DISABLED[4] = {__STR(__BLUE("＝＝＞普通＜＝＝＝ ")), __STR(__RED("＝＝＝试炼（未开启）＝＝＝ ")), __STR(__RED("＝＝＝地狱（未开启）＝＝＝ ")), __STR(__RED("＝＝＝梦魇（未开启）＝＝＝ "))};
+const std::string __DUNGEONS_DIFFICULTY_MINIMUM[4] = { __STR(__BLUE("普通难度　")), __STR(__BLUE("英雄难度　")), __STR(__BLUE("地狱难度　")), __STR(__BLUE("梦魇难度　")) };
+const std::string __DUNGEONS_DIFFICULTY[4] = {__STR(__BLUE("＝＝＞普通难度＜＝＝＝ ")), __STR(__BLUE("＝＝＞英雄难度＜＝＝＝ ")), __STR(__BLUE("＝＝＞地狱难度＜＝＝＝ ")), __STR(__BLUE("＝＝＞梦魇难度＜＝＝＝ "))};
+const std::string __DUNGEONS_DIFFICULTY_DISABLED[4] = {__STR(__BLUE("＝＝＞普通难度＜＝＝＝ ")), __STR(__RED("＝＝＝英雄难度（未开启）＝＝＝ ")), __STR(__RED("＝＝＝地狱（未开启）＝＝＝ ")), __STR(__RED("＝＝＝梦魇（未开启）＝＝＝ "))};
 
 bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint32 action)
 {
@@ -167,8 +168,8 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 	if(action >= __MENU_TELEPORT_DUNGEONS_MAIN && action < __MENU_TELEPORT_DUNGEONS_MAIN + 2)
 	{
 		//add to the gossip item, split to two pages.
-		auto _start_id = 0;
-		auto _end_id = __DUNGEONS_NUM_PER_PAGE;
+		uint32 _start_id = 0;
+		uint32 _end_id = __DUNGEONS_NUM_PER_PAGE;
 		if(action == __MENU_TELEPORT_DUNGEONS_MAIN) 
 		{
 			_start_id = 0;
@@ -182,7 +183,7 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝请选择要传送的地图＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
 
-		for (auto i = _start_id; i < _end_id; i++)
+		for (uint32 i = _start_id; i < _end_id; i++)
 		{
 			text = "";
 			//get the dungeon name from the array, if the name is empty, then skip it.
@@ -192,8 +193,9 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 			uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, TP_Dungeons[i].id);
 
 			//lower 2bit is current difficulty, higher 2bit is achieved difficulty.
-			uint32 _currentDifficulty = _playerDungeonInfo & 0x03;
-			uint32 _achievedDifficulty = (_playerDungeonInfo >> 2) & 0x03;
+			//modify only one difficulties
+			uint32 _currentDifficulty = _playerDungeonInfo & 0x01;
+			uint32 _achievedDifficulty = (_playerDungeonInfo >> 1) & 0x01;
 
 			text.append(__STR(" => "));
 			text.append(__DUNGEONS_DIFFICULTY_MINIMUM[_achievedDifficulty]);
@@ -219,8 +221,8 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 		uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID);
 
 		//lower 2bit is current difficulty, higher 2bit is achieved difficulty.
-		uint32 _currentDifficulty = _playerDungeonInfo & 0x03;
-		uint32 _achievedDifficulty = (_playerDungeonInfo >> 2) & 0x03;
+		uint32 _currentDifficulty = _playerDungeonInfo & 0x01;
+		uint32 _achievedDifficulty = (_playerDungeonInfo >> 1) & 0x01;
 
 		//display the info
 		text.append(__STR("当前地图：　"));
@@ -237,18 +239,22 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__DUNGEONS_DIFFICULTY[0]), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_DUNGEONS_MAIN + __MENU_TELEPORT_DUNGEONS_ACT2 + _acID + 0); 
 
-		for (auto i = 1; i < 4; i++)
+		//qzqstar, 250813, only one difficulties
+		for (uint32 i = 1; i < 2 /* 4 */; i++)
 		{
 			//if the difficulty is not achieved, then display it in red.
 			if (i <= _achievedDifficulty)	
 			{
 				// i << 5 means the difficulty is achieved, so we can teleport to the dungeon.
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__DUNGEONS_DIFFICULTY[i]), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_DUNGEONS_MAIN + __MENU_TELEPORT_DUNGEONS_ACT2 + _acID + (i * 32)); 
-			}else
+			}
+			else
 			{
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__DUNGEONS_DIFFICULTY_DISABLED[i]), GOSSIP_SENDER_MAIN, __MENU_NONE); 
 			}
 		}
+
+
 	}
 
 	else if (action >= __MENU_TELEPORT_DUNGEONS_MAIN + __MENU_TELEPORT_DUNGEONS_ACT2 && action <= __MENU_TELEPORT_DUNGEONS_MAIN + __MENU_TELEPORT_DUNGEONS_ACT2 + 128 /* Note, 0x7F is max 127 */)
@@ -259,14 +265,14 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 		//map id is lower 5 bit
 		uint32 _acID = _localBytes & 0x1F;
 
-		//difficulty is higher 3 bit, 0 means normal, 1 means trial, 2 means hell, 3 means nightmare.
-		uint32 _difficulty = (_localBytes >> 5) & 0x03;
+		//difficulty is higher 1 bit, 0 means normal, 1 means heroic.
+		uint32 _difficulty = (_localBytes >> 5) & 0x01;
 
 		//get the dungeon information
 		uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID);	
 		//save the current difficulty
-		_playerDungeonInfo &= 0x0C; //clear the lower 2 bit, keep the higher 2 bit.
-		_playerDungeonInfo |= _difficulty; //set the lower 2 bit to the difficulty.
+		_playerDungeonInfo &= 0x02; //clear the lower 1 bit, keep the higher 1 bit.
+		_playerDungeonInfo |= _difficulty; //set the lower 1 bit to the difficulty.
 		sQZAchievements.SetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID, _playerDungeonInfo); //save the dungeon information to the player's achievements vector.
 
 		player->CLOSE_GOSSIP_MENU();
@@ -296,7 +302,7 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "BOSS list: %s", _monsterName);
 
 		//chathandler ...
-		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Dungeons[_acID].name.c_str(), _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "), _monsterName.c_str());
+		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Dungeons[_acID].name.c_str(), _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("英雄　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "), _monsterName.c_str());
 		
 		
 		//teleport to the dungeon.
@@ -351,8 +357,8 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 
 		//check reset scroll
 		if(player->HasItemCount(ZQ_ITEM_RAID_ZG, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置祖尔格拉布　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 1);	
-		if(player->HasItemCount(ZQ_ITEM_RAID_MC, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置奥妮克希亚　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 2);	
-		if(player->HasItemCount(ZQ_ITEM_RAID_HL, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置熔火之心　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 3);	
+		if(player->HasItemCount(ZQ_ITEM_RAID_MC, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置熔火之心　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 2);	
+		if(player->HasItemCount(ZQ_ITEM_RAID_HL, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置奥妮克希亚　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 3);	
 		if(player->HasItemCount(ZQ_ITEM_RAID_FX, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置黑翼之巢　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 4);	
 		if(player->HasItemCount(ZQ_ITEM_RAID_BWL, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置安其拉废墟　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 5);	
 		if(player->HasItemCount(ZQ_ITEM_RAID_TAQ, 1))	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＞　重置安其拉神庙　＜　")), GOSSIP_SENDER_MAIN, action + __MENU_TELEPORT_RAIDS_RESET + 6);	
@@ -403,7 +409,7 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__DUNGEONS_DIFFICULTY[0]), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT2 + _acID + 0); 
 
-		for (auto i = 1; i < 4; i++)
+		for (uint32 i = 1; i < 4; i++)
 		{
 			//if the difficulty is not achieved, then display it in red.
 			if (i <= _achievedDifficulty)	
@@ -417,7 +423,8 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 		}
 	}
 
-	else if (action >= __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT2 && action < __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT2 + __MENU_SUB_SIZE)
+	//FIX bug: i * 32 means, max might be about 200, 6*32...
+	else if (action >= __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT2 && action < __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT2 + __MENU_SUB_SIZE * 5)
 	{
 		//get the real actions = acID
 		uint32 _localBytes = action - __MENU_TELEPORT_RAIDS_MAIN - __MENU_TELEPORT_RAIDS_ACT2;
@@ -498,7 +505,7 @@ bool Menus_teleport_Common(Player *player, Creature *_cr, uint32 sender, uint32 
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝　请选择要传送的地图　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-		for (auto i = 0; i < counts ; i++)
+		for (uint32 i = 0; i < counts ; i++)
 		{
 			text = "";
 			//get the dungeon name from the array, if the name is empty, then skip it.

@@ -514,7 +514,7 @@ Map* MapManager::CreateInstance(uint32 id, Player* player)
     Achievement_t _mapType = ACHIEVEMENTS_DUNGEONS;
     if (entry && entry->IsRaid()) //Attention Null ptr!
         _mapType = ACHIEVEMENTS_RAIDS;
-    uint32 _map_difficulty = sQZAchievements.GetDungeonsInfo(_mapType, player, ac_mapid) & 0x03;
+    uint32 _map_difficulty = sQZAchievements.GetDungeonsInfo(_mapType, player, ac_mapid) & 0x01;
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "MapManager::CreateInstance: Player:%s, mapid %d, ac_mapid %d, difficulty %d", player->GetName(), id, ac_mapid, _map_difficulty);
 
 

@@ -814,7 +814,7 @@ bool Pet_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action
 			if(_petEntry.data7) _activePetNumber++;
 
 			//Tell the player how much gold he should pay, around 10 - 2160 Gold
-			int32 _needGold = _activePetNumber * _activePetNumber * _activePetNumber * 10;
+			uint32 _needGold = _activePetNumber * _activePetNumber * _activePetNumber * 10;
 
 			auto __actionBuy = action - __MENU_PET_MAIN - __MENU_PET_ACT_BUY;
 
