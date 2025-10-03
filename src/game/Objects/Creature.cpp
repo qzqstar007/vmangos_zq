@@ -1627,7 +1627,8 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
         }
     }
 
-    if(roll_chance_i(2))
+    //if(roll_chance_i(2))
+	if(0)
     {
         if (loot.items.size() < MAX_NR_LOOT_ITEMS)             // Non-quest drop
         {
@@ -1667,13 +1668,31 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
         //iterate the loot.items
         for (auto it = loot.items.begin(); it != loot.items.end(); ++it)
         {
-			if (it->randomPropertyId>3300 && it->randomPropertyId<3321)
-			{
-				it->difficulty = _dg_info;
+			ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(it->itemid);
 
-                //should update the random property id according to difficulty level
-                it->randomPropertyId += _dg_info * 5;
+			if ((itemProto->Class == ITEM_CLASS_WEAPON) || (itemProto->Class == ITEM_CLASS_ARMOR))
+			{
+
+				//check if map is heroic, and only Quality =3/4 can be 
+				if ( (_dg_info > 0) && (itemProto->Quality > 2) )
+				{
+                    uint32 _randomID = 0;
+
+                    if(roll_chance_i(60))
+                    {
+                        //pick values from 3355 yo 3369
+                        _randomID = urand(3355,3369);
+                    }else
+                    {
+                        _randomID = PickRandomValue(ZQ_ENCHANT_HEROIC, ZQ_ENCHANT_HEROIC + 1, ZQ_ENCHANT_HEROIC + 2);
+                        if (roll_chance_i(10)) _randomID = PickRandomValue(ZQ_ENCHANT_HEROIC+3, ZQ_ENCHANT_HEROIC + 4, ZQ_ENCHANT_HEROIC + 5);
+                        if (roll_chance_i(2))  _randomID = ZQ_ENCHANT_HEROIC + 6;
+                    } 
+
+					it->randomPropertyId = _randomID;
+				}
 			}
+
 
             //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Creature gen Loot] PLAYER:[%u][%s] === __goldMux: %d", looter->GetGUID(), looter->GetName(), __goldMux);
         }

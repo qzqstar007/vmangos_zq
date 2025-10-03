@@ -1541,6 +1541,9 @@ int32 SpellCaster::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
                     }
                 }
             }
+
+
+            //S8: can add the spell damage bonus from the FS
         }
     }
     

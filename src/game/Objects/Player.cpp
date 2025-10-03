@@ -88,6 +88,9 @@
 
 #include "QzqstarAchievements.h"
 #include "custom/qzqstar_id.h"
+#include "custom/qzqstar_db.h"
+#include "custom/qzqstar_custom.h"
+#include "custom/qzqstar_helper.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -3118,7 +3121,7 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
         // Save to Achievement and store it for further reward
         M_Item_Counts += xp;
 
-        if(M_Item_Counts > level * level * 30)
+        if(M_Item_Counts > level * level * 50)
         {
             M_Item_Counts = 0;
 
@@ -10599,6 +10602,36 @@ void Player::RemoveAmmo()
         UpdateDamagePhysical(RANGED_ATTACK);
 }
 
+
+#define __MAX_ENCHANTMENT_IDS (177)
+static const int32 __Random_EnchantIDs[__MAX_ENCHANTMENT_IDS] =
+{ // 1   2      3     4     5   6   7   8   9       10  11  12  13  14
+3200,3206,3212,3201,3207,3213,3202,3208,3214,3203,3209,3215,3161,3141,3126,3111,3180,3204,3205,3210,3211,3216,3217,3162,3142,3127,
+3112,3046,3181,3163,3143,3128,3113,3056,3066,3076,3086,3182,3164,3144,3129,3114,3036,3047,3183,3165,3145,3130,3115,3184,3166,3101,
+3106,3146,3131,3116,3037,3048,3057,3067,3077,3087,3185,3167,3147,3132,3117,3186,3168,3148,3102,3107,3133,3118,3038,3049,3058,3068,
+3078,3088,3187,3149,3169,3188,3150,3170,3189,3151,3103,3108,3134,3119,3039,3050,3059,3069,3079,3089,3171,3190,3152,3172,3191,3153,
+3135,3104,3109,3120,3040,3051,3060,3070,3080,3090,3173,3192,3154,3136,3121,3174,3193,3155,3137,3122,3041,3052,3061,3071,3081,3091,
+3175,3194,3156,3138,3123,3176,3195,3157,3139,3124,3105,3110,3042,3053,3062,3072,3082,3092,3177,3196,3158,3140,3125,3178,3197,3159,
+3179,3198,3199,3160,3043,3044,3045,3054,3055,3063,3064,3065,3073,3074,3075,3083,3084,3085,3093,3094,3095
+};
+
+static int32 __getRandomEnchantId(int32 itemLevel)
+{
+    int32 _minRange = itemLevel;
+    int32 _maxRange = itemLevel*2;
+
+    if(itemLevel < 15) { _minRange = 0; _maxRange = 30; }
+
+    if(_minRange < 20) _minRange = 0;
+    if(_maxRange < 30) _maxRange = 30;
+
+
+    if(_minRange > 60) _minRange = 60;
+    if(_maxRange > __MAX_ENCHANTMENT_IDS-1) _maxRange = __MAX_ENCHANTMENT_IDS-1;
+    
+    return __Random_EnchantIDs[urand(_minRange, _maxRange)];
+}
+
 // Return stored item (if stored to stack, it can diff. from pItem). And pItem ca be deleted in this case.
 Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update, int32 randomPropertyId)
 {
@@ -10613,16 +10646,23 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         if (randomPropertyId)
             pItem->SetItemRandomProperties(randomPropertyId);
 
+        //S8: check the item
+		auto _proto = pItem->GetProto();
 
-		// qzqstar, 250213, ESS, equipment slot system
-        // we don't need to do this for items with random properties, because they are replaced by random enchants.
-		/*if (randomPropertyId > 3000)
+		if (_proto->Class == ITEM_CLASS_WEAPON || _proto->Class == ITEM_CLASS_ARMOR)
 		{
-			// so, we can curve the slots
-			//pItem->SetEnchantment(PROP_ENCHANTMENT_SLOT_1, 3000, 0, 0);
-			//if (pItem->GetProto()->Quality > 2)	pItem->SetEnchantment(PROP_ENCHANTMENT_SLOT_3, 3500, 0, 0);
-        }*/
+        	int32 _quality = _proto->Quality;
+            if (_quality <2 ) _quality = 2;
 
+            for (int i = 0; i < _quality-1; i++)
+            {
+                auto enchantID = __getRandomEnchantId(_proto->ItemLevel);
+
+                //__LOG("Item:%u Create with EchantID:%u", item, enchantID);
+                //enchant the item
+                pItem->SetEnchantment((EnchantmentSlot)( PROP_ENCHANTMENT_SLOT_1 + i), enchantID, 0, 0);
+            }				
+		}
 
         pItem = StoreItem(dest, pItem, update);
     }
@@ -12211,8 +12251,41 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
     if (item->IsEquipped() && !item->IsBroken() || (item->GetProto()->Class == ITEM_CLASS_KEY) )
     // Process modifiers to Player stats
     {
+        //S8: add the leech support
+        if(pEnchant->ID == ZQ_ENCHANT_LEECH)
+        {
+            if(apply)
+            {
+                M_Leech_Spell += 1;
+            }
+            else if(M_Leech_Spell > 1)
+            {
+                //remove the leech aura
+                M_Leech_Spell -= 1;
+            }
+
+            //__LOG("[Leech] = %d", M_Leech_Spell);
+        }
+
+        //M_Spell_Power_Bonus_Pct Power Bonus
+        else if(pEnchant->ID == ZQ_ENCHANT_SPELL_POWER_BONUS)
+        {
+            if(apply)
+            {
+                M_Spell_Power_Bonus_Pct += 1;
+            }
+            else if(M_Spell_Power_Bonus_Pct > 1)
+            {
+                //remove the leech aura
+                M_Spell_Power_Bonus_Pct -= 1;
+            }
+            __LOG("[M_Spell_Power_Bonus_Pct] = %d", M_Spell_Power_Bonus_Pct);
+        }
+
+
         //qzqstar, 250727, check the item enchantment, and apply bonus spell as well, 3316 to 3320
-        if(apply_dur && pEnchant->ID >= ZQ_RANDOM_DIFFICULTY_NIGHTMARE && pEnchant->ID <= ZQ_RANDOM_DIFFICULTY_END)
+        //if(apply_dur && pEnchant->ID >= ZQ_RANDOM_DIFFICULTY_NIGHTMARE && pEnchant->ID <= ZQ_RANDOM_DIFFICULTY_END)
+        if(false)
         {
             //Mannual set the enchantment for them
             //need 5 x 3 spells
@@ -15210,6 +15283,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     M_TalentPoints=0;
     M_Speed = 0;
     M_WeaponSkill = 0;
+    M_Spell_Power_Bonus_Pct = 0;
+    M_AccountID = GetSession()->GetAccountId();
 
     Object::_Create(guid.GetCounter(), 0, HIGHGUID_PLAYER);
 
@@ -15232,6 +15307,16 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     SetUInt32Value(PLAYER_XP, fields[7].GetUInt32());
 
     _LoadIntoDataField(fields[52].GetString(), PLAYER_EXPLORED_ZONES_1, PLAYER_EXPLORED_ZONES_SIZE);
+
+    //S8: check the zones not equal to "0"
+    std::istringstream iss(fields[52].GetString());
+    std::string token;
+    int _explCount = 0;
+    while (iss >> token) {
+        if (token != "0") _explCount++;
+    }
+    __LOG("Player %s has explored zones:%u", GetName(), _explCount);  //Saved below
+
 
     InitPlayerDisplayIds();                                       // model, scale and model data
 
@@ -15318,8 +15403,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
         
     // SHALL i reload the achivements here?
-    uint32 __count = sQZAchievements.Load(this); //before calling the spells
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Player:%s Loaded %u Achievements records. ", GetName(), __count);
+    int32 __count          = sQZAchievements.Load(this); //before calling the spells
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Player:%s Loaded %d Player Achievements records. ", GetName(), __count);
 
     // Load achievements here, before spell and talents
     //get the challenge mode from db
@@ -15331,8 +15416,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     M_TalentPoints = (_Promotions / 100)%10;
     M_Speed = (_Promotions / 1000)%10;
     M_WeaponSkill = (_Promotions / 10000)%10;
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s has Challenge Mode= 0x%X, Promotions=%d", GetName(), M_Challenge_Mode, _Promotions);
-        
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s [AccountID:%u] has Challenge Mode= 0x%X, Promotions=%d", GetName(),M_AccountID, M_Challenge_Mode, _Promotions);
 
     InitPrimaryProfessions();                               // to max set before any spell loaded
 
@@ -15549,9 +15633,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     // make sure the unit is considered out of combat for proper loading
     ClearInCombat();
 
-
-
-
     // make sure the unit is considered not in duel for proper loading
     SetGuidValue(PLAYER_DUEL_ARBITER, ObjectGuid());
     SetUInt32Value(PLAYER_DUEL_TEAM, 0);
@@ -15667,9 +15748,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if (!IsAlive())
         RemoveAllAurasOnDeath();
 
-    //apply all stat bonuses from items and auras
-    SetCanModifyStats(true);
-    UpdateAllStats();
 
 
 
@@ -15704,14 +15782,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
 	SetPersonalXpRate(__xpRate);
     UpdateSpeed(MOVE_RUN, false);
-    if(M_WeaponSkill > 0) {
-        if (M_WeaponSkill > 5) M_WeaponSkill = 5;
-        //all of the weapon skill, update ...
-        uint32 _skillList [] = {43,44,45,46,54,55,136,160,162,172,173,174,226,228,229};
-        for (uint32 i=0; i<sizeof(_skillList)/sizeof(uint32); i++) {
-        	ModifySkillBonus(_skillList[i], M_WeaponSkill * 2, false);
-        }
-    }
+
 
     // reset the M_Luckydraw_Times, as lucky draws
     M_Luckydraw_Times = 0;
@@ -15797,7 +15868,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
 	// qzqstar, 241229, cast shield on login to avoid death
 	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[LOG IN] Player:%s GUID:%u  AccountID:%u enter map:%u, Area ID:%u", 
-        GetName(), GetGUID(), GetSession()->GetAccountId(), GetMapId(), GetAreaId());
+        GetName(), GetGUID(), M_AccountID, GetMapId(), GetAreaId());
 	if (GetAreaId() != 976)
 		CastSpell(this, 13874, true);
 
@@ -15810,28 +15881,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     {
         
     }
-
-    // qzqstar, 250328, add aura upon different break-through spells
-    // break-through points: 1700, 1800, 1900, 2000, 2100, 2200
-    // critical damage bonus: 3%, 6% ... 15% 
-    // armor bonus: 300, 600, 900, 1200, 1500
-    //
-    // dummpy learnt spells:
-    // 31290, ...
-    // cast spells:
-    // 31295, ....
-    //
-    // five differnet break-through?
-#define	__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL (31290)
-	//if (GetLevel() > 58)
-    if (false)
-	{
-		if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 4))		CastSpell(this, 31295 + 4, true);
-		else if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 3))		CastSpell(this, 31295 + 3, true);
-		else if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 2))		CastSpell(this, 31295 + 2, true);
-		else if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 1))		CastSpell(this, 31295 + 1, true);
-		else if (HasSpell(__MENU_MODE_BREAK_THROUGH_DUMMY_SPELL + 0))		CastSpell(this, 31295 + 0, true);
-	}
     
 	//qzqstar, 250306, apply the spell upon social points. start from spell 30931
     //obsolete, use the achievements instead
@@ -15871,7 +15920,126 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     else if (HasSpell(ZQ_SPELL_MOUNTS_BONUS_ZGH) && (!HasItemCount(ZQ_ITEM_MOUNTS_ZGH, 1, true))) RemoveSpell(ZQ_SPELL_MOUNTS_BONUS_ZGH);
     if(HasItemCount(ZQ_ITEM_MOUNTS_ZGL, 1, true) && (!HasSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL)))  LearnSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL, false);
     else if (HasSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL) && (!HasItemCount(ZQ_ITEM_MOUNTS_ZGL, 1, true))) RemoveSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL);
-    
+
+
+    //S8: caculate the points player had owned, and compare with account points
+    __LOG("[Player:%s] Explore:%u Quest:%u", GetName(), _explCount, M_Custom_Quest_Done);
+
+
+    /* fill the data
+            uint32  M_Achiv_Account_VIP;            //Vip functions
+        uint32  M_Achiv_Account_Task;           //Account Task Points Nums
+        uint32  M_Achiv_Account_Explore;        //Account Explore Points Nums
+        uint32  M_Achiv_Account_Pet_Collection;         //Account Pet Collection Points Nums
+        uint32  M_Achiv_Account_Reputation_List;        //Account Reputation List Points Nums
+        uint32  M_Achiv_Account_Profession_Skill;       //Account Profession Skill Points Nums
+        uint32  M_Achiv_Account_Killing_Nums;           //Account Killing Points Nums
+        uint32  M_Achiv_Account_PVP_Nums;               //Account PVP Points Nums
+        uint32  M_Achiv_Account_Gold_Collect;       //Account Gold Collect Points Nums
+        uint32  M_Achiv_Account_Dungeon_NUMS1;      //Account Dungeon Points Nums1
+        uint32  M_Achiv_Account_Dungeon_NUMS2;      //Account Dungeon Points Nums2
+        uint32  M_Achiv_Account_Mats_NUMS;          //Account Mats Points Nums
+        uint32  M_Achiv_Account_EQ_Nums;            //Account Equip Points Nums
+        uint32  M_Achiv_Account_Bonus_Nums;         //Account Bonus Points Nums
+        uint32  M_Achiv_Account_REWARD;             //Account Reward Points Nums */
+
+    // 假设此处需要填充 M_achiv_account 相关数据，以下是示例代码
+    // 初始化 M_achiv_account 相关数据，实际实现需根据业务逻辑调整
+    /* 00 */M_Achiv_Account_VIP         = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_VIP);
+    /* 01 */M_Achiv_Account_Explore     = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_EXPLORE);
+    /* 02 */M_Achiv_Account_Task        = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_TASK);
+    /* 03 */M_Achiv_Account_Pet_Collection = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_PET_COLLECTION);
+    /* 04 */M_Achiv_Account_Reputation_List = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_REPUTATION_LIST);
+    /* 05 */M_Achiv_Account_Profession_Skill = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_PROFESSION_SKILL);
+    /* 06 */M_Achiv_Account_Killing_Nums = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_KILLING_NUMS);
+    /* 07 */M_Achiv_Account_PVP_Nums = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_PVP_NUMS);
+    /* 08 */M_Achiv_Account_Gold_Collect = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_GOLD_COLLECT);
+    /* 09 */M_Achiv_Account_Dungeon_NUMS1 = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1);
+    /* 10 */M_Achiv_Account_Dungeon_NUMS2 = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2);
+    /* 11 */M_Achiv_Account_Mats_NUMS = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_MATS_NUMS);
+    /* 12 */M_Achiv_Account_EQ_Nums = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_EQ_NUMS);
+    /* 13 */M_Achiv_Account_Bonus_Nums = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_BONUS_NUMS);
+    /* 14 */M_Achiv_Account_REWARD = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_REWARD);
+
+
+
+    if(_explCount > M_Achiv_Account_Explore)   M_Achiv_Account_Explore = _explCount;
+    if(M_Custom_Quest_Done > M_Achiv_Account_Task)  M_Achiv_Account_Task = M_Custom_Quest_Done;
+
+    //bitwise for the reputation list, professional list
+    M_Achiv_Account_Reputation_List |= DBHelper_GetPlayerReputation_Bits(this);
+    M_Achiv_Account_Profession_Skill |= DBHelper_GetPlayerProfs_Bits(this);
+
+
+    //detailed nums M_Achiv_Account_XXX
+    Helper_Chat(this, Helper_MakeString("","详细数据：Player :%s,  VIP:%u,\
+        Task:%u, Explore:%u, Pet:%u, Reputation:%u, Profession:%u, Killing:%u, \
+        PVP:%u, Gold:%u, Dungeon1:%u, Dungeon2:%u, Mats:%u, EQ:%u, Bonus:%u, Reward:%u.",
+        GetName(), M_Achiv_Account_VIP,
+        M_Achiv_Account_Task, M_Achiv_Account_Explore, M_Achiv_Account_Pet_Collection, 
+        M_Achiv_Account_Reputation_List, M_Achiv_Account_Profession_Skill,
+        M_Achiv_Account_Killing_Nums, M_Achiv_Account_PVP_Nums, M_Achiv_Account_Gold_Collect, 
+        M_Achiv_Account_Dungeon_NUMS1, M_Achiv_Account_Dungeon_NUMS2, M_Achiv_Account_Mats_NUMS,
+        M_Achiv_Account_EQ_Nums, M_Achiv_Account_Bonus_Nums, M_Achiv_Account_REWARD).c_str());
+
+
+    //get player used achievements
+    M_Achiv_Player_Chenyi = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_CHENYI);
+    M_Achiv_Player_Zhanpao = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_ZHANPAO);
+    M_Achiv_Player_NumsTalent = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_TALENT);
+    M_Achiv_Player_LevelWeapon = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_WEAPON);
+    M_Achiv_Player_LevelPet = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_PET);
+    M_Achiv_Player_NumsKang = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_KANG);
+    M_Achiv_Player_NumsStrength = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_STRENGTH);
+    M_Achiv_Player_NumsAgility = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_AGILITY);
+    M_Achiv_Player_NumsStamina = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_STAMINA);
+    M_Achiv_Player_NumsIntellect = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_INTELLECT);
+    M_Achiv_Player_NumsSpirit = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_SPIRIT);
+    M_Achiv_Player_NumsAP = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_AP);
+    M_Achiv_Player_NumsSP = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_SP);
+    M_Achiv_Player_DungeonTimes = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_DUNGEON_TIMES);
+
+
+	M_Achiv_Account_Sum = sQZAchievements.GetAccountSum(this);
+    M_Achiv_Player_Used = sQZAchievements.GetPlayerSum(this);
+
+	int _restPoints = M_Achiv_Account_Sum - M_Achiv_Player_Used;
+	if (_restPoints < 0)
+	{
+		//ERROR Check
+		__LOG("Error achievement sum and used. player:%s, sum:%u, used:%u. ", GetName(), M_Achiv_Account_Sum, M_Achiv_Player_Used);
+		_restPoints = 0;
+	}
+	ChatHandler(this).PSendSysMessage(Helper_MakeString("","注意：你账号总成就点数：%u，当前角色已经消耗点数：%u, 剩余点数: %u. ", M_Achiv_Account_Sum, M_Achiv_Player_Used, _restPoints).c_str());
+
+	//so, now we should cast some spell on player?
+	//1. modify the weapon skills
+	if (M_Achiv_Player_LevelWeapon > 0) {
+		if (M_Achiv_Player_LevelWeapon > 9)  M_Achiv_Player_LevelWeapon = 9;
+		//all of the weapon skill, update ...
+		uint32 _skillList[] = { 43,44,45,46,54,55,136,160,162,172,173,174,226,228,229 };
+		for (uint32 i = 0; i<sizeof(_skillList) / sizeof(uint32); i++) {
+			ModifySkillBonus(_skillList[i], M_Achiv_Player_LevelWeapon, false);
+		}
+	}
+
+	//2. check if has chenyi or zhanpao of that level
+	//   get the pos and check if's same with ID ... plus level_chenyi/zhanpao
+	//   delete that and add a new one. can only sell 1 copper.
+	//   OR? just get those manually?
+
+	//3. talented.
+
+
+
+
+
+
+    //apply all stat bonuses from items and auras
+    SetCanModifyStats(true);
+    UpdateAllStats();
+
+        
     // restore remembered power/health values (but not more max values)
     uint32 savedhealth = fields[46].GetUInt32();
     SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
@@ -16619,15 +16787,10 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
     }
 
     //console log out using sLog
-    if (__quest_count > 0)
-    {
-        std::stringstream ss;
-        ss << "[Quest Counter] Player " << GetName() << " has finished " << __quest_count << " Quests.";
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, ss.str().c_str());
-
-        //todo, add to achievements
-        sQZAchievements.SetNormalQuestDoneNum(this, __quest_count);
-    }
+    std::stringstream ss;
+    ss << "[Quest Counter] Player " << GetName() << " has finished " << __quest_count << " Quests.";
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, ss.str().c_str());
+    M_Custom_Quest_Done = __quest_count;
 
     // clear quest log tail
     for (uint16 i = slot; i < MAX_QUEST_LOG_SIZE; ++i)
@@ -17359,6 +17522,54 @@ void Player::SaveToDB(bool online, bool force)
     CharacterDatabase.CommitTransaction();
 
 	//qzqstar, 250411, save the achievements as well
+    /* update the achievements 
+            uint32  M_Achiv_Account_VIP;                    //Vip functions
+        uint32  M_Achiv_Account_Task;                   //Account Task Points Nums
+        uint32  M_Achiv_Account_Explore;                //Account Explore Points Nums
+        uint32  M_Achiv_Account_Pet_Collection;         //Account Pet Collection Points Nums
+        uint32  M_Achiv_Account_Reputation_List;        //Account Reputation List Points Nums
+        uint32  M_Achiv_Account_Profession_Skill;       //Account Profession Skill Points Nums
+        uint32  M_Achiv_Account_Killing_Nums;           //Account Killing Points Nums
+        uint32  M_Achiv_Account_PVP_Nums;               //Account PVP Points Nums
+        uint32  M_Achiv_Account_Gold_Collect;          //Account Gold Collect Points Nums
+        uint32  M_Achiv_Account_Dungeon_NUMS1;         //Account Dungeon Points Nums1
+        uint32  M_Achiv_Account_Dungeon_NUMS2;         //Account Dungeon Points Nums2
+        uint32  M_Achiv_Account_Mats_NUMS;              //Account Mats Points Nums
+        uint32  M_Achiv_Account_EQ_Nums;                //Account Equip Points Nums
+        uint32  M_Achiv_Account_Bonus_Nums;             //Account Bonus Points Nums
+        uint32  M_Achiv_Account_REWARD;                 //Account Reward Points Nums
+        // */
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_VIP, M_Achiv_Account_VIP);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_TASK, M_Achiv_Account_Task);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_EXPLORE, M_Achiv_Account_Explore);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_PET_COLLECTION, M_Achiv_Account_Pet_Collection);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_REPUTATION_LIST, M_Achiv_Account_Reputation_List);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_PROFESSION_SKILL, M_Achiv_Account_Profession_Skill);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_KILLING_NUMS, M_Achiv_Account_Killing_Nums);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_PVP_NUMS, M_Achiv_Account_PVP_Nums);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_GOLD_COLLECT, M_Achiv_Account_Gold_Collect);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1, M_Achiv_Account_Dungeon_NUMS1);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2, M_Achiv_Account_Dungeon_NUMS2);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_MATS_NUMS, M_Achiv_Account_Mats_NUMS);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_EQ_NUMS, M_Achiv_Account_EQ_Nums);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_BONUS_NUMS, M_Achiv_Account_Bonus_Nums);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_REWARD, M_Achiv_Account_REWARD);
+
+    //set the player data
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_LEVEL_CHENYI, M_Achiv_Player_Chenyi);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_LEVEL_ZHANPAO, M_Achiv_Player_Zhanpao);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_TALENT, M_Achiv_Player_NumsTalent);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_LEVEL_WEAPON, M_Achiv_Player_LevelWeapon);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_LEVEL_PET, M_Achiv_Player_LevelPet);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_KANG, M_Achiv_Player_NumsKang);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_STRENGTH, M_Achiv_Player_NumsStrength);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_AGILITY, M_Achiv_Player_NumsAgility);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_STAMINA, M_Achiv_Player_NumsStamina);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_INTELLECT, M_Achiv_Player_NumsIntellect);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_SPIRIT, M_Achiv_Player_NumsSpirit);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_AP, M_Achiv_Player_NumsAP);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_SP, M_Achiv_Player_NumsSP);
+    
 	sQZAchievements.Save(this);
 
     // check if stats should only be saved on logout
@@ -18055,15 +18266,15 @@ bool Player::CheckInstanceCount(uint32 instanceId) const
 	//if (HasSpell(32857)) 
 	//	return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 20);
 
-	if (HasSpell(ZQ_SPELL_HS_VIP))
-		return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 15);
+	//if (HasSpell(ZQ_SPELL_HS_VIP))
+	//	return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 15);
 
 	//qzqstar, 250228, check if killer mode, MAX_INSTANCE_PER_ACCOUNT_PER_HOUR should be 1
 	//if (HasSpell(__MODE_MA))
 	//	return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 4);
 	//else
 		//old origs
-	return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, sWorld.getConfig(CONFIG_UINT32_INSTANCE_PER_HOUR_LIMIT));
+	return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, sWorld.getConfig(CONFIG_UINT32_INSTANCE_PER_HOUR_LIMIT) + M_Achiv_Player_DungeonTimes);
 }
 
 void Player::AddInstanceEnterTime(uint32 instanceId, time_t enterTime) const
@@ -20887,6 +21098,12 @@ void Player::RewardSinglePlayerAtKill(Unit const* pVictim)
         {
             if (Pet* pet = GetPet())
                 pet->GivePetXP(MaNGOS::XP::Gain(pet, static_cast<Creature const*>(pVictim)));
+
+            //S8
+            if(GetGroup() == nullptr)
+            {
+                M_Achiv_Account_Killing_Nums++;
+            }
         }
 
         // normal creature (not pet/etc) can be only in !PvP case
@@ -21424,17 +21641,20 @@ uint32 Player::CalculateTalentsPoints() const
 	//qzqstar, 241201, add extra talents for spell
 	talentPointsForLevel = uint32(talentPointsForLevel * sWorld.getConfig(CONFIG_FLOAT_RATE_TALENT));
 
-    talentPointsForLevel += M_TalentPoints;
+    //add extra talent frees.
+    talentPointsForLevel += M_Achiv_Player_NumsTalent;
+	
+    //talentPointsForLevel += M_TalentPoints;
 	//#define  __SPELL_VIP        (32858)
 	//if (HasSpell(__SPELL_VIP))   talentPointsForLevel += 5;
 	//if (HasSpell(30010))         talentPointsForLevel += 5; //shanshan special
     //if (HasSpell(30851))         talentPointsForLevel += 5; //collect bonus
-
+/*
     if((M_Challenge_Mode & CHALLENGING_MODE_DONE_TASK) == CHALLENGING_MODE_DONE_TASK)
     {
         talentPointsForLevel += 5;
     }
-
+*/
 	return talentPointsForLevel;
 }
 
@@ -22838,6 +23058,7 @@ void Player::RewardHonorOnDeath()
                 rewItr->GetHonorMgr().Add(rewPoints, HONORABLE, this);
 
                 //qzqstar, 250708, add killer points to player
+                /*
                 uint32 _rawpoints = sQZAchievements.GetSocialPointsPVP(rewItr);
 
                 uint32 _weekpoints = _rawpoints % 10000;
@@ -22853,31 +23074,32 @@ void Player::RewardHonorOnDeath()
 
                 //save to Achievements
                 sQZAchievements.SetSocialPointsPVP(rewItr, _totalpoints * 10000 + _weekpoints);
-
+                */
+                M_Achiv_Account_Killing_Nums++;
 
                 std::string text = "";
                 bool anncounce = false;
-                if(_totalpoints == 10)
+                if(M_Achiv_Account_Killing_Nums == 10)
                 {
                     text = __STR("十人斩　"); anncounce = true;
-                }else if (_totalpoints == 100)
+                }else if (M_Achiv_Account_Killing_Nums == 100)
                 {
                     text = __STR("百人斩　"); anncounce = true;	
-                }else if (_totalpoints == 1000)
+                }else if (M_Achiv_Account_Killing_Nums == 1000)
                 {
                     text = __STR("千人斩　"); anncounce = true;
-                }else if (_totalpoints == 10000)
+                }else if (M_Achiv_Account_Killing_Nums == 10000)
                 {
                     text = __STR("万人斩　"); anncounce = true;
                 }
 #define	__STR(x)		((std::string)(x)).c_str()
 #define	__NSTR(x)		(std::to_string(x))
-                if(_totalpoints%10 == 0)
+                if(M_Achiv_Account_Killing_Nums%10 == 0)
                 {
                     //tell player
                     std::string text="";
                     text.append(__STR(">>>>> 你已击杀人数： "));
-                    text.append(__NSTR(_totalpoints));
+                    text.append(__NSTR(M_Achiv_Account_Killing_Nums));
                     text.append(__STR(" <<<<<<"));
                     ChatHandler(rewItr).PSendSysMessage(text.c_str());
                 }

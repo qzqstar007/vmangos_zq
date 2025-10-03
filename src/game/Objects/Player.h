@@ -881,11 +881,56 @@ class Player final: public Unit
 		uint32 M_Luckydraw_Times;
         uint32 M_Challenge_Mode;    //Challenge Mode
 
-        uint8  M_Leech_Phy;
-        uint8  M_Leech_Spell;
-        uint8  M_TalentPoints;
-        uint8  M_Speed;
-        uint8  M_WeaponSkill;
+        uint32  M_Leech_Phy;
+        uint32  M_Leech_Spell;
+        uint32  M_TalentPoints;
+        uint32  M_Speed;
+        uint32  M_WeaponSkill;
+
+
+        //S8:
+        uint32  M_AccountID;
+        uint32  M_Spell_Power_Bonus_Pct;
+        uint32  M_Custom_Quest_Done;
+
+        //AchievementsEntry* pMAccountEntry;
+	    //std::vector<AchievementsEntry> M_Achievements;	//holds both player and account achievements
+        std::map<uint32, AchievementsEntry> M_Achievements;	//holds both player and account achievements
+        uint32  M_Achiv_Account_Sum;    //Account Achieve Points Sum
+        uint32  M_Achiv_Player_Used;    //Player Achieve Points used.
+
+        //Account Achievements
+        uint32  M_Achiv_Account_VIP;                    //Vip functions
+        uint32  M_Achiv_Account_Task;                   //Account Task Points Nums
+        uint32  M_Achiv_Account_Explore;                //Account Explore Points Nums
+        uint32  M_Achiv_Account_Pet_Collection;         //Account Pet Collection Points Nums
+        uint32  M_Achiv_Account_Reputation_List;        //Account Reputation List Points Nums
+        uint32  M_Achiv_Account_Profession_Skill;       //Account Profession Skill Points Nums
+        uint32  M_Achiv_Account_Killing_Nums;           //Account Killing Points Nums
+        uint32  M_Achiv_Account_PVP_Nums;               //Account PVP Points Nums
+        uint32  M_Achiv_Account_Gold_Collect;          //Account Gold Collect Points Nums
+        uint32  M_Achiv_Account_Dungeon_NUMS1;         //Account Dungeon Points Nums1
+        uint32  M_Achiv_Account_Dungeon_NUMS2;         //Account Dungeon Points Nums2
+        uint32  M_Achiv_Account_Mats_NUMS;              //Account Mats Points Nums
+        uint32  M_Achiv_Account_EQ_Nums;                //Account Equip Points Nums
+        uint32  M_Achiv_Account_Bonus_Nums;             //Account Bonus Points Nums
+        uint32  M_Achiv_Account_REWARD;                 //Account Reward Points Nums
+
+        //Player spend achievements points
+        uint32  M_Achiv_Player_Chenyi;    //Chenyi
+        uint32  M_Achiv_Player_Zhanpao;    //Zhanpao
+        uint32  M_Achiv_Player_NumsTalent;    //NumsTalent
+        uint32  M_Achiv_Player_LevelWeapon;    //LevelWeapon
+        uint32  M_Achiv_Player_LevelPet;    //LevelPet
+        uint32  M_Achiv_Player_NumsKang;    //NumsKang
+        uint32  M_Achiv_Player_NumsStrength;    //NumsStrength
+        uint32  M_Achiv_Player_NumsAgility;    //NumsAgility
+        uint32  M_Achiv_Player_NumsStamina;    //NumsStamina
+        uint32  M_Achiv_Player_NumsIntellect;    //NumsIntellect
+        uint32  M_Achiv_Player_NumsSpirit;    //NumsSpirit
+        uint32  M_Achiv_Player_NumsAP;    //NumsAP
+        uint32  M_Achiv_Player_NumsSP;    //NumsSP
+        uint32  M_Achiv_Player_DungeonTimes;  //additional dungeon times.
 
 
 

@@ -812,8 +812,8 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     // we add 100000xN means N difficulties
     // so, we can use item_id to get difficulty level, and add random property id to it.
 
-    uint32 difficulty = item_id / 100000;
-    item_id %= 100000;
+    //S8: item_id is fixed. 
+    if(item_id >= 100000) return 0;
 
     ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(item_id);
 
@@ -834,53 +834,6 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     {
         if(roll_chance_i(30)) return 3319;
     }
-
-
-    // qzqstar, 250602, all item should have random property id
-    // id range : 3301,3302,3303,3304,3305,3306,3307,3308,3309,3310,3311,3312,3313,3314,3315,3316,3317,3318,3319,3320
-    if( ((itemProto->Class == ITEM_CLASS_WEAPON) ||(itemProto->Class == ITEM_CLASS_ARMOR) ) && (itemProto->Quality > 1) &&(roll_chance_i(50)) )
-    {
-        uint32 _randomEnchantID = 0;
-        if(itemProto->ItemLevel < 40) _randomEnchantID = 3301 + difficulty * 5;
-        else if(itemProto->ItemLevel < 63) _randomEnchantID = 3302 + difficulty * 5;
-        else if(itemProto->ItemLevel < 75) _randomEnchantID = 3303 + difficulty * 5;
-        else if(itemProto->ItemLevel < 85) _randomEnchantID = 3304 + difficulty * 5;
-        else _randomEnchantID = 3305 + difficulty * 5;
-
-        /*
-        if(roll_chance_i(20)) 
-        {
-            //3321 starting from ... 
-            if(itemProto->Class == ITEM_CLASS_WEAPON) 
-            {
-                _randomEnchantID += 20;
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">>>> Add nice weapon enchant id:%d", _randomEnchantID);
-            }
-
-            else if (itemProto->Class == ITEM_CLASS_ARMOR) 
-            {
-                //
-                //if(itemProto->InventoryType == )
-            }
-        }*/
-
-        return _randomEnchantID;
-    }
-
-    else  if ( (itemProto->Class == ITEM_CLASS_WEAPON) ||(itemProto->Class == ITEM_CLASS_ARMOR) )
-    {
-        auto enchant = DBHelper_GetRandEnchantIDByLevel(itemProto->ItemLevel);
-
-        ItemRandomPropertiesEntry const* random_id = sItemRandomPropertiesStore.LookupEntry(enchant.enchantID);
-        if (!random_id)
-        {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Enchantment id #%u used but it doesn't have records in 'ItemRandomProperties.dbc'", enchant.enchantID);
-            return 0;
-        }
-
-        return random_id->ID;
-    }
-
     return 0;
 
     // RandomProperty case
@@ -900,41 +853,6 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     return 0;
 }
 
-#define __MAX_ENCHANTMENT_IDS 157
-static const int32 __Random_EnchantIDs[__MAX_ENCHANTMENT_IDS] =
-{
-    3112,3127,3141,3161,3180,3036,3046,3056,3066,3076,3086,3142,3162,3181,
-    3113,3128,3143,3163,3182,3037,3047,3057,3067,3077,3087,3144,3164,3183,
-    3101,3106,3114,3129,3038,3048,3058,3068,3078,3088,3145,3165,3184,3115,
-    3130,3146,3166,3185,3039,3049,3059,3069,3079,3089,3147,3167,3186,3116,
-    3131,3148,3168,3187,3102,3107,3149,3169,3188,3040,3050,3060,3070,3080,
-    3090,3117,3132,3150,3170,3189,3151,3171,3190,3041,3051,3061,3071,3081,
-    3091,3118,3133,3152,3172,3191,3042,3052,3062,3072,3082,3092,3103,3108,
-    3119,3134,3153,3173,3192,3120,3135,3154,3174,3193,3043,3053,3063,3073,
-    3083,3093,3121,3136,3104,3109,3122,3137,3155,3175,3194,3123,3138,3156,
-    3176,3195,3157,3177,3196,3044,3054,3064,3074,3084,3094,3124,3139,3158,
-    3178,3197,3159,3198,3045,3055,3065,3075,3085,3095,3105,3110,3125,3140,3160,3179,3199
-};
-
-static int32 __getRandomEnchantId(int32 itemLevel, int32 difficult = 0)
-{
-    int32 _minRange = 0;
-    int32 _maxRange = 0;
-
-    if(itemLevel < 20) {  _minRange = 0 + difficult * 10; _maxRange = 20 + difficult * 30; }
-    else if(itemLevel < 30) { _minRange = 10 + difficult * 10; _maxRange = 30 + difficult * 30; }
-    else { _minRange = itemLevel - 20 + difficult * 10; _maxRange = itemLevel + difficult * 30;}
-    
-    if(_minRange < 0) _minRange = 0;
-    if(_maxRange < 20) _maxRange = 20;
-
-
-    if(_minRange > 100) _minRange = 100;
-    if(_maxRange > __MAX_ENCHANTMENT_IDS-1) _maxRange = __MAX_ENCHANTMENT_IDS-1;
-
-    
-    return __Random_EnchantIDs[urand(_minRange, _maxRange)];
-}
 
 void Item::SetItemRandomProperties(int32 randomPropId)
 {
@@ -954,7 +872,7 @@ void Item::SetItemRandomProperties(int32 randomPropId)
 
                 //Set the random properties
                 SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_0), item_rand->enchant_id[0], 0, 0);
-
+/* S8:remove here.
                 //Random Enchantment for slot 2 and 3.
                 auto itemQuality = GetProto()->Quality;
                 auto _slot1 = false;
@@ -984,68 +902,7 @@ void Item::SetItemRandomProperties(int32 randomPropId)
                 {
                     SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_2), __getRandomEnchantId(GetProto()->ItemLevel), 0, 0);
                 }
-                /*
-                //qzqstar, 250213, reuse the enchant slots 1--3
-                if (randomPropId < 3000)
-                {
-                    //old settings
-                    for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < PROP_ENCHANTMENT_SLOT_0 + 3; ++i)
-                        SetEnchantment(EnchantmentSlot(i), item_rand->enchant_id[i - PROP_ENCHANTMENT_SLOT_0], 0, 0);
-                }
-                else
-                {
-                    //new enchantments, only set the enchant_id[0] to PROP_ENCHANTMENT_SLOT_0
-                    //PROP_ENCHANTMENT_SLOT_1, reused for the 
-                    SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_0), item_rand->enchant_id[0], 0, 0);
-                
-                
-                    // the PROP_ENCHANTMENT_SLOT_1 and PROP_ENCHANTMENT_SLOT_2 is used as dynamic generate enchanting
-                    auto itemLevel = GetProto()->ItemLevel;
-                    auto itemQuality = GetProto()->Quality;
-                    auto _slot1 = false;
-                    auto _slot2 = false;
-                    auto _slot3 = false;
-
-                    _slot1 = roll_chance_i(30) ? true : false;
-                    if(itemQuality > 2) 
-                    {
-                        _slot1 = true;
-                        _slot2 = roll_chance_i(20)? true : false;
-                    }
-
-                    if(itemQuality > 3)
-                    {
-                        _slot1 = true;
-                        _slot2 = true;
-                        _slot3 = roll_chance_i(30)? true : false;
-                    }
-
-                    auto __itemEchantRange = itemLevel<30? 12:
-                        itemLevel<50 ? 24:
-                        itemLevel<60 ? 36:
-                        itemLevel<70 ? 48: 60;
-                    if(_slot1)
-                    {
-                        auto _enchantId = __Random_EnchantIDs[urand(0, __itemEchantRange -1)];
-                        SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_1), _enchantId, 0, 0);
-                    }
-
-                    if(_slot2)
-                    {
-                        auto _enchantId = __Random_EnchantIDs[urand(0, __itemEchantRange -1)];
-                        SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_2), _enchantId, 0, 0);
-                    }
-
-                    //set the slot3 if slot3 is true and the slot3 is not a 3500 enchantment number
-                    //3500 is the max enchantment number for the item level 70
-                    if(_slot3 && GetEnchantmentId(PROP_ENCHANTMENT_SLOT_3)<3500)
-                    {
-                        auto _enchantId = __Random_EnchantIDs[urand(0, __itemEchantRange -1)];
-                        SetEnchantment(EnchantmentSlot(PROP_ENCHANTMENT_SLOT_3), _enchantId, 0, 0);
-                    }
-                }
-                */
-
+                    */
             }
 			//end of 250213
         }

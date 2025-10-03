@@ -698,15 +698,17 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 			if (damage > __DAMAGE_MAX_PHY) damage = __DAMAGE_MAX_PHY + (damage - __DAMAGE_MAX_PHY) / 100;
 
             //Do heal upon damage
-			if(player->M_Leech_Phy) this->CastCustomSpell(this, ZQ_SPELL_LEECH_PHY, damage * player->M_Leech_Phy/50.0f, 0, 0, true);
+			//if(player->M_Leech_Phy) this->CastCustomSpell(this, ZQ_SPELL_LEECH_PHY, damage * player->M_Leech_Phy/50.0f, 0, 0, true);
 		}
 		else if (SPELL_DIRECT_DAMAGE == damagetype)
 		{
 			if (damage > __DAMAGE_MAX_SPELL) damage = __DAMAGE_MAX_SPELL + (damage - __DAMAGE_MAX_SPELL) / 100;
 
             //Do heal upon spell damage
-			if (player->M_Leech_Spell) this->CastCustomSpell(this, ZQ_SPELL_LEECH_SPELL, damage * player->M_Leech_Spell / 50.0f, 0, 0, true);
+			//if (player->M_Leech_Spell) this->CastCustomSpell(this, ZQ_SPELL_LEECH_SPELL, damage * player->M_Leech_Spell / 50.0f, 0, 0, true);
 		}
+
+        if (player->M_Leech_Spell) this->CastCustomSpell(this, ZQ_SPELL_LEECH_SPELL, damage * player->M_Leech_Spell / 100.0f, 0, 0, true);
 	}
 
 	//qzqstar, 250207, reduce the damage for pvp

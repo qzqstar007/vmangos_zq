@@ -26,7 +26,7 @@
 #define	__STR(x)		((std::string)(x)).c_str()
 
 
-
+#define __LOG(fmt, ...)     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, fmt, ##__VA_ARGS__)
 
 #endif	//_QZQSTAR_CUSTOM_H
 

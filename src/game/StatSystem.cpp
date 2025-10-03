@@ -82,8 +82,15 @@ void Player::UpdateSpellDamageAndHealingBonus()
     // This information for client side use only
     // Get healing bonus for all schools
     // Get damage bonus for all schools
+    
+    //old
+    //for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
+    //    SetStatInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, SpellBaseDamageBonusDone(GetSchoolMask(i)));
+
+    //S8: add values for player achievements
     for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-        SetStatInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, SpellBaseDamageBonusDone(GetSchoolMask(i)));
+        SetStatInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, 
+            SpellBaseDamageBonusDone(GetSchoolMask(i)) + M_Achiv_Player_NumsSP);
 }
 
 bool Player::UpdateAllStats()
@@ -91,11 +98,27 @@ bool Player::UpdateAllStats()
     for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
     {
         float value = GetTotalStatValue(Stats(i));
+
+        //S8: add values for player achievements
+        /*        uint32  M_Achiv_Player_NumsStrength;    //NumsStrength
+        uint32  M_Achiv_Player_NumsAgility;    //NumsAgility
+        uint32  M_Achiv_Player_NumsStamina;    //NumsStamina
+        uint32  M_Achiv_Player_NumsIntellect;    //NumsIntellect
+        uint32  M_Achiv_Player_NumsSpirit;    //NumsSpirit*/
+        if(Stats(i) == STAT_STAMINA)            value += M_Achiv_Player_NumsStamina;    //NumsStamina
+        else if(Stats(i) == STAT_STRENGTH)      value += M_Achiv_Player_NumsStrength;   //NumsStrength
+        else if(Stats(i) == STAT_AGILITY)       value += M_Achiv_Player_NumsAgility;    //NumsAgility
+        else if(Stats(i) == STAT_INTELLECT)     value += M_Achiv_Player_NumsIntellect;  //NumsIntellect
+        else if(Stats(i) == STAT_SPIRIT)        value += M_Achiv_Player_NumsSpirit;     //NumsSpirit
+
         SetStat(Stats(i), (int32)value);
     }
+    //update attack power as well. Achivements.
 
     UpdateAttackPowerAndDamage();
     UpdateAttackPowerAndDamage(true);
+
+
     UpdateMaxHealth();
 
     for (int i = POWER_MANA; i < MAX_POWERS; ++i)
@@ -333,6 +356,10 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     }
 
     float baseAttackPower = GetAttackPowerFromStrengthAndAgility(ranged, GetStat(STAT_STRENGTH), GetStat(STAT_AGILITY));
+
+
+    //S8: add attach modifier
+    baseAttackPower += M_Achiv_Player_NumsAP;
 
     // attack power mods are split into positive and negative field
     float attackPowerModPositive = GetAttackPowerModifierValue(unitMod, AP_MOD_POSITIVE_FLAT);

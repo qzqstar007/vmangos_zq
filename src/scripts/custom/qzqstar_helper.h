@@ -25,8 +25,8 @@
 
 class Top10Ranking {
 private:
-	std::multimap<int, std::string, std::greater<int>> ranking; // °´·ÖÊý½µÐòÅÅÁÐ
-	static const size_t MAX_SIZE = 10; // ±£ÁôÇ°10Ãû
+	std::multimap<int, std::string, std::greater<int>> ranking; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	static const size_t MAX_SIZE = 10; // ï¿½ï¿½ï¿½ï¿½Ç°10ï¿½ï¿½
 
 
 public:
@@ -35,17 +35,27 @@ public:
 			ranking.emplace(0, "---");
 		}
 	}
-	// Ìí¼Ó»ò¸üÐÂÔªËØ
+	// ï¿½ï¿½ï¿½Ó»ï¿½ï¿½ï¿½ï¿½Ôªï¿½ï¿½
 	void addOrUpdate(int score, const std::string& name);
-	// É¾³ýÖ¸¶¨Ãû³ÆµÄÔªËØ
+	// É¾ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½Ôªï¿½ï¿½
 	bool remove(const std::string& name);
-	// ÐÂÔöº¯Êý£º»ñÈ¡µÚNÃûµÄÃû×Ö
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	std::pair<int, std::string> getEntryByRank(int rank) const;
-	// »ñÈ¡µ±Ç°ÅÅÐÐ°ñ´óÐ¡
+	// ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ð°ï¿½ï¿½Ð¡
 	size_t size() const;
-	// ¼ì²éÊÇ·ñ°üº¬Ä³¸öÃû³Æ
+	// ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	bool contains(const std::string& name) const;
 };
 
+
+
+
+#define COLOR_BLUE "|cff0829C9"
+extern std::string Helper_MakeString(std::string color, const char* fmt, ...);
+
+
+extern uint32_t Helper_GetDateInt(void);
+
+extern void Helper_Chat(Player *player, const char *fmt, ...);
 
 #endif

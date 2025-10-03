@@ -22,6 +22,10 @@
 
 #include "qzqstar_db.h"
 #include "Chat.h"
+#include "qzqstar_custom.h"
+#include "qzqstar_id.h"
+#include "QzqstarAchievements.h"
+#include "qzqstar_helper.h"
 
 #define	__STR(x)		((std::string)(x)).c_str()
 #define	__NSTR(x)		(std::to_string(x))
@@ -34,6 +38,7 @@
 
 #pragma region Quest DB Region
 
+#if false
 const std::vector<Level_QuestID_t> _Quest_Aliance_5 =
 {
 	{ 3,15}, // 回音山调查行动 |") },
@@ -2252,6 +2257,7 @@ const std::vector<Level_QuestID_t> _Quest_All =
 	{ 60,7505}, // 你与冰霜震击 |") }
 };
 
+#endif
 
 #pragma endregion
 
@@ -8796,42 +8802,6 @@ const std::vector<Level_ItemEqID_t> _Items_Eq_Rank3 =
 
 #pragma region Common Data Processing Area
 
-/*
-template <typename T, typename ValueGetter>
-auto DBHelperGetRandomElementInRangeOptimized(
-	const std::vector<T>& elements,
-	int minValue,  
-	int maxValue, 
-	ValueGetter getValue) -> decltype(getValue(std::declval<T>()))
-{
-	// 1. 计算符合条件的记录数量
-	size_t count = std::count_if(elements.begin(), elements.end(),
-		[minValue, maxValue](const T& elem) {
-		return elem.reqLevel >= minValue && elem.reqLevel <= maxValue;
-	});
-
-	if (count == 0) {
-		return decltype(getValue(std::declval<T>()))(); // 返回默认构造的值
-	}
-
-	// 2. 随机选择一条符合条件的记录
-	size_t selected = urand(0, count);
-
-	auto it = std::find_if(elements.begin(), elements.end(),
-		[minValue, maxValue](const T& elem) {
-		return elem.reqLevel >= minValue && elem.reqLevel <= maxValue;
-	});
-
-	while (selected-- > 0) {
-		it = std::find_if(std::next(it), elements.end(),
-			[minValue, maxValue](const T& elem) {
-			return elem.reqLevel >= minValue && elem.reqLevel <= maxValue;
-		});
-	}
-
-	return getValue(*it);
-}*/
-
 template <typename T, typename ValueGetter>
 auto DBHelperGetRandomElementInRangeOptimized(
     const std::vector<T>& elements,
@@ -8856,9 +8826,11 @@ auto DBHelperGetRandomElementInRangeOptimized(
 //Get the Quest by level
 Level_QuestID_t DBHelper_GetQuestByLevel(Player *p)
 {
-	if (p->GetLevel() < 5) return DBHelperGetRandomElementInRangeOptimized<Level_QuestID_t>(p->GetTeamId() == TEAM_ALLIANCE ? _Quest_Aliance_5 : _Quest_Horde_5, 1, 5, [](const Level_QuestID_t& quest) { return quest; });
-	else if (p->GetLevel() < 10) return DBHelperGetRandomElementInRangeOptimized<Level_QuestID_t>(p->GetTeamId() == TEAM_ALLIANCE ? _Quest_Aliance_10 : _Quest_Horde_10, 5, 10, [](const Level_QuestID_t& quest) { return quest; });
-	else return DBHelperGetRandomElementInRangeOptimized<Level_QuestID_t>(_Quest_All, 5, p->GetLevel(), [](const Level_QuestID_t& quest) { return quest; });
+	Level_QuestID_t x;
+	return x;
+	//if (p->GetLevel() < 5) return DBHelperGetRandomElementInRangeOptimized<Level_QuestID_t>(p->GetTeamId() == TEAM_ALLIANCE ? _Quest_Aliance_5 : _Quest_Horde_5, 1, 5, [](const Level_QuestID_t& quest) { return quest; });
+	//else if (p->GetLevel() < 10) return DBHelperGetRandomElementInRangeOptimized<Level_QuestID_t>(p->GetTeamId() == TEAM_ALLIANCE ? _Quest_Aliance_10 : _Quest_Horde_10, 5, 10, [](const Level_QuestID_t& quest) { return quest; });
+	//else return DBHelperGetRandomElementInRangeOptimized<Level_QuestID_t>(_Quest_All, 5, p->GetLevel(), [](const Level_QuestID_t& quest) { return quest; });
 };
 
 
@@ -8900,138 +8872,58 @@ Level_ItemEqID_t DBHelper_GetItemEqByCreatureLevel(Creature *c, int32 rank)
 };
 
 
-
+/* 6	+1 力量
+select DIR.ID, DBS.Name_deDE
+from db_itemrandomproperties_5875 as DIR
+join db_spellitemenchantment_5875 as DBS on DBS.ID = DIR.Enchantment_1
+where DBS.Name_deDE like "%力量%";
+ -- or  DBS.Name_deDE like "%耐力%" or  DBS.Name_deDE like "%敏捷%" or  DBS.Name_deDE like "%精神%" or  DBS.Name_deDE like "%智力%" ;
+*/
 
 const std::vector<Level_EnchantID_t> _Enchant_All =
 {
-	{ 1, 1548 },
-	{ 1, 28 },
-	{ 1, 6 },
-	{ 1, 14 },
-	{ 1, 19 },
-	{ 1, 26 },
-	{ 5, 1549 },
-	{ 5, 113 },
-	{ 5, 23 },
-	{ 5, 17 },
-	{ 5, 96 },
-	{ 5, 112 },
-	{ 9, 1550 },
-	{ 9, 153 },
-	{ 9, 24 },
-	{ 9, 18 },
-	{ 9, 135 },
-	{ 9, 152 },
-	{ 13, 1551 },
-	{ 13, 180 },
-	{ 13, 97 },
-	{ 13, 93 },
-	{ 13, 184 },
-	{ 13, 175 },
-	{ 17, 1552 },
-	{ 17, 182 },
-	{ 17, 115 },
-	{ 17, 111 },
-	{ 17, 186 },
-	{ 17, 177 },
-	{ 20, 108 },
-	{ 21, 1555 },
-	{ 21, 215 },
-	{ 21, 136 },
-	{ 21, 132 },
-	{ 21, 188 },
-	{ 21, 213 },
-	{ 25, 1556 },
-	{ 25, 409 },
-	{ 25, 155 },
-	{ 25, 151 },
-	{ 25, 218 },
-	{ 25, 383 },
-	{ 29, 1557 },
-	{ 29, 411 },
-	{ 29, 189 },
-	{ 29, 167 },
-	{ 29, 333 },
-	{ 29, 385 },
-	{ 30, 128 },
-	{ 33, 1558 },
-	{ 33, 413 },
-	{ 33, 190 },
-	{ 33, 168 },
-	{ 33, 335 },
-	{ 33, 387 },
-	{ 37, 1559 },
-	{ 37, 414 },
-	{ 37, 191 },
-	{ 37, 171 },
-	{ 37, 337 },
-	{ 37, 389 },
-	{ 40, 1608 },
-	{ 41, 1560 },
-	{ 41, 416 },
-	{ 41, 192 },
-	{ 41, 172 },
-	{ 41, 339 },
-	{ 41, 391 },
-	{ 45, 1561 },
-	{ 45, 418 },
-	{ 45, 193 },
-	{ 45, 173 },
-	{ 45, 341 },
-	{ 45, 393 },
-	{ 49, 1562 },
-	{ 49, 420 },
-	{ 49, 219 },
-	{ 49, 211 },
-	{ 49, 343 },
-	{ 49, 394 },
-	{ 50, 1609 },
-	{ 50, 1563 },
-	{ 50, 421 },
-	{ 50, 220 },
-	{ 50, 212 },
-	{ 50, 344 },
-	{ 50, 395 },
-	{ 53, 1564 },
-	{ 53, 422 },
-	{ 53, 307 },
-	{ 53, 267 },
-	{ 53, 345 },
-	{ 53, 396 },
-	{ 57, 1565 },
-	{ 57, 423 },
-	{ 57, 308 },
-	{ 57, 358 },
-	{ 57, 346 },
-	{ 57, 397 },
-	{ 60, 1612 },
-	{ 60, 1566 },
-	{ 60, 424 },
-	{ 60, 309 },
-	{ 60, 359 },
-	{ 60, 347 },
-	{ 60, 398 }	
+	{1,3200}, {1,3206}, {1,3212},	{2,3201}, {2,3207}, {2,3213},
+	{3,3202}, {3,3208}, {3,3214},	{4,3203}, {4,3209}, {4,3215},
+	{5,3161}, {5,3141}, {5,3126}, {5,3111}, {5,3180}, {5,3204}, {5,3205}, {5,3210}, {5,3211}, {5,3216}, {5,3217},
+	{10,3162}, {10,3142}, {10,3127}, {10,3112}, {10,3046}, {10,3181},
+	{15,3163}, {15,3143}, {15,3128}, {15,3113}, {15,3056}, {15,3066}, {15,3076}, {15,3086}, {15,3182},
+	{20,3164}, {20,3144}, {20,3129}, {20,3114}, {20,3036}, {20,3047}, {20,3183},
+	{25,3165}, {25,3145}, {25,3130}, {25,3115}, {25,3184},
+	{30,3166}, {30,3101}, {30,3106}, {30,3146}, {30,3131}, {30,3116}, {30,3037}, {30,3048}, {30,3057}, {30,3067}, {30,3077}, {30,3087}, {30,3185},
+	{35,3167}, {35,3147}, {35,3132}, {35,3117}, {35,3186},
+	{40,3168}, {40,3148}, {40,3102}, {40,3107}, {40,3133}, {40,3118}, {40,3038}, {40,3049}, {40,3058}, {40,3068}, {40,3078}, {40,3088}, {40,3187},
+	{43,3149}, {43,3169}, {43,3188}, {46,3150}, {46,3170}, {46,3189},
+	{50,3151}, {50,3103}, {50,3108}, {50,3134}, {50,3119}, {50,3039}, {50,3050}, {50,3059}, {50,3069}, {50,3079}, {50,3089}, {50,3171}, {50,3190},
+	{55,3152}, {55,3172}, {55,3191},
+	{60,3153}, {60,3135}, {60,3104}, {60,3109}, {60,3120}, {60,3040}, {60,3051}, {60,3060}, {60,3070}, {60,3080}, {60,3090}, {60,3173}, {60,3192},
+	{65,3154}, {65,3136}, {65,3121}, {65,3174}, {65,3193},
+	{70,3155}, {70,3137}, {70,3122}, {70,3041}, {70,3052}, {70,3061}, {70,3071}, {70,3081}, {70,3091}, {70,3175}, {70,3194},
+	{75,3156}, {75,3138}, {75,3123}, {75,3176}, {75,3195},
+	{80,3157}, {80,3139}, {80,3124}, {80,3105}, {80,3110}, {80,3042}, {80,3053}, {80,3062}, {80,3072}, {80,3082}, {80,3092}, {80,3177}, {80,3196},
+	{85,3158}, {85,3140}, {85,3125}, {85,3178}, {85,3197},	{90,3159}, {90,3179}, {90,3198}, {90,3199},	{95,3160},
+	{100,3043}, {100,3044}, {100,3045}, {100,3054}, {100,3055}, {100,3063}, {100,3064}, {100,3065}, {100,3073}, {100,3074}, {100,3075}, {100,3083}, 
+	{100,3084}, {100,3085}, {100,3093}, {100,3094}, {100,3095}
 };
 
 
-Level_EnchantID_t DBHelper_GetRandEnchantIDByLevel(int32 itemLevel)
+int32 DBHelper_GetRandEnchantIDByLevel(int32 itemLevel)
 {
 	int _minRange = 0;
 	int _maxRange = 0;
 
-	if(itemLevel <= 10) 
+	if(itemLevel <= 15) 
 	{
 		_minRange = 0;
-		_maxRange = 10;
+		_maxRange = 15;
 	}
 	else 
 	{
-		_minRange = itemLevel - 10;
-		_maxRange = itemLevel + 5;
+		_minRange = itemLevel - 15;
+		_maxRange = itemLevel;
 	}
 
 	return DBHelperGetRandomElementInRangeOptimized<Level_EnchantID_t>(
-		_Enchant_All, _minRange , _maxRange, [](const Level_EnchantID_t& en) { return en; });
+		_Enchant_All, _minRange , _maxRange, [](const Level_EnchantID_t& en) { return en.enchantID; });
 };
 
 
@@ -9144,6 +9036,211 @@ bool isCollectionItem(uint32_t eqItemID)
 	}
 
 	return false;
+}
+
+// Equipment list for the world
+const int32_t _Pet_Collections_World[] =
+{    //world level,  item level (can be used as pet level/bonus points), ... etc
+	8490,8491,8492,8498, 	8499,10398,10822,11474, 
+	12264,12529,20769,21277,	/*12*/8494,12185,13582,13583,
+	18597,18598,19054,19055,	19450,20371,20651,22235,
+	22780,22781,23002,23007,	23015,23083
+};	
+uint32_t DBHelper_IsPetCollection(uint32_t eqItemID)
+{
+	//check world, dungeons, and profession
+	int i = 0;
+	for(i = 0; i < sizeof(_Pet_Collections_World) / sizeof(_Pet_Collections_World[0]); i++)
+	{
+		if (_Pet_Collections_World[i] == eqItemID) {
+			__LOG("Pet id %u is chosen id.", _Pet_Collections_World[i]);
+			return i + 1;
+		}
+	}
+	return 0;
+}
+
+//reputation list for the player and accounts
+const int32_t _Reputations_List[] =
+{
+	//reputation ids
+
+	//alliance	
+	47,72,69,54,	890,509,730,
+
+	//horde
+	76,68,81,530,	889,510,729,
+
+	//common
+	21,470,577,369,	609,349,909,576,	59,529,270,966
+
+};
+
+uint32_t DBHelper_GetPlayerReputation_Bits(Player * player)
+{
+	//check world, dungeons, and profession
+	uint32_t bits = 0;
+	
+	//get reputation list from _Reputations_List
+	for(int i = 0; i < sizeof(_Reputations_List)/sizeof(_Reputations_List[0]); i++)
+	{
+		//get the player's reputation rank
+		int rank = player->GetReputationMgr().GetReputation(_Reputations_List[i]);
+		//__LOG("Reputation %d: %d", _Reputations_List[i], rank);
+		if(rank >= 21000)
+		{
+			bits |= (1 << i);
+		}
+	}
+
+	return bits;
+}
+
+const int32_t _Profs_List[] =
+{
+	SKILL_HERBALISM,
+	SKILL_ALCHEMY,
+	SKILL_MINING,
+	SKILL_BLACKSMITHING,
+	SKILL_SKINNING,
+	SKILL_LEATHERWORKING,
+	SKILL_TAILORING,
+	SKILL_ENCHANTING,
+	SKILL_ENGINEERING,
+	SKILL_FIRST_AID,
+	SKILL_FISHING,
+	SKILL_COOKING
+};
+uint32_t DBHelper_GetPlayerProfs_Bits(Player * player)
+{
+	//check world, dungeons, and profession
+	uint32_t bits = 0;
+	
+	//get profession list from _EQ_Collections_Profession
+	for(int i = 0; i < sizeof(_Profs_List)/sizeof(_Profs_List[0]); i++)
+	{
+		if(player->HasSkill(_Profs_List[i]) && player->GetSkillValuePure(_Profs_List[i]) >= 300)	
+			bits |= (1 << i);
+	}
+	
+	return bits;
+}
+
+
+/*	int				_id;
+	int             multi;
+	uint32			spellId;
+	int             pointsNeed;
+	int             pointsIncEachLevel;   //check this
+	int             maxpoints;*/
+const FragUpgrade_t Ability_MenuS8[PLAYER_ABILITIES_NUM_S8]=
+{  //id  multi, spellID, pointsneeded, each level.
+	{0, 1, 0, 10, 30, 9, __STR("|cff002fa7【衬衣】最高９级　|r"), __STR("级　")},
+	{1, 1, 0, 10, 30, 9, __STR("|cff002fa7【战袍】最高９级　|r"), __STR("级　")},
+	{2, 1, 0, 20, 30, 9, __STR("|cff002fa7【天赋】最高９点　|r"), __STR("点　")},
+	{3, 1, 0, 10,  5, 9, __STR("|cff002fa7【武器】最高９点　|r"), __STR("点　")},
+	{4, 1, 0, 10, 20, 9, __STR("|cff002fa7【宠物】最高９级　|r"), __STR("级　")},
+    {5, 5, 0, 10, 5, 10, __STR("|cff002fa7【抗性】最高５０点　|r"), __STR("点　")},
+	{6, 1, 0, 2, 0, 200, __STR("|cff002fa7【力量】最高２００点　|r"), __STR("级　")},
+	{7, 1, 0, 2, 0, 200, __STR("|cff002fa7【敏捷】最高２００点　|r"), __STR("级　")},
+	{8, 1, 0, 1, 0, 400, __STR("|cff002fa7【耐力】最高４００点　|r"), __STR("点　")},
+	{9, 1, 0, 1, 0, 400, __STR("|cff002fa7【智力】最高４００点　|r"), __STR("级　")},
+   {10, 1, 0, 1, 0, 400, __STR("|cff002fa7【精神】最高４００点　|r"), __STR("级　")},
+   {11, 1, 0, 1, 0, 400, __STR("|cff002fa7【法伤】最高４００点　|r"), __STR("点　")},
+   {12, 1, 0, 1, 0, 800, __STR("|cff002fa7【攻强】最高８００点　|r"), __STR("点　")},
+   {13, 1, 0, 100, 100,  5, __STR("|cff002fa7【副本】额外最多５次　|r"), __STR("次　")},
+};
+
+//nullptr means level 60 player
+int DBHelper_get_upgrade_points(Player *player,  int ability_type, int curpoints)
+{
+	//ability upgrade should also depend on the player level
+	//player level [1, 15, 25, 45, 60]
+	//ablity level [0, 1, 2, 3, 4]
+	int playerlevel = player?player->GetLevel():60;
+	if (ability_type >= PLAYER_ABILITIES_NUM_S8) return -1;
+	if(curpoints >= Ability_MenuS8[ability_type].maxpoints) return -2;
+	if(playerlevel < (curpoints * 60 / Ability_MenuS8[ability_type].maxpoints) ) return -3;
+	return Ability_MenuS8[ability_type].pointsNeed +  curpoints * Ability_MenuS8[ability_type].pointsIncEachLevel;
+}
+
+int DBHelper_get_used_points(Player *player, int ability_type)
+{
+	if (ability_type >= PLAYER_ABILITIES_NUM_S8) return -1;
+
+	int curpoints = 0;
+	
+	//check the ability type of player
+	switch(ability_type)
+	{
+		case PLAYER_USED_LEVEL_CHENYI: curpoints  = player->M_Achiv_Player_Chenyi; break;
+		case PLAYER_USED_LEVEL_ZHANPAO: curpoints  = player->M_Achiv_Player_Zhanpao; break;
+		case PLAYER_USED_NUMS_TALENT: curpoints  = player->M_Achiv_Player_NumsTalent; break;
+		case PLAYER_USED_LEVEL_WEAPON: curpoints  = player->M_Achiv_Player_LevelWeapon; break;
+		case PLAYER_USED_LEVEL_PET: curpoints  = player->M_Achiv_Player_LevelPet; break;
+		case PLAYER_USED_NUMS_KANG: curpoints  = player->M_Achiv_Player_NumsKang; break;
+		case PLAYER_USED_NUMS_STRENGTH: curpoints  = player->M_Achiv_Player_NumsStrength; break;
+		case PLAYER_USED_NUMS_AGILITY: curpoints  = player->M_Achiv_Player_NumsAgility; break;
+		case PLAYER_USED_NUMS_STAMINA: curpoints  = player->M_Achiv_Player_NumsStamina; break;
+		case PLAYER_USED_NUMS_INTELLECT: curpoints  = player->M_Achiv_Player_NumsIntellect; break;
+		case PLAYER_USED_NUMS_SPIRIT: curpoints  = player->M_Achiv_Player_NumsSpirit; break;
+		case PLAYER_USED_NUMS_AP: curpoints  = player->M_Achiv_Player_NumsAP; break;
+		case PLAYER_USED_NUMS_SP: curpoints  = player->M_Achiv_Player_NumsSP; break;
+		case PLAYER_USED_NUMS_DUNGEON_TIMES: curpoints  = player->M_Achiv_Player_DungeonTimes; break;
+	}
+	if(curpoints == 0) return 0;
+
+	//curpoints is current level spent, so we need to caculate how many points had been used.
+	//each level used points = Ability_MenuS8[ability_type].pointsNeed +  curpoints * Ability_MenuS8[ability_type].pointsIncEachLevel;
+
+	if(Ability_MenuS8[ability_type].pointsIncEachLevel == 0)  return Ability_MenuS8[ability_type].pointsNeed * curpoints;
+
+	int sum = 0;
+	for (int i = 0; i < curpoints; i++)
+	{
+		//60 means maximum player level.
+		sum += DBHelper_get_upgrade_points(nullptr, ability_type, i);
+	}
+
+	return sum;
+}
+
+
+int DBHelper_get_bonus_points(Player *player, Item * pItem)
+{
+	int _bonus = 0;
+	if (!player || !pItem) return 0;
+
+	if ( (pItem->GetEntry() == ZQ_ITEM_ACHIVE_ITEM)  && (player->M_Achiv_Account_Bonus_Nums < 500 ))
+	{
+		_bonus = pItem->GetProto()->SellPrice * pItem->GetCount();
+		_bonus += ACHIEVEMENT_ACCOUNT_BONUS_NUMS * 1000;
+	}
+	else if (int index = DBHelper_IsPetCollection(pItem->GetEntry()))
+	{
+		//check if player has achieved this index
+		if (( player->M_Achiv_Account_Pet_Collection & (1 << index) ) == 0)
+		{
+			_bonus = pItem->GetProto()->SellPrice;
+			_bonus += ACHIEVEMENT_ACCOUNT_PET_COLLECTION * 1000;
+		}
+		else
+		{
+			Helper_Chat(player, ">> 你已经获取此成就： %s  ", pItem->GetProto()->Name1);
+		}
+	}
+	else if ( (player->M_Achiv_Account_EQ_Nums < 500) && (pItem->GetProto()->DisenchantID > 0) && (pItem->GetProto()->Quality > 1) && (pItem->GetProto()->Class == ITEM_CLASS_WEAPON || pItem->GetProto()->Class == ITEM_CLASS_ARMOR))
+	{
+		//check the pItemlevel,	range 10~ 80 etc ... max achivpoints is 500, 400 is 80 * 4 = 320 * 1.5 ... 
+		if (player->M_Achiv_Account_EQ_Nums < pItem->GetProto()->ItemLevel * pItem->GetProto()->Quality * 1.5)
+		{
+			_bonus = 1;
+			_bonus += ACHIEVEMENT_ACCOUNT_EQ_NUMS * 1000;
+
+		}
+	}
+
+	return _bonus;
 }
 
 #pragma endregion

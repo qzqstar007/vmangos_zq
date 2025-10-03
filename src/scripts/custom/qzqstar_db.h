@@ -55,7 +55,7 @@ typedef struct _level_enchantID {
 	int32 enchantID;
 }Level_EnchantID_t;
 
-extern Level_EnchantID_t DBHelper_GetRandEnchantIDByLevel(int32 itemLevel);
+extern int32 DBHelper_GetRandEnchantIDByLevel(int32 itemLevel);
 
 
 //Equipment list for the world
@@ -80,6 +80,28 @@ extern const EQ_Collect_Dungeon_t * DBHelper_GetEQByDungeonID(int32 mapId);
 extern int COUNT_ONES(uint32_t x) ;
 
 extern bool isCollectionItem(uint32_t eqItemID);
+
+extern uint32_t DBHelper_IsPetCollection(uint32_t eqItemID);
+extern uint32_t DBHelper_GetPlayerReputation_Bits(Player * player);
+extern uint32_t DBHelper_GetPlayerProfs_Bits(Player * player);
+
+typedef struct _Fragment_Upgrade_t
+{
+	int				_id;
+	int             multi;
+	uint32			spellId;
+	int             pointsNeed;
+	int             pointsIncEachLevel;
+	int             maxpoints;
+	std::string		desc;
+	std::string     unit;
+}FragUpgrade_t;
+
+#define PLAYER_ABILITIES_NUM_S8				14
+extern const FragUpgrade_t Ability_MenuS8[PLAYER_ABILITIES_NUM_S8];
+extern int DBHelper_get_upgrade_points(Player *player,  int ability_type, int curpoints);
+extern int DBHelper_get_used_points(Player *player, int ability_type);
+extern int DBHelper_get_bonus_points(Player *player, Item * pItem);
 
 
 

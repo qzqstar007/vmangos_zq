@@ -28,6 +28,8 @@
 #include "qzqstar_rune_str.h"
 #include "qzqstar_teleport.h"
 
+#include "qzqstar_custom.h"
+
 #define	__MENU_NONE						0
 #define	__MENU_SIZE						999
 
@@ -35,11 +37,12 @@
 #define __MENU_KELALA_MAIN				 1000
 #define __MENU_KELALA_LOGIN				 2000
 #define __MENU_KELALA_TASK				 3000
-#define __MENU_KELALA_MODE				 4000
-#define __MENU_KELALA_SHOP				 5000
-#define __MENU_KELALA_SOCIAL			 6000
-#define __MENU_KELALA_REP				 7000
-#define __MENU_KELALA_EQUIP_COLLECTS     10000
+#define __MENU_KELALA_ACHIEVEMENTS		 4000
+#define __MENU_KELALA_MODE				 5000
+#define __MENU_KELALA_SHOP				 6000
+#define __MENU_KELALA_SOCIAL			 7000
+#define __MENU_KELALA_REP				 8000
+#define __MENU_KELALA_EQUIP_COLLECTS     				10000
 #define __MENU_KELALA_EQUIP_COLLECTS_WORLD				11000
 #define __MENU_KELALA_EQUIP_COLLECTS_DUNGEON 			12000
 #define __MENU_KELALA_EQUIP_COLLECTS_RAID	 			16000
@@ -71,15 +74,15 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 	auto abs_action = action - __MENU_KELALA_LOGIN;
 
 	//get player's vip level
-	uint32 vip_level = sQZAchievements.GetVIPLevel(player);
-	uint32 vip_gold  = vip_level * vip_level * 1000;
-	std::string text = "";
+	//uint32 vip_level = sQZAchievements.GetVIPLevel(player);
+	//uint32 vip_gold  = vip_level * vip_level * 1000;
+	//std::string text = "";
 
 	if (abs_action == __SUBMENU_LOGIN_MAIN)
 	{
 		//check if player has finished the quest of login reward
 		//login reward quest id is __LOGIN_REWARD_QUEST_ID, 
-		Quest const* pQuest = sObjectMgr.GetQuestTemplate(__LOGIN_REWARD_QUEST_ID);
+		/*Quest const* pQuest = sObjectMgr.GetQuestTemplate(__LOGIN_REWARD_QUEST_ID);
 		if(pQuest && player->CanTakeQuest(pQuest, false))
 		{
 			player->RewardQuest(pQuest, 0, player, false);
@@ -109,18 +112,34 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　登陆奖励领取成功　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		}*/
+		//Get the account time and date
+		uint32_t _now = Helper_GetDateInt();
+		uint32_t _accountDate = sQZAchievements.GetAccAchieveData(player, ACHIEVEMENT_ACCOUNT_REWARD);
+		if(_now / 100 != _accountDate / 100)
+		{
+			//update the account date
+			sQZAchievements.SetAccAchieveData(player, ACHIEVEMENT_ACCOUNT_REWARD, _now);
+
+			__LOG("[Menus_Kelala_Login] Player:%s got daily reward. @%u, old:%u", player->GetName(), _now, _accountDate);
+			player->AddItem(ZQ_ITEM_VOUCHER,  5); player->AddItem(ZQ_ITEM_BUFF, 1); 
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　登陆奖励领取成功　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		}
 		else
 		{
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝奖励已领取，或等级１０级以上。＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　　账号奖励已领取　　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 		}
 
 		//display the player's vip level
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
+		/*
 		//todo, get the level if has vouchers/stones etc...
 		for (uint32 i = 0; i < 4; i++)
 		{
@@ -150,9 +169,10 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 
 			text = __STR(__BLUE("＝＝＝＞　点击升级 ＜＝＝　"));
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(text), GOSSIP_SENDER_MAIN, __MENU_KELALA_LOGIN + __SUBMENU_LOGIN_VIP_LEVELUP);
-		}
+		}*/
 
 	}
+	/*
 	else if (abs_action == __SUBMENU_LOGIN_VIP_LEVELUP)
 	{
 		//check if player has enough gold to level up vip level
@@ -175,7 +195,7 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 		//add item to main menu
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＞　返回　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_LOGIN + __SUBMENU_LOGIN_MAIN);
-	}
+	}*/
 	else if (abs_action >= __SUBMENU_LOGIN_VIP_LEVELUP_STONE && abs_action <= __SUBMENU_LOGIN_VIP_LEVELUP_STONE + 3)
 	{
 		//check if player has the item of vip level i
@@ -608,6 +628,42 @@ bool Menus_Kelala_Task(Player *player, Creature *_Creature, uint32 sender, uint3
 }
 
 #pragma endregion
+
+
+#pragma region Achievement System
+
+#define __MENU_ACHIEVEMENTS_MAIN				(__MENU_KELALA_ACHIEVEMENTS)
+#define __MENU_ACHIEVEMENTS_SUB_1				(__MENU_ACHIEVEMENTS_MAIN + 10)
+
+bool Menus_Kelala_Achievements(Player *player, Creature *_Creature, uint32 sender, uint32 action)
+{
+	//check if player is null and go is null
+	if (!player ||!_Creature) return false;
+
+	// Main menu
+	std::string text = "";
+
+	// Main menu
+
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(Helper_MakeString(COLOR_BLUE, "＝　账号成就点数：　%u　　", player->M_Achiv_Account_Sum)), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(Helper_MakeString(COLOR_BLUE, "＝　当前角色消耗：　%u　　", player->M_Achiv_Player_Used)), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR((" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝　查询成就　＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝　分配点数　＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR((" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝　领取成就称号　＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+
+	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+
+	return true;
+}
+
+#pragma endregion
+
 
 #pragma region Shop System
 
@@ -2033,11 +2089,14 @@ bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 acti
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　点券商城　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SHOP);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　任务系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_TASK);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　成就系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_ACHIEVEMENTS);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装备收集　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　任务系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_TASK);
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装备收集　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_COLLECTS);
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　社区贡献　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SOCIAL);
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -2048,8 +2107,8 @@ bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 acti
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	}
 
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　声望奖励　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_REP);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　声望奖励　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_REP);
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 
 
@@ -2078,7 +2137,7 @@ bool Menus_Kelala_Newbie(Player *player, Creature *_cr, uint32 sender, uint32 ac
 		player->RewardQuest(pQuest, 0, player, false);
 
 		//add item
-		player->AddItem(30000, 200);
+		//player->AddItem(30000, 200);
 
 		//Cast the first spell
 		player->CastSpell(player, ZQ_SPELL_BUFF_DRAGON_SLAYER, true);
@@ -2129,6 +2188,11 @@ bool Kelala_Menus(Player *player, Creature *_cr, uint32 sender, uint32 action)
 	else if (action >= __MENU_KELALA_TASK && action <= __MENU_KELALA_TASK + __MENU_SIZE)
 	{
 		return Menus_Kelala_Task(player, _cr, sender, action);
+	}
+	// Achievement menu
+	else if (action >= __MENU_KELALA_ACHIEVEMENTS && action <= __MENU_KELALA_ACHIEVEMENTS + __MENU_SIZE)
+	{
+		return Menus_Kelala_Achievements(player, _cr, sender, action);	
 	}
 	// Mode menu
 	else if (action >= __MENU_KELALA_MODE && action <= __MENU_KELALA_MODE + __MENU_SIZE)

@@ -6,26 +6,20 @@
 
 #include <vector>
 
-struct AchievementsEntry
-{
-	int32 entry;
-	int32 guid;
-	int32 type;
-	int32 subType;
-	int32 data1;	
-	int32 data2;	
-	int32 data3;
-	int32 data4;
-	std::string note;
-	int32 data5;
-	int32 data6;
-	int32 data7;
-	int32 data8;
-};
+
+
+
+#define ACHIEVEMENT_TYPE_PLAYER		(0)
+#define ACHIEVEMENT_TYPE_ACCOUNT	(1)
 
 enum Achievement_t
 {
 	ACHIEVEMENT_ACCOUNT			= 	11,	//We use this as Account Achievement, shared the characters in this account
+	ACHIEVEMENT_PLAYER_DATA 	= 	12,	//Player spend list, should be caculated each time log in
+
+
+
+	//Older Type
 	ACHIEVEMENT_VIP 		  	= 	66,
 	ACHIEVEMENT_RUNE 		  	= 	88,
 	ACHIEVEMENT_CUSTOM_QUEST 	= 	100,
@@ -44,14 +38,58 @@ enum Achievement_t
 	ACHIEVEMENT_COUNTERS		=	1000,	//For combine and refreshing...
 };
 
+//S8 -
+//Achievement Data
+#define ACHIEVEMENT_ACCOUNT_VIP					(0)
+#define ACHIEVEMENT_ACCOUNT_TASK				(1)	 //Explore the world, and get the data in data1
+#define ACHIEVEMENT_ACCOUNT_EXPLORE				(2)
+#define ACHIEVEMENT_ACCOUNT_PET_COLLECTION		(3)
+#define ACHIEVEMENT_ACCOUNT_REPUTATION_LIST		(4)
+#define ACHIEVEMENT_ACCOUNT_PROFESSION_SKILL	(5)	
+#define ACHIEVEMENT_ACCOUNT_KILLING_NUMS		(6)	
+#define ACHIEVEMENT_ACCOUNT_PVP_NUMS			(7)
+#define ACHIEVEMENT_ACCOUNT_GOLD_COLLECT		(8)
+#define ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1		(9)	
+#define ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2		(10)	
+#define ACHIEVEMENT_ACCOUNT_MATS_NUMS			(11)		
+#define ACHIEVEMENT_ACCOUNT_EQ_NUMS				(12)	
+#define ACHIEVEMENT_ACCOUNT_BONUS_NUMS			(14)
+#define ACHIEVEMENT_ACCOUNT_REWARD				(15)
+
+//Player Used Data
+//need caculate and compare with account data
+#define PLAYER_USED_LEVEL_CHENYI				(0)
+#define PLAYER_USED_LEVEL_ZHANPAO				(1)
+#define PLAYER_USED_NUMS_TALENT					(2)
+#define PLAYER_USED_LEVEL_WEAPON				(3)
+#define PLAYER_USED_LEVEL_PET					(4)
+#define PLAYER_USED_NUMS_KANG					(5)
+#define PLAYER_USED_NUMS_STRENGTH				(6)
+#define PLAYER_USED_NUMS_AGILITY				(7)
+#define PLAYER_USED_NUMS_STAMINA				(8)
+#define PLAYER_USED_NUMS_INTELLECT				(9)
+#define PLAYER_USED_NUMS_SPIRIT					(10)
+#define PLAYER_USED_NUMS_SP						(11)
+#define PLAYER_USED_NUMS_AP						(12)
+#define PLAYER_USED_NUMS_DUNGEON_TIMES			(13)
+
+
+//don't need caculate
+#define PLAYER_USED_CHALLGE_MODE				(90)
+
+
 //VIP Features
-#define VIP_SUISHEN_ROBOT	(0x01)
-#define VIP_SUISHEN_BANK	(0x02)
-#define VIP_SUISHEN_AH		(0x04)
-#define VIP_SUISHEN_STABLE	(0x08)
-#define VIP_TEAM_SUMMON		(0x10)
-#define VIP_TEAM_REVIVE		(0x20)
-#define VIP_TEAM_FULLFILL	(0x40)
+#define VIP_SUISHEN_ROBOT	(0x00000001)
+#define VIP_SUISHEN_BANK	(0x00000002)
+#define VIP_SUISHEN_AH		(0x00000004)
+#define VIP_SUISHEN_STABLE	(0x00000008)
+#define VIP_TEAM_SUMMON		(0x00000010)
+#define VIP_TEAM_REVIVE		(0x00000020)
+#define VIP_TEAM_FULLFILL	(0x00000040)
+#define VIP_ONEKEY_PICK		(0x00000100)
+#define VIP_SUISHEN_BUFF	(0x00000200)
+#define VIP_LEVEL_MASK		(0x000F0000)
+#define VIP_SPEICIAL_MASK	(0x00F00000)
 
 #define VIP_SPECIAL_FREE_STOLE	 (0x01)		//stored in data8
 #define VIP_SPECIAL_FREE_ENCHANT (0x02)		//stored in data8
@@ -92,7 +130,8 @@ class QzqstarAchievements
 private:
 	//create a vector map to store all the player's achievements
 	//key is player guid, value is a vector of AchievementsEntry
-	std::map<uint32, std::vector<AchievementsEntry> > _playerAchievements;
+	//move to player's achievements
+	std::map<uint32, std::vector<AchievementsEntry> > _playerAchievements;	//holds both player and account achievements
 
 public:
 	QzqstarAchievements();
@@ -119,21 +158,14 @@ public:
 	 *		Account Achievement Functions
 	 *
 	 *****************************************************/
-	//Data1: Pet Collections
-	//Data2: Reputation list
-	//Data3: Collection Herb/Ore/Feather Nums
-	//Data4: Tasks:9999 Explore Area:9999 
-	//Data5: 12 Professions - 300
-	//Data6:
-	//Data7: Killing numbers: 99999 9999
-	//Data8: Gold collect
-	AchievementsEntry GetAccountAchievementEntry(Player *player);
+	uint32 QzqstarAchievements::GetAccountSum(Player * _player);
+	uint32 QzqstarAchievements::GetAccAchieveData(Player * _player, uint32 type);
+	void QzqstarAchievements::IncAccAchieveData(Player * _player, uint32 type);
+	void QzqstarAchievements::SetAccAchieveData(Player * _player, uint32 type, uint32 data);
 
-
-	uint32 GetAccountAchievement(Player *player);
-	bool SetAccountAchievement(Player *player, uint32 achievement);
-	// Check if the player has achieved the account achievement
-	bool CheckAccountAchievement(Player *player, uint32 achievement);
+	uint32 QzqstarAchievements::GetPlayerData(Player * _player, uint32 type);
+	uint32 QzqstarAchievements::GetPlayerSum(Player * _player);
+	void QzqstarAchievements::SetPlayerData(Player * _player, uint32 type, uint32 data);
 
 
 	/*****************************************************

@@ -19,23 +19,23 @@
 #include "qzqstar_helper.h"
 #include "Chat.h"
 
-// Ìí¼Ó»ò¸üĞÂÔªËØ
+// ï¿½ï¿½ï¿½Ó»ï¿½ï¿½ï¿½ï¿½Ôªï¿½ï¿½
 void Top10Ranking::addOrUpdate(int score, const std::string& name) {
-	// ÏÈ³¢ÊÔÉ¾³ıÍ¬ÃûÌõÄ¿£¨Èç¹û´æÔÚ£©
+	// ï¿½È³ï¿½ï¿½ï¿½É¾ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½
 	remove(name);
 
-	// Ìí¼ÓĞÂÌõÄ¿
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
 	ranking.emplace(score, name);
 
-	// Èç¹û³¬¹ı´óĞ¡ÏŞÖÆ£¬É¾³ı×îµÍ·ÖµÄ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¡ï¿½ï¿½ï¿½Æ£ï¿½É¾ï¿½ï¿½ï¿½ï¿½Í·Öµï¿½
 	if (ranking.size() > MAX_SIZE) {
 		auto last = ranking.end();
-		--last; // Ö¸Ïò×îºóÒ»¸öÔªËØ£¨×îµÍ·Ö£©
+		--last; // Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ôªï¿½Ø£ï¿½ï¿½ï¿½Í·Ö£ï¿½
 		ranking.erase(last);
 	}
 }
 
-// É¾³ıÖ¸¶¨Ãû³ÆµÄÔªËØ
+// É¾ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½Ôªï¿½ï¿½
 bool Top10Ranking::remove(const std::string& name) {
 	bool found = false;
 	for (auto it = ranking.begin(); it != ranking.end(); ) {
@@ -50,12 +50,12 @@ bool Top10Ranking::remove(const std::string& name) {
 	return found;
 }
 
-// »ñÈ¡µ±Ç°ÅÅĞĞ°ñ´óĞ¡
+// ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ğ°ï¿½ï¿½Ğ¡
 size_t Top10Ranking::size() const {
 	return ranking.size();
 }
 
-// ĞÂÔöº¯Êı£ºÍ¬Ê±»ñÈ¡µÚNÃûµÄ·ÖÊıºÍÃû×Ö
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬Ê±ï¿½ï¿½È¡ï¿½ï¿½Nï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 std::pair<int, std::string> Top10Ranking::getEntryByRank(int rank) const {
 	if (rank < 1 || rank > MAX_SIZE) {
 		return {0, "---"};
@@ -66,7 +66,7 @@ std::pair<int, std::string> Top10Ranking::getEntryByRank(int rank) const {
 	return{ std::get<0>(*it), std::get<1>(*it) };
 }
 
-// ¼ì²éÊÇ·ñ°üº¬Ä³¸öÃû³Æ
+// ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 bool Top10Ranking::contains(const std::string& name) const {
 	for (const auto& entry : ranking) {
 		if (entry.second == name) {
@@ -74,5 +74,91 @@ bool Top10Ranking::contains(const std::string& name) const {
 		}
 	}
 	return false;
+}
+
+
+
+extern std::string Helper_MakeString(std::string color, const char* fmt, ...) {
+    std::string result;
+    
+    // æ·»åŠ é¢œè‰²ä»£ç å‰ç¼€
+    if(color.length() > 2)result.append(color);
+    
+    // å¤„ç†å¯å˜å‚æ•°
+    va_list args;
+    va_start(args, fmt);
+    
+    // è®¡ç®—æ ¼å¼åŒ–åçš„å­—ç¬¦ä¸²é•¿åº¦
+    int length = vsnprintf(nullptr, 0, fmt, args);
+    va_end(args);
+    
+    if (length > 0) {
+        // åˆ†é…ç¼“å†²åŒº
+        char* buffer = new char[length + 1];
+        
+        // é‡æ–°è·å–å‚æ•°å¹¶æ ¼å¼åŒ–
+        va_start(args, fmt);
+        vsnprintf(buffer, length + 1, fmt, args);
+        va_end(args);
+        
+        // æ·»åŠ æ ¼å¼åŒ–åçš„å­—ç¬¦ä¸²
+        result.append(buffer);
+        
+        // é‡Šæ”¾ç¼“å†²åŒº
+        delete[] buffer;
+    }
+    
+    // æ·»åŠ é¢œè‰²é‡ç½®ä»£ç 
+	if (color.length() > 2) result.append("|r");
+    
+    return result;
+}
+
+
+//like 25092114
+uint32_t Helper_GetDateInt() {
+    // è·å–å½“å‰æ—¶é—´æˆ³
+    std::time_t now = std::time(nullptr);
+    
+    // è½¬æ¢ä¸ºæœ¬åœ°æ—¶é—´ï¼ˆè€ƒè™‘æ—¶åŒºï¼‰
+    std::tm* local_time = std::localtime(&now);
+    
+    // æå–å¹´æœˆæ—¥å¹¶æ ¼å¼åŒ–ä¸ºæ•´æ•°
+    int year = 1900 + local_time->tm_year;  // tm_year æ˜¯ä»1900å¼€å§‹çš„å¹´æ•°
+    int month = 1 + local_time->tm_mon;     // tm_mon ä»0å¼€å§‹ï¼Œ0=1æœˆ
+    
+    // ç»„åˆæˆ YYMMDD æ ¼å¼çš„æ•´æ•°
+    return (year % 100) * 1000000 + month * 10000 + local_time->tm_mday*100 + local_time->tm_hour;
+}
+
+void Helper_Chat(Player *player, const char *fmt, ...) {
+    std::string result;
+    
+    // å¤„ç†å¯å˜å‚æ•°
+    va_list args;
+    va_start(args, fmt);
+    
+    // è®¡ç®—æ ¼å¼åŒ–åçš„å­—ç¬¦ä¸²é•¿åº¦
+    int length = vsnprintf(nullptr, 0, fmt, args);
+    va_end(args);
+    
+    if (length > 0) {
+        // åˆ†é…ç¼“å†²åŒº
+        char* buffer = new char[length + 1];
+        
+        // é‡æ–°è·å–å‚æ•°å¹¶æ ¼å¼åŒ–
+        va_start(args, fmt);
+        vsnprintf(buffer, length + 1, fmt, args);
+        va_end(args);
+        
+        // æ·»åŠ æ ¼å¼åŒ–åçš„å­—ç¬¦ä¸²
+        result.append(buffer);
+        
+        // é‡Šæ”¾ç¼“å†²åŒº
+        delete[] buffer;
+    }
+    
+    // å‘é€èŠå¤©æ¶ˆæ¯
+	ChatHandler(player).PSendSysMessage(result.c_str());	
 }
 

@@ -7,8 +7,11 @@
 
 #include "QzqstarAchievements.h"
 #include "custom/qzqstar_db.h"
+#include "custom/qzqstar_custom.h"
 
 INSTANTIATE_SINGLETON_1(QzqstarAchievements);
+
+#define DATA_MAX		(2000000000)
 
 QzqstarAchievements::QzqstarAchievements()
 {
@@ -46,46 +49,63 @@ void QzqstarAchievements::Update(uint32 diff)
 	}
 }
 
+static void _zeroData(AchievementsEntry * e)
+{
+	if(!e) return;
+	e->subType = 0;	e->data0 = 0;
+	e->data1 = 0; 	e->data2 = 0; 	e->data3 = 0;	e->data4 = 0;
+	e->data5 = 0; 	e->data6 = 0; 	e->data7 = 0;	e->data8 = 0;
+	e->data9 = 0; 	e->data10 = 0; 	e->data11 = 0;	e->data12 = 0;
+	e->data13 = 0; 	e->data14 = 0; 	e->data15 = 0;
+}
+
 //load player's achievements from database a_achievements
 int32 QzqstarAchievements::Load(Player * _player)
 {
-	std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT `guid`, `type`, `subType`,`data1`,`data2`,`data3`,`data4`, `note`, `data5`, `data6`, `data7`, `data8` FROM `a_achievements` WHERE `guid` = '%u'", _player->GetGUID()));
-	if (!result)
-	{
-		return 0;
-	}
-
-	//clear the _playerAchievements vector map of this player first
-	if(_player)
-		_playerAchievements.erase(_player->GetGUID());
+	if(!_player)  return -1;
 
 	//set the counter
+	bool  _account_found = false;
 	int32 counter = 0;
 	Field* fields;
-	do
+
+	uint32 guid = _player->GetGUID();
+	uint32 auid = _player->M_AccountID;
+
+	//clear the _player->M_Achievements vector map of this player first
+	_player->M_Achievements.clear();
+
+	std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT `auid`, `guid`, `type`, `subType`, `data0`, `data1`,`data2`,`data3`,`data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15` FROM `a_achievements` WHERE (`guid` = '%u' or `guid` = '0') and `auid` = '%u'", guid, auid));
+	if (result)
 	{
-		fields = result->Fetch();
+		do
+		{
+			fields = result->Fetch();
 
-		//save fields to struct AchievementsEntry
+			//save fields to struct AchievementsEntry
+			AchievementsEntry e;
+			e.auid = fields[0].GetInt32();			e.guid = fields[1].GetInt32();			e.type = fields[2].GetInt32();			e.subType = fields[3].GetInt32();
+			e.data0 = fields[4].GetInt32();			e.data1 = fields[5].GetInt32();			e.data2 = fields[6].GetInt32();			e.data3 = fields[7].GetInt32();
+			e.data4 = fields[8].GetInt32();			e.data5 = fields[9].GetInt32();			e.data6 = fields[10].GetInt32();			e.data7 = fields[11].GetInt32();
+			e.data8 = fields[12].GetInt32();			e.data9 = fields[13].GetInt32();			e.data10 = fields[14].GetInt32();			e.data11 = fields[15].GetInt32();
+			e.data12 = fields[16].GetInt32();			e.data13 = fields[17].GetInt32();			e.data14 = fields[18].GetInt32();			e.data15 = fields[19].GetInt32();
+
+			if (e.type == ACHIEVEMENT_ACCOUNT) _account_found = true;
+			_player->M_Achievements[e.type] = e;
+			counter ++;
+			
+		} while (result->NextRow());
+	}
+
+	if (!_account_found)
+	{
 		AchievementsEntry e;
-		e.guid = fields[0].GetInt32();
-		e.type = fields[1].GetInt32();
-		e.subType = fields[2].GetInt32();
-		e.data1 = fields[3].GetInt32();
-		e.data2 = fields[4].GetInt32();
-		e.data3 = fields[5].GetInt32();
-		e.data4 = fields[6].GetInt32();
-		e.note = fields[7].GetCppString();
-		e.data5 = fields[8].GetInt32();
-		e.data6 = fields[9].GetInt32();
-		e.data7 = fields[10].GetInt32();
-		e.data8 = fields[11].GetInt32();
-		//save to vector maps _playerAchievements regardless of type
-		_playerAchievements[_player->GetGUID()].push_back(e);
-		
-		counter ++;
-	} while (result->NextRow());
-
+		e.auid = _player->M_AccountID; e.guid = 0;	e.type = ACHIEVEMENT_ACCOUNT;
+		_zeroData(&e);
+		_player->M_Achievements[e.type] = e;
+		sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[QzqstarAchievements::__init_Account_Entry] Not found but init one Player:%s (AccountID:%u) type:%u, data0=%u, data1=%u",
+			_player->GetName(), _player->M_AccountID, e.type, e.data0, e.data1);
+	}
 	return counter;
 }
 
@@ -93,31 +113,380 @@ int32 QzqstarAchievements::Load(Player * _player)
 void QzqstarAchievements::Save(Player * _player)
 {
 	//check _player if none
-	if (!_player)
-		return;
-
-	//iterate the _playerAchievements vector map of this player to save to database a_achievements
-	for (auto it = _playerAchievements[_player->GetGUID()].begin(); it != _playerAchievements[_player->GetGUID()].end(); ++it)
+	if(!_player) return;
+	
+	//iterate the _player->M_Achievements vector map of this player to save to database a_achievements
+	for (auto it = _player->M_Achievements.begin(); it != _player->M_Achievements.end(); ++it)
 	{
-		AchievementsEntry e = *it;
-		CharacterDatabase.PExecute("Replace into `a_achievements` (`guid`, `type`, `subType`,`data1`,`data2`,`data3`,`data4`, `note`, `data5`, `data6`, `data7`, `data8`) VALUES('%u', '%u', '%u', '%u', '%u', '%u', '%u', '%s', '%u', '%u', '%u', '%u')",
-			e.guid,
-			e.type,
-			e.subType,
-			e.data1,
-			e.data2,
-			e.data3,
-			e.data4,
-			e.note.c_str(),
-			e.data5,
-			e.data6,
-			e.data7,
-			e.data8
+		AchievementsEntry e = it->second;
+		CharacterDatabase.PExecute("Replace into `a_achievements` ( `auid`, `guid`, `type`, `subType`,`data0`,`data1`,`data2`,`data3`,`data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`) VALUES('%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')",
+			e.auid,				e.guid,			e.type,			e.subType,			
+			e.data0,			e.data1,			e.data2,			e.data3,			e.data4, 			e.data5,			e.data6,			e.data7,
+			e.data8,			e.data9,			e.data10,			e.data11,			e.data12,			e.data13,			e.data14,			e.data15
 			);
+
+		//__LOG("Saving player:%s, type:%d, data0=%u, data1=%u.", _player->GetName(), e.type, e.data0, e.data1);
 	}
 }
 
 
+/* ================================================================================================================== */
+/* ========================= S8 new caculate system  ================================================================ */
+/* ================================================================================================================== */
+#pragma region S8 new caculate system
+static AchievementsEntry& __init_Achivement_Entry(Player * _player)
+{
+	AchievementsEntry e;
+	e.auid = _player->M_AccountID; e.guid = 0;	e.type = 0;
+	_zeroData(&e);
+	_player->M_Achievements[e.type] = e;
+	return _player->M_Achievements[e.type];
+}
+
+
+// ----------------------------- Account -----------------------------------------
+static void __init_Account_Entry(Player *_player)
+{
+	if (_player->M_Achievements.find(ACHIEVEMENT_ACCOUNT) == _player->M_Achievements.end())
+	{
+		AchievementsEntry& e = __init_Achivement_Entry(_player);
+		e.type = ACHIEVEMENT_ACCOUNT;
+	}
+}
+
+uint32 QzqstarAchievements::GetAccAchieveData(Player * _player, uint32 type)
+{
+	if (!_player) return 0;
+	__init_Account_Entry(_player);
+
+	//return the player's achievement data
+	uint32 _data = 0;
+	switch(type)
+	{
+		case ACHIEVEMENT_ACCOUNT_VIP:				_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data0; break;
+		case ACHIEVEMENT_ACCOUNT_TASK:				_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data1; break;
+		case ACHIEVEMENT_ACCOUNT_EXPLORE:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data2; break;
+		case ACHIEVEMENT_ACCOUNT_PET_COLLECTION:	_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data3; break;
+		case ACHIEVEMENT_ACCOUNT_REPUTATION_LIST:	_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data4; break;
+		case ACHIEVEMENT_ACCOUNT_PROFESSION_SKILL:	_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data5; break;
+		case ACHIEVEMENT_ACCOUNT_KILLING_NUMS:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data6; break;
+		case ACHIEVEMENT_ACCOUNT_PVP_NUMS:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data7; break;
+		case ACHIEVEMENT_ACCOUNT_GOLD_COLLECT:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data8; break;
+		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data9; break;
+		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data10; break;
+		case ACHIEVEMENT_ACCOUNT_MATS_NUMS:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data11; break;
+		case ACHIEVEMENT_ACCOUNT_EQ_NUMS:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data12; break;
+		case ACHIEVEMENT_ACCOUNT_BONUS_NUMS:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data14; break;
+		case ACHIEVEMENT_ACCOUNT_REWARD:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data15; break;
+		default:  
+			__LOG("[QzqstarAchievements::GetAccAchieveData] Not found data for player:%s, type:%d", _player->GetName(), type);
+			break;
+	}
+	return _data;
+}
+
+
+//set the type and data1 of the achievement
+void QzqstarAchievements::SetAccAchieveData(Player * _player, uint32 type, uint32 data)
+{
+	if (!_player) return;
+
+	//check the player's achievement map if none
+	__init_Account_Entry(_player);
+
+	AchievementsEntry& e = _player->M_Achievements[ACHIEVEMENT_ACCOUNT];
+	switch(type)
+	{
+		case ACHIEVEMENT_ACCOUNT_VIP:			e.data0 = data; break;
+		case ACHIEVEMENT_ACCOUNT_TASK:			e.data1 = data; break;
+		case ACHIEVEMENT_ACCOUNT_EXPLORE:			e.data2 = data; break;
+		case ACHIEVEMENT_ACCOUNT_PET_COLLECTION:	e.data3 = data; break;
+		case ACHIEVEMENT_ACCOUNT_REPUTATION_LIST:	e.data4 = data; break;
+		case ACHIEVEMENT_ACCOUNT_PROFESSION_SKILL:	e.data5 = data; break;
+		case ACHIEVEMENT_ACCOUNT_KILLING_NUMS:		e.data6 = data; break;
+		case ACHIEVEMENT_ACCOUNT_PVP_NUMS:		e.data7 = data; break;
+		case ACHIEVEMENT_ACCOUNT_GOLD_COLLECT:	e.data8 = data; break;
+		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1:	e.data9 = data; break;
+		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2:	e.data10 = data; break;
+		case ACHIEVEMENT_ACCOUNT_MATS_NUMS:		e.data11 = data; break;
+		case ACHIEVEMENT_ACCOUNT_EQ_NUMS:			e.data12 = data; break;
+		case ACHIEVEMENT_ACCOUNT_BONUS_NUMS:			e.data14 = data; break;
+		case ACHIEVEMENT_ACCOUNT_REWARD:			e.data15 = data; break;
+		default:  
+			__LOG("[QzqstarAchievements::SetAccAchieveData] Not found data for player:%s, type:%d", _player->GetName(), type);
+			break;
+	}
+}
+
+void QzqstarAchievements::IncAccAchieveData(Player * _player, uint32 type)
+{
+	if (!_player) return;
+	__init_Account_Entry(_player);
+
+	AchievementsEntry& e = _player->M_Achievements[ACHIEVEMENT_ACCOUNT];
+	switch(type)
+	{
+		case ACHIEVEMENT_ACCOUNT_VIP:				e.data0++; break;
+		case ACHIEVEMENT_ACCOUNT_TASK:				e.data1++; break;
+		case ACHIEVEMENT_ACCOUNT_EXPLORE:			e.data2++; break;
+		case ACHIEVEMENT_ACCOUNT_PET_COLLECTION:	e.data3++; break;
+		case ACHIEVEMENT_ACCOUNT_REPUTATION_LIST:	e.data4++; break;
+		case ACHIEVEMENT_ACCOUNT_PROFESSION_SKILL:	e.data5++; break;
+		case ACHIEVEMENT_ACCOUNT_KILLING_NUMS:		if(e.data6<DATA_MAX) e.data6++; break;
+		case ACHIEVEMENT_ACCOUNT_PVP_NUMS:			if(e.data7<DATA_MAX) e.data7++; break;
+		case ACHIEVEMENT_ACCOUNT_GOLD_COLLECT:		if(e.data8<DATA_MAX) e.data8++; break;
+		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1:	e.data9++; break;
+		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2:	e.data10++; break;
+		case ACHIEVEMENT_ACCOUNT_MATS_NUMS:			if(e.data11<DATA_MAX) e.data11++; break;
+		case ACHIEVEMENT_ACCOUNT_BONUS_NUMS:				if(e.data14<DATA_MAX) e.data14++; break;
+		case ACHIEVEMENT_ACCOUNT_REWARD:			if(e.data15<DATA_MAX) e.data15++; break;
+		default:  
+			__LOG("[QzqstarAchievements::IncAccAchieveData] Not found data for player:%s, type:%d", _player->GetName(), type);
+			break;
+	}
+
+}
+
+uint32 QzqstarAchievements::GetAccountSum(Player * _player)
+{
+	if (!_player) return 0;
+	__init_Account_Entry(_player);
+
+	uint32 sum = 0;
+	//data0 - VIP
+	//data1 - task
+	if (_player->M_Achiv_Account_Task < 500) sum += _player->M_Achiv_Account_Task; else sum += 500;
+
+	//data2 - explore
+	if (_player->M_Achiv_Account_Explore < 100) sum += _player->M_Achiv_Account_Explore*2; else sum += 200;
+
+	//data3 - pet collects
+	uint32 _pet = _player->M_Achiv_Account_Pet_Collection;
+	uint32 _index = 0;
+	while(_pet > 0)
+	{
+		if(_pet & 1) { sum += 10; if(_index >= 12) sum += 20; }
+		_index ++;
+		_pet >>= 1;
+	}
+
+	//data4 - reputation
+	sum += COUNT_ONES(_player->M_Achiv_Account_Reputation_List) * 50;
+
+	//data5 - profession
+	sum += COUNT_ONES(_player->M_Achiv_Account_Profession_Skill) * 100;
+	
+	//data6 - killing nums
+	if(_player->M_Achiv_Account_Killing_Nums > 1000 * 100) sum += 1000;
+	else sum += _player->M_Achiv_Account_Killing_Nums /1000;
+
+	//data7 - pvp nums
+	if(_player->M_Achiv_Account_PVP_Nums > 1000 * 100) sum += 1000;
+	else sum += _player->M_Achiv_Account_PVP_Nums /1000;
+
+	//data8 - gold collect
+	if(_player->M_Achiv_Account_Gold_Collect > 1000 * 100) sum += 1000;
+	else sum += _player->M_Achiv_Account_Gold_Collect/1000;
+	//data9 - dungeon nums 1
+	if(_player->M_Achiv_Account_Dungeon_NUMS1 > 1000 * 100) sum += 1000;	
+	else sum += _player->M_Achiv_Account_Dungeon_NUMS1/1000;
+	//data10 - dungeon nums 2
+	if(_player->M_Achiv_Account_Dungeon_NUMS2 > 1000 * 100) sum += 1000;
+	else sum += _player->M_Achiv_Account_Dungeon_NUMS2/1000;
+
+	//data11 - mats nums
+	if(_player->M_Achiv_Account_Mats_NUMS > 500) sum += 500;
+	else sum += _player->M_Achiv_Account_Mats_NUMS;		
+	
+	//data12 - equipments
+	if(_player->M_Achiv_Account_EQ_Nums > 500) sum += 500;
+	else sum += _player->M_Achiv_Account_EQ_Nums;
+
+	//data14 - extra points for some vip
+	sum += _player->M_Achiv_Account_Bonus_Nums;
+
+	return sum;
+}
+
+
+// ----------------------------- Player -----------------------------------------
+static void __init_Player_Entry(Player *_player)
+{
+	if (_player->M_Achievements.find(ACHIEVEMENT_PLAYER_DATA) == _player->M_Achievements.end())
+	{
+		AchievementsEntry& e = __init_Achivement_Entry(_player);
+		e.type = ACHIEVEMENT_PLAYER_DATA;
+		e.guid = _player->GetGUID();
+	}
+}
+
+uint32 QzqstarAchievements::GetPlayerData(Player * _player, uint32 type)
+{
+	if (!_player) return 0;
+
+	//check the player's achievement map if none
+	__init_Player_Entry(_player);
+
+	uint32 _data = 0;
+	switch(type)
+	{
+		case PLAYER_USED_NUMS_DUNGEON_TIMES:	_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data0 / 10000000)%10; break;
+		case PLAYER_USED_LEVEL_CHENYI:			_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data0 / 1000000)%10; break;
+		case PLAYER_USED_LEVEL_ZHANPAO:			_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data0 / 100000)%10; break;
+		case PLAYER_USED_NUMS_TALENT:			_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data0 / 10000)%10; break;	
+		case PLAYER_USED_LEVEL_WEAPON:			_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data0 / 1000)%10; break;
+		case PLAYER_USED_LEVEL_PET:				_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data0 / 100)%10; break;
+		case PLAYER_USED_NUMS_KANG:				_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data0)%100; break;
+		case PLAYER_USED_NUMS_STRENGTH:			_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data1 / 1000000)%1000; break;
+		case PLAYER_USED_NUMS_AGILITY:			_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data1 / 1000)%1000; break;
+		case PLAYER_USED_NUMS_STAMINA:			_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data1 )%1000; break;
+		case PLAYER_USED_NUMS_INTELLECT:		_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data2 / 1000)%1000; break;
+		case PLAYER_USED_NUMS_SPIRIT:			_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data2 )%1000; break;
+		case PLAYER_USED_NUMS_SP:				_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data3 / 1000)%1000; break;
+		case PLAYER_USED_NUMS_AP:				_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data3 )%1000; break;
+
+		case PLAYER_USED_CHALLGE_MODE:			_data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data9; break;
+		default:  
+			__LOG("[QzqstarAchievements::GetPlayerData] Not found data for player:%s, type:%d", _player->GetName(), type);
+			break;
+	}
+
+	return _data;
+}
+
+void QzqstarAchievements::SetPlayerData(Player * _player, uint32 type, uint32 data)
+{
+	if (!_player) return;
+
+	//check the player's achievement map if none
+	__init_Player_Entry(_player);
+
+	switch(type)
+	{
+		case PLAYER_USED_LEVEL_CHENYI:			
+		case PLAYER_USED_LEVEL_ZHANPAO:	
+		case PLAYER_USED_NUMS_TALENT:
+		case PLAYER_USED_LEVEL_WEAPON:	
+		case PLAYER_USED_LEVEL_PET:	
+		case PLAYER_USED_NUMS_KANG:
+		case PLAYER_USED_NUMS_DUNGEON_TIMES:
+		{
+			uint32 _data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data0;
+			uint32 _dg_times = (_data / 10000000) % 10;
+			uint32 _chenyi = (_data / 1000000) % 10;
+			uint32 _zhanpao = (_data / 100000) % 10;
+			uint32 _talent = (_data / 10000) % 10;
+			uint32 _weapon = (_data / 1000) % 10;
+			uint32 _pet = (_data / 100) % 10;
+			uint32 _kang = (_data ) % 100;
+
+			switch(type)
+			{
+				case PLAYER_USED_NUMS_DUNGEON_TIMES:	_dg_times = data; break;
+				case PLAYER_USED_LEVEL_CHENYI:		_chenyi = data; break;
+				case PLAYER_USED_LEVEL_ZHANPAO:		_zhanpao = data; break;
+				case PLAYER_USED_NUMS_TALENT:		_talent = data; break;
+				case PLAYER_USED_LEVEL_WEAPON:		_weapon = data; break;
+				case PLAYER_USED_LEVEL_PET:			_pet = data; break;
+				case PLAYER_USED_NUMS_KANG:			_kang = data; break;
+			}
+			_data = _dg_times * 10000000 + _chenyi * 1000000 + _zhanpao * 100000 + _talent * 10000 + _weapon * 1000 + _pet * 100 + _kang;
+			_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data0 = _data;
+			break;
+		}
+
+		case PLAYER_USED_NUMS_STRENGTH:
+		case PLAYER_USED_NUMS_AGILITY:
+		case PLAYER_USED_NUMS_STAMINA:
+		{
+			uint32 _data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data1;
+			uint32 _strength = _data / 1000000;
+			uint32 _agility = (_data / 1000) % 1000;
+			uint32 _stamina = (_data ) % 1000;
+			switch(type)
+			{
+				case PLAYER_USED_NUMS_STRENGTH:		_strength = data; break;
+				case PLAYER_USED_NUMS_AGILITY:		_agility = data; break;
+				case PLAYER_USED_NUMS_STAMINA:		_stamina = data; break;
+			}
+			_data = _strength * 1000000 + _agility * 1000 + _stamina;
+			_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data1 = _data;
+			break;
+		}
+
+		case PLAYER_USED_NUMS_INTELLECT:
+		case PLAYER_USED_NUMS_SPIRIT:
+		{
+			uint32 _data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data2;
+			uint32 _intellect = _data / 1000;
+			uint32 _spirit = (_data ) % 1000;
+			switch(type)
+			{
+				case PLAYER_USED_NUMS_INTELLECT:		_intellect = data; break;
+				case PLAYER_USED_NUMS_SPIRIT:		_spirit = data; break;
+			}
+			_data = _intellect * 1000 + _spirit;
+			_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data2 = _data;
+			break;
+		}
+
+		case PLAYER_USED_NUMS_AP:
+		case PLAYER_USED_NUMS_SP:
+		{
+			uint32 _data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data3;
+			uint32 _sp = _data / 1000;
+			uint32 _ap = (_data ) % 1000;
+			switch(type)
+			{
+				case PLAYER_USED_NUMS_SP:		_sp = data; break;
+				case PLAYER_USED_NUMS_AP:		_ap = data; break;
+			}
+			_data = _sp * 1000 + _ap;
+			_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data3 = _data;
+			break;
+		}
+
+		case PLAYER_USED_CHALLGE_MODE:
+		{
+			_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data9 = data; 
+			break;
+		}
+		
+		default:  
+			__LOG("[QzqstarAchievements::SetPlayerData] Not found data for player:%s, type:%d", _player->GetName(), type);
+			break;
+	}
+}
+
+uint32 QzqstarAchievements::GetPlayerSum(Player * _player)
+{
+	if (!_player) return 0;
+	__init_Player_Entry(_player);
+
+	uint32 sum = 0;
+
+	//calculate the chenyi, zhanpao needs ....
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_CHENYI);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_ZHANPAO);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_TALENT);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_WEAPON);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_PET);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_KANG);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_STRENGTH);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_AGILITY);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_STAMINA);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_INTELLECT);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_SPIRIT);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_AP);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_SP);
+
+	return sum;
+}
+
+
+
+
+#pragma endregion
 
 /* ================================================================================================================== */
 /* ========================= VIP system  ============================================================================ */
@@ -140,7 +509,7 @@ void QzqstarAchievements::__init_VIP_Entry(Player * _player)
 	e.data2 = 0;
 	e.data3 = 0;
 	e.data4 = 0;
-	e.note = "";
+	//e.note = "";
 	e.data5 = 0;	//reuse for Social Points (967 for faction old version)
 	e.data6 = 0;
 	e.data7 = 0;
@@ -462,7 +831,7 @@ uint32 QzqstarAchievements::GetRuneSlots(Player * _player)
 	e.guid = _player->GetGUID();
 	e.type = ACHIEVEMENT_RUNE;
 	e.subType = 0;
-	e.data1 = 2; 	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;	e.note = "";
+	e.data1 = 2; 	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;	//e.note = "";
 	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;   //becareful, data 5 - 8 is not inited before.
 	_playerAchievements[_player->GetGUID()].push_back(e);
 
@@ -549,7 +918,7 @@ int32 QzqstarAchievements::GetCustomQuestID(Player * _player)
 		e.data2 = 0;
 		e.data3 = 0;
 		e.data4 = 0;
-		e.note = "";
+		//e.note = "";
 		_playerAchievements[_player->GetGUID()].push_back(e);
 
 		sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Not found but init one Quest Entry: %u", _player->GetGUID());
@@ -674,7 +1043,7 @@ void QzqstarAchievements::__init_SocialPoints_Entry(Player * _player)
 	e.data2 = 0;
 	e.data3 = 0;
 	e.data4 = 0;
-	e.note = "";
+	//e.note = "";
 	e.data5 = 0;	// for use of PVP killer points
 	e.data6 = 0;
 	e.data7 = 0;
@@ -751,7 +1120,7 @@ AchievementsEntry QzqstarAchievements::GetPetEntry(Player * _player)
 	e.data2 = 0;
 	e.data3 = 0;
 	e.data4 = 0;
-	e.note = "";
+	//e.note = "";
 	e.data5 = 0;	//pet level, happiness level, relationship level
 	e.data6 = 0;
 	e.data7 = 0;
@@ -801,7 +1170,7 @@ int32 QzqstarAchievements::GetActivePetInfo(Player * _player)
 	e.data2 = 0;	
 	e.data3 = 0;
 	e.data4 = 0;	
-	e.note = "";
+	//e.note = "";
 	e.data5 = 0;	
 	e.data6 = 0;
 	e.data7 = 0;
@@ -937,7 +1306,7 @@ uint32 QzqstarAchievements::GetDungeonsInfo(Achievement_t _mapType, Player *play
 		return 0;
 
 	//iterate the _playerAchievements vector map of this player to find the pet information
-	for (auto it = _playerAchievements[player->GetSession()->GetAccountId()].begin(); it!= _playerAchievements[player->GetSession()->GetAccountId()].end(); ++it)
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
 	{
 		AchievementsEntry& e = *it;
 		if (e.type == _mapType)
@@ -975,19 +1344,19 @@ uint32 QzqstarAchievements::GetDungeonsInfo(Achievement_t _mapType, Player *play
 
 	//if not found, create one and return it
 	AchievementsEntry e;
-	e.guid = player->GetSession()->GetAccountId();
+	e.guid = player->GetGUID();
 	e.type = _mapType;
 	e.subType = 0;
 	e.data1 = 0;
 	e.data2 = 0;
 	e.data3 = 0;
 	e.data4 = 0;
-	e.note = "";
+	//e.note = "";
 	e.data5 = 0;
 	e.data6 = 0;
 	e.data7 = 0;
 	e.data8 = 0;
-	_playerAchievements[player->GetSession()->GetAccountId()].push_back(e);
+	_playerAchievements[player->GetGUID()].push_back(e);
 
 	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeons: %u", player->GetName(), e.subType);
 
@@ -1003,7 +1372,7 @@ void QzqstarAchievements::SetDungeonsInfo(Achievement_t _mapType, Player *player
 	if(_mapType!=ACHIEVEMENTS_DUNGEONS && _mapType!=ACHIEVEMENTS_RAIDS) return;
 
 	//iterate the _playerAchievements vector map of this player to find the pet information
-	for (auto it = _playerAchievements[player->GetSession()->GetAccountId()].begin(); it!= _playerAchievements[player->GetSession()->GetAccountId()].end(); ++it)
+	for (auto it = _playerAchievements[player->GetGUID()].begin(); it!= _playerAchievements[player->GetGUID()].end(); ++it)
 	{
 		AchievementsEntry& e = *it;
 		if (e.type == _mapType)
@@ -1067,7 +1436,7 @@ AchievementsEntry QzqstarAchievements::GetZitiaosInfo(Player *player)
 	e.data2 = 0;
 	e.data3 = 0;
 	e.data4 = 0;
-	e.note = "";
+	//e.note = "";
 	e.data5 = 0;
 	e.data6 = 0;
 	e.data7 = 0;
@@ -1096,7 +1465,7 @@ void QzqstarAchievements::SetZitiaosInfo(Player *player, AchievementsEntry entry
 			e.data2 = entry.data2;
 			e.data3 = entry.data3;
 			e.data4 = entry.data4;
-			e.note = entry.note;
+			//e.note = entry.note;
 			e.data5 = entry.data5;
 			e.data6 = entry.data6;
 			e.data7 = entry.data7;
@@ -1114,7 +1483,7 @@ void QzqstarAchievements::SetZitiaosInfo(Player *player, AchievementsEntry entry
 	e.data2 = entry.data2;
 	e.data3 = entry.data3;
 	e.data4 = entry.data4;
-	e.note = entry.note;
+//	e.note = entry.note;
 	e.data5 = entry.data5;
 	e.data6 = entry.data6;
 	e.data7 = entry.data7;
@@ -1157,7 +1526,7 @@ uint32_t QzqstarAchievements::GetCollectAchiveInfo(Player *player, uint32_t item
 	e.guid = player->GetGUID();
 	e.type = ACHIEVEMENTS_COLLECTIONS;
 	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
-	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
+	//e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
 	_playerAchievements[player->GetGUID()].push_back(e);
 
 	//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Collections: %u", player->GetName(), e.subType);
@@ -1191,7 +1560,7 @@ void QzqstarAchievements::SetCollectAchiveInfo(Player *player, uint32_t itemSetT
 	e.guid = player->GetGUID();
 	e.type = ACHIEVEMENTS_COLLECTIONS;
 	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
-	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
+	//e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
 	_playerAchievements[player->GetGUID()].push_back(e);
 	//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Collections: %u", player->GetName(), e.subType);
 }
@@ -1220,7 +1589,7 @@ AchievementsEntry QzqstarAchievements::GetCollectionEntry(Player *player, uint32
 	e.guid = player->GetGUID();
 	e.type = collection_type;
 	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
-	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
+	//e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
 	_playerAchievements[player->GetGUID()].push_back(e);
 	// sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Not found but init one Dungeon Entry: %u", player->GetGUID());
 	return e;
@@ -1259,7 +1628,7 @@ uint32    QzqstarAchievements::GetEquipCollectCommon(Player *player, uint32_t ke
 	e.guid = player->GetGUID();
 	e.type = key;
 	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
-	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
+	//e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
 	_playerAchievements[player->GetGUID()].push_back(e);
 
 	//sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeon Collect: %u", player->GetName(), ac_mapId);
@@ -1302,7 +1671,7 @@ void      QzqstarAchievements::SetEquipCollectCommon(Player *player, uint32_t co
 	e.guid = player->GetGUID();
 	e.type = key;
 	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
-	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
+	//e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 0;
 	_playerAchievements[player->GetGUID()].push_back(e);
 
 	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player:%s Init Dungeon Collect: %u", player->GetName(), key);
@@ -1408,7 +1777,7 @@ AchievementsEntry QzqstarAchievements::GetSkillsCollectEntry(Player *player)
 	e.guid = player->GetGUID();
 	e.type = ACHIEVEMENTS_COLLECTIONS_SKILLS;
 	e.subType = 0; 	e.data1 = 0;	e.data2 = 0;	e.data3 = 0;	e.data4 = 0;
-	e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 2;
+	//e.note = "";	e.data5 = 0;	e.data6 = 0;	e.data7 = 0;	e.data8 = 2;
 	_playerAchievements[player->GetGUID()].push_back(e);
 	// sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Not found but init one Skills Entry: %u", player->GetGUID());
 	return e;
@@ -1486,5 +1855,9 @@ int32     QzqstarAchievements::GetSkillsCollectEmptySlot(Player *player)
 	//not found
 	return 0;
 }
+
+
+
+
 
 #pragma endregion

@@ -56,6 +56,8 @@
 #include <limits>
 
 #include "custom/qzqstar_db.h"
+#include "custom/qzqstar_helper.h"
+
 
 INSTANTIATE_SINGLETON_1(ObjectMgr);
 
@@ -3816,18 +3818,24 @@ void ObjectMgr::LoadItemPrototypes()
         item.Name1 = strdup(fields[3].GetString());
         item.Description = strdup(fields[4].GetString());
 
-        //check if collection
-        if(isCollectionItem(entry))
-        {
-            item.Description = strdup(std::string("该物品是【收藏物品】，可以交给克拉拉提升攻强、法伤。 ").c_str());
-        }
-
         item.DisplayInfoID = fields[ 5].GetUInt32();
         item.Quality = fields[ 6].GetUInt8();
         item.Flags = fields[ 7].GetUInt32();
         item.BuyCount = fields[ 8].GetUInt8();
         item.BuyPrice = fields[ 9].GetUInt32();
         item.SellPrice = fields[10].GetUInt32();
+
+        /*
+        if(isCollectionItem(entry))
+        {
+            item.Description = strdup(std::string("该物品是【收藏物品】，可以交给克拉拉提升攻强、法伤。 ").c_str());
+        }*/
+        uint32 petIndex = DBHelper_IsPetCollection(entry);
+        if(petIndex)
+        {
+            item.Description = strdup(Helper_MakeString("", "该宠物是【成就物品】，可以在炉石兑换成就：%u点。 ", item.SellPrice).c_str());
+        }
+
         item.InventoryType = fields[11].GetUInt8();
         item.AllowableClass = fields[12].GetInt32();
         item.AllowableRace = fields[13].GetInt32();

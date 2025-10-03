@@ -132,8 +132,8 @@ struct LootItem
 {
     uint32  itemid;
     int32   randomPropertyId;
-    uint16  difficulty;                                     // diffculty id 0-3
-    uint16  difficulty_randomID;                            // qzqstar, 250515, make randome ID,default zero
+    uint16  item_difficulty;                                     // diffculty id 0-3
+    uint16  item_difficulty_randomID;                            // qzqstar, 250515, make randome ID,default zero
     uint16  conditionId       :16;                          // allow compiler pack structure
     uint8   count             : 8;
     bool    is_looted         : 1;

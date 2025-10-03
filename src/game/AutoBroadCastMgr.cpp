@@ -10,6 +10,7 @@
 #include "QzqstarAchievements.h"
 
 #include "PlayerBotMgr.h"
+#include "custom/qzqstar_helper.h"
 
 INSTANTIATE_SINGLETON_1(AutoBroadCastMgr);
 
@@ -125,7 +126,7 @@ void AutoBroadCastMgr::Update(uint32 diff)
     {
 		_lastBroadCast1Min = _currentMinute;
         //slog
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[AutoBroadCastMgr::Update] 1 Min: %u.", _lastBroadCast1Min);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[AutoBroadCastMgr::Update] 1 Min: %u. Now:%u", _lastBroadCast1Min, Helper_GetDateInt());
 
     }
 

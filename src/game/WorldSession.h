@@ -61,6 +61,33 @@ class MasterPlayer;
 struct OpcodeHandler;
 struct PlayerBotEntry;
 
+
+
+struct AchievementsEntry
+{
+    int32 auid;
+    int32 guid;
+	int32 type;
+	int32 subType;
+    int32 data0;
+	int32 data1;
+	int32 data2;
+	int32 data3;
+	int32 data4;
+	int32 data5;
+	int32 data6;
+	int32 data7;
+	int32 data8;
+	int32 data9;
+	int32 data10;
+	int32 data11;
+	int32 data12;
+	int32 data13;
+	int32 data14;
+	int32 data15;
+};
+
+
 enum PartyOperation
 {
     PARTY_OP_INVITE = 0,
