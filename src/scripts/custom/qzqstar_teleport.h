@@ -26,21 +26,7 @@
 #define	__XSTR(x)		((std::string)(x)).c_str()
 #endif
 
-//point of intreset
-typedef struct _teleport_point_t {
-	uint32 id;		//point id, unique in map, also used as the index of the array, so it should be continuous, starting from 0.
-	uint32 mapId;	//map id, the map id of the point of intreset.
-	std::string name;	//name of the point of intreset.
-    uint32 tele_mapid;  //map id of the teleport destination.
-	float tele_x;		//x coordinate of the point of intreset.
-	float tele_y;		//y coordinate of the point of intreset.
-	float tele_z;		//z coordinate of the point of intreset.
-	float tele_o;		//orientation of the point of intreset.
-    uint32 npc_list[10];
-}Teleport_Point_t;
 
-extern const Teleport_Point_t TP_Dungeons[18];
-extern const Teleport_Point_t TP_Raids[7];
 
 extern uint32 QZQSTAR_GET_AC_MAPID(uint32 mapid);
 

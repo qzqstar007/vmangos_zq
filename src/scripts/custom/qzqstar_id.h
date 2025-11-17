@@ -64,9 +64,6 @@
 //Mounts Items
 #define ZQ_ITEM_MOUNTS_ITEM			30061	//Mounts Item, 坐骑物品 ~ 30066
 
-//CHenyi ZHanpao
-#define ZQ_ITEM_CHENYI		        30048	//Chenyi Zhanpao, 陈怡之杖
-#define ZQ_ITEM_ZHANPAO		        30049	//Chenyi Zhanpao, 陈怡之杖
 
 #define ZQ_ITEM_TURTLE              30066   //Turtle, 乌龟
 //Bonus Box
@@ -83,6 +80,8 @@
 
 // 30200 - season 8
 #define ZQ_ITEM_ACHIVE_ITEM         30201   //Achievement item, 成就物品
+#define ZQ_ITEM_CHENYI		        30251	//Chenyi Zhanpao, 陈怡之杖
+#define ZQ_ITEM_ZHANPAO		        30261	//Chenyi Zhanpao, 陈怡之杖
 
 /******************************************************************** 
  *  Spell IDs, largest first (33386).
@@ -174,8 +173,8 @@
 #define ZQ_SPELL_SLOTS_END              32684	//Slots, 技能栏 - end
 #define ZQ_SPELL_SLOTS_START            32531	//Slots 1, 技能栏1 - Start
 
-
-
+#define ZQ_SPELL_EQ_BONUS_END               32499   //Equipment spell bonus for special slots
+#define ZQ_SPELL_EQ_BONUS_START             32401
 
 
 #define ZQ_SPELL_RUNE_TRIG              31246   //Rune Trigger, 符文触发
@@ -254,6 +253,28 @@
 #define ZQ_ENCHANT_LEECH                3355    //Leech, 吸血
 #define ZQ_ENCHANT_SPELL_POWER_BONUS    3357    //Spell Power Bonus, 法术能量奖励
 #define ZQ_ENCHANT_HEROIC               3371    //Heroic, 英雄 to 3373, 3374 to 3376 and 3377 is best
+
+#define ZQ_ENCHANT_TALENT_START         5001    //Talent Start, 天赋开始
+#define ZQ_ENCHANT_TALENT_END           5999    //Talent End, 天赋结束
+#define ZQ_ENCHANT_ROBE                 5001
+#define ZQ_ENCHANT_ROBE_NUM              192
+#define ZQ_ENCHANT_LEG                  5201
+#define ZQ_ENCHANT_LEG_NUM               187
+#define ZQ_ENCHANT_FEET                 5401
+#define ZQ_ENCHANT_FEET_NUM              189
+#define ZQ_ENCHANT_GLOVE                5601
+#define ZQ_ENCHANT_GLOVE_NUM             134
+#define ZQ_ENCHANT_CLOAK                5801
+#define ZQ_ENCHANT_CLOAK_NUM             149
+#define ZQ_ENCHANT_BELT                 6001
+#define ZQ_ENCHANT_BELT_NUM              150
+#define ZQ_ENCHANT_SHOUWAN              6201
+#define ZQ_ENCHANT_SHOUWAN_NUM            92
+#define ZQ_ENCHANT_SHOULDER             6301
+#define ZQ_ENCHANT_SHOULDER_NUM           99
+#define ZQ_ENCHANT_HEAD                 6401
+#define ZQ_ENCHANT_HEAD_NUM               82
+
 
 
 #endif	//_QZQSTAR_CPP_IDS_H

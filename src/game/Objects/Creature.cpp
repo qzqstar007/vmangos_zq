@@ -264,13 +264,13 @@ void Creature::AddToWorld()
         if(pInstanceData)
         {
             //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Init Creatures for CustomDifficulty = %u!", pInstanceData->CustomDifficulty);
-            if(pInstanceData->CustomDifficulty  == 1)
+            if(pInstanceData->CustomDifficulty  > 0)
             {
                 //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Creature:%s id:%u created!", GetName(), GetGUID());
                 //SetMaxHealth(GetMaxHealth() * (1 + pInstanceData->CustomDifficulty * pInstanceData->CustomDifficulty)); 
                 
                 //SetNativeScale(GetNativeScale()*(1.0f + pInstanceData->CustomDifficulty/10.0f));
-                CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY0, true);
+                CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1, true);
                 //SetHealth(GetMaxHealth());
                 //UpdateAllStats();
 				//UpdateMaxHealth();
@@ -280,7 +280,7 @@ void Creature::AddToWorld()
     }
     else if (GetLevel() >= 55  && GetMapId() < 2)
     {
-		CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY0, true);
+		CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1, true);
 		CastSpell(this, 31046, true); //Restore health
     }
 }
@@ -1647,23 +1647,27 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
 	//qzqstar, 250515, generate money according to diffculty level
 	auto __mapid = GetMapId();
 	auto __goldMux = 0;
-	if ( (!loot.items.empty()) && (__mapid > 1) && (looter) )
+    uint32 _dg_info = 0;
+	//if ( (!loot.items.empty()) && (__mapid > 1) && (looter) )
+	if ( (!loot.items.empty()) && (looter) )
 	{
-        uint32 _dg_info = 0;
-        InstanceData* const pInstanceData = GetMap()->GetInstanceData();
-        if(pInstanceData)
+        //refine the generate
+        if(__mapid > 1)
         {
-            //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Init Creatures for CustomDifficulty = %u!", pInstanceData->CustomDifficulty);
-            if(pInstanceData->CustomDifficulty > 0 && pInstanceData->CustomDifficulty < 4)
+            InstanceData* const pInstanceData = GetMap()->GetInstanceData();
+            if(pInstanceData)
             {
-                _dg_info = pInstanceData->CustomDifficulty;
+                //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Init Creatures for CustomDifficulty = %u!", pInstanceData->CustomDifficulty);
+                if(pInstanceData->CustomDifficulty > 0 && pInstanceData->CustomDifficulty < 4)
+                {
+                    _dg_info = pInstanceData->CustomDifficulty;
+                }
             }
+            __goldMux = _dg_info == 1 ? 2
+                : _dg_info == 2 ? 3
+                : _dg_info == 3 ? 5
+                : 0;
         }
-		__goldMux = _dg_info == 1 ? 2
-			: _dg_info == 2 ? 3
-			: _dg_info == 3 ? 5
-			: 0;
-
 
         //iterate the loot.items
         for (auto it = loot.items.begin(); it != loot.items.end(); ++it)
@@ -1672,25 +1676,99 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
 
 			if ((itemProto->Class == ITEM_CLASS_WEAPON) || (itemProto->Class == ITEM_CLASS_ARMOR))
 			{
+                uint32 _randomID = 0;
+                auto _chance = 50;
+
+                //set the item difficulty
+                it->item_difficulty = _dg_info;
+                //if(_dg_info > 0) _chance = 40;
 
 				//check if map is heroic, and only Quality =3/4 can be 
-				if ( (_dg_info > 0) && (itemProto->Quality > 2) )
+				if (itemProto->Quality > 1) 
 				{
-                    uint32 _randomID = 0;
-
-                    if(roll_chance_i(60))
+                    if(roll_chance_i(_chance))
                     {
-                        //pick values from 3355 yo 3369
-                        _randomID = urand(3355,3369);
-                    }else
+                        uint32 _randMin = 0;
+                        uint32 _randMax = 1;
+                        uint32 _itemLevel = itemProto->ItemLevel;
+                        uint32 _enchantNums = 0;
+                        uint32 _enchantStart = 0;
+                        #define __MAX_ITEM_LEVEL (80)
+                        if(itemProto->InventoryType == INVTYPE_ROBE || itemProto->InventoryType == INVTYPE_CHEST)
+                        {
+                            _enchantStart = ZQ_ENCHANT_ROBE; _enchantNums = ZQ_ENCHANT_ROBE_NUM;
+                        }
+                        else if (itemProto->InventoryType == INVTYPE_LEGS)
+                        {
+                            _enchantStart = ZQ_ENCHANT_LEG; _enchantNums = ZQ_ENCHANT_LEG_NUM;
+                        }
+                        else if (itemProto->InventoryType == INVTYPE_FEET)
+                        {
+                            _enchantStart = ZQ_ENCHANT_FEET; _enchantNums = ZQ_ENCHANT_FEET_NUM;
+                        }
+                        else if (itemProto->InventoryType == INVTYPE_HANDS)
+                        {
+                            _enchantStart = ZQ_ENCHANT_GLOVE; _enchantNums = ZQ_ENCHANT_GLOVE_NUM;
+                        }
+                        else if (itemProto->InventoryType == INVTYPE_CLOAK)
+                        {
+                            _enchantStart = ZQ_ENCHANT_CLOAK; _enchantNums = ZQ_ENCHANT_CLOAK_NUM;
+                        }
+                        else if (itemProto->InventoryType == INVTYPE_WAIST)
+                        {
+                            _enchantStart = ZQ_ENCHANT_BELT; _enchantNums = ZQ_ENCHANT_BELT_NUM;
+                        }
+                        else if (itemProto->InventoryType == INVTYPE_WRISTS)
+                        {
+                            _enchantStart = ZQ_ENCHANT_SHOUWAN; _enchantNums = ZQ_ENCHANT_SHOUWAN_NUM;
+                        }
+                        else if (itemProto->InventoryType == INVTYPE_SHOULDERS)
+                        {
+                            _enchantStart = ZQ_ENCHANT_SHOULDER; _enchantNums = ZQ_ENCHANT_SHOULDER_NUM;
+                        }
+                        else if (itemProto->InventoryType == INVTYPE_HEAD)
+                        {
+                            _enchantStart = ZQ_ENCHANT_HEAD; _enchantNums = ZQ_ENCHANT_HEAD_NUM;
+                        }
+                        /*
+                        else if ( (itemProto->InventoryType == INVTYPE_WEAPON)
+                            || (itemProto->InventoryType == INVTYPE_2HWEAPON)
+                            || (itemProto->InventoryType == INVTYPE_WEAPONMAINHAND)
+                            || (itemProto->InventoryType == INVTYPE_WEAPONOFFHAND)
+                            || (itemProto->InventoryType == INVTYPE_RANGED)
+                        )
+                        {
+                            if(roll_chance_i(20)) _enchantStart = ZQ_ENCHANT_WEAPON; _enchantNums = ZQ_ENCHANT_WEAPON_NUM;
+                            else if (roll_chance_i(10))
+                        }*/
+                        else
+                        {
+                            _enchantNums = 0;_enchantStart=0;
+                        }
+
+                        if(_enchantNums + _enchantStart != 0)
+                        {
+                            if(_itemLevel >= __MAX_ITEM_LEVEL) { _randMin = _enchantNums/2; _randMax = _enchantNums; }
+                            else if (_itemLevel <= __MAX_ITEM_LEVEL/2) { _randMin = 0; _randMax = _enchantNums/2; }
+                            else {_randMin = _enchantNums * (_itemLevel - __MAX_ITEM_LEVEL/2) / __MAX_ITEM_LEVEL ; _randMax =  _enchantNums * _itemLevel/ __MAX_ITEM_LEVEL; }
+                            _randomID = urand(_enchantStart + _randMin, _enchantStart + _randMax-1);
+                        }
+                        else
+                        {
+                            _randomID = 0;
+                        }
+
+                    }else if (roll_chance_i(20))
                     {
                         _randomID = PickRandomValue(ZQ_ENCHANT_HEROIC, ZQ_ENCHANT_HEROIC + 1, ZQ_ENCHANT_HEROIC + 2);
-                        if (roll_chance_i(10)) _randomID = PickRandomValue(ZQ_ENCHANT_HEROIC+3, ZQ_ENCHANT_HEROIC + 4, ZQ_ENCHANT_HEROIC + 5);
-                        if (roll_chance_i(2))  _randomID = ZQ_ENCHANT_HEROIC + 6;
+                        if (roll_chance_i(20)) 
+                            _randomID = PickRandomValue(ZQ_ENCHANT_HEROIC+3, ZQ_ENCHANT_HEROIC + 4, ZQ_ENCHANT_HEROIC + 5);
+                        if (roll_chance_i(5))  
+                            _randomID = ZQ_ENCHANT_HEROIC + 6;
                     } 
 
-					it->randomPropertyId = _randomID;
 				}
+                it->randomPropertyId = _randomID;
 			}
 
 

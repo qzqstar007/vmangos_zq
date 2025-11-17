@@ -911,7 +911,7 @@ class Player final: public Unit
         uint32  M_Achiv_Account_Gold_Collect;          //Account Gold Collect Points Nums
         uint32  M_Achiv_Account_Dungeon_NUMS1;         //Account Dungeon Points Nums1
         uint32  M_Achiv_Account_Dungeon_NUMS2;         //Account Dungeon Points Nums2
-        uint32  M_Achiv_Account_Mats_NUMS;              //Account Mats Points Nums
+        uint32  M_Achiv_Account_Max_Level;              //Account Mats Points Nums
         uint32  M_Achiv_Account_EQ_Nums;                //Account Equip Points Nums
         uint32  M_Achiv_Account_Bonus_Nums;             //Account Bonus Points Nums
         uint32  M_Achiv_Account_REWARD;                 //Account Reward Points Nums
@@ -931,6 +931,8 @@ class Player final: public Unit
         uint32  M_Achiv_Player_NumsAP;    //NumsAP
         uint32  M_Achiv_Player_NumsSP;    //NumsSP
         uint32  M_Achiv_Player_DungeonTimes;  //additional dungeon times.
+
+        uint32 M_Dungeon_Difficulty;  //defaults to zero
 
 
 
@@ -983,7 +985,7 @@ class Player final: public Unit
         InventoryResult CanUseItem(Item const* pItem, bool not_loading = true) const;
         InventoryResult CanUseItem(ItemPrototype const* pItem, bool not_loading = true) const;
         InventoryResult CanUseAmmo(uint32 item) const;
-        Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0);
+        Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0, int32 item_difficulty = 0);
         Item* StoreItem(ItemPosCountVec const& pos, Item* pItem, bool update);
         Item* EquipNewItem(uint16 pos, uint32 item, bool update);
         Item* EquipItem(uint16 pos, Item* pItem, bool update);

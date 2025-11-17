@@ -177,7 +177,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
     InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->itemid, item->count);
     if (msg == EQUIP_ERR_OK)
     {
-        Item * newitem = player->StoreNewItem(dest, item->itemid, true, item->randomPropertyId);
+        Item * newitem = player->StoreNewItem(dest, item->itemid, true, item->randomPropertyId, item->item_difficulty);
         if (!newitem)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Unable to store loot item #%u from %s !", item->itemid, lguid.GetString().c_str());
@@ -737,7 +737,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
     }
 
     // now move item from loot to target inventory
-    if (Item* newitem = target->StoreNewItem(dest, item.itemid, true, item.randomPropertyId))
+    if (Item* newitem = target->StoreNewItem(dest, item.itemid, true, item.randomPropertyId, item.item_difficulty))
     {
         sLog.Player(this, LOG_LOOTS, LOG_LVL_BASIC,
             "Master loot %s gives %ux%u to %s [loot from %s]",

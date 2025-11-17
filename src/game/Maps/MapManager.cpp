@@ -37,6 +37,7 @@
 #include "InstanceData.h"
 #include "ScriptedInstance.h"
 #include "QzqstarAchievements.h"
+#include "custom/qzqstar_db.h"
 #include "custom/qzqstar_teleport.h"
 
 
@@ -511,10 +512,11 @@ Map* MapManager::CreateInstance(uint32 id, Player* player)
 
     //qzqstar, 250513, get the ac mapid
     uint32 ac_mapid = QZQSTAR_GET_AC_MAPID(id);
-    Achievement_t _mapType = ACHIEVEMENTS_DUNGEONS;
-    if (entry && entry->IsRaid()) //Attention Null ptr!
-        _mapType = ACHIEVEMENTS_RAIDS;
-    uint32 _map_difficulty = sQZAchievements.GetDungeonsInfo(_mapType, player, ac_mapid) & 0x01;
+    //Achievement_t _mapType = ACHIEVEMENTS_DUNGEONS;
+    //if (entry && entry->IsRaid()) //Attention Null ptr!
+    //    _mapType = ACHIEVEMENTS_RAIDS;
+    //uint32 _map_difficulty = sQZAchievements.GetDungeonsInfo(_mapType, player, ac_mapid) & 0x01;
+    uint32 _map_difficulty = player->M_Dungeon_Difficulty;
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "MapManager::CreateInstance: Player:%s, mapid %d, ac_mapid %d, difficulty %d", player->GetName(), id, ac_mapid, _map_difficulty);
 
 

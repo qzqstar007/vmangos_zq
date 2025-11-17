@@ -110,41 +110,6 @@ const Teleport_Point_t TP_MainLand_Kalimdor[] = {
 	{12, MAP_KALIMDOR,   	__XSTR("月光林地　"), MAP_KALIMDOR, 7882.0f,-2312.0f,466.0f,1.0f, {0}}
 };
 
-const Teleport_Point_t TP_Dungeons[] = {
-	{ 0, MAP_RAGEFIRE_CHASM,    __XSTR("怒焰裂谷　"), 1, 1815,-4419,-18.7,5.2, {11518,11520,11517,4,5,6,7,8,0,1}},
-	{ 1, MAP_WAILING_CAVERNS,   __XSTR("哀嚎洞穴　"), 1, -731.607f,-2218.39f,17.0281f,2.78486f, {3653,3654,3671,3674,3673,3670,7,8,0,1}},
-	{ 2, MAP_DEADMINES,         __XSTR("死亡矿井　"), 0, -11208.7f,1673.52f,24.6361f,1.51067f, {644,1763,646,639,645,6,7,8,30071,1}},
-	{ 3, MAP_SHADOWFANG_KEEP,   __XSTR("影牙城堡　"), 0, -234.675,1561.63,76.8921,1.24031, {4274,4279,4275,3886,3887,4278,7,8,30071,1}},
-	{ 4, MAP_BLACKFATHOM_DEEPS, __XSTR("黑暗深渊　"), 1, 4249.99,740.102,-25.671,1.34062, {4887,4831,6243,4829,4832,6,7,8,30071,1}},
-	{ 5, MAP_GNOMEREGAN,        __XSTR("诺莫瑞根　"), 0, -5163.54,925.423,257.181,1.57423, {6235,7079,6229,7800,5,6,7,8,30071,1}},
-	{ 6, MAP_MONASTERY,         __XSTR("血色修道院　"), 0, 2872.6,-764.398,160.332,5.05735, {4543,6487,3976,3975,3977,6,7,8,30071,1}},
-	{ 7, MAP_RAZORFEN_KRAUL,    __XSTR("剃刀沼泽　"), 1, -4470.28,-1677.77,81.3925,1.16302, {4428,4421,4422,4420,5,6,7,8,30071,1}},
-	{ 8, MAP_RAZORFEN_DOWNS,    __XSTR("剃刀高地　"), 1, -4657.3,-2519.35,81.0529,4.54808, {7358,8567,7357,4,5,6,7,8,30071,1}},
-	{ 9, MAP_ULDAMAN,           __XSTR("奥达曼　"), 0, -6071.37,-2955.16,209.782,0.015708, {7291,4854,6910,7206,5,6,7,8,30071,1}},
-	{10, MAP_MARAUDON,          __XSTR("玛拉顿　"), 1, -1188.37,2879.61,85.7888,5.07366, {12203,12201,12236,13282,12258,6,7,8,30071,1}},
-	{11, MAP_ZUL_FARRAK,        __XSTR("祖尔法拉克　"), 1, -6801.19,-2893.02,9.00388,0.158639, {7271,8127,7275,7267,5,6,7,8,30071,1}},
-	{12, MAP_SUNKEN_TEMLE,      __XSTR("沉没的神庙　"), 0, -10177.9,-3994.9,-111.239,6.01885, {5710,5721,5720,5719,5,6,7,8,30071,1}},
-	{13, MAP_BLACKROCK_DEPTHS,  __XSTR("黑石深渊　"), 0, -7179.34,-921.212,165.821,5.09599, {9033, 9018, 9019, 8983, 5,6,7,8,30071,1}},
-	{14, MAP_DIRE_MAUL,         __XSTR("厄运之锤　"), 1, -3521.29,1085.2,161.097,4.7281, {14327, 11501, 11486, 11492, 5, 6, 7, 8, 30071, 1}},
-	{15, MAP_SCHOLOMANCE,       __XSTR("通灵学院　"), 0, 1269.64,-2556.21,93.6088,0.620623, {10506, 11261,10505,10503, 1853, 6,7,8,30071,1}},
-	{16, MAP_STRATHOLME,        __XSTR("斯坦索姆　"), 0, 3352.92,-3379.03,144.782,6.25978, {10436, 10437,10440, 10438, 10435, 6,7,8,30071,1}},
-	{17, MAP_BLACKROCK_SPIRE,   __XSTR("黑石塔　"), 0, -7527.05,-1226.77,285.732,5.29626, {10429, 9196, 10430, 9568, 10363, 6,7,8,30071,1}},
-};
-
-
-const Teleport_Point_t TP_Raids[] = {
-	// Makeup from upper comment, reverse order
-	{0, MAP_ZUL_GURUB,      	__XSTR("祖尔格拉布　"), 	MAP_ZUL_GURUB, 		-11916.9f,-1248.36f,92.5334f,4.72417f, {14507,14517,14515,11382,11380,14834,7,8,30091,1}},
-	//{0, MAP_ZUL_GURUB,      	__XSTR("祖尔格拉布　"), 	MAP_ZUL_GURUB, 		-11916.9f,-1248.36f,92.5334f,4.72417f, {14507,14517,3,4,5,6,7,8,30091,1}},
-	{1, MAP_MOLTEN_CORE,    	__XSTR("熔火之心　"), 		MAP_MOLTEN_CORE, 	1082.04f,-474.596f,-107.762f,5.02623f, {1,2,3,4,5,6,7,8,30092,1}},
-	{2, MAP_ONYXIAS_LAIR,   	__XSTR("奥妮克希亚　"), 	MAP_ONYXIAS_LAIR, 29.1607f,-71.3372f,-8.18032f,4.43584f, {1,2,3,4,5,6,7,8,30093,1}},
-	{3, MAP_AHN_QIRAJ_RUINS, 	__XSTR("安其拉废墟　"), 	MAP_AHN_QIRAJ_RUINS, -8437.74f,1516.91f,31.9074f,2.73319f, {1,2,3,4,5,6,7,8,30094,1}},
-	{4, MAP_BLACKWING_LAIR, 	__XSTR("黑翼之巢　"), 		MAP_BLACKWING_LAIR, -7664.76f,-1100.87f,399.679f,0.561981f, {1,2,3,4,5,6,7,8,30095,1}},
-	{5, MAP_AHN_QIRAJ_TEMPLE, 	__XSTR("安其拉神殿　"), 	MAP_AHN_QIRAJ_TEMPLE, -8213.48f,2016.0f,129.072f,1.28414f, {1,2,3,4,5,6,7,8,30096,1}},
-	{6, MAP_NAXXRAMAS,       	__XSTR("纳克萨玛斯　"), 	MAP_NAXXRAMAS, 3021.64f,-3402.99f,298.22f,2.97352f, {1,2,3,4,5,6,7,8,30097,1}},
-
-};
-
 
 #pragma region Teleport Dungeons
 #define __MENU_TELEPORT_DUNGEONS_MAIN		(__MENU_TELEPORT_DUNGEONS)
@@ -190,15 +155,15 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 			text.append(__STR(TP_Dungeons[i].name));
 			
 			//get the dungeon information
-			uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, TP_Dungeons[i].id);
+			//uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, TP_Dungeons[i].id);
 
 			//lower 2bit is current difficulty, higher 2bit is achieved difficulty.
 			//modify only one difficulties
-			uint32 _currentDifficulty = _playerDungeonInfo & 0x01;
-			uint32 _achievedDifficulty = (_playerDungeonInfo >> 1) & 0x01;
+			//uint32 _currentDifficulty = _playerDungeonInfo & 0x01;
+			uint32 _farmTimes = DBHelper_Get_Farm_Times(player, MAP_INSTANCE, TP_Dungeons[i].mapId);
 
 			text.append(__STR(" => "));
-			text.append(__DUNGEONS_DIFFICULTY_MINIMUM[_achievedDifficulty]);
+			text.append(__DUNGEONS_DIFFICULTY_MINIMUM[_farmTimes>0?1:0]);
 			if(player->GetLevel() > i * 3 ) player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_DUNGEONS_MAIN + __MENU_TELEPORT_DUNGEONS_ACT1 + i); //add the difficulty to the menu
 			else player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝其他地图，玩家等级不够＝ ")), GOSSIP_SENDER_MAIN, __MENU_NONE); //add the difficulty to the menu
 		}
@@ -218,11 +183,13 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 		//get the real actions = acID
 		uint32 _acID = action - __MENU_TELEPORT_DUNGEONS_MAIN - __MENU_TELEPORT_DUNGEONS_ACT1;
 		//get the dungeon information
-		uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID);
+		//uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID);
 
 		//lower 2bit is current difficulty, higher 2bit is achieved difficulty.
-		uint32 _currentDifficulty = _playerDungeonInfo & 0x01;
-		uint32 _achievedDifficulty = (_playerDungeonInfo >> 1) & 0x01;
+		//uint32 _currentDifficulty = _playerDungeonInfo & 0x01;
+		//uint32 _achievedDifficulty = (_playerDungeonInfo >> 1) & 0x01;			
+		uint32 _farmTimes = DBHelper_Get_Farm_Times(player, MAP_INSTANCE, TP_Dungeons[_acID].mapId);
+		uint32 _achievedDifficulty = _farmTimes>0?1:0;
 
 		//display the info
 		text.append(__STR("当前地图：　"));
@@ -269,11 +236,12 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 		uint32 _difficulty = (_localBytes >> 5) & 0x01;
 
 		//get the dungeon information
-		uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID);	
+		//uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID);	
 		//save the current difficulty
-		_playerDungeonInfo &= 0x02; //clear the lower 1 bit, keep the higher 1 bit.
-		_playerDungeonInfo |= _difficulty; //set the lower 1 bit to the difficulty.
-		sQZAchievements.SetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID, _playerDungeonInfo); //save the dungeon information to the player's achievements vector.
+		//_playerDungeonInfo &= 0x02; //clear the lower 1 bit, keep the higher 1 bit.
+		//_playerDungeonInfo |= _difficulty; //set the lower 1 bit to the difficulty.
+		//sQZAchievements.SetDungeonsInfo(ACHIEVEMENTS_DUNGEONS, player, _acID, _playerDungeonInfo); //save the dungeon information to the player's achievements vector.
+		player->M_Dungeon_Difficulty = _difficulty;
 
 		player->CLOSE_GOSSIP_MENU();
 
@@ -288,7 +256,6 @@ bool Menus_teleport_Dungeons(Player *player, Creature *_cr, uint32 sender, uint3
 
 			else 
 			{
-				
 				//look for the npc name in the database.
 				CreatureLocale const* cl = sObjectMgr.GetCreatureLocale(_npclist[i]);
 				if (cl)

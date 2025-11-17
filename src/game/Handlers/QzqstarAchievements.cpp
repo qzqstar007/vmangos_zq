@@ -125,7 +125,7 @@ void QzqstarAchievements::Save(Player * _player)
 			e.data8,			e.data9,			e.data10,			e.data11,			e.data12,			e.data13,			e.data14,			e.data15
 			);
 
-		//__LOG("Saving player:%s, type:%d, data0=%u, data1=%u.", _player->GetName(), e.type, e.data0, e.data1);
+		__LOG("Saving player:%s, type:%d, data0=%u, data15=%u.", _player->GetName(), e.type, e.data0, e.data15);
 	}
 }
 
@@ -174,7 +174,7 @@ uint32 QzqstarAchievements::GetAccAchieveData(Player * _player, uint32 type)
 		case ACHIEVEMENT_ACCOUNT_GOLD_COLLECT:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data8; break;
 		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data9; break;
 		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data10; break;
-		case ACHIEVEMENT_ACCOUNT_MATS_NUMS:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data11; break;
+		case ACHIEVEMENT_ACCOUNT_MAX_LEVEL:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data11; break;
 		case ACHIEVEMENT_ACCOUNT_EQ_NUMS:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data12; break;
 		case ACHIEVEMENT_ACCOUNT_BONUS_NUMS:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data14; break;
 		case ACHIEVEMENT_ACCOUNT_REWARD:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data15; break;
@@ -208,7 +208,7 @@ void QzqstarAchievements::SetAccAchieveData(Player * _player, uint32 type, uint3
 		case ACHIEVEMENT_ACCOUNT_GOLD_COLLECT:	e.data8 = data; break;
 		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1:	e.data9 = data; break;
 		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2:	e.data10 = data; break;
-		case ACHIEVEMENT_ACCOUNT_MATS_NUMS:		e.data11 = data; break;
+		case ACHIEVEMENT_ACCOUNT_MAX_LEVEL:		e.data11 = data; break;
 		case ACHIEVEMENT_ACCOUNT_EQ_NUMS:			e.data12 = data; break;
 		case ACHIEVEMENT_ACCOUNT_BONUS_NUMS:			e.data14 = data; break;
 		case ACHIEVEMENT_ACCOUNT_REWARD:			e.data15 = data; break;
@@ -216,6 +216,8 @@ void QzqstarAchievements::SetAccAchieveData(Player * _player, uint32 type, uint3
 			__LOG("[QzqstarAchievements::SetAccAchieveData] Not found data for player:%s, type:%d", _player->GetName(), type);
 			break;
 	}
+
+	//__LOG("[QzqstarAchievements::SetAccAchieveData] set data for player:%s, type:%d, data:%d", _player->GetName(), type, data);
 }
 
 void QzqstarAchievements::IncAccAchieveData(Player * _player, uint32 type)
@@ -237,7 +239,7 @@ void QzqstarAchievements::IncAccAchieveData(Player * _player, uint32 type)
 		case ACHIEVEMENT_ACCOUNT_GOLD_COLLECT:		if(e.data8<DATA_MAX) e.data8++; break;
 		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1:	e.data9++; break;
 		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2:	e.data10++; break;
-		case ACHIEVEMENT_ACCOUNT_MATS_NUMS:			if(e.data11<DATA_MAX) e.data11++; break;
+		case ACHIEVEMENT_ACCOUNT_MAX_LEVEL:			if(e.data11<DATA_MAX) e.data11++; break;
 		case ACHIEVEMENT_ACCOUNT_BONUS_NUMS:				if(e.data14<DATA_MAX) e.data14++; break;
 		case ACHIEVEMENT_ACCOUNT_REWARD:			if(e.data15<DATA_MAX) e.data15++; break;
 		default:  
@@ -288,15 +290,24 @@ uint32 QzqstarAchievements::GetAccountSum(Player * _player)
 	if(_player->M_Achiv_Account_Gold_Collect > 1000 * 100) sum += 1000;
 	else sum += _player->M_Achiv_Account_Gold_Collect/1000;
 	//data9 - dungeon nums 1
-	if(_player->M_Achiv_Account_Dungeon_NUMS1 > 1000 * 100) sum += 1000;	
-	else sum += _player->M_Achiv_Account_Dungeon_NUMS1/1000;
-	//data10 - dungeon nums 2
-	if(_player->M_Achiv_Account_Dungeon_NUMS2 > 1000 * 100) sum += 1000;
-	else sum += _player->M_Achiv_Account_Dungeon_NUMS2/1000;
+	_pet = _player->M_Achiv_Account_Dungeon_NUMS1; //reuse the _pet
+	while (_pet > 0)
+	{
+		sum += (_pet % 10) * 2;
+		_pet /= 10;
+	}
 
-	//data11 - mats nums
-	if(_player->M_Achiv_Account_Mats_NUMS > 500) sum += 500;
-	else sum += _player->M_Achiv_Account_Mats_NUMS;		
+	//data10 - dungeon nums 2
+	_pet = _player->M_Achiv_Account_Dungeon_NUMS2; //reuse the _pet
+	while (_pet > 0)
+	{
+		sum += (_pet % 10) * 2;
+		_pet /= 10;
+	}
+
+	//data11 - max levels 
+	//if(_player->M_Achiv_Account_Max_Level > 500) sum += 500;
+	//else sum += _player->M_Achiv_Account_Max_Level;		
 	
 	//data12 - equipments
 	if(_player->M_Achiv_Account_EQ_Nums > 500) sum += 500;

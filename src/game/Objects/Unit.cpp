@@ -63,6 +63,7 @@
 #include "ScriptedInstance.h"
 #include "QzqstarAchievements.h"
 #include "custom\qzqstar_teleport.h"
+#include "custom\qzqstar_db.h"
 #include "custom\qzqstar_id.h"
  
  //#define DEBUG_DEBUFF_LIMIT
@@ -708,7 +709,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 			//if (player->M_Leech_Spell) this->CastCustomSpell(this, ZQ_SPELL_LEECH_SPELL, damage * player->M_Leech_Spell / 50.0f, 0, 0, true);
 		}
 
-        if (player->M_Leech_Spell) this->CastCustomSpell(this, ZQ_SPELL_LEECH_SPELL, damage * player->M_Leech_Spell / 100.0f, 0, 0, true);
+        //if (player->M_Leech_Spell) this->CastCustomSpell(this, ZQ_SPELL_LEECH_SPELL, damage * player->M_Leech_Spell / 100.0f, 0, 0, true);
 	}
 
 	//qzqstar, 250207, reduce the damage for pvp
@@ -1376,6 +1377,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
                                 {
                                     //check the player's info
 									auto player = playerx.getSource();
+                                    /*
                                     uint32 _dungeonInfo = sQZAchievements.GetDungeonsInfo(_mapType, player, _acmapID);
                                     if( ((_dungeonInfo >> 2) <= (_difficulty&3) ) && ( (_dungeonInfo>>2) < 3))
                                     {
@@ -1389,6 +1391,14 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
                                             //add reset raid scroll
                                             player->AddItem(TP_Raids[_acmapID].npc_list[8], 1);
                                         }
+                                    }*/
+
+                                    if(GetMap()->IsRaid()) {
+                                        //todo, raid counter
+                                    }
+                                    else if((_difficulty !=0) || (DBHelper_Get_Farm_Times(player, MAP_INSTANCE, pCreatureVictim->GetMapId()) == 0))
+                                    {
+                                        DBHelper_Inc_Farm_Times(player, MAP_INSTANCE, pCreatureVictim->GetMapId());
                                     }
 
                                     #ifndef __STR
@@ -1396,16 +1406,16 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
                                     #endif
 
                                     
-                                    std::string _diffDesc = _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 ");
+                                    std::string _diffDesc = _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("英雄　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 ");
                                     ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_CPLT_NPCS, 
                                         GetMap()->IsRaid()? TP_Raids[_acmapID].name:TP_Dungeons[_acmapID].name, _diffDesc);
 
-                                    
+                                    /*
                                     if(GetMap()->IsDungeon() && TP_Dungeons[_acmapID].npc_list[8] > 10)
                                     {
                                         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player %s has completed the %s dungeon, difficulty: %u, Need Reward ....", player->GetName(), TP_Dungeons[_acmapID].name, _difficulty&3);
                                         player->AddItem(TP_Dungeons[_acmapID].npc_list[8] + (_dungeonInfo&3), TP_Dungeons[_acmapID].npc_list[9]);
-                                    }
+                                    }*/
                                         
                                 }
                             }

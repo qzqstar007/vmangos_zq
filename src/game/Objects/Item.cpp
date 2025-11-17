@@ -834,6 +834,15 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     {
         if(roll_chance_i(30)) return 3319;
     }
+
+
+
+
+
+
+
+
+
     return 0;
 
     // RandomProperty case

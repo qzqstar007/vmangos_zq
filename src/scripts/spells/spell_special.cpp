@@ -19,6 +19,7 @@
 #include "QzqstarAchievements.h"
 #include "Chat.h"
 #include "../custom/qzqstar_id.h"
+#include "../custom/qzqstar_custom.h"
 
 // 24340, 26558, 28884 - Meteor
 // 26789 - Shard of the Fallen Star
@@ -602,6 +603,52 @@ struct SpellVIPHasteScript : public SpellScript
 };
 
 
+
+//custom spell script for heal
+struct HealCustomSpellScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+			Player* player = spell->GetCaster()->ToPlayer();
+            if( (spell->m_triggeredBySpellInfo) && (player) )
+            {
+
+				uint32_t _bp = 0;
+				
+				switch (spell->m_triggeredBySpellInfo->Id)
+				{
+                    #define BASE_SPELL_HEAL_ID 32402
+                    case BASE_SPELL_HEAL_ID + 0: _bp = player->GetStat(STAT_STRENGTH) * 0.5f; break;
+                    case BASE_SPELL_HEAL_ID + 1: _bp = player->GetStat(STAT_STRENGTH) * 0.75f; break;
+                    case BASE_SPELL_HEAL_ID + 2: _bp = player->GetStat(STAT_STRENGTH); break;
+
+                    case BASE_SPELL_HEAL_ID + 3: _bp = player->GetStat(STAT_AGILITY) * 0.5f; break;
+                    case BASE_SPELL_HEAL_ID + 4: _bp = player->GetStat(STAT_AGILITY) * 0.75f; break;
+                    case BASE_SPELL_HEAL_ID + 5: _bp = player->GetStat(STAT_AGILITY); break;
+
+                    case BASE_SPELL_HEAL_ID + 6: _bp = player->GetStat(STAT_INTELLECT) * 0.3f; break;
+                    case BASE_SPELL_HEAL_ID + 7: _bp = player->GetStat(STAT_INTELLECT) * 0.4f; break;
+                    case BASE_SPELL_HEAL_ID + 8: _bp = player->GetStat(STAT_INTELLECT) * 0.5f; break;
+
+                    case BASE_SPELL_HEAL_ID + 9: _bp = player->GetStat(STAT_SPIRIT) * 0.3f; break;
+                    case BASE_SPELL_HEAL_ID + 10: _bp = player->GetStat(STAT_SPIRIT) * 0.4f; break;
+                    case BASE_SPELL_HEAL_ID + 11: _bp = player->GetStat(STAT_SPIRIT) * 0.5f; break;
+
+				}
+				
+                player->CastCustomSpell(player, 32400, _bp, 0, 0, false);
+
+                __LOG("Triggered by SpellID: %u. bp: %u" , spell->m_triggeredBySpellInfo->Id, _bp);
+
+            }
+        }	
+        return true;
+    }	
+};
+
+
 void AddSC_special_spell_scripts()
 {
     Script* newscript;
@@ -667,5 +714,11 @@ void AddSC_special_spell_scripts()
     newscript = new Script;
     newscript->Name = "qzqstar_vip_haste";
     newscript->GetSpellScript = [](SpellEntry const*) -> SpellScript* { return new SpellVIPHasteScript(); };
+    newscript->RegisterSelf();
+
+    //add heal custom spell script for heal
+    newscript = new Script;
+    newscript->Name = "qzqstar_heal_custom";
+    newscript->GetSpellScript = [](SpellEntry const*) -> SpellScript* { return new HealCustomSpellScript(); };
     newscript->RegisterSelf();
 }

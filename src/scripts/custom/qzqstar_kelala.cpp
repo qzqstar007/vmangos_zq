@@ -36,6 +36,7 @@
 #define	__MENU_KELALA_NEWBIE			 (100)
 #define __MENU_KELALA_MAIN				 1000
 #define __MENU_KELALA_LOGIN				 2000
+#define __MENU_KELALA_EQUIP_REFINE		 3000 //S8 added
 #define __MENU_KELALA_TASK				 3000
 #define __MENU_KELALA_ACHIEVEMENTS		 4000
 #define __MENU_KELALA_MODE				 5000
@@ -115,14 +116,15 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 		}*/
 		//Get the account time and date
 		uint32_t _now = Helper_GetDateInt();
-		uint32_t _accountDate = sQZAchievements.GetAccAchieveData(player, ACHIEVEMENT_ACCOUNT_REWARD);
+		uint32_t _accountDate = player->M_Achiv_Account_REWARD;
 		if(_now / 100 != _accountDate / 100)
 		{
 			//update the account date
-			sQZAchievements.SetAccAchieveData(player, ACHIEVEMENT_ACCOUNT_REWARD, _now);
+			//sQZAchievements.SetAccAchieveData(player, ACHIEVEMENT_ACCOUNT_REWARD, _now);
+			player->M_Achiv_Account_REWARD = _now;
 
-			__LOG("[Menus_Kelala_Login] Player:%s got daily reward. @%u, old:%u", player->GetName(), _now, _accountDate);
-			player->AddItem(ZQ_ITEM_VOUCHER,  5); player->AddItem(ZQ_ITEM_BUFF, 1); 
+			__LOG("[Menus_Kelala_Login] Player:%s got daily reward. time:%u, old:%u", player->GetName(), _now, _accountDate);
+			player->AddItem(ZQ_ITEM_VOUCHER,  1000); player->AddItem(ZQ_ITEM_BUFF, 1); 
 
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　登陆奖励领取成功　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -226,6 +228,41 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 
 	return true;
 }
+
+#pragma region Equipment Refine
+
+bool Menus_Kelala_EquipRefine(Player *player, Creature *_Creature, uint32 sender, uint32 action)
+{
+	std::string text = "";
+	uint32 __menu_nums = 0;
+	
+	uint32 abs_action = action - __MENU_KELALA_EQUIP_REFINE;
+
+	if(abs_action == 0)
+	{
+		//display equip refine menu
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_REFINE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_REFINE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　装备重铸　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_REFINE + 100);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_REFINE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　重铸转移　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_REFINE + 200);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_REFINE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　返回　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
+	}
+	else if (abs_action >= 100 && abs_action < 200)
+	{
+		//equip refine
+
+	}
+	else if (abs_action >= 200 && abs_action < 300)
+	{
+		//refine transfer
+	}
+
+	return true;
+}
+
+#pragma endregion Equipment Refine
 
 #pragma region Dynamic Task_Generate
 
@@ -2089,8 +2126,12 @@ bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 acti
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　点券商城　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_SHOP);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　成就系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_ACHIEVEMENTS);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　史诗任务链　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EQUIP_REFINE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　成就系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_ACHIEVEMENTS);
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　任务系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_TASK);
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -2184,11 +2225,18 @@ bool Kelala_Menus(Player *player, Creature *_cr, uint32 sender, uint32 action)
 	{
 		return Menus_Kelala_Login(player, _cr, sender, action);
 	}
+
+	// Equipment refine menu
+	else if (action >= __MENU_KELALA_EQUIP_REFINE && action <= __MENU_KELALA_EQUIP_REFINE + __MENU_SIZE)
+	{
+		return Menus_Kelala_EquipRefine(player, _cr, sender, action);
+	}
 	// Task menu
+	/*
 	else if (action >= __MENU_KELALA_TASK && action <= __MENU_KELALA_TASK + __MENU_SIZE)
 	{
 		return Menus_Kelala_Task(player, _cr, sender, action);
-	}
+	}*/
 	// Achievement menu
 	else if (action >= __MENU_KELALA_ACHIEVEMENTS && action <= __MENU_KELALA_ACHIEVEMENTS + __MENU_SIZE)
 	{

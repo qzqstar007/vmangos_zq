@@ -10603,7 +10603,9 @@ void Player::RemoveAmmo()
 }
 
 
-#define __MAX_ENCHANTMENT_IDS (177)
+
+//Note, the following enchantids values are bit high...
+/* #define __MAX_ENCHANTMENT_IDS (177)
 static const int32 __Random_EnchantIDs[__MAX_ENCHANTMENT_IDS] =
 { // 1   2      3     4     5   6   7   8   9       10  11  12  13  14
 3200,3206,3212,3201,3207,3213,3202,3208,3214,3203,3209,3215,3161,3141,3126,3111,3180,3204,3205,3210,3211,3216,3217,3162,3142,3127,
@@ -10613,18 +10615,23 @@ static const int32 __Random_EnchantIDs[__MAX_ENCHANTMENT_IDS] =
 3135,3104,3109,3120,3040,3051,3060,3070,3080,3090,3173,3192,3154,3136,3121,3174,3193,3155,3137,3122,3041,3052,3061,3071,3081,3091,
 3175,3194,3156,3138,3123,3176,3195,3157,3139,3124,3105,3110,3042,3053,3062,3072,3082,3092,3177,3196,3158,3140,3125,3178,3197,3159,
 3179,3198,3199,3160,3043,3044,3045,3054,3055,3063,3064,3065,3073,3074,3075,3083,3084,3085,3093,3094,3095
+};*/
+#define __MAX_ENCHANTMENT_IDS (100)
+static const int32 __Random_EnchantIDs[__MAX_ENCHANTMENT_IDS] =
+{ // 1   2      3     4     5   6       7   8   9       10      11  12  13  14 15 16 17 18 19 20
+    3200,3206,  3212,3201,  3207,3213,  3202,3208,  3214,3203,  3209,3215,3161,3141,    3126,3111,3180,3204,    3205,3210,
+    3211,3216,  3217,3162,  3142,3127,  3112,3046,  3181,3163,  3143,3128,3113,3056,    3066,3076,3086,3182,    3164,3144,
+    3129,3114,  3036,3047,  3183,3165,  3145,3130,  3115,3184,  3166,3101,3106,3146,    3131,3116,3037,3048,    3057,3067,
+    3077,3087,  3185,3167,  3147,3132,  3117,3186,  3168,3148,  3102,3107,3133,3118,    3038,3049,3058,3068,    3078,3088,
+    3187,3149,  3169,3188,  3150,3170,  3189,3151,  3103,3108,  3134,3119,3039,3050,    3059,3069,3079,3089,    3171,3190
 };
-
 static int32 __getRandomEnchantId(int32 itemLevel)
 {
-    int32 _minRange = itemLevel;
-    int32 _maxRange = itemLevel*2;
+    int32 _minRange = itemLevel/2;
+    int32 _maxRange = itemLevel;
 
-    if(itemLevel < 15) { _minRange = 0; _maxRange = 30; }
-
-    if(_minRange < 20) _minRange = 0;
-    if(_maxRange < 30) _maxRange = 30;
-
+    if(_minRange < 10) _minRange = 0;
+    if(_maxRange < 15) _maxRange = 15;
 
     if(_minRange > 60) _minRange = 60;
     if(_maxRange > __MAX_ENCHANTMENT_IDS-1) _maxRange = __MAX_ENCHANTMENT_IDS-1;
@@ -10633,7 +10640,7 @@ static int32 __getRandomEnchantId(int32 itemLevel)
 }
 
 // Return stored item (if stored to stack, it can diff. from pItem). And pItem ca be deleted in this case.
-Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update, int32 randomPropertyId)
+Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update, int32 randomPropertyId, int32 item_difficulty)
 {
     uint32 count = 0;
     for (const auto& itr : dest)
@@ -10649,7 +10656,8 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         //S8: check the item
 		auto _proto = pItem->GetProto();
 
-		if (_proto->Class == ITEM_CLASS_WEAPON || _proto->Class == ITEM_CLASS_ARMOR)
+        //excluding the chenyi and zhanpao
+		if ( (_proto->Class == ITEM_CLASS_WEAPON || _proto->Class == ITEM_CLASS_ARMOR) && (item < 30200) )
 		{
         	int32 _quality = _proto->Quality;
             if (_quality <2 ) _quality = 2;
@@ -10661,7 +10669,19 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
                 //__LOG("Item:%u Create with EchantID:%u", item, enchantID);
                 //enchant the item
                 pItem->SetEnchantment((EnchantmentSlot)( PROP_ENCHANTMENT_SLOT_1 + i), enchantID, 0, 0);
-            }				
+            }
+
+            //S8: add difficulty enchant
+            if(item_difficulty > 0)
+            {
+                //generate random enchant id
+                auto enchantID = DBHelper_GetSpecialSlotsByLevel(item_difficulty);
+                //enchant the item
+                if(_proto->Class == ITEM_CLASS_ARMOR)
+                    pItem->SetEnchantment((EnchantmentSlot)( TEMP_ENCHANTMENT_SLOT ), enchantID, 0, 0);
+                else if (_proto->Class == ITEM_CLASS_WEAPON)
+                    pItem->SetEnchantment((EnchantmentSlot)( PROP_ENCHANTMENT_SLOT_3 ), enchantID, 0, 0);
+            }
 		}
 
         pItem = StoreItem(dest, pItem, update);
@@ -12258,7 +12278,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
             {
                 M_Leech_Spell += 1;
             }
-            else if(M_Leech_Spell > 1)
+            else if(M_Leech_Spell >= 1)
             {
                 //remove the leech aura
                 M_Leech_Spell -= 1;
@@ -15921,27 +15941,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if(HasItemCount(ZQ_ITEM_MOUNTS_ZGL, 1, true) && (!HasSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL)))  LearnSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL, false);
     else if (HasSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL) && (!HasItemCount(ZQ_ITEM_MOUNTS_ZGL, 1, true))) RemoveSpell(ZQ_SPELL_MOUNTS_BONUS_ZGL);
 
-
     //S8: caculate the points player had owned, and compare with account points
     __LOG("[Player:%s] Explore:%u Quest:%u", GetName(), _explCount, M_Custom_Quest_Done);
-
-
-    /* fill the data
-            uint32  M_Achiv_Account_VIP;            //Vip functions
-        uint32  M_Achiv_Account_Task;           //Account Task Points Nums
-        uint32  M_Achiv_Account_Explore;        //Account Explore Points Nums
-        uint32  M_Achiv_Account_Pet_Collection;         //Account Pet Collection Points Nums
-        uint32  M_Achiv_Account_Reputation_List;        //Account Reputation List Points Nums
-        uint32  M_Achiv_Account_Profession_Skill;       //Account Profession Skill Points Nums
-        uint32  M_Achiv_Account_Killing_Nums;           //Account Killing Points Nums
-        uint32  M_Achiv_Account_PVP_Nums;               //Account PVP Points Nums
-        uint32  M_Achiv_Account_Gold_Collect;       //Account Gold Collect Points Nums
-        uint32  M_Achiv_Account_Dungeon_NUMS1;      //Account Dungeon Points Nums1
-        uint32  M_Achiv_Account_Dungeon_NUMS2;      //Account Dungeon Points Nums2
-        uint32  M_Achiv_Account_Mats_NUMS;          //Account Mats Points Nums
-        uint32  M_Achiv_Account_EQ_Nums;            //Account Equip Points Nums
-        uint32  M_Achiv_Account_Bonus_Nums;         //Account Bonus Points Nums
-        uint32  M_Achiv_Account_REWARD;             //Account Reward Points Nums */
 
     // 假设此处需要填充 M_achiv_account 相关数据，以下是示例代码
     // 初始化 M_achiv_account 相关数据，实际实现需根据业务逻辑调整
@@ -15956,7 +15957,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     /* 08 */M_Achiv_Account_Gold_Collect = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_GOLD_COLLECT);
     /* 09 */M_Achiv_Account_Dungeon_NUMS1 = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1);
     /* 10 */M_Achiv_Account_Dungeon_NUMS2 = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2);
-    /* 11 */M_Achiv_Account_Mats_NUMS = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_MATS_NUMS);
+    /* 11 */M_Achiv_Account_Max_Level = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_MAX_LEVEL);
     /* 12 */M_Achiv_Account_EQ_Nums = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_EQ_NUMS);
     /* 13 */M_Achiv_Account_Bonus_Nums = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_BONUS_NUMS);
     /* 14 */M_Achiv_Account_REWARD = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_REWARD);
@@ -15974,12 +15975,12 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     //detailed nums M_Achiv_Account_XXX
     Helper_Chat(this, Helper_MakeString("","详细数据：Player :%s,  VIP:%u,\
         Task:%u, Explore:%u, Pet:%u, Reputation:%u, Profession:%u, Killing:%u, \
-        PVP:%u, Gold:%u, Dungeon1:%u, Dungeon2:%u, Mats:%u, EQ:%u, Bonus:%u, Reward:%u.",
+        PVP:%u, Gold:%u, Dungeon1:%u, Dungeon2:%u, maxlevel:%u, EQ:%u, Bonus:%u, Reward:%u.",
         GetName(), M_Achiv_Account_VIP,
         M_Achiv_Account_Task, M_Achiv_Account_Explore, M_Achiv_Account_Pet_Collection, 
         M_Achiv_Account_Reputation_List, M_Achiv_Account_Profession_Skill,
         M_Achiv_Account_Killing_Nums, M_Achiv_Account_PVP_Nums, M_Achiv_Account_Gold_Collect, 
-        M_Achiv_Account_Dungeon_NUMS1, M_Achiv_Account_Dungeon_NUMS2, M_Achiv_Account_Mats_NUMS,
+        M_Achiv_Account_Dungeon_NUMS1, M_Achiv_Account_Dungeon_NUMS2, M_Achiv_Account_Max_Level,
         M_Achiv_Account_EQ_Nums, M_Achiv_Account_Bonus_Nums, M_Achiv_Account_REWARD).c_str());
 
 
@@ -16030,8 +16031,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
 	//3. talented.
 
+    //4. chenyi and zhanpao
 
-
+    //5. defaults to zero
+    M_Dungeon_Difficulty = 0;
 
 
 
@@ -17534,7 +17537,7 @@ void Player::SaveToDB(bool online, bool force)
         uint32  M_Achiv_Account_Gold_Collect;          //Account Gold Collect Points Nums
         uint32  M_Achiv_Account_Dungeon_NUMS1;         //Account Dungeon Points Nums1
         uint32  M_Achiv_Account_Dungeon_NUMS2;         //Account Dungeon Points Nums2
-        uint32  M_Achiv_Account_Mats_NUMS;              //Account Mats Points Nums
+        uint32  M_Achiv_Account_Max_Level;              //Account Mats Points Nums
         uint32  M_Achiv_Account_EQ_Nums;                //Account Equip Points Nums
         uint32  M_Achiv_Account_Bonus_Nums;             //Account Bonus Points Nums
         uint32  M_Achiv_Account_REWARD;                 //Account Reward Points Nums
@@ -17550,7 +17553,7 @@ void Player::SaveToDB(bool online, bool force)
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_GOLD_COLLECT, M_Achiv_Account_Gold_Collect);
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1, M_Achiv_Account_Dungeon_NUMS1);
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2, M_Achiv_Account_Dungeon_NUMS2);
-    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_MATS_NUMS, M_Achiv_Account_Mats_NUMS);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_MAX_LEVEL, M_Achiv_Account_Max_Level);
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_EQ_NUMS, M_Achiv_Account_EQ_Nums);
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_BONUS_NUMS, M_Achiv_Account_Bonus_Nums);
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_REWARD, M_Achiv_Account_REWARD);
