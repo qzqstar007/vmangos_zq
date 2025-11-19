@@ -67,7 +67,7 @@ bool MapSessionFilter::Process(std::unique_ptr<WorldPacket> const& packet)
     return MapSessionFilterHelper(m_pSession, opHandle);
 }
 
-static uint32 g_sessionCounter = 0;
+static uint32 g_sessionCounter = 1;
 
 // WorldSession constructor
 WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale) :
@@ -294,9 +294,11 @@ void WorldSession::QueuePacket(std::unique_ptr<WorldPacket> newPacket)
 
         if (processing >= PACKET_PROCESS_MAX_TYPE)
         {
+            /*
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: opcode %s (0x%.4X) will be skipped",
                 LookupOpcodeName(newPacket->GetOpcode()),
                 newPacket->GetOpcode());
+            */
             return;
         }
     }
@@ -683,15 +685,6 @@ void WorldSession::LogoutPlayer(bool Save)
         {
             queue->RemovePlayerFromQueue(playerGuid, PLAYER_SYSTEM_LEAVE);
         });
-
-        // Teleport to home if the player is in an invalid instance
-        if (!_player->m_instanceValid && !_player->IsGameMaster())
-        {
-            _player->TeleportToHomebind();
-            //this is a bad place to call for far teleport because we need player to be in world for successful logout
-            //maybe we should implement delayed far teleport logout?
-            sMapMgr.ExecuteSingleDelayedTeleport(_player);
-        }
 
         // FG: finish pending transfers after starting the logout
         // this should fix players being able to logout and login back with full hp at death position

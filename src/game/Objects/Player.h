@@ -1549,6 +1549,7 @@ class Player final: public Unit
         bool CanDualWield() const { return m_canDualWield; }
         void SetCanDualWield(bool value) { m_canDualWield = value; }
 
+        void UpdateDamageDonePercent(uint32 school);
         void ApplyStatBuffMod(Stats stat, float val, bool apply) { ApplyModSignedFloatValue((val > 0 ? PLAYER_FIELD_POSSTAT0 + stat : PLAYER_FIELD_NEGSTAT0 + stat), val, apply); }
         void ApplyStatPercentBuffMod(Stats stat, float val, bool apply)
         {
@@ -1808,7 +1809,7 @@ class Player final: public Unit
         bool IsVisibleGloballyFor(Player const* viewer) const;
         void UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* target);
         template<class T>
-        void UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
+        void UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateData& data);
         void LeaveCombatWithFarAwayCreatures();
 
         Camera& GetCamera() { return m_camera; }
@@ -2074,7 +2075,7 @@ class Player final: public Unit
         void SendDismountResult(UnitDismountResult result) const;
         void UpdateCorpseReclaimDelay();
     public:
-        void ScheduleStandUp();
+        void ScheduleStandUp() { m_isStandUpScheduled = true; }
         bool IsStandUpScheduled() const { return m_isStandUpScheduled; }
         void ClearScheduledStandUp() { m_isStandUpScheduled = false; }
         UnitMountResult Mount(uint32 mount, uint32 spellId = 0) override;

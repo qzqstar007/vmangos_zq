@@ -393,7 +393,7 @@ bool Creature::InitEntry(uint32 entry, GameEventCreatureData const* eventData /*
     // Load creature equipment
     LoadDefaultEquipment(eventData);
 
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 #else
     SetInt32Value(UNIT_MOD_CAST_SPEED, 0);
@@ -663,7 +663,7 @@ bool Creature::UpdateEntry(uint32 entry, GameEventCreatureData const* eventData 
     // No need to set spell list if creature is not yet spawned,
     // as it will be done in the CreatureAI constructor.
     if (IsInWorld() && AI() && GetCreatureInfo()->spell_list_id)
-            AI()->SetSpellsList(GetCreatureInfo()->spell_list_id);
+        AI()->SetSpellsList(GetCreatureInfo()->spell_list_id);
 
     // if eventData set then event active and need apply spell_start
     if (eventData)
@@ -1883,7 +1883,7 @@ void Creature::SetInitCreaturePowerType()
 {
     Pet* pPet = ToPet();
 
-    if (pPet && pPet->getPetType() == HUNTER_PET)
+    if (pPet && pPet->GetPetType() == HUNTER_PET)
         return;
 
     if (GetClassLevelStats()->mana > 0)
@@ -1911,8 +1911,8 @@ void Creature::SelectLevel(float percentHealth, float percentMana)
     CreatureInfo const* cinfo = GetCreatureInfo();
 
     // level
-    uint32 const minLevel = std::min(cinfo->level_max, cinfo->level_min);
-    uint32 const maxLevel = std::max(cinfo->level_max, cinfo->level_min);
+    uint32 const minLevel = cinfo->level_min;
+    uint32 const maxLevel = cinfo->level_max;
     uint32 const level = minLevel == maxLevel ? minLevel : urand(minLevel, maxLevel);
 
     SetLevel(level);
@@ -3284,7 +3284,7 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
             suitableUnits.reserve(threatlist.size() - position);
             advance(itr, position);
             for (; itr != threatlist.end(); ++itr)
-                if (Unit* pTarget = GetMap()->GetUnit((*itr)->getUnitGuid()))
+                if (Unit* pTarget = (*itr)->getTarget())
                     if (MeetsSelectAttackingRequirement(pTarget, pSpellInfo, selectFlags))
                         suitableUnits.push_back(pTarget);
 
@@ -3297,7 +3297,7 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
         {
             advance(itr, position);
             for (; itr != threatlist.end(); ++itr)
-                if (Unit* pTarget = GetMap()->GetUnit((*itr)->getUnitGuid()))
+                if (Unit* pTarget = (*itr)->getTarget())
                     if (MeetsSelectAttackingRequirement(pTarget, pSpellInfo, selectFlags))
                         return pTarget;
 
@@ -3307,7 +3307,7 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
         {
             advance(ritr, position);
             for (; ritr != threatlist.rend(); ++ritr)
-                if (Unit* pTarget = GetMap()->GetUnit((*itr)->getUnitGuid()))
+                if (Unit* pTarget = (*ritr)->getTarget())
                     if (MeetsSelectAttackingRequirement(pTarget, pSpellInfo, selectFlags))
                         return pTarget;
 
@@ -3323,7 +3323,7 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
             advance(itr, position);
             for (; itr != threatlist.end(); ++itr)
             {
-                pTarget = GetMap()->GetUnit((*itr)->getUnitGuid());
+                pTarget = (*itr)->getTarget();
                 if (pTarget && MeetsSelectAttackingRequirement(pTarget, pSpellInfo, selectFlags))
                 {
                     combatDistance = GetDistance3dToCenter(pTarget);
@@ -3347,7 +3347,7 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
             advance(itr, position);
             for (; itr != threatlist.end(); ++itr)
             {
-                pTarget = GetMap()->GetUnit((*itr)->getUnitGuid());
+                pTarget = (*itr)->getTarget();
                 if (pTarget && MeetsSelectAttackingRequirement(pTarget, pSpellInfo, selectFlags))
                 {
                     combatDistance = GetCombatDistance(pTarget);
@@ -3720,6 +3720,7 @@ void Creature::GetHomePosition(float &x, float &y, float &z, float &o)
     }
     GetRespawnCoord(x, y, z, &o);
 }
+
 void Creature::SetHomePosition(float x, float y, float z, float o)
 {
     m_homePosition.x = x;
@@ -3891,7 +3892,7 @@ Unit* Creature::GetNearestVictimInRange(float min, float max)
     ThreatList const& tList = GetThreatManager().getThreatList();
     for (const auto i : tList)
     {
-        Unit* pTarget = GetMap()->GetUnit(i->getUnitGuid());
+        Unit* pTarget = i->getTarget();
         if (!pTarget)
             continue;
 
@@ -3916,7 +3917,7 @@ Unit* Creature::GetFarthestVictimInRange(float min, float max)
     ThreatList const& tList = GetThreatManager().getThreatList();
     for (const auto i : tList)
     {
-        Unit* pTarget = GetMap()->GetUnit(i->getUnitGuid());
+        Unit* pTarget = i->getTarget();
         if (!pTarget)
             continue;
 
@@ -3938,7 +3939,7 @@ Unit* Creature::GetVictimInRange(float min, float max)
     ThreatList const& tList = GetThreatManager().getThreatList();
     for (const auto i : tList)
     {
-        Unit* pTarget = GetMap()->GetUnit(i->getUnitGuid());
+        Unit* pTarget = i->getTarget();
 
         if (pTarget && IsInRange(pTarget, min, max))
             return pTarget;
@@ -3954,7 +3955,7 @@ Unit* Creature::GetHostileCasterInRange(float min, float max)
     ThreatList const& tList = GetThreatManager().getThreatList();
     for (const auto i : tList)
     {
-        Unit* pTarget = GetMap()->GetUnit(i->getUnitGuid());
+        Unit* pTarget = i->getTarget();
 
         if (pTarget && pTarget->IsCaster() && IsInRange(pTarget, min, max))
             return pTarget;
@@ -3970,7 +3971,7 @@ Unit* Creature::GetHostileCaster()
     ThreatList const& tList = GetThreatManager().getThreatList();
     for (const auto i : tList)
     {
-        Unit* pTarget = GetMap()->GetUnit(i->getUnitGuid());
+        Unit* pTarget = i->getTarget();
 
         if (pTarget && pTarget->IsCaster())
             return pTarget;
@@ -3986,7 +3987,7 @@ void Creature::ProcessThreatList(ThreatListProcesser* f)
     ThreatList const& tList = GetThreatManager().getThreatList();
     for (const auto i : tList)
     {
-        Unit* target = GetMap()->GetUnit(i->getUnitGuid());
+        Unit* target = i->getTarget();
 
         if (target)
             if (f->Process(target))
@@ -4029,7 +4030,7 @@ void Creature::AddThreatsOf(Creature const* pOther)
     ThreatList const& tList = pOther->GetThreatManager().getThreatList();
     for (const auto i : tList)
     {
-        Unit* pTarget = GetMap()->GetUnit(i->getUnitGuid());
+        Unit* pTarget = i->getTarget();
 
         if (pTarget && pTarget->IsAlive() && !IsFriendlyTo(pTarget))
         {
@@ -4037,30 +4038,6 @@ void Creature::AddThreatsOf(Creature const* pOther)
             AddThreat(pTarget);
         }
     }
-}
-
-// select nearest hostile unit within the given attack distance (i.e. distance is ignored if > than ATTACK_DISTANCE), regardless of threat list.
-Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
-{
-    CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    Unit* target = nullptr;
-
-    if (dist > ATTACK_DISTANCE)
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature (GUID: %u Entry: %u) SelectNearestTargetInAttackDistance called with dist > ATTACK_DISTANCE. Extra distance ignored.", GetGUIDLow(), GetEntry());
-
-    MaNGOS::NearestHostileUnitInAttackDistanceCheck u_check(this, dist);
-    MaNGOS::UnitLastSearcher<MaNGOS::NearestHostileUnitInAttackDistanceCheck> searcher(target, u_check);
-
-    TypeContainerVisitor<MaNGOS::UnitLastSearcher<MaNGOS::NearestHostileUnitInAttackDistanceCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
-    TypeContainerVisitor<MaNGOS::UnitLastSearcher<MaNGOS::NearestHostileUnitInAttackDistanceCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
-
-    cell.Visit(p, world_unit_searcher, *GetMap(), *this, ATTACK_DISTANCE);
-    cell.Visit(p, grid_unit_searcher, *GetMap(), *this, ATTACK_DISTANCE);
-
-    return target;
 }
 
 Unit* Creature::SelectNearestHostileUnitInAggroRange(bool useLOS, bool ignoreCivilians) const
@@ -4207,57 +4184,6 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, SpellEntry const* pSpellInfo,
     return spell->prepare(std::move(targets), nullptr, uiChance);
 }
 
-// use this function to avoid having hostile creatures attack
-// friendlies and other mobs they shouldn't attack
-bool Creature::_IsTargetAcceptable(Unit const* target) const
-{
-    ASSERT(target);
-
-    // if the target cannot be attacked, the target is not acceptable
-    if (IsFriendlyTo(target) || !target->IsTargetableBy(this))
-        return false;
-
-    Unit* myVictim = GetAttackerForHelper();
-    Unit* targetVictim = target->GetAttackerForHelper();
-
-    // if I'm already fighting target, or I'm hostile towards the target, the target is acceptable
-    if (myVictim == target || targetVictim == this || IsHostileTo(target))
-        return true;
-
-    // if the target's victim is friendly, and the target is neutral, the target is acceptable
-    if (targetVictim && IsFriendlyTo(targetVictim))
-        return true;
-
-    // if the target's victim is not friendly, or the target is friendly, the target is not acceptable
-    return false;
-}
-
-// this should not be called by petAI or
-bool Creature::canCreatureAttack(Unit const* pVictim, bool force) const
-{
-    if (!pVictim->IsInMap(this))
-        return false;
-
-    if (!CanAttack(pVictim, force))
-        return false;
-
-    if (GetMap()->IsDungeon())
-        return true;
-
-    //Use AttackDistance in distance check if threat radius is lower. This prevents creature bounce in and out of combat every update tick.
-    float dist = std::max(GetAttackDistance(pVictim), 150.0f);
-
-    if (Unit* unit = GetCharmerOrOwner())
-    {
-        if (!pVictim->IsWithinDist(unit, dist))
-            return false;
-    }
-    else if (!pVictim->IsWithinDist3d(m_homePosition, dist))
-        return false;
-
-    return pVictim->IsInAccessablePlaceFor(this);
-}
-
 time_t Creature::GetCombatTime(bool total) const
 {
     auto diff = time(nullptr) - m_combatStartTime;
@@ -4284,37 +4210,6 @@ void Creature::EnterCombatWithTarget(Unit* pVictim)
         AddThreat(pVictim);
         pVictim->SetInCombatWith(this);
     }
-}
-
-bool Creature::canStartAttack(Unit const* who, bool force) const
-{
-    if (IsCivilian())
-        return false;
-
-    if (!CanFly() && (GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE))
-        //|| who->IsControlledByPlayer() && who->IsFlying()))
-        // we cannot check flying for other creatures, too much map/vmap calculation
-        // TODO: should switch to range attack
-        return false;
-
-    if (!force)
-    {
-        if (!_IsTargetAcceptable(who))
-            return false;
-
-        if (who->IsInCombat())
-            if (Unit* victim = who->GetAttackerForHelper())
-                if (IsWithinDistInMap(victim, 10.0f))
-                    force = true;
-
-        if (!force && (IsNeutralToAll() || !IsWithinDistInMap(who, GetAttackDistance(who), true, SizeFactor::None)))
-            return false;
-    }
-
-    if (!canCreatureAttack(who, force))
-        return false;
-
-    return IsWithinLOSInMap(who);
 }
 
 void Creature::ApplyGameEventSpells(GameEventCreatureData const* eventData, bool activated)

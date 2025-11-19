@@ -586,8 +586,10 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
                     switch (m_casterGo->GetEntry())
                     {
-                        case 179785:    // Silverwing Flag
-                        case 179786:    // Warsong Flag
+                        case 179785:    // Silverwing Flag (dropped)
+                        case 179786:    // Warsong Flag (dropped)
+                        case 179830:    // Silverwing Flag (base)
+                        case 179831:    // Warsong Flag (base)
                             if (bg->GetTypeID() == BATTLEGROUND_WS)
                                 bg->EventPlayerClickedOnFlag(pPlayer, m_casterGo);
                             break;
@@ -2104,6 +2106,18 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         m_casterUnit->CastCustomSpell(m_casterUnit, 23782, LifegivingGemHealthMod, {}, {}, true, nullptr);
                     }
                     return;
+                case 24150:                                 // Stinger Charge Primer
+                {
+                    if (!unitTarget)
+                        return;
+
+                    if (unitTarget->HasAura(25187))
+                        m_caster->CastSpell(unitTarget, 25191, true);
+                    else
+                        m_caster->CastSpell(unitTarget, 25190, true);
+
+                    return;
+                }
                 case 24781:                                 // Dream Fog
                 {
                     if (m_caster->GetTypeId() != TYPEID_UNIT || !unitTarget)
@@ -3064,6 +3078,7 @@ void Spell::EffectOpenLock(SpellEffectIndex effIdx)
                 return;
             }
         }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
         else if (goInfo->type == GAMEOBJECT_TYPE_FLAGSTAND)
         {
             //CanUseBattleGroundObject() already called in CheckCast()
@@ -3071,6 +3086,7 @@ void Spell::EffectOpenLock(SpellEffectIndex effIdx)
             if (BattleGround *bg = player->GetBattleGround())
                 return;
         }
+#endif
         lockId = goInfo->GetLockId();
         guid = gameObjTarget->GetObjectGuid();
     }
@@ -3107,6 +3123,13 @@ void Spell::EffectOpenLock(SpellEffectIndex effIdx)
 
     if (gameObjTarget && m_casterUnit)
     {
+        // World of Warcraft Client Patch 1.6.0 (2005-07-12)
+        // - Disarming an enemy faction hunter's trap will now flag the rogue for PvP.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+        if (Unit* pOwner = gameObjTarget->GetOwner())
+            m_casterUnit->TogglePlayerPvPFlagOnAttackVictim(pOwner, true);
+#endif
+
         if (player)
             sScriptMgr.OnGameObjectOpen(player, gameObjTarget);
         if (gameObjTarget->AI())
@@ -4212,7 +4235,7 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
     // petEntry==0 for hunter "call pet" (current pet summoned if any)
     if (GetTypeId() == TYPEID_PLAYER && newSummon->LoadPetFromDB((Player*)this, petEntry))
     {
-        if (newSummon->getPetType() == SUMMON_PET)
+        if (newSummon->GetPetType() == SUMMON_PET)
         {
             // Remove Demonic Sacrifice auras (known pet)
             Unit::AuraList const& auraClassScripts = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -4248,7 +4271,7 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
     }
     newSummon->SetSummonPoint(pos);
 
-    newSummon->setPetType(SUMMON_PET);
+    newSummon->SetPetType(SUMMON_PET);
     newSummon->SetOwnerGuid(GetObjectGuid());
     newSummon->SetCreatorGuid(GetObjectGuid());
     newSummon->SetFactionTemplateId(GetFactionTemplateId());
@@ -4266,7 +4289,7 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
     else
         newSummon->SetReactState(REACT_DEFENSIVE);
 
-    if (newSummon->getPetType() == SUMMON_PET)
+    if (newSummon->GetPetType() == SUMMON_PET)
     {
         // Remove Demonic Sacrifice auras (new pet)
         Unit::AuraList const& auraClassScripts = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -4288,7 +4311,7 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
         else
             newSummon->InitializeDefaultName();
     }
-    else if (newSummon->getPetType() == HUNTER_PET)
+    else if (newSummon->GetPetType() == HUNTER_PET)
     {
         newSummon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME);
         newSummon->InitializeDefaultName();
@@ -4337,7 +4360,7 @@ void Spell::EffectLearnPetSpell(SpellEffectIndex effIdx)
     if (!pet->CanLearnPetSpell(pLearnSpell->Id))
         return;
 
-    pet->SetTP(pet->m_TrainingPoints - pet->GetTPForSpell(pLearnSpell->Id));
+    pet->SetTP(pet->m_trainingPoints - pet->GetTPForSpell(pLearnSpell->Id));
     pet->LearnSpell(pLearnSpell->Id);
 
     pet->SavePetToDB(PET_SAVE_AS_CURRENT);
@@ -4681,62 +4704,6 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
         {
             switch (m_spellInfo->Id)
             {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-                case 456: // SHOWLABEL Only OFF
-                {
-                    if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetGMChat(false, true);
-                    return;
-                }
-                case 2765: // SHOWLABEL Only ON
-                {
-                    if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetGMChat(true, true);
-                    return;
-                }
-                case 1509: // GM Only OFF
-                {
-                    if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetGameMaster(false, true);
-                    return;
-                }
-                case 18139: // GM Only ON
-                {
-                    if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetGameMaster(true, true);
-                    return;
-                }
-                case 6147: // INVIS Only OFF
-                {
-                    if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetGMVisible(true, true);
-                    return;
-                }
-                case 2763: // INVIS Only ON
-                {
-                    if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetGMVisible(false, true);
-                    return;
-                }
-                case 20114: // BM Only OFF
-                {
-                    if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetCheatGod(false, true);
-                    return;
-                }
-                case 20115: // BM Only ON
-                {
-                    if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetCheatGod(true, true);
-                    return;
-                }
-                case 29313: // CooldownAll
-                {
-                    if (m_casterUnit)
-                        m_casterUnit->RemoveAllCooldowns();
-                    return;
-                }
-#endif
                 case 8856:                                  // Bending Shinbone
                 {
                     if (!itemTarget && m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -5300,15 +5267,12 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     // Select maintank + 4 random targets
                     std::vector<Unit*> viableTargets;
                     ThreatList const& tl = m_casterUnit->GetThreatManager().getThreatList();
-                    for (const auto it : tl)
+                    for (auto const& itr : tl)
                     {
-                        if (it->getUnitGuid().IsPlayer())
+                        if (Player* pPlayer = itr->getTarget()->ToPlayer())
                         {
-                            if (Unit* pUnit = m_casterUnit->GetMap()->GetUnit(it->getUnitGuid()))
-                            {
-                                if (pUnit->IsAlive())
-                                    viableTargets.push_back(pUnit);
-                            }
+                            if (pPlayer->IsAlive())
+                                viableTargets.push_back(pPlayer);
                         }
                     }
 
@@ -5492,67 +5456,6 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
         }
         case SPELLFAMILY_WARLOCK:
         {
-            switch (m_spellInfo->Id)
-            {
-                case  6201:                                 // Healthstone creating spells
-                case  6202:
-                case  5699:
-                case 11729:
-                case 11730:
-                {
-                    if (!unitTarget)
-                        return;
-
-                    uint32 itemtype;
-                    uint32 rank = 0;
-                    Unit::AuraList const& mDummyAuras = unitTarget->GetAurasByType(SPELL_AURA_DUMMY);
-                    for (const auto aura : mDummyAuras)
-                    {
-                        if (aura->GetId() == 18692)
-                        {
-                            rank = 1;
-                            break;
-                        }
-                        else if (aura->GetId() == 18693)
-                        {
-                            rank = 2;
-                            break;
-                        }
-                    }
-
-                    static uint32 const itypes[5][3] =
-                    {
-                        { 5512, 19004, 19005},              // Minor Healthstone
-                        { 5511, 19006, 19007},              // Lesser Healthstone
-                        { 5509, 19008, 19009},              // Healthstone
-                        { 5510, 19010, 19011},              // Greater Healthstone
-                        { 9421, 19012, 19013}               // Major Healthstone
-                    };
-
-                    switch (m_spellInfo->Id)
-                    {
-                        case  6201:
-                            itemtype = itypes[0][rank];
-                            break; // Minor Healthstone
-                        case  6202:
-                            itemtype = itypes[1][rank];
-                            break; // Lesser Healthstone
-                        case  5699:
-                            itemtype = itypes[2][rank];
-                            break; // Healthstone
-                        case 11729:
-                            itemtype = itypes[3][rank];
-                            break; // Greater Healthstone
-                        case 11730:
-                            itemtype = itypes[4][rank];
-                            break; // Major Healthstone
-                        default:
-                            return;
-                    }
-                    DoCreateItem(effIdx, itemtype);
-                    return;
-                }
-            }
             break;
         }
         case SPELLFAMILY_DRUID:
@@ -6803,7 +6706,7 @@ void Spell::EffectTransmitted(SpellEffectIndex effIdx)
 
     uint32 gameObjectId = m_spellInfo->EffectMiscValue[effIdx];
 
-    GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(gameObjectId);
+    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectTemplate(gameObjectId);
 
     if (!goinfo)
     {
@@ -6912,10 +6815,6 @@ void Spell::EffectTransmitted(SpellEffectIndex effIdx)
             }
             break;
         }
-        case GAMEOBJECT_TYPE_FISHINGHOLE:
-        case GAMEOBJECT_TYPE_CHEST:
-        default:
-            break;
     }
 
     pGameObj->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);

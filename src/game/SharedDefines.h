@@ -297,7 +297,7 @@ enum DamageEffectType
     DOT                     = 2,
     HEAL                    = 3,
     NODAMAGE                = 4,                            // used also in case when damage applied to health but not applied to spell channelInterruptFlags/etc
-    SELF_DAMAGE             = 5,
+    SELF_DAMAGE             = 5,                            // used for environmental damage
 };
 
 enum TextEmotes
@@ -1325,11 +1325,6 @@ enum PetDiet
 #define MAX_PET_DIET 9
 
 #define CHAIN_SPELL_JUMP_RADIUS 10
-
-// Max values for Guild
-#define GUILD_EVENTLOG_MAX_RECORDS  100
-#define GUILD_RANKS_MIN_COUNT       5
-#define GUILD_RANKS_MAX_COUNT       10
 
 enum AiReaction
 {

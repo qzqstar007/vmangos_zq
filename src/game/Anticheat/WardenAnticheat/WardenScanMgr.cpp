@@ -28,10 +28,13 @@
 #include "Policies/SingletonImp.h"
 #include "Database/DatabaseEnv.h"
 #include "World.h"
+#include "Log.h"
 
 #include <vector>
 #include <algorithm>
 #include <random>
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
 
 INSTANTIATE_SINGLETON_1(WardenScanMgr);
 
@@ -347,3 +350,5 @@ std::vector<std::shared_ptr<Scan const>> WardenScanMgr::GetRandomScans(ScanFlags
 
     return std::move(matches);
 }
+
+#endif

@@ -333,7 +333,7 @@ struct ProcTriggeredData
     uint32 procFlag;
 };
 
-typedef std::list< ProcTriggeredData > ProcTriggeredList;
+typedef std::vector<ProcTriggeredData> ProcTriggeredList;
 
 class Unit : public SpellCaster
 {
@@ -442,7 +442,7 @@ class Unit : public SpellCaster
                 ResetAttackTimer(att);
         }
         void ApplyAttackTimePercentMod(WeaponAttackType att,float val, bool apply, bool recalcDamage = false);
-        void ApplyCastTimePercentMod(float val, bool apply);
+        void UpdateCastSpeed();
 
         float GetObjectBoundingRadius() const final { return m_floatValues[UNIT_FIELD_BOUNDINGRADIUS]; }
         float GetCombatReach() const final { return m_floatValues[UNIT_FIELD_COMBATREACH]; }
@@ -1438,7 +1438,7 @@ class Unit : public SpellCaster
         // Serialize access to the movespline to prevent thread race conditions in async
         // move spline updates (one thread updates a spline, while another checks the
         // spline for end point with targeted move gen)
-        std::mutex asyncMovesplineLock;
+        mutable std::mutex asyncMovesplineLock;
 
         void HandleInterruptsOnMovement(bool positionChanged);
         void OnRelocated();

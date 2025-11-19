@@ -30,6 +30,7 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "Util.h"
+#include "Log.h"
 #include "Crypto/BigNumber.h"
 #include "Crypto/Hash/HMACSHA1.h"
 #include "ByteBuffer.h"
@@ -41,6 +42,8 @@
 #include <memory>
 #include <sstream>
 #include <iomanip>
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
 
 namespace
 {
@@ -1430,3 +1433,5 @@ void WardenWin::GetPlayerInfo(std::string& clock, std::string& fingerprint, std:
     if (m_proxifierFound)
         proxifier = "Proxifier is running";
 }
+
+#endif

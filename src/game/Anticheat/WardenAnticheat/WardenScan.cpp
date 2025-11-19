@@ -28,10 +28,13 @@
 #include "Util.h"
 #include "Crypto/Hash/HMACSHA1.h"
 #include "Crypto/Hash/SHA1.h"
+#include "World.h"
 
 #include <string>
 #include <algorithm>
 #include <functional>
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
 
 ScanFlags operator|(ScanFlags lhs, ScanFlags rhs)
 {
@@ -58,6 +61,13 @@ bool operator&&(ScanFlags lhs, ScanFlags rhs)
 {
     return static_cast<std::underlying_type<ScanFlags>::type>(lhs) &&
            static_cast<std::underlying_type<ScanFlags>::type>(rhs);
+}
+
+Scan::Scan(BuildT builder, CheckT checker, ScanFlags f, size_t req, size_t rep, uint32 minBuild, uint32 maxBuild, std::string const&c)
+    : m_builder(builder), m_checker(checker), checkId(0), flags(f), buildMin(minBuild), buildMax(maxBuild), comment(c), requestSize(req), replySize(rep)
+{
+    MANGOS_ASSERT(!((flags & ScanFlags::Windows) && (flags & ScanFlags::Mac)));
+    penalty = sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY);
 }
 
 Scan::BuildT StringHashScan::GetBuilder()
@@ -515,3 +525,5 @@ WindowsTimeScan::WindowsTimeScan(CheckT checker, std::string const& comment, Sca
 {
     MANGOS_ASSERT(!!checker);
 }
+
+#endif
