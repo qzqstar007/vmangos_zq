@@ -1103,7 +1103,7 @@ void Group::CountSingleLooterRoll(Roll* roll)
             --roll->getLoot()->unlootedCount;
             sLog.Player(player->GetSession(), LOG_LOOTS, LOG_LVL_MINIMAL, "%s wins need roll for %ux%u [loot from %s]",
                 player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
-            if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
+            if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, item->item_difficulty))
                 player->OnReceivedItem(newItem);
         }
         else
@@ -1164,7 +1164,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
                     --roll->getLoot()->unlootedCount;
                     sLog.Player(player->GetSession(), LOG_LOOTS, LOG_LVL_MINIMAL, "%s wins need roll for %ux%u [loot from %s]",
                              player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
-                    if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
+                    if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, item->item_difficulty))
                         player->OnReceivedItem(newItem);
                 }
                 else
@@ -1215,7 +1215,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
                     --roll->getLoot()->unlootedCount;
                     sLog.Player(player->GetSession(), LOG_LOOTS, LOG_LVL_MINIMAL, "%s wins greed roll for %ux%u [loot from %s]",
                              player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
-                    if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
+                    if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, item->item_difficulty))
                         player->OnReceivedItem(newItem);
                 }
                 else

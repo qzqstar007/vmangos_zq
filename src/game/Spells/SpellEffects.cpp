@@ -442,7 +442,7 @@ bool Spell::OneKeyPickall(Player* caster)
 				InventoryResult msg = caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->itemid, item->count);
 				if (msg == EQUIP_ERR_OK)
 				{
-					Item * newitem = caster->StoreNewItem(dest, item->itemid, true, item->randomPropertyId);
+					Item * newitem = caster->StoreNewItem(dest, item->itemid, true, item->randomPropertyId, item->item_difficulty);
 					if (!newitem)
 					{
 						continue;

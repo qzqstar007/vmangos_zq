@@ -142,7 +142,8 @@ void AutoBroadCastMgr::Update(uint32 diff)
 		UpdatePetStatus();
 
         // init the battle bot 
-        if(_lastBroadCast10Min == 2)
+        //if(_lastBroadCast10Min == 2)
+        if(false)
         {
             uint32 _maxlevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
             
