@@ -7771,7 +7771,7 @@ SpellCastResult Spell::CheckItems()
         }
 
         //qzqstar, 250518, if has spell of ... ignore totems
-        if(p_caster->HasSpell(2329))
+        if(pCaster->HasSpell(2329))
             totems = 0;
 
         if (totems != 0)

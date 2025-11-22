@@ -253,6 +253,7 @@
 #define ZQ_ENCHANT_LEECH                3355    //Leech, 吸血
 #define ZQ_ENCHANT_SPELL_POWER_BONUS    3357    //Spell Power Bonus, 法术能量奖励
 #define ZQ_ENCHANT_HEROIC               3371    //Heroic, 英雄 to 3373, 3374 to 3376 and 3377 is best
+#define ZQ_ENCHANT_HEROIC_LEECH2        3378    //Heroic Leech 2, 英雄吸血2,78/79/80, and best 81
 
 #define ZQ_ENCHANT_TALENT_START         5001    //Talent Start, 天赋开始
 #define ZQ_ENCHANT_TALENT_END           5999    //Talent End, 天赋结束

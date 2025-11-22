@@ -92,8 +92,14 @@ enum Achievement_t
 #define VIP_LEVEL_MASK		(0x000F0000)
 #define VIP_SPEICIAL_MASK	(0x00F00000)
 
+//S7
 #define VIP_SPECIAL_FREE_STOLE	 (0x01)		//stored in data8
 #define VIP_SPECIAL_FREE_ENCHANT (0x02)		//stored in data8
+
+//S8
+#define VIP_SPECIAL_DG_TELEPORT		(0x00100000)		//stored in data0
+#define VIP_SPECIAL_SPELL_HASTE		(0x00200000)		//haste spell
+
 
 //Challenging Mode
 #define CHALLENGING_MODE_ONELIFE		(0x0001)
@@ -166,7 +172,6 @@ public:
 	 *****************************************************/
 	uint32 QzqstarAchievements::GetAccountSum(Player * _player);
 	uint32 QzqstarAchievements::GetAccAchieveData(Player * _player, uint32 type);
-	void QzqstarAchievements::IncAccAchieveData(Player * _player, uint32 type);
 	void QzqstarAchievements::SetAccAchieveData(Player * _player, uint32 type, uint32 data);
 
 	uint32 QzqstarAchievements::GetPlayerData(Player * _player, uint32 type);

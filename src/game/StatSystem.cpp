@@ -40,6 +40,12 @@ bool Player::UpdateStats(Stats stat)
     // value = ((base_value * base_pct) + total_value) * total_pct
     float value  = GetTotalStatValue(stat);
 
+    if(Stats(stat) == STAT_STAMINA)            value += M_Achiv_Player_NumsStamina;    //NumsStamina
+    else if(Stats(stat) == STAT_STRENGTH)      value += M_Achiv_Player_NumsStrength;   //NumsStrength
+    else if(Stats(stat) == STAT_AGILITY)       value += M_Achiv_Player_NumsAgility;    //NumsAgility
+    else if(Stats(stat) == STAT_INTELLECT)     value += M_Achiv_Player_NumsIntellect;  //NumsIntellect
+    else if(Stats(stat) == STAT_SPIRIT)        value += M_Achiv_Player_NumsSpirit;     //NumsSpirit
+
     SetStat(stat, int32(value));
 
     switch (stat)
@@ -114,7 +120,6 @@ bool Player::UpdateAllStats()
         SetStat(Stats(i), (int32)value);
     }
     //update attack power as well. Achivements.
-
     UpdateAttackPowerAndDamage();
     UpdateAttackPowerAndDamage(true);
 
@@ -1178,7 +1183,7 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
         }
     }
 	//qzqstar, 241218, more dmg if is Summoned pet (SS).
-	else if (getPetType() == SUMMON_PET)
+	else if (GetPetType() == SUMMON_PET)
 	{
 		if (GetOwner() && GetOwner()->HasSpell(31153))
 		{

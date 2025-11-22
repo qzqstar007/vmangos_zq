@@ -1621,8 +1621,8 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
         {
 			if (loot.items.size() < MAX_NR_LOOT_ITEMS)             // Non-quest drop
 			{
-				LootItem _lootItem = LootItem(item.itemID, 1, Item::GenerateItemRandomPropertyId(item.itemID));
-				loot.items.emplace_back(_lootItem);
+				//LootItem _lootItem = LootItem();
+				loot.items.emplace_back(item.itemID, 1, 0);
 			}
         }
     }
@@ -1677,7 +1677,8 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
 			if ((itemProto->Class == ITEM_CLASS_WEAPON) || (itemProto->Class == ITEM_CLASS_ARMOR))
 			{
                 uint32 _randomID = 0;
-                auto _chance = 50;
+                uint32 _chance = 50;
+                uint32 _peak_chance = 10;
 
                 //set the item difficulty
                 it->item_difficulty = _dg_info;
@@ -1686,6 +1687,14 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
 				//check if map is heroic, and only Quality =3/4 can be 
 				if (itemProto->Quality > 1) 
 				{
+                    //modify the chance
+                    _chance = 40 + itemProto->Quality * 10;
+                    if(_chance > 100) _chance = 100;
+
+                    //peak chance as well
+                    _peak_chance = 5 + itemProto->Quality * 5;
+                    if(_peak_chance > 20) _peak_chance = 20;
+
                     if(roll_chance_i(_chance))
                     {
                         uint32 _randMin = 0;
@@ -1758,13 +1767,17 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
                             _randomID = 0;
                         }
 
-                    }else if (roll_chance_i(20))
+                    }
+                    
+                    if (roll_chance_i(_peak_chance))
                     {
-                        _randomID = PickRandomValue(ZQ_ENCHANT_HEROIC, ZQ_ENCHANT_HEROIC + 1, ZQ_ENCHANT_HEROIC + 2);
-                        if (roll_chance_i(20)) 
-                            _randomID = PickRandomValue(ZQ_ENCHANT_HEROIC+3, ZQ_ENCHANT_HEROIC + 4, ZQ_ENCHANT_HEROIC + 5);
-                        if (roll_chance_i(5))  
-                            _randomID = ZQ_ENCHANT_HEROIC + 6;
+                        _randomID = PickRandomValue(ZQ_ENCHANT_LEECH, ZQ_ENCHANT_HEROIC, ZQ_ENCHANT_HEROIC + 1, ZQ_ENCHANT_HEROIC + 2);
+                        uint32 _nxt_rand = urand(1, 100);
+                        if (_nxt_rand > 80) 
+                            _randomID = PickRandomValue(ZQ_ENCHANT_HEROIC+3, ZQ_ENCHANT_HEROIC + 4, ZQ_ENCHANT_HEROIC + 5,
+                                        ZQ_ENCHANT_HEROIC_LEECH2, ZQ_ENCHANT_HEROIC_LEECH2+1, ZQ_ENCHANT_HEROIC_LEECH2+2);
+                        else if (_nxt_rand < 10)  
+                            _randomID = PickRandomValue(ZQ_ENCHANT_HEROIC + 6, ZQ_ENCHANT_HEROIC_LEECH2 + 3);
                     } 
 
 				}

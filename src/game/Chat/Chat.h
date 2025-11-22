@@ -401,6 +401,7 @@ class ChatHandler
         bool HandleAccountLockCommand(char* args);
         bool HandleAccountOnlineListCommand(char* args);
         bool HandleAccountPasswordCommand(char* args);
+        bool HandleAccountCheckPwdCommand(char* args);
         bool HandleAccountSetAddonCommand(char* args);
         bool HandleAccountSetGmLevelCommand(char* args);
         bool HandleAccountSetPasswordCommand(char* args);

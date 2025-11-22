@@ -723,7 +723,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 			//if (player->M_Leech_Spell) this->CastCustomSpell(this, ZQ_SPELL_LEECH_SPELL, damage * player->M_Leech_Spell / 50.0f, 0, 0, true);
 		}
 
-        //if (player->M_Leech_Spell) this->CastCustomSpell(this, ZQ_SPELL_LEECH_SPELL, damage * player->M_Leech_Spell / 100.0f, 0, 0, true);
+        if (player->M_Leech_Spell) this->CastCustomSpell(this, ZQ_SPELL_LEECH_SPELL, damage * player->M_Leech_Spell / 100.0f, 0, 0, true);
 	}
 
 	//qzqstar, 250207, reduce the damage for pvp
@@ -978,31 +978,31 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
                 }
             }
 
-                if (Spell* spell = pVictim->m_currentSpells[CURRENT_CHANNELED_SPELL])
+            if (Spell* spell = pVictim->m_currentSpells[CURRENT_CHANNELED_SPELL])
+            {
+                if (spell->getState() == SPELL_STATE_CASTING)
                 {
-                    if (spell->getState() == SPELL_STATE_CASTING)
+                    //qzqstar, 250719, some channels with unique target cannot be delayed, such as mind fray
+                    //if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION))
+                    if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION) && (spell->m_spellInfo->EffectImplicitTargetA[0] != TARGET_UNIT_ENEMY))
                     {
-                        //qzqstar, 250719, some channels with unique target cannot be delayed, such as mind fray
-                        //if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION))
-                        if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION) && (spell->m_spellInfo->EffectImplicitTargetA[0] != TARGET_UNIT_ENEMY))
-                        {
-                            if (pVictim != this)                //don't shorten the duration of channeling if you damage yourself
-                                spell->DelayedChannel();
-                        }
-                        else if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS))
-                        {
-                            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Spell %u canceled at damage!", spell->m_spellInfo->Id);
-                            pVictim->InterruptSpell(CURRENT_CHANNELED_SPELL);
-                        }
+                        if (pVictim != this)                //don't shorten the duration of channeling if you damage yourself
+                            spell->DelayedChannel();
                     }
-                    else if (spell->getState() == SPELL_STATE_DELAYED)
-                        // break channeled spell in delayed state on damage
+                    else if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS))
                     {
                         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Spell %u canceled at damage!", spell->m_spellInfo->Id);
                         pVictim->InterruptSpell(CURRENT_CHANNELED_SPELL);
                     }
                 }
+                else if (spell->getState() == SPELL_STATE_DELAYED)
+                    // break channeled spell in delayed state on damage
+                {
+                    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Spell %u canceled at damage!", spell->m_spellInfo->Id);
+                    pVictim->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                }
             }
+            
         }
 
         // last damage from duel opponent

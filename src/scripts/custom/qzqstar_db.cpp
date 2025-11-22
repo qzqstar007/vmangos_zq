@@ -9150,7 +9150,7 @@ uint32_t DBHelper_IsPetCollection(uint32_t eqItemID)
 	for(i = 0; i < sizeof(_Pet_Collections_World) / sizeof(_Pet_Collections_World[0]); i++)
 	{
 		if (_Pet_Collections_World[i] == eqItemID) {
-			__LOG("Pet id %u is chosen id.", _Pet_Collections_World[i]);
+			//__LOG("Pet id %u is chosen id.", _Pet_Collections_World[i]);
 			return i + 1;
 		}
 	}
@@ -9289,7 +9289,8 @@ int DBHelper_get_used_points(Player *player, int ability_type)
 	for (int i = 0; i < curpoints; i++)
 	{
 		//60 means maximum player level.
-		sum += DBHelper_get_upgrade_points(nullptr, ability_type, i);
+		auto _points = DBHelper_get_upgrade_points(nullptr, ability_type, i);
+		if(_points>0) sum += _points;
 	}
 
 	return sum;

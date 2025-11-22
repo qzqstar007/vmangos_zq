@@ -371,6 +371,27 @@ bool ChatHandler::HandleAccountLockCommand(char* args)
     return true;
 }
 
+//S8, qzqstar, add check password command
+bool ChatHandler::HandleAccountCheckPwdCommand(char* args)
+{
+    //should be 2 args, account name and password
+    char *account_cs = ExtractQuotedOrLiteralArg(&args);
+    char *password_cs = ExtractQuotedOrLiteralArg(&args);
+    if (!account_cs || !password_cs)
+        return false;
+
+    std::string username = account_cs;
+    std::string password = password_cs;
+
+    if (sAccountMgr.CheckPassword(0, username, password))
+        SendSysMessage(LANG_COMMAND_PASSWORD);
+    else
+        SendSysMessage(LANG_COMMAND_WRONGOLDPASSWORD);
+
+    return true;
+}
+
+
 bool ChatHandler::HandleAccountPasswordCommand(char* args)
 {
     // allow use from RA, but not from console (not have associated account id)

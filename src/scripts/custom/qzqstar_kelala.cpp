@@ -124,7 +124,8 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 			player->M_Achiv_Account_REWARD = _now;
 
 			__LOG("[Menus_Kelala_Login] Player:%s got daily reward. time:%u, old:%u", player->GetName(), _now, _accountDate);
-			player->AddItem(ZQ_ITEM_VOUCHER,  1000); player->AddItem(ZQ_ITEM_BUFF, 1); 
+			player->AddItem(ZQ_ITEM_VOUCHER,  1000); 
+			player->AddItem(ZQ_ITEM_BUFF, 1); 
 
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　登陆奖励领取成功　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -825,7 +826,8 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			//One Life mode
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_ONELIFE;
 			player->M_Challenge_Mode &= ~CHALLENGING_MODE_ONELIFE;
-			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			 //sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			sQZAchievements.SetPlayerData(player, PLAYER_USED_CHALLGE_MODE, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_TURTLE);
 			player->AddItem(ZQ_ITEM_VOUCHER, 600);
 			player->ADD_GOSSIP_ITEM(5, "<==成功退出一命模式，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
@@ -836,7 +838,8 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		case __MENU_MODE_SUB_2: //manufact
 		{	
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_MANUFACT;
-			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			 //sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			sQZAchievements.SetPlayerData(player, PLAYER_USED_CHALLGE_MODE, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_VOUCHER, 300);
 			player->ADD_GOSSIP_ITEM(5, "<==成功获取工匠奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
@@ -846,7 +849,8 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		case __MENU_MODE_SUB_3: //Task
 		{	
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_TASK;
-			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			 //sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			sQZAchievements.SetPlayerData(player, PLAYER_USED_CHALLGE_MODE, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_VOUCHER, 300);
 			player->ADD_GOSSIP_ITEM(5, "<==成功获取任务奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
@@ -855,7 +859,8 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		case __MENU_MODE_SUB_4: //Equipment
 		{	
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_EQUIPMENT;
-			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			 //sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			sQZAchievements.SetPlayerData(player, PLAYER_USED_CHALLGE_MODE, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_VOUCHER, 300);
 			player->ADD_GOSSIP_ITEM(5, "<==成功获取装等奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
@@ -866,7 +871,8 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		{	
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_RICH;
 			player->M_Challenge_Mode &= ~CHALLENGING_MODE_RICH;
-			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			 //sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			sQZAchievements.SetPlayerData(player, PLAYER_USED_CHALLGE_MODE, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_GOLD_BAR, 5);
 			player->ADD_GOSSIP_ITEM(5, "<==成功获取富豪奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 
@@ -876,7 +882,8 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		case __MENU_MODE_SUB_6:
 		{	
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_KILLER;
-			sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			 //sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
+			sQZAchievements.SetPlayerData(player, PLAYER_USED_CHALLGE_MODE, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_VOUCHER, 300);
 			player->ADD_GOSSIP_ITEM(5, "<==成功获取杀手奖励，返回首页===", GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN); 
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID()); 

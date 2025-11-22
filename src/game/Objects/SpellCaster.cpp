@@ -1469,7 +1469,7 @@ float SpellCaster::SpellDamageBonusDone(Unit const* pVictim, SpellEntry const* s
     }
 
 	//qzqstar, 241218, increase the dmage of Summoned Pet
-	if (IsPet() && ((Pet*)this)->getPetType() == SUMMON_PET)
+	if (IsPet() && ((Pet*)this)->GetPetType() == SUMMON_PET)
 	{
 		if (Pet* pet = ((Pet*)this))
 		{

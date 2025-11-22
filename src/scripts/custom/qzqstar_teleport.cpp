@@ -678,7 +678,7 @@ bool Teleport_Menus(Player *player, Creature *_cr, uint32 sender, uint32 action)
 	//check if player is null and go is null
 	if (!player || !_cr) return false;
 
-	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[teleport Menus] PLAYER:[%u][%s] === action: %d", player->GetGUID(), player->GetName(), action);
+	//sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[teleport Menus] PLAYER:[%u][%s] === action: %d", player->GetGUID(), player->GetName(), action);
 
 	// Main menu
 	if (action >= __MENU_TELEPORT_MAIN && action <= __MENU_TELEPORT_MAIN + __MENU_SIZE)

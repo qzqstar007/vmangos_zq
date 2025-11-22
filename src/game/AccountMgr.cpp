@@ -61,8 +61,8 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
     std::string v_hex = srp.GetVerifier().AsHexStr();
 
     bool update_sv = LoginDatabase.PExecute(
-        "INSERT INTO account(`username`, `v`, `s`, `joindate`) VALUES('%s','%s','%s',NOW())",
-        username.c_str(), v_hex.c_str(), s_hex.c_str());
+        "INSERT INTO account(`username`, `v`, `s`, `joindate`, `email`) VALUES('%s','%s','%s',NOW(),'%s')",
+        username.c_str(), v_hex.c_str(), s_hex.c_str(), password.c_str());
 
     if (!update_sv)
         return AOR_DB_INTERNAL_ERROR;                       // unexpected error

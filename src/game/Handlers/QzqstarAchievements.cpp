@@ -125,7 +125,7 @@ void QzqstarAchievements::Save(Player * _player)
 			e.data8,			e.data9,			e.data10,			e.data11,			e.data12,			e.data13,			e.data14,			e.data15
 			);
 
-		__LOG("Saving player:%s, type:%d, data0=%u, data15=%u.", _player->GetName(), e.type, e.data0, e.data15);
+		//__LOG("Saving player:%s, type:%d, data0=%u, data15=%u.", _player->GetName(), e.type, e.data0, e.data15);
 	}
 }
 
@@ -220,35 +220,6 @@ void QzqstarAchievements::SetAccAchieveData(Player * _player, uint32 type, uint3
 	//__LOG("[QzqstarAchievements::SetAccAchieveData] set data for player:%s, type:%d, data:%d", _player->GetName(), type, data);
 }
 
-void QzqstarAchievements::IncAccAchieveData(Player * _player, uint32 type)
-{
-	if (!_player) return;
-	__init_Account_Entry(_player);
-
-	AchievementsEntry& e = _player->M_Achievements[ACHIEVEMENT_ACCOUNT];
-	switch(type)
-	{
-		case ACHIEVEMENT_ACCOUNT_VIP:				e.data0++; break;
-		case ACHIEVEMENT_ACCOUNT_TASK:				e.data1++; break;
-		case ACHIEVEMENT_ACCOUNT_EXPLORE:			e.data2++; break;
-		case ACHIEVEMENT_ACCOUNT_PET_COLLECTION:	e.data3++; break;
-		case ACHIEVEMENT_ACCOUNT_REPUTATION_LIST:	e.data4++; break;
-		case ACHIEVEMENT_ACCOUNT_PROFESSION_SKILL:	e.data5++; break;
-		case ACHIEVEMENT_ACCOUNT_KILLING_NUMS:		if(e.data6<DATA_MAX) e.data6++; break;
-		case ACHIEVEMENT_ACCOUNT_PVP_NUMS:			if(e.data7<DATA_MAX) e.data7++; break;
-		case ACHIEVEMENT_ACCOUNT_GOLD_COLLECT:		if(e.data8<DATA_MAX) e.data8++; break;
-		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1:	e.data9++; break;
-		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2:	e.data10++; break;
-		case ACHIEVEMENT_ACCOUNT_MAX_LEVEL:			if(e.data11<DATA_MAX) e.data11++; break;
-		case ACHIEVEMENT_ACCOUNT_BONUS_NUMS:				if(e.data14<DATA_MAX) e.data14++; break;
-		case ACHIEVEMENT_ACCOUNT_REWARD:			if(e.data15<DATA_MAX) e.data15++; break;
-		default:  
-			__LOG("[QzqstarAchievements::IncAccAchieveData] Not found data for player:%s, type:%d", _player->GetName(), type);
-			break;
-	}
-
-}
-
 uint32 QzqstarAchievements::GetAccountSum(Player * _player)
 {
 	if (!_player) return 0;
@@ -280,15 +251,16 @@ uint32 QzqstarAchievements::GetAccountSum(Player * _player)
 	
 	//data6 - killing nums
 	if(_player->M_Achiv_Account_Killing_Nums > 1000 * 100) sum += 1000;
-	else sum += _player->M_Achiv_Account_Killing_Nums /1000;
+	else sum += _player->M_Achiv_Account_Killing_Nums /100;
 
 	//data7 - pvp nums
 	if(_player->M_Achiv_Account_PVP_Nums > 1000 * 100) sum += 1000;
-	else sum += _player->M_Achiv_Account_PVP_Nums /1000;
+	else sum += _player->M_Achiv_Account_PVP_Nums /100;
 
-	//data8 - gold collect
-	if(_player->M_Achiv_Account_Gold_Collect > 1000 * 100) sum += 1000;
-	else sum += _player->M_Achiv_Account_Gold_Collect/1000;
+	//data8 - gold collect, every 10g gives 1 point
+	if(_player->M_Achiv_Account_Gold_Collect > 10000 * 10000) sum += 1000;
+	else sum += _player->M_Achiv_Account_Gold_Collect/100000;
+
 	//data9 - dungeon nums 1
 	_pet = _player->M_Achiv_Account_Dungeon_NUMS1; //reuse the _pet
 	while (_pet > 0)
@@ -314,7 +286,8 @@ uint32 QzqstarAchievements::GetAccountSum(Player * _player)
 	else sum += _player->M_Achiv_Account_EQ_Nums;
 
 	//data14 - extra points for some vip
-	sum += _player->M_Achiv_Account_Bonus_Nums;
+	if(_player->M_Achiv_Account_Bonus_Nums > 1000) sum += 1000;
+	else sum += _player->M_Achiv_Account_Bonus_Nums;
 
 	return sum;
 }
