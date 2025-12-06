@@ -280,8 +280,9 @@ void Creature::AddToWorld()
     }
     else if (GetLevel() >= 55  && GetMapId() < 2)
     {
-		CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1, true);
-		CastSpell(this, 31046, true); //Restore health
+        // do nothings.
+		//CastSpell(this, ZQ_SPELL_SPELL_DIFFICULTY1, true);
+		//CastSpell(this, 31046, true); //Restore health
     }
 }
 
@@ -1693,7 +1694,7 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
 
                     //peak chance as well
                     _peak_chance = 5 + itemProto->Quality * 5;
-                    if(_peak_chance > 20) _peak_chance = 20;
+                    if(_peak_chance > 15) _peak_chance = 15;
 
                     if(roll_chance_i(_chance))
                     {
@@ -1776,7 +1777,7 @@ void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
                         if (_nxt_rand > 80) 
                             _randomID = PickRandomValue(ZQ_ENCHANT_HEROIC+3, ZQ_ENCHANT_HEROIC + 4, ZQ_ENCHANT_HEROIC + 5,
                                         ZQ_ENCHANT_HEROIC_LEECH2, ZQ_ENCHANT_HEROIC_LEECH2+1, ZQ_ENCHANT_HEROIC_LEECH2+2);
-                        else if (_nxt_rand < 10)  
+                        else if ((_nxt_rand < 10)  && (itemProto->Quality >= 3))
                             _randomID = PickRandomValue(ZQ_ENCHANT_HEROIC + 6, ZQ_ENCHANT_HEROIC_LEECH2 + 3);
                     } 
 

@@ -145,7 +145,8 @@ void Player::UpdateResistances(uint32 school)
 {
     if (school > SPELL_SCHOOL_NORMAL)
     {
-        int32 value = school == SPELL_SCHOOL_HOLY ? 0 : GetTotalResistanceValue(SpellSchools(school));
+        //S8: add values for player resistance
+        int32 value = school == SPELL_SCHOOL_HOLY ? 0 : GetTotalResistanceValue(SpellSchools(school)) + M_Achiv_Player_NumsResistance * 5;
         SetResistance(SpellSchools(school), value);
     }
     else

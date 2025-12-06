@@ -8984,15 +8984,15 @@ const std::vector<Level_EnchantID_t> _Enchant_SpecialSots =
 	{5,3709},	{5,3716},	{5,3717},	{5,3724},	{5,3725},	{5,3726},	{5,3727},	{5,3728},	{5,3739},	{5,3740},	
 	{5,3741},	{5,3837},	{5,3855},	{5,3862},	{5,3878},	{5,3883},	{5,3898},	{5,3907},	{5,3911},	{5,3943},	
 	{5,3945},	{5,3951},	{5,3953},	{5,3956},	{5,3958},	{5,3962},	{5,3972},	{5,4506},	{5,4575},	{5,4577},	
-	{5,4593},	{5,4596},	{5,4653},	{5,4654},	{6,3517},	{6,3524},	{6,3557},	{6,3558},	{6,3559},	{6,3570},	
+	{5,4593},		{5,4653},	{5,4654},	{6,3517},	{6,3524},	{6,3557},	{6,3558},	{6,3559},	{6,3570},	
 	{6,3621},	{6,3626},	{6,3627},	{6,3628},	{6,3629},	{6,3632},	{6,3656},	{6,3663},	{6,3664},	{6,3665},	
 	{6,3666},	{6,3667},	{6,3668},	{6,3674},	{6,3679},	{6,3684},	{6,3686},	{6,3729},	{6,3730},	{6,3731},	
 	{6,3732},	{6,3733},	{6,3734},	{6,3735},	{6,3742},	{6,3743},	{6,3770},	{6,3832},	{6,3854},	{6,3856},	
 	{6,3861},	{6,3869},	{6,3870},	{6,3872},	{6,3897},	{6,3905},	{6,3906},	{6,3908},	{6,3910},	{6,3939},	
-	{6,3940},	{6,3942},	{6,3952},	{6,3976},	{6,4572},	{6,4629},	{6,4646},	{7,3560},	{7,3561},	{7,3607},	
+	{6,3940},	{6,3942},	{6,3952},	{6,3976},	{6,4572},	{7,4629},	{7,4646},	{7,3560},	{7,3561},	{7,3607},	
 	{7,3646},	{7,3669},	{7,3670},	{7,3671},	{7,3672},	{7,3673},	{7,3868},	{7,3873},	{7,3912},	{7,3914},	
-	{7,3915},	{7,3916},	{7,3937},	{7,3938},	{7,3941},	{7,3949},	{7,3955},	{7,3957},	{7,3959},	{7,3973},	
-	{7,4501},	{8,3946},	{8,3948},	{8,3950},	{9,3682},	{9,3683},	{9,3841},	{9,3858},	{9,3881},	{9,3944},
+	{7,3915},	{7,3916},	{7,3937},	{7,3938},	{7,3941},	{7,3949},	{7,3955},	{7,3957},	{7,3959},	{7,3973},	{7,4596},
+	{7,4501},	{8,3946},	{8,3948},	{8,3950},	{8,3682},	{8,3683},	{8,3841},	{8,3858},	{8,3881},	{8,3944}, 
 };
 
 
@@ -9006,10 +9006,10 @@ int32 DBHelper_GetSpecialSlotsByLevel(int32 itemLevel)
 		_minRange = 0;
 		_maxRange = itemLevel/10;
 	}
-	else if (itemLevel <= 60) 
+	else if (itemLevel <= 63) 
 	{
 		_minRange = 2;
-		_maxRange = 6;
+		_maxRange = 5;
 	}
 	else 
 	{
@@ -9230,7 +9230,7 @@ const FragUpgrade_t Ability_MenuS8[PLAYER_ABILITIES_NUM_S8]=
 	{2, 1, 0, 10, 30, 9, __STR("|cff002fa7【天赋】最高９点　|r"), __STR("点　")},
 	{3, 1, 0, 10,  5, 9, __STR("|cff002fa7【武器】最高９点　|r"), __STR("点　")},
 	{4, 1, 0, 10, 20, 9, __STR("|cff002fa7【宠物】最高９级　|r"), __STR("级　")},
-    {5, 5, 0, 10, 5, 10, __STR("|cff002fa7【抗性】最高５０点　|r"), __STR("点　")},
+    {5, 5, 0, 5, 3, 10,  __STR("|cff002fa7【抗性】最高５０点　|r"), __STR("点　")},
 	{6, 1, 0, 2, 0, 200, __STR("|cff002fa7【力量】最高２００点　|r"), __STR("点　")},
 	{7, 1, 0, 2, 0, 200, __STR("|cff002fa7【敏捷】最高２００点　|r"), __STR("点　")},
 	{8, 1, 0, 1, 0, 400, __STR("|cff002fa7【耐力】最高４００点　|r"), __STR("点　")},
@@ -9268,7 +9268,7 @@ int DBHelper_get_used_points(Player *player, int ability_type)
 		case PLAYER_USED_NUMS_TALENT: curpoints  = player->M_Achiv_Player_NumsTalent; break;
 		case PLAYER_USED_LEVEL_WEAPON: curpoints  = player->M_Achiv_Player_LevelWeapon; break;
 		case PLAYER_USED_LEVEL_PET: curpoints  = player->M_Achiv_Player_LevelPet; break;
-		case PLAYER_USED_NUMS_KANG: curpoints  = player->M_Achiv_Player_NumsKang; break;
+		case PLAYER_USED_NUMS_RESISTANCE: curpoints  = player->M_Achiv_Player_NumsResistance; break;
 		case PLAYER_USED_NUMS_STRENGTH: curpoints  = player->M_Achiv_Player_NumsStrength; break;
 		case PLAYER_USED_NUMS_AGILITY: curpoints  = player->M_Achiv_Player_NumsAgility; break;
 		case PLAYER_USED_NUMS_STAMINA: curpoints  = player->M_Achiv_Player_NumsStamina; break;

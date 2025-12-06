@@ -1059,17 +1059,47 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     }while (0);
 
 
+                    //S8, leadership
+                    do {
+
+                        auto _auraID = ZQ_SPELL_CHALLENGE_BONUS_LEADER;
+						auto _points0=0, _points1 = 4;
+
+                        if(player->M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_LEADER)
+                        {
+                            if(Group * _group = player->GetGroup())
+                            {
+                                if(_group->IsLeader(player->GetGUID()))
+                                {
+                                    if(_group->isRaidGroup()) { _points0 = 6; _points1 = -8;}
+                                    else {_points0 = 4; _points1 = -6;}
+                                }
+                                else
+                                {
+                                    _points0=0, _points1 = -2;
+                                }
+                            }
+                            player->CastCustomSpell(player, _auraID, _points0, _points1, 0, true, nullptr);
+                        }
+                        //
+                        /*
+                        else if (player->HasAura(_auraID))
+                        {
+                            player->RemoveAurasDueToSpell(_auraID);
+                        }
+                        */
+					} while (0);
 
                     // qzqstar, 250702, the rich achievement bonus system
 					do {
 						// each class add 1% all stat to self.
 						// 1. first get the player class
-						auto _auraID = ZQ_SPELL_SPELL_RICH_BONUS;
+						auto _auraID = ZQ_SPELL_CHALLENGE_BONUS_RICH;
 						auto _apply = true;
 						auto _points0=0, _points1 = 0, _points2=0;
 
 						// 2. check the target player
-                        if(player->M_Challenge_Mode & CHALLENGING_MODE_RICH)
+                        if(player->M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_RICH)
                         {
                             auto _money_gold = player->GetMoney()/10000;
 
@@ -1131,8 +1161,8 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                             {
                                 player->RemoveSpell(ZQ_SPELL_VIP_HASTE);
                                 ChatHandler(player).PSendSysMessage(((std::string)(">>>不在副本里，关闭急速技能。<<<")).c_str());
-                                player->M_Leech_Phy = 5;
-                                player->M_Leech_Spell = 5;
+                                //player->M_Leech_Phy = 5;
+                                //player->M_Leech_Spell = 5;
                             }
 
                         }
@@ -2748,7 +2778,19 @@ void Spell::EffectPowerBurn(SpellEffectIndex effIdx)
     if (m_casterUnit)
     {
         if (Player* modOwner = m_casterUnit->GetSpellModOwner())
+        {
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_MULTIPLE_VALUE, multiplier);
+
+        }
+
+        if(Player * player = m_casterUnit->ToPlayer())
+        {
+            //S8: qzqstar, improved mana burn
+            if(player->HasSpell(14750) || player->HasSpell(14772))
+            {
+                multiplier *= 2;
+            }
+        }
     }
     
     newDamage = newDamage * multiplier;

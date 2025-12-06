@@ -54,7 +54,7 @@ enum Achievement_t
 #define ACHIEVEMENT_ACCOUNT_MAX_LEVEL			(11)		
 #define ACHIEVEMENT_ACCOUNT_EQ_NUMS				(12)	
 #define ACHIEVEMENT_ACCOUNT_BONUS_NUMS			(14)
-#define ACHIEVEMENT_ACCOUNT_REWARD				(15)
+#define ACHIEVEMENT_ACCOUNT_DAILY_REWARD				(15)
 
 //Player Used Data
 //need caculate and compare with account data
@@ -63,7 +63,7 @@ enum Achievement_t
 #define PLAYER_USED_NUMS_TALENT					(2)
 #define PLAYER_USED_LEVEL_WEAPON				(3)
 #define PLAYER_USED_LEVEL_PET					(4)
-#define PLAYER_USED_NUMS_KANG					(5)
+#define PLAYER_USED_NUMS_RESISTANCE					(5)
 #define PLAYER_USED_NUMS_STRENGTH				(6)
 #define PLAYER_USED_NUMS_AGILITY				(7)
 #define PLAYER_USED_NUMS_STAMINA				(8)
@@ -106,12 +106,12 @@ enum Achievement_t
 #define CHALLENGING_MODE_MANUFACT		(0x0002)
 #define CHALLENGING_MODE_EQUIPMENT		(0x0004)
 #define CHALLENGING_MODE_TASK			(0x0008)
-#define CHALLENGING_MODE_RICH			(0x0010)
+#define ZQ_SPELL_CHALLENGE_BONUS_RICH			(0x0010)
 #define CHALLENGING_MODE_KILLER_HUMAN	(0x0020)
 #define CHALLENGING_MODE_KILLER_BEAST	(0x0040)
 #define CHALLENGING_MODE_KILLER_UNDEAD	(0x0080)
 #define CHALLENGING_MODE_KILLER_MASK    (0x0020 | 0x0040 | 0x0080)
-#define CHALLENGING_MODE_DISCIPLINE		(0x0100)
+#define CHALLENGING_MODE_ASCE			(0x0100)
 #define CHALLENGING_MODE_LEADER			(0x0200)
 
 #define CHALLENGING_MODE_DONE_ONELIFE	(0x00010000)
@@ -176,7 +176,8 @@ public:
 
 	uint32 QzqstarAchievements::GetPlayerData(Player * _player, uint32 type);
 	uint32 QzqstarAchievements::GetPlayerSum(Player * _player);
-	void QzqstarAchievements::SetPlayerData(Player * _player, uint32 type, uint32 data);
+	void   QzqstarAchievements::SetPlayerData(Player * _player, uint32 type, uint32 data);
+	int32  QzqstarAchievements::InitPlayerData(Player * _player);
 
 
 	/*****************************************************

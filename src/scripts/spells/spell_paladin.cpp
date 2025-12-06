@@ -140,7 +140,7 @@ struct PaladinArtOfWarScript : SpellScript
 			{
 				/*879,5614,5615,10312,10313,10314*/
 				if ((spellEntry.Id == 879 || spellEntry.Id == 5614 || spellEntry.Id == 5615 ||
-					spellEntry.Id == 10312 || spellEntry.Id == 10313 || spellEntry.Id == 10313) && spellEntry.GetRecoveryTime() > 0)
+					spellEntry.Id == 10312 || spellEntry.Id == 10313 || spellEntry.Id == 10314) && spellEntry.GetRecoveryTime() > 0)
 					return true;
 				/*20473, 20929, 20930 */
 				if ((spellEntry.Id == 20473 || spellEntry.Id == 20929 || spellEntry.Id == 20930) && spellEntry.GetRecoveryTime() > 0)
@@ -183,7 +183,7 @@ struct PaladinMartyrStrikeScript : SpellScript
 
 			if (_dmgSelfo < 20) _dmgSelfo = 20;
 
-			int32 _dmgSelf = urand(_dmgSelfo / 20, _dmgSelfo/8);
+			int32 _dmgSelf = urand(_dmgSelfo / 4, _dmgSelfo/2);
 			
 			if (pPlayer->GetHealth() < _dmgSelf) _dmgSelf = pPlayer->GetHealth() - 1;
 

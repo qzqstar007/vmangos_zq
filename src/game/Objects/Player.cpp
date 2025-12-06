@@ -500,6 +500,9 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
     // original spells
     LearnDefaultSpells();
 
+    //init the default achievements
+    sQZAchievements.InitPlayerData(this);
+
     // Phasing
     SetWorldMask(WORLD_DEFAULT_CHAR);
 
@@ -3373,6 +3376,13 @@ void Player::GiveLevel(uint32 level)
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
         pet->SynchronizeLevelWithOwner();
+
+    //S8: add item box for new bie
+    if(level <= 12)
+    {
+        AddItem(ZQ_ITEM_NEWBIE_BOX, 1);
+        Helper_Chat(this, ">> 恭喜升级，获得新手装备奖励，请查收背包！  ");
+    }
 }
 
 void Player::UpdateFreeTalentPoints(bool resetIfNeed)
@@ -4979,7 +4989,7 @@ void Player::KillPlayer()
 
 		//2. killer mode, lost the money
 		//if (HasSpell(__MODE_RICH))
-		if(M_Challenge_Mode & CHALLENGING_MODE_RICH)
+		if(M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_RICH)
 		{
 			__looseMoney = __totalMoney / 6;
 
@@ -15462,12 +15472,12 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     //get the challenge mode from db
     //qzqstar, 250411, load from achievements
     //M_Challenge_Mode = sQZAchievements.GetChallengeMode(this);
-    uint32 _Promotions = sQZAchievements.GetPromotions(this);
+    /*uint32 _Promotions = sQZAchievements.GetPromotions(this);
     M_Leech_Phy = _Promotions % 10;
     M_Leech_Spell = (_Promotions / 10)%10;
     M_TalentPoints = (_Promotions / 100)%10;
     M_Speed = (_Promotions / 1000)%10;
-    M_WeaponSkill = (_Promotions / 10000)%10;
+    M_WeaponSkill = (_Promotions / 10000)%10;*/
     //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Player %s [AccountID:%u] has Challenge Mode= 0x%X, Promotions=%d", GetName(),M_AccountID, M_Challenge_Mode, _Promotions);
 
 
@@ -15489,29 +15499,12 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     /* 11 */M_Achiv_Account_Max_Level = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_MAX_LEVEL);
     /* 12 */M_Achiv_Account_EQ_Nums = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_EQ_NUMS);
     /* 13 */M_Achiv_Account_Bonus_Nums = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_BONUS_NUMS);
-    /* 14 */M_Achiv_Account_REWARD = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_REWARD);
+    /* 14 */M_Achiv_Account_REWARD = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DAILY_REWARD);
 
-
-
-    if(_explCount > M_Achiv_Account_Explore)   M_Achiv_Account_Explore = _explCount;
-    if(M_Custom_Quest_Done > M_Achiv_Account_Task)  M_Achiv_Account_Task = M_Custom_Quest_Done;
 
     //bitwise for the reputation list, professional list
     M_Achiv_Account_Reputation_List |= DBHelper_GetPlayerReputation_Bits(this);
     M_Achiv_Account_Profession_Skill |= DBHelper_GetPlayerProfs_Bits(this);
-
-
-    //detailed nums M_Achiv_Account_XXX
-    Helper_Chat(this, Helper_MakeString("","详细数据：Player :%s,  VIP:%u,\
-        Task:%u, Explore:%u, Pet:%u, Reputation:%u, Profession:%u, Killing:%u, \
-        PVP:%u, Gold:%u, Dungeon1:%u, Dungeon2:%u, maxlevel:%u, EQ:%u, Bonus:%u, Reward:%u.",
-        GetName(), M_Achiv_Account_VIP,
-        M_Achiv_Account_Task, M_Achiv_Account_Explore, M_Achiv_Account_Pet_Collection, 
-        M_Achiv_Account_Reputation_List, M_Achiv_Account_Profession_Skill,
-        M_Achiv_Account_Killing_Nums, M_Achiv_Account_PVP_Nums, M_Achiv_Account_Gold_Collect, 
-        M_Achiv_Account_Dungeon_NUMS1, M_Achiv_Account_Dungeon_NUMS2, M_Achiv_Account_Max_Level,
-        M_Achiv_Account_EQ_Nums, M_Achiv_Account_Bonus_Nums, M_Achiv_Account_REWARD).c_str());
-
 
     //get player used achievements
     M_Achiv_Player_Chenyi = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_CHENYI);
@@ -15519,7 +15512,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     M_Achiv_Player_NumsTalent = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_TALENT);
     M_Achiv_Player_LevelWeapon = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_WEAPON);
     M_Achiv_Player_LevelPet = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_PET);
-    M_Achiv_Player_NumsKang = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_KANG);
+    M_Achiv_Player_NumsResistance = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_RESISTANCE);
     M_Achiv_Player_NumsStrength = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_STRENGTH);
     M_Achiv_Player_NumsAgility = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_AGILITY);
     M_Achiv_Player_NumsStamina = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_STAMINA);
@@ -15893,14 +15886,16 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 #define	__STR(x)		((std::string)(x)).c_str()
 #endif
     std::string _ModeText = __STR("");
-    if(M_Challenge_Mode & CHALLENGING_MODE_MANUFACT)    { _ModeText.append(__STR("工匠模式、、 ")); __xpRate = 1.0f;}
-    if(M_Challenge_Mode & CHALLENGING_MODE_ONELIFE)     { _ModeText.append(__STR("一命模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_MANUFACT)        { _ModeText.append(__STR("工匠模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_ONELIFE)         { _ModeText.append(__STR("一命模式、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_EQUIPMENT)      { _ModeText.append(__STR("装等模式、、 ")); __xpRate = 1.0f;}
-    if(M_Challenge_Mode & CHALLENGING_MODE_TASK)        { _ModeText.append(__STR("任务模式、、 ")); __xpRate = 1.0f;}
-    if(M_Challenge_Mode & CHALLENGING_MODE_RICH)        { _ModeText.append(__STR("富豪模式、、 ")); __xpRate = 1.0f;}
-    if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_HUMAN)  { _ModeText.append(__STR("杀手模式（人形）、、 ")); __xpRate = 1.0f;}
-    if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_BEAST)  { _ModeText.append(__STR("杀手模式（野兽）、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_TASK)            { _ModeText.append(__STR("任务模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_RICH)            { _ModeText.append(__STR("富豪模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_HUMAN)    { _ModeText.append(__STR("杀手模式（人形）、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_BEAST)    { _ModeText.append(__STR("杀手模式（野兽）、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_UNDEAD)  { _ModeText.append(__STR("杀手模式（亡灵）、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_ASCE)      { _ModeText.append(__STR("修行模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_LEADER)          { _ModeText.append(__STR("领袖模式、、 ")); __xpRate = 1.0f;}
 
     if(M_Challenge_Mode > 0 && GetLevel() < 60) PSendSysMessage("【注意】你已经开启以下挑战模式：%s 。 ", _ModeText.c_str());
     else if(GetLevel() <= 50 ) PSendSysMessage("【注意】你没有开启任何挑战模式，只能一级开启。 ");
@@ -16059,9 +16054,25 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     //learn spell ZQ_SPELL_VIP_HASTE_ONOFF
     if((M_Achiv_Account_VIP & VIP_SPECIAL_SPELL_HASTE) && (!HasSpell(ZQ_SPELL_VIP_HASTE_ONOFF)))  LearnSpell(ZQ_SPELL_VIP_HASTE_ONOFF, false);
+    if((M_Challenge_Mode & CHALLENGING_MODE_ASCE) && (!HasSpell(ZQ_SPELL_CHALLENGE_BONUS_ASCE)))  LearnSpell(ZQ_SPELL_CHALLENGE_BONUS_ASCE, false);
 
 
-
+    if(_explCount > M_Achiv_Account_Explore)   M_Achiv_Account_Explore = _explCount;
+    if(M_Custom_Quest_Done > M_Achiv_Account_Task)  M_Achiv_Account_Task = M_Custom_Quest_Done;
+    //detailed nums M_Achiv_Account_XXX
+    
+    if(IsGameMaster())
+    {
+        Helper_Chat(this, Helper_MakeString("","详细数据：Player :%s,  VIP:%u,\
+            Task:%u, Explore:%u, Pet:%u, Reputation:%u, Profession:%u, Killing:%u, \
+            PVP:%u, Gold:%u, Dungeon1:%u, Dungeon2:%u, maxlevel:%u, EQ:%u, Bonus:%u, Reward:%u.",
+            GetName(), M_Achiv_Account_VIP,
+            M_Achiv_Account_Task, M_Achiv_Account_Explore, M_Achiv_Account_Pet_Collection, 
+            M_Achiv_Account_Reputation_List, M_Achiv_Account_Profession_Skill,
+            M_Achiv_Account_Killing_Nums, M_Achiv_Account_PVP_Nums, M_Achiv_Account_Gold_Collect, 
+            M_Achiv_Account_Dungeon_NUMS1, M_Achiv_Account_Dungeon_NUMS2, M_Achiv_Account_Max_Level,
+            M_Achiv_Account_EQ_Nums, M_Achiv_Account_Bonus_Nums, M_Achiv_Account_REWARD).c_str());
+    }
 	//2. check if has chenyi or zhanpao of that level
 	//   get the pos and check if's same with ID ... plus level_chenyi/zhanpao
 	//   delete that and add a new one. can only sell 1 copper.
@@ -17576,7 +17587,7 @@ void Player::SaveToDB(bool online, bool force)
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_MAX_LEVEL, M_Achiv_Account_Max_Level);
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_EQ_NUMS, M_Achiv_Account_EQ_Nums);
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_BONUS_NUMS, M_Achiv_Account_Bonus_Nums);
-    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_REWARD, M_Achiv_Account_REWARD);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DAILY_REWARD, M_Achiv_Account_REWARD);
 
     //set the player data
     sQZAchievements.SetPlayerData(this, PLAYER_USED_LEVEL_CHENYI, M_Achiv_Player_Chenyi);
@@ -17584,7 +17595,7 @@ void Player::SaveToDB(bool online, bool force)
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_TALENT, M_Achiv_Player_NumsTalent);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_LEVEL_WEAPON, M_Achiv_Player_LevelWeapon);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_LEVEL_PET, M_Achiv_Player_LevelPet);
-    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_KANG, M_Achiv_Player_NumsKang);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_RESISTANCE, M_Achiv_Player_NumsResistance);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_STRENGTH, M_Achiv_Player_NumsStrength);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_AGILITY, M_Achiv_Player_NumsAgility);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_STAMINA, M_Achiv_Player_NumsStamina);

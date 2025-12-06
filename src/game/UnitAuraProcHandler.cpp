@@ -1366,10 +1366,10 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 a
                 switch (auraSpellInfo->Id)
                 {
                     case 18096: // Rank 1
-                        chance = 13.0f / tick;
+                        chance = 50.0f / tick;
                         break;
                     case 18073: // Rank 2
-                        chance = 26.0f / tick;
+                        chance = 100.0f / tick;
                         break;
                 }
 
@@ -1947,7 +1947,9 @@ SpellAuraProcResult Unit::HandleAddTargetTriggerAuraProc(Unit* pVictim, uint32 /
             pVictim->CastSpell(pVictim, trigger_spell_id, true, nullptr, triggeredByAura);
         }
         else
+        {
             CastSpell(this, trigger_spell_id, true, nullptr, triggeredByAura);
+        }
     }
     return SPELL_AURA_PROC_OK;
 }

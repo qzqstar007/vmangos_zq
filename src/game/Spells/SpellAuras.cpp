@@ -2715,6 +2715,8 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                                     Rage_val = 250;
                                     break;
                             }
+                            //S8, reserve more rage for warriors.
+                            Rage_val *= 4;
                             if (Rage_val != 0)
                                 break;
                         }
@@ -4895,9 +4897,10 @@ void Aura::HandleAuraModStat(bool apply, bool /*Real*/)
                     bool exitLoop = false;
                     switch (aura->GetModifier()->m_miscvalue)
                     {
-                        case 2388: staminaToRemove = m_modifier.m_amount * 10 / 100; exitLoop = true; break; // Rank 1
-                        case 2389: staminaToRemove = m_modifier.m_amount * 20 / 100; exitLoop = true; break; // Rank 2
-                        case 2390: staminaToRemove = m_modifier.m_amount * 30 / 100; exitLoop = true; break; // Rank 3
+                        //s8, improved sting
+                        case 2388: staminaToRemove = m_modifier.m_amount * 10 / 10; exitLoop = true; break; // Rank 1
+                        case 2389: staminaToRemove = m_modifier.m_amount * 20 / 10; exitLoop = true; break; // Rank 2
+                        case 2390: staminaToRemove = m_modifier.m_amount * 30 / 10; exitLoop = true; break; // Rank 3
                     }
                     if (exitLoop)
                         break;
@@ -6454,10 +6457,11 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             auto improvedManaDrain1 = pCaster->GetAura(17864, EFFECT_INDEX_0);
             auto improvedManaDrain2 = pCaster->GetAura(18393, EFFECT_INDEX_0);
 
+            //s8: qzqstar, improve from 30/15 to 200/100
             if (improvedManaDrain2)
-                PeriodicTick(improvedManaDrain2->GetHolder()->GetSpellProto(), SPELL_AURA_PERIODIC_DAMAGE, drain_amount * 0.3f);
+                PeriodicTick(improvedManaDrain2->GetHolder()->GetSpellProto(), SPELL_AURA_PERIODIC_DAMAGE, drain_amount * 2.0f);
             else if (improvedManaDrain1)
-                PeriodicTick(improvedManaDrain1->GetHolder()->GetSpellProto(), SPELL_AURA_PERIODIC_DAMAGE, drain_amount * 0.15f);
+                PeriodicTick(improvedManaDrain1->GetHolder()->GetSpellProto(), SPELL_AURA_PERIODIC_DAMAGE, drain_amount * 1.15f);
 
             target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_DAMAGE_CANCELS);
             break;

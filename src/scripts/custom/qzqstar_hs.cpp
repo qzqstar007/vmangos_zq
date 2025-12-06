@@ -72,9 +72,8 @@ void _Main_Menus(Player *player)
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　成就系统　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　符文系统　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　符文系统　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_RUNE_MAIN);
+	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 	if(false)
 	{
@@ -382,7 +381,7 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 	_ability_values[2] = pPlayer->M_Achiv_Player_NumsTalent;
 	_ability_values[3] = pPlayer->M_Achiv_Player_LevelWeapon;
 	_ability_values[4] = pPlayer->M_Achiv_Player_LevelPet;
-	_ability_values[5] = pPlayer->M_Achiv_Player_NumsKang;
+	_ability_values[5] = pPlayer->M_Achiv_Player_NumsResistance;
 	_ability_values[6] = pPlayer->M_Achiv_Player_NumsStrength;
 	_ability_values[7] = pPlayer->M_Achiv_Player_NumsAgility;
 	_ability_values[8] = pPlayer->M_Achiv_Player_NumsStamina;
@@ -709,7 +708,7 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 			pPlayer->M_Achiv_Player_NumsTalent = _ability_values[2];
 			pPlayer->M_Achiv_Player_LevelWeapon = _ability_values[3];
 			pPlayer->M_Achiv_Player_LevelPet = _ability_values[4];
-			pPlayer->M_Achiv_Player_NumsKang = _ability_values[5];
+			pPlayer->M_Achiv_Player_NumsResistance = _ability_values[5];
 			pPlayer->M_Achiv_Player_NumsStrength = _ability_values[6];
 			pPlayer->M_Achiv_Player_NumsAgility = _ability_values[7];
 			pPlayer->M_Achiv_Player_NumsStamina = _ability_values[8];
@@ -1120,10 +1119,10 @@ struct CustomHSSpell : SpellScript
 				if(_Mode & CHALLENGING_MODE_EQUIPMENT) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　装等模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启装等模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 4);
 
-				if(_Mode & CHALLENGING_MODE_RICH) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　富豪模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				if(_Mode & ZQ_SPELL_CHALLENGE_BONUS_RICH) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　富豪模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启富豪模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 5);
 
-				if(_Mode >= CHALLENGING_MODE_KILLER_HUMAN) 
+				if( (_Mode & CHALLENGING_MODE_KILLER_HUMAN) || (_Mode & CHALLENGING_MODE_KILLER_BEAST) || (_Mode & CHALLENGING_MODE_KILLER_UNDEAD) )
 				{
 					if(_Mode & CHALLENGING_MODE_KILLER_HUMAN)pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　杀手模式（人形）　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 					else if(_Mode & CHALLENGING_MODE_KILLER_BEAST) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　杀手模式（野兽）　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -1137,7 +1136,7 @@ struct CustomHSSpell : SpellScript
 				}
 
 
-				if(_Mode & CHALLENGING_MODE_DISCIPLINE) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　修行模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+				if(_Mode & CHALLENGING_MODE_ASCE) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　修行模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 				else pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＞　开启修行模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_MODE_MAIN + 6);
 
 				if(_Mode & CHALLENGING_MODE_LEADER) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　领袖模式　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -1258,12 +1257,13 @@ struct CustomHSSpell : SpellScript
 					case 2:	 _Mode |= CHALLENGING_MODE_MANUFACT; break;
 					case 3:	 _Mode |= CHALLENGING_MODE_TASK; break;
 					case 4:	 _Mode |= CHALLENGING_MODE_EQUIPMENT; break;
-					case 5:	 _Mode |= CHALLENGING_MODE_RICH; break;
-					case 6:	 _Mode |= CHALLENGING_MODE_DISCIPLINE; break;
+					case 5:	 _Mode |= ZQ_SPELL_CHALLENGE_BONUS_RICH; break;
+					case 6:	 _Mode |= CHALLENGING_MODE_ASCE; break;
 					case 7:	 _Mode |= CHALLENGING_MODE_LEADER; break;
 					case 10: _Mode |= CHALLENGING_MODE_KILLER_HUMAN; break;
 					case 11: _Mode |= CHALLENGING_MODE_KILLER_BEAST; break;
 					case 12: _Mode |= CHALLENGING_MODE_KILLER_UNDEAD; break;
+					default: break;
 				}
 				//sQZAchievements.SetChallengeMode(pPlayer, _Mode);
 				sQZAchievements.SetPlayerData(pPlayer, PLAYER_USED_CHALLGE_MODE, _Mode);

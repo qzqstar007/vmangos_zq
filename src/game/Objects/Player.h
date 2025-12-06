@@ -922,7 +922,7 @@ class Player final: public Unit
         uint32  M_Achiv_Player_NumsTalent;    //NumsTalent
         uint32  M_Achiv_Player_LevelWeapon;    //LevelWeapon
         uint32  M_Achiv_Player_LevelPet;    //LevelPet
-        uint32  M_Achiv_Player_NumsKang;    //NumsKang
+        uint32  M_Achiv_Player_NumsResistance;    //NumsKang
         uint32  M_Achiv_Player_NumsStrength;    //NumsStrength
         uint32  M_Achiv_Player_NumsAgility;    //NumsAgility
         uint32  M_Achiv_Player_NumsStamina;    //NumsStamina

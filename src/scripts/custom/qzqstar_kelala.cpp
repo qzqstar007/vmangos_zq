@@ -120,7 +120,7 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 		if(_now / 100 != _accountDate / 100)
 		{
 			//update the account date
-			//sQZAchievements.SetAccAchieveData(player, ACHIEVEMENT_ACCOUNT_REWARD, _now);
+			//sQZAchievements.SetAccAchieveData(player, ACHIEVEMENT_ACCOUNT_DAILY_REWARD, _now);
 			player->M_Achiv_Account_REWARD = _now;
 
 			__LOG("[Menus_Kelala_Login] Player:%s got daily reward. time:%u, old:%u", player->GetName(), _now, _accountDate);
@@ -790,7 +790,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 					case 2:	 _Mode |= CHALLENGING_MODE_MANUFACT; break;
 					case 3:	 _Mode |= CHALLENGING_MODE_TASK; break;
 					case 4:	 _Mode |= CHALLENGING_MODE_EQUIPMENT; break;
-					case 5:	 _Mode |= CHALLENGING_MODE_RICH; break;*/
+					case 5:	 _Mode |= ZQ_SPELL_CHALLENGE_BONUS_RICH; break;*/
 			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_ONELIFE) && ( (player->M_Challenge_Mode & CHALLENGING_MODE_DONE_ONELIFE) == 0) ) 
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出一命模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_1);
 			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_MANUFACT) && ( (player->M_Challenge_Mode & CHALLENGING_MODE_DONE_MANUFACT) == 0) ) 
@@ -799,7 +799,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出任务模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_3);
 			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_EQUIPMENT) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_EQUIPMENT) == 0) )
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出装等模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_4);
-			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_RICH) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_RICH) == 0) )
+			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_RICH) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_RICH) == 0) )
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出富豪（退后无属性加成、考虑好）　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_5);
 			if (player->GetLevel() == 60 
 				&& ((player->M_Challenge_Mode & CHALLENGING_MODE_KILLER_MASK) != 0)
@@ -870,7 +870,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		case __MENU_MODE_SUB_5:
 		{	
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_RICH;
-			player->M_Challenge_Mode &= ~CHALLENGING_MODE_RICH;
+			player->M_Challenge_Mode &= ~ZQ_SPELL_CHALLENGE_BONUS_RICH;
 			 //sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
 			sQZAchievements.SetPlayerData(player, PLAYER_USED_CHALLGE_MODE, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_GOLD_BAR, 5);

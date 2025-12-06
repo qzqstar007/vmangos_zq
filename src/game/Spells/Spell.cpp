@@ -4555,8 +4555,19 @@ void Spell::HandleAddTargetTriggerAuras()
             // Calculate chance at that moment (can be depend for example from combo points)
             int32 auraBasePoints = targetTrigger->GetBasePoints();
             int32 chance = m_casterUnit->CalculateSpellEffectValue(target, auraSpellInfo, auraSpellIdx, &auraBasePoints);
-            if ((m_casterUnit->IsPlayer() && m_casterUnit->ToPlayer()->HasCheatOption(PLAYER_CHEAT_ALWAYS_PROC)) || roll_chance_i(chance))
-                m_casterUnit->CastSpell(target, triggerSpellInfo, true, nullptr, targetTrigger);
+
+            //s8:, seperate the rogues's ignore the Relentless Strikes 14179-> 14181
+			if (auraSpellInfo->Id == 14179)
+			{
+				if(m_casterUnit->IsPlayer())
+					m_casterUnit->CastCustomSpell(target, 14181, chance, 0, 0, true, nullptr, targetTrigger);
+			}
+			else
+			{
+				//normal id
+				if ((m_casterUnit->IsPlayer() && m_casterUnit->ToPlayer()->HasCheatOption(PLAYER_CHEAT_ALWAYS_PROC)) || roll_chance_i(chance))
+					m_casterUnit->CastSpell(target, triggerSpellInfo, true, nullptr, targetTrigger);
+			}
         }
     }
 }

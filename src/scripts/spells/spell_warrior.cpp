@@ -16,6 +16,7 @@
 
 #include "scriptPCH.h"
 
+
 // 5246 - Intimidating Shout
 struct WarriorIntimidatingShoutScript : SpellScript
 {
@@ -45,6 +46,10 @@ struct WarriorBloodthirstScript : SpellScript
             if (spell->GetUnitTarget())
                 attackPower += spell->m_casterUnit->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS, spell->GetUnitTarget()->GetCreatureTypeMask());
             spell->damage = spell->damage * attackPower / 100;
+
+            //cast the heal immediately for this damage
+            #define _HEAL_BLOODTHIRST 23880
+            spell->m_casterUnit->CastCustomSpell(spell->m_casterUnit, _HEAL_BLOODTHIRST, urand(spell->damage/10, spell->damage/5), {}, {}, true, nullptr);
         }
         return true;
     }
@@ -176,6 +181,29 @@ SpellScript* GetScript_WarriorBloodrage(SpellEntry const*)
     return new WarriorBloodrageScript();
 }
 
+
+
+//spell_warrior_bloodthirst_heal
+struct WarriorBloodthirstHealScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            //check the player's strength and add to damage
+			if (spell->GetUnitTarget()->IsPlayer())
+			{
+				
+				int32 _strength = static_cast<Player*>(spell->GetUnitTarget())->GetStat(STAT_STRENGTH);
+				spell->damage += _strength / 10;
+
+				//sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "MNew_strength:%d  damage:%d", _strength, spell->damage);
+			}
+        }
+        return true;
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     Script* newscript;
@@ -219,4 +247,5 @@ void AddSC_warrior_spell_scripts()
     newscript->Name = "spell_warrior_bloodrage";
     newscript->GetSpellScript = &GetScript_WarriorBloodrage;
     newscript->RegisterSelf();
+
 }

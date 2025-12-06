@@ -62,7 +62,7 @@ const Teleport_Point_t TP_Trainers_ALLIANCE[] = {
 	// Makeup from upper comment, reverse order
 	{0, 0,    __XSTR("战士、骑士　 "),   		0, -9468.0f,115.5f,58.0f,5.3f, {0}},
 	{1, 1,    __XSTR("猎人、德鲁伊　 "), 		1, 10131.0f,2541.0f,1322.0f,5.8f, {0}},
-	{2, 0,    __XSTR("急救烹饪、法牧术贼　 "), 	0, -9471.0f,23.5f,64.5f,0.3f, {0}},
+	{2, 0,    __XSTR("急救烹饪、法师、牧师、术士、盗贼　 "), 	0, -9471.0f,23.5f,64.5f,0.3f, {0}},
 	{3, 0,    __XSTR("采矿、锻造、工程　 "), 	0, -8375.0f,631.0f,95.0f,3.2f, {0}},
 	{4, 0,    __XSTR("剥皮、制皮、钓鱼　 "), 	0, -9393.0f,-89.0f,64.5f,6.2f, {0}},
 	{5, 0,    __XSTR("炼金、采药、裁缝、附魔　 "), 0, -8915.0f,786.0f,87.5f,3.6f, {0}}
@@ -71,7 +71,7 @@ const Teleport_Point_t TP_Trainers_ALLIANCE[] = {
 const Teleport_Point_t TP_Trainers_HORDE[] = {
 	// Makeup from upper comment, reverse order
 	{0, 0,    __XSTR("法师、牧师、术士、盗贼　 "),   		0, 2257.0f,242.0f,33.5f,0.2f, {0}},
-	{1, 1,    __XSTR("烹饪急救、战德猎萨　 "), 		1, -2313.0f,-351.0f,-9.4f,6.2f, {0}},
+	{1, 1,    __XSTR("烹饪急救、战士、德鲁伊、猎人、萨满　 "), 		1, -2313.0f,-351.0f,-9.4f,6.2f, {0}},
 	{2, 1,    __XSTR("采矿、锻造、工程、钓鱼　 "), 	1, 2021.0f,-4725.0f,24.7f,6.0f, {0}},
 	{3, 1,    __XSTR("剥皮制皮、裁缝附魔、采药炼金　 "), 1, -1122.0f,29.0f,143.0f,2.8f, {0}}
 };
@@ -309,14 +309,12 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 			text.append(__STR(TP_Raids[i].name));
 			
 			//get the dungeon information
-			uint32 _playerRaidsInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_RAIDS, player, TP_Raids[i].id);
-
+			//uint32 _playerRaidsInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_RAIDS, player, TP_Raids[i].id);
 			//lower 2bit is current difficulty, higher 2bit is achieved difficulty.
-			uint32 _currentDifficulty = _playerRaidsInfo & 0x03;
-			uint32 _achievedDifficulty = (_playerRaidsInfo >> 2) & 0x03;
-
-			text.append(__STR(" => "));
-			text.append(__DUNGEONS_DIFFICULTY_MINIMUM[_achievedDifficulty]);
+			//uint32 _currentDifficulty = _playerRaidsInfo & 0x03;
+			//uint32 _achievedDifficulty = (_playerRaidsInfo >> 2) & 0x03;
+			//text.append(__STR(" => "));
+			//text.append(__DUNGEONS_DIFFICULTY_MINIMUM[_achievedDifficulty]);
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT1 + i); //add the difficulty to the menu
 		}
 
@@ -647,19 +645,43 @@ bool Menus_teleport_Main(Player *player, Creature *_cr, uint32 sender, uint32 ac
 	//check if player is null and go is null
 	if (!player || !_cr) return false;
 
+	//check the challenge mode
+	if((player->M_Challenge_Mode & CHALLENGING_MODE_ASCE) && (player->GetLevel() < 60))
+	{
+		uint32_t _now = Helper_GetDateInt();
+		uint32_t _accountDate = player->M_Achiv_Account_REWARD;
+
+		if(_now / 100 != _accountDate / 100)
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　请先去克拉拉领取今日奖励。　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _cr->GetGUID());
+			return true;
+		}
+		else if (_now == _accountDate)
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　修行模式每小时只能用一次传送。　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _cr->GetGUID());
+			return true;
+		}
+		else
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　修行模式，谨慎选择！　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);	
+			player->M_Achiv_Account_REWARD = _now;
+		}
+	}
+
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　主城传送　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　专业职业　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_TRAINERS);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　东部王国　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_EASTKINGDOM);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　卡利姆多　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_KALIMDOR);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　副本传送　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_DUNGEONS);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-	if(player->GetLevel() >= 45) 
+	if(player->GetLevel() >= 60) 
 	{
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　团本传送　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_RAIDS);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);

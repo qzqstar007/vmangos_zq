@@ -360,7 +360,7 @@ struct ChuanSpellScript : public SpellScript
                         break;
                 }
 
-                if(player->M_Challenge_Mode & CHALLENGING_MODE_RICH)
+                if(player->M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_RICH)
                 {
                     basePoints0 = basePoints0 * 1.5;
                     basePoints1 = basePoints1 * 1.5;
@@ -640,7 +640,7 @@ struct HealCustomSpellScript : public SpellScript
 				
                 player->CastCustomSpell(player, 32400, _bp, 0, 0, false);
 
-                __LOG("Triggered by SpellID: %u. bp: %u" , spell->m_triggeredBySpellInfo->Id, _bp);
+                //__LOG("Triggered by SpellID: %u. bp: %u" , spell->m_triggeredBySpellInfo->Id, _bp);
 
             }
         }	

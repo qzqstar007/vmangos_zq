@@ -191,4 +191,9 @@ void AddSC_hunter_spell_scripts()
     newscript->Name = "spell_hunter_counterattack";
     newscript->GetSpellScript = &GetScript_HunterCounterAttack;
     newscript->RegisterSelf();
+
+    newscript = new Script;
+	newscript->Name = "spell_hunter_farshot";
+	newscript->GetSpellScript = &GetScript_HunterFarShot;
+	newscript->RegisterSelf();
 }

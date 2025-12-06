@@ -79,7 +79,8 @@ struct WarlockConflagrateScript : SpellScript
                 if (i->GetSpellProto()->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_IMMOLATE>() &&
                     i->GetCasterGuid() == spell->m_caster->GetObjectGuid())
                 {
-                    spell->GetUnitTarget()->RemoveAurasByCasterSpell(i->GetId(), spell->m_caster->GetObjectGuid());
+                    //s8: qzqstar don't remove chance of 50
+                    if(roll_chance_i(50)) spell->GetUnitTarget()->RemoveAurasByCasterSpell(i->GetId(), spell->m_caster->GetObjectGuid());
                     break;
                 }
             }

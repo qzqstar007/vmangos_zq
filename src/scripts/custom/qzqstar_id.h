@@ -67,6 +67,7 @@
 
 #define ZQ_ITEM_TURTLE              30066   //Turtle, 乌龟
 //Bonus Box
+#define ZQ_ITEM_NEWBIE_BOX          30078
 #define ZQ_ITEM_BONUS_BOX			30088	//Bonus Box, 奖励宝箱 ~ 30061
 
 //raid Reset 
@@ -112,7 +113,6 @@
 #define ZQ_SPELL_SPELL_CHUAN_PROPERTY	33365	//Spell Chuan Property, 传家宝属性
 #define ZQ_SPELL_SPELL_CHUAN_APSP   	33366	//Spell Chuan APSP, 传家宝法强攻强
 #define ZQ_SPELL_SPELL_CHUAN_HASTE	    33367	//Spell Chuan Haste, 传家宝急速
-#define ZQ_SPELL_SPELL_RICH_BONUS	    33368	//Spell Rich Bonus, 富豪奖励
 
 #define ZQ_SPELL_SPELL_DIFFICULTY0  33350	//Spell Difficulty 0, Wolrd Difficutly 0
 #define ZQ_SPELL_SPELL_DIFFICULTY1	33351	//Spell Difficulty 1, 副本难度1
@@ -126,6 +126,10 @@
 
 #define ZQ_SPELL_RERANDOM			33348	//Rerandom, 随机附魔重置
 
+
+#define ZQ_SPELL_CHALLENGE_BONUS_RICH	    33330	//Spell Rich Bonus, 富豪奖励   //33368
+#define ZQ_SPELL_CHALLENGE_BONUS_ASCE       33331   //Challenge Mode ASCE, 修行模式
+#define ZQ_SPELL_CHALLENGE_BONUS_LEADER     33332   //Challenge Mode LEADER, 领袖模式奖励
 
 #define ZQ_SPELL_PET_AURA           33311   //Pet Aura, 宠物光环 33311-33317
 #define ZQ_SPELL_PET_TRIGGERED      33321   //Pet Triggered Spell, 宠物触发技能 33321-33327, never forget the spell_Proc
@@ -146,6 +150,10 @@
 #define ZQ_SPELL_MOUNTS_GRIYP_LEARN         32989   //Mounts, 幽灵狮鹫
 #define ZQ_SPELL_MOUNTS_TURTLE              32990   //Mounts, 海龟
 #define ZQ_SPELL_MOUNTS_TURTLE_LEARN        32991   //Mounts, 海龟
+
+
+#define ZQ_SPELL_RACE_BONUS_END             32940
+#define ZQ_SPELL_RACE_BONUS_START           32850
 
 #define ZQ_SPELL_BONUS_AP         32830   //Bonus, 奖励，例如坐骑之类，被动奖励 攻强
 #define ZQ_SPELL_BONUS_SP         32831   //Bonus, 奖励，例如坐骑之类，被动奖励 法强
@@ -370,22 +378,25 @@ update spell_template set startRecoveryTime=1100 where startRecoveryTime=1500;
 update creature_template set gold_min = gold_min/20, gold_max=gold_max/20 where gold_max > 50000;
 
 //ZG BOSS
-14510 update creature_template set health_multiplier=1500, damage_multiplier=50 where entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
-14509 
-14507
-14517
-14515
-11382
-14834
-11380
+update creature_template set health_multiplier=1500, damage_multiplier=50 where entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
+update creature_template set health_multiplier=500, damage_multiplier=30 where entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
 
 //MC BOSS, and ONYKIA
 11988 12057 12259 11502 12264 11982 12098 12056 12118
 update creature_template set health_multiplier=2000, damage_multiplier=60 where entry in (11988, 12057, 12259, 11502, 12264, 11982, 12098, 12056, 12118, 10184);
 -- alians 12099 11673 11661 11663 11662 12119 11664 11672 11659 11658, 12129
 update creature_template set health_multiplier=500, damage_multiplier=30 where entry in (12099, 11673, 11661, 11663, 11662, 12119, 11664, 11672, 11659, 11658, 12129);
+
+//S8
+update creature_template set health_multiplier=800, damage_multiplier=30 where entry in (11988, 12057, 12259, 11502, 12264, 11982, 12098, 12056, 12118, 10184);
+update creature_template set health_multiplier=100, damage_multiplier=15 where entry in (12099, 11673, 11661, 11663, 11662, 12119, 11664, 11672, 11659, 11658, 12129);
+
 -- ONY
 update creature_template set health_multiplier=2000, damage_multiplier=100 where entry in (10184, 12129);
+update creature_template set health_multiplier=800, damage_multiplier=30 where entry in (10184, 12129);
+update creature_template set health_multiplier=500, damage_multiplier=30 where entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
+update creature_template set health_multiplier=800, damage_multiplier=30 where entry in (11988, 12057, 12259, 11502, 12264, 11982, 12098, 12056, 12118, 10184);
+update creature_template set health_multiplier=100, damage_multiplier=15 where entry in (12099, 11673, 11661, 11663, 11662, 12119, 11664, 11672, 11659, 11658, 12129);
 
 
 -- BWL BOSS
@@ -541,9 +552,25 @@ dropped good nice pets
 19054,19055,19450,20371,20651,20769,21277,22235,22780,22781,23002,23007,23015,23083
 
 
-
-
 */
 
+/* Spell Enchanced.
+7744
+20555
+20575 20576 21563
+20591
+20580
+20549
+20595
+20550
+20572
+20582
+20589
+20577
+20598
+20594
+26296 26297 20554
+20600
+*/
 
 
