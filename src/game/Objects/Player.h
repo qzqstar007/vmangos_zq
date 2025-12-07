@@ -915,6 +915,7 @@ class Player final: public Unit
         uint32  M_Achiv_Account_EQ_Nums;                //Account Equip Points Nums
         uint32  M_Achiv_Account_Bonus_Nums;             //Account Bonus Points Nums
         uint32  M_Achiv_Account_REWARD;                 //Account Reward Points Nums
+        uint32  M_Achiv_Account_Task_Custom_MaxID;      //Account Max ID
 
         //Player spend achievements points
         uint32  M_Achiv_Player_Chenyi;    //Chenyi
@@ -931,6 +932,9 @@ class Player final: public Unit
         uint32  M_Achiv_Player_NumsAP;    //NumsAP
         uint32  M_Achiv_Player_NumsSP;    //NumsSP
         uint32  M_Achiv_Player_DungeonTimes;  //additional dungeon times.
+        uint32  M_Achiv_Player_RacialSpell_Passive;    //Racial Skills Passive
+        uint32  M_Achiv_Player_RacialSpell_Active;    //Racial Skills Active
+        uint32  M_Achiv_Player_Custom_TaskID;         //Current Custom task ID for this player
 
         uint32 M_Dungeon_Difficulty;  //defaults to zero
 

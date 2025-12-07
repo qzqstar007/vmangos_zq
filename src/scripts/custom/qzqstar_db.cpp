@@ -280,8 +280,6 @@ const std::vector<Level_QuestID_t> _Quest_Horde_10 =
 	{ 12,854}, // 十字路口之旅 |") }
 };
 
-
-
 const std::vector<Level_QuestID_t> _Quest_All =
 {
 	{ 8,357}, // 巫妖的身份 |") },
@@ -9224,21 +9222,23 @@ uint32_t DBHelper_GetPlayerProfs_Bits(Player * player)
 }
 
 const FragUpgrade_t Ability_MenuS8[PLAYER_ABILITIES_NUM_S8]=
-{  //id  multi, spellID, pointsneeded, each level.
-	{0, 1, 0, 10, 20, 9, __STR("|cff002fa7【衬衣】最高９级　|r"), __STR("级　")},
-	{1, 1, 0, 10, 20, 9, __STR("|cff002fa7【战袍】最高９级　|r"), __STR("级　")},
-	{2, 1, 0, 10, 30, 9, __STR("|cff002fa7【天赋】最高９点　|r"), __STR("点　")},
-	{3, 1, 0, 10,  5, 9, __STR("|cff002fa7【武器】最高９点　|r"), __STR("点　")},
-	{4, 1, 0, 10, 20, 9, __STR("|cff002fa7【宠物】最高９级　|r"), __STR("级　")},
-    {5, 5, 0, 5, 3, 10,  __STR("|cff002fa7【抗性】最高５０点　|r"), __STR("点　")},
-	{6, 1, 0, 2, 0, 200, __STR("|cff002fa7【力量】最高２００点　|r"), __STR("点　")},
-	{7, 1, 0, 2, 0, 200, __STR("|cff002fa7【敏捷】最高２００点　|r"), __STR("点　")},
-	{8, 1, 0, 1, 0, 400, __STR("|cff002fa7【耐力】最高４００点　|r"), __STR("点　")},
-	{9, 1, 0, 1, 0, 400, __STR("|cff002fa7【智力】最高４００点　|r"), __STR("点　")},
-   {10, 1, 0, 1, 0, 400, __STR("|cff002fa7【精神】最高４００点　|r"), __STR("点　")},
-   {11, 1, 0, 1, 0, 400, __STR("|cff002fa7【法伤】最高４００点　|r"), __STR("点　")},
-   {12, 1, 0, 1, 0, 800, __STR("|cff002fa7【攻强】最高８００点　|r"), __STR("点　")},
-   {13, 1, 0, 100, 100,  5, __STR("|cff002fa7【副本】额外最多５次　|r"), __STR("次　")},
+{  //id, enable,  multi, spellID, pointsneeded, each level, max level
+	{0, false, 1, 0, 10, 20, 9, __STR("|cff002fa7【衬衣】最高９级　|r"), __STR("级　")},
+	{1, false, 1, 0, 10, 20, 9, __STR("|cff002fa7【战袍】最高９级　|r"), __STR("级　")},
+	{2, true,  1, 0, 10, 30, 9, __STR("|cff002fa7【天赋】最高９点　|r"), __STR("点　")},
+	{3, true,  1, 0, 10,  5, 9, __STR("|cff002fa7【武器】最高９点　|r"), __STR("点　")},
+	{4, false, 1, 0, 10, 20, 9, __STR("|cff002fa7【宠物】最高９级　|r"), __STR("级　")},
+    {5, true,  5, 0, 5, 3, 10,  __STR("|cff002fa7【抗性】最高５０点　|r"), __STR("点　")},
+	{6, true,  1, 0, 2, 0, 200, __STR("|cff002fa7【力量】最高２００点　|r"), __STR("点　")},
+	{7, true,  1, 0, 2, 0, 200, __STR("|cff002fa7【敏捷】最高２００点　|r"), __STR("点　")},
+	{8, true,  1, 0, 1, 0, 400, __STR("|cff002fa7【耐力】最高４００点　|r"), __STR("点　")},
+	{9, true,  1, 0, 1, 0, 400, __STR("|cff002fa7【智力】最高４００点　|r"), __STR("点　")},
+   {10, true,  1, 0, 1, 0, 400, __STR("|cff002fa7【精神】最高４００点　|r"), __STR("点　")},
+   {11, true,  1, 0, 1, 0, 400, __STR("|cff002fa7【法伤】最高４００点　|r"), __STR("点　")},
+   {12, true,  1, 0, 1, 0, 800, __STR("|cff002fa7【攻强】最高８００点　|r"), __STR("点　")},
+   {13, true,  1, 0, 30, 100,  5, __STR("|cff002fa7【副本】额外最多５次　|r"), __STR("次　")},
+   {14, true,  1, 0, 20, 40,  4, __STR("|cff002fa7【种族特长】被动技能　|r"), __STR("级　")},
+   {15, true,  1, 0, 20, 40,  4, __STR("|cff002fa7【种族特长】主动技能　|r"), __STR("级　")},
 };
 
 //nullptr means level 60 player
@@ -9277,6 +9277,9 @@ int DBHelper_get_used_points(Player *player, int ability_type)
 		case PLAYER_USED_NUMS_AP: curpoints  = player->M_Achiv_Player_NumsAP; break;
 		case PLAYER_USED_NUMS_SP: curpoints  = player->M_Achiv_Player_NumsSP; break;
 		case PLAYER_USED_NUMS_DUNGEON_TIMES: curpoints  = player->M_Achiv_Player_DungeonTimes; break;
+		case PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE: curpoints  = player->M_Achiv_Player_RacialSpell_Passive; break;
+		case PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE: curpoints  = player->M_Achiv_Player_RacialSpell_Active; break;
+		default: break;
 	}
 	if(curpoints == 0) return 0;
 
@@ -9458,6 +9461,51 @@ uint32_t DBHelper_Inc_Farm_Times(Player *player, uint32_t maptype, uint32_t mapi
 	return 0;
 }
 
+/*        {RACE_HUMAN, {0,0}},
+        {RACE_ORC, {0,0}},
+        {RACE_DWARF, {0,0}},
+        {RACE_NIGHTELF, {0,0}},
+        {RACE_UNDEAD, {0,0}},
+        {RACE_TAUREN, {0,0}},
+        {RACE_GNOME, {0,0}},
+        {RACE_TROLL, {0,0}},*/
+const Racial_Spell_t Racial_Spells[] = {
 
+	//Alliance
+	{RACE_HUMAN, ZQ_SPELL_RACE_BONUS_START, ZQ_SPELL_RACE_BONUS_START+5 },	//
+	{RACE_NIGHTELF, ZQ_SPELL_RACE_BONUS_START + 10, ZQ_SPELL_RACE_BONUS_START + 15},
+	{RACE_DWARF, ZQ_SPELL_RACE_BONUS_START + 20, ZQ_SPELL_RACE_BONUS_START + 25},
+	{RACE_GNOME, ZQ_SPELL_RACE_BONUS_START + 30, ZQ_SPELL_RACE_BONUS_START + 35},
+
+	//Horde
+	{RACE_ORC, ZQ_SPELL_RACE_BONUS_START + 40, ZQ_SPELL_RACE_BONUS_START + 45},
+	{RACE_TAUREN, ZQ_SPELL_RACE_BONUS_START + 50, ZQ_SPELL_RACE_BONUS_START + 55},
+	{RACE_TROLL, ZQ_SPELL_RACE_BONUS_START + 60, ZQ_SPELL_RACE_BONUS_START + 65},
+	{RACE_UNDEAD, ZQ_SPELL_RACE_BONUS_START + 70, ZQ_SPELL_RACE_BONUS_START + 75}
+};
+
+void BDHelper_Learn_Race_Spells(Player *player, uint32_t passive_level, uint32_t active_level)
+{
+	//M_Achiv_Player_RacialSpell_Passive
+	//__LOG("Init the Racial spells of player %s, Race:%d, passive_level:%u, active_level:%u", player->GetName(),player->GetRace(), passive_level, active_level);
+
+	for (uint32_t i = 0; i < sizeof(Racial_Spells)/sizeof(Racial_Spells[0]); i++)
+	{
+		if (Racial_Spells[i].race == player->GetRace())
+		{
+			for(uint32_t j=0;j<5;j++) 
+			{
+				player->RemoveSpell(Racial_Spells[i].spell_passive + j);
+				player->RemoveSpell(Racial_Spells[i].spell_active + j);
+
+			}
+			player->LearnSpell(Racial_Spells[i].spell_passive + passive_level, false);
+			player->LearnSpell(Racial_Spells[i].spell_active + active_level, false);
+
+			//__LOG("Player had learnt racial spell passive:%d, active:%d", Racial_Spells[i].spell_passive + passive_level, Racial_Spells[i].spell_active + active_level);
+			break;
+		}
+	}
+}
 
 #pragma endregion

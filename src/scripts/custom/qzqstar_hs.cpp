@@ -89,6 +89,8 @@ void _Main_Menus(Player *player)
 	
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＞　副本内飞　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_VIP_TELEPORT_MAIN);
 
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, player->GetGUID());
 }
@@ -390,12 +392,14 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 	_ability_values[11] = pPlayer->M_Achiv_Player_NumsSP;
 	_ability_values[12] = pPlayer->M_Achiv_Player_NumsAP;
 	_ability_values[13] = pPlayer->M_Achiv_Player_DungeonTimes;
+	_ability_values[14] = pPlayer->M_Achiv_Player_RacialSpell_Passive;
+	_ability_values[15] = pPlayer->M_Achiv_Player_RacialSpell_Active;
 
-	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "PLAYER:[%u][%s] === chenyi:%d, zhanpao:%d, talent:%d, weapon:%d, pet:%d, kang:%d, strength:%d, agility:%d, stamina:%d, intellect:%d, spirit:%d, sp:%d, ap:%d, dungeonTimes:%d",
+	sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "PLAYER:[%u][%s] === chenyi:%d, zhanpao:%d, talent:%d, weapon:%d, pet:%d, kang:%d, strength:%d, agility:%d, stamina:%d, intellect:%d, spirit:%d, sp:%d, ap:%d, dungeonTimes:%d, passive:%d, active:%d",
 		pPlayer->GetGUID(), pPlayer->GetName(),
 		_ability_values[0], _ability_values[1], _ability_values[2], _ability_values[3], _ability_values[4],
 		_ability_values[5], _ability_values[6], _ability_values[7], _ability_values[8], _ability_values[9],
-		_ability_values[10], _ability_values[11], _ability_values[12], _ability_values[13]);
+		_ability_values[10], _ability_values[11], _ability_values[12], _ability_values[13], _ability_values[14], _ability_values[15]);
 
 	//Main action, display the menus
 	if(abs_action == 0)
@@ -410,10 +414,10 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR((" ")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＞　账号成就　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + 10);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＞　兑换点数　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + 14);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＞　分配点数　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + 20);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＞　重置点数　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + 30);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＞　账号成就　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + 10);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＞　兑换点数　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + 14);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＞　分配点数　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + 20);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＞　重置点数　＜＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + 30);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,       __STR(" "), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,       __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1,  __STR(__RED("＝＝　领取成就称号　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + 40);
@@ -518,7 +522,7 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 						}
 						case ACHIEVEMENT_ACCOUNT_EQ_NUMS:
 						{
-							if (_realBonus)
+							if (_realBonus && (player->M_Achiv_Account_EQ_Nums < 500))
 							{
 								player->M_Achiv_Account_EQ_Nums += _realBonus;
 								player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + _pos, true);
@@ -586,7 +590,26 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 	{
 		//display the menus
 		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝　点击字条、分配点数　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
-		for (size_t i = 0; i < PLAYER_ABILITIES_NUM_S8; i++)
+		#define PAGE_SIZE (PLAYER_ABILITIES_NUM_S8)
+		for (size_t i = 0; i < PAGE_SIZE; i++)
+		{
+			text = __STR(Ability_MenuS8[i].desc);
+			text.append(__STR("|cff002fa7当前：　"));
+			text.append(__NSTR(_ability_values[i] * Ability_MenuS8[i].multi));
+			text.append(__STR(Ability_MenuS8[i].unit));
+			text.append(__STR("|r"));
+			if(Ability_MenuS8[i].enable) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + i*10 + 100);	
+		}
+		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝　下一页　＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + 21);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝　返回　＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
+
+		pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+		return;
+	}else if (abs_action == 21)
+	{
+		//display the menus
+		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝　点击字条、分配点数　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		for (size_t i = PAGE_SIZE; i < PLAYER_ABILITIES_NUM_S8; i++)
 		{
 			text = __STR(Ability_MenuS8[i].desc);
 			text.append(__STR("|cff002fa7当前：　"));
@@ -595,6 +618,7 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 			text.append(__STR("|r"));
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + i*10 + 100);	
 		}
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝　上一页　＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + 20);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝　返回　＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
 
 		pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
@@ -623,7 +647,7 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 		uint32 _realAction = (abs_action - 100) / 10;
 		if (_realAction >= PLAYER_ABILITIES_NUM_S8) return;
 
-		sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[qzqstar_hs] ERROR Player:[%s] === Aciton:%d, Upgrade ability: %d", pPlayer->GetName(), action, _realAction);
+		//sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[qzqstar_hs] Player:[%s] === Aciton:%d, Upgrade ability: %d", pPlayer->GetName(), action, _realAction);
 
 		//check if abs_action is ended by zero
 		//100 -> means the menu display,
@@ -651,7 +675,7 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 			text = "";
-			text = __STR("|cff002fa7需要消耗成就：　");
+			text = __STR("|cff002fa7需要金币和成就：　");
 			text.append(__NSTR(_achieve_num));
 			text.append(__STR("　|r"));
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -663,7 +687,9 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 			{
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__RED("＝＝该字条已经阶段满级＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
 			}
-			else if (pPlayer->M_Achiv_Account_Sum > pPlayer->M_Achiv_Player_Used && pPlayer->M_Achiv_Account_Sum - pPlayer->M_Achiv_Player_Used >= _achieve_num)
+			//check gold
+			else if ((pPlayer->GetMoney() > _achieve_num * 10000)
+				&&(pPlayer->M_Achiv_Account_Sum > pPlayer->M_Achiv_Player_Used && pPlayer->M_Achiv_Account_Sum - pPlayer->M_Achiv_Player_Used >= _achieve_num))
 			{
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__BLUE("＝＝＝＝　升级一次　＝＝＝＝　")), GOSSIP_SENDER_MAIN, action + 1);
 				if(Ability_MenuS8[_realAction].pointsNeed <= 2)
@@ -673,7 +699,7 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 			}	
 			else
 			{
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__RED("＝＝＝＝　成就不足，返回　＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__RED("＝＝　成就或者金币不足，返回　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
 			}
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝＝＝　返回　＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
@@ -683,6 +709,13 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 		{
 			//check if has enough achievement and not exceed the max points
 			uint32_t _add_points = (abs_action %10 == 1) ? 1 : 10;
+
+			if(pPlayer->GetMoney() < _achieve_num * 10000 * _add_points)
+			{
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__RED("＝＝　金币不足，返回　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+				return;
+			}
 
 			if(_ability_values[_realAction]  + _add_points > Ability_MenuS8[_realAction].maxpoints)
 			{
@@ -702,6 +735,9 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 			//mostly, the add points is 1.
 			pPlayer->M_Achiv_Player_Used += _achieve_num * _add_points;
 
+			//substract the money
+			pPlayer->ModifyMoney(-_achieve_num * 10000 * _add_points);
+
 			//save to pPlayer->M_Achiv * back
 			pPlayer->M_Achiv_Player_Chenyi = _ability_values[0];
 			pPlayer->M_Achiv_Player_Zhanpao = _ability_values[1];
@@ -717,13 +753,15 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 			pPlayer->M_Achiv_Player_NumsSP = _ability_values[11];
 			pPlayer->M_Achiv_Player_NumsAP = _ability_values[12];		
 			pPlayer->M_Achiv_Player_DungeonTimes = _ability_values[13];
+			pPlayer->M_Achiv_Player_RacialSpell_Passive = _ability_values[14];
+			pPlayer->M_Achiv_Player_RacialSpell_Active = _ability_values[15];
 
 			//check real action if chenyi and zhanpao
-			if(_realAction == 0) 		pPlayer->AddItem(ZQ_ITEM_CHENYI + pPlayer->M_Achiv_Player_Chenyi);
-			else if(_realAction == 1) 	pPlayer->AddItem(ZQ_ITEM_ZHANPAO + pPlayer->M_Achiv_Player_Zhanpao);
+			//if(_realAction == 0) 		pPlayer->AddItem(ZQ_ITEM_CHENYI + pPlayer->M_Achiv_Player_Chenyi);
+			//else if(_realAction == 1) 	pPlayer->AddItem(ZQ_ITEM_ZHANPAO + pPlayer->M_Achiv_Player_Zhanpao);
 
 			//__LOG("Player %s upgrade ability %d, need %d achievements", pPlayer->GetName(), _realAction, _achieve_num);
-			Helper_Chat(pPlayer, Helper_MakeString(" ", ">>> 你升级 %u 倍消耗成就点数： %u 剩余点数： %u ", abs_action %10 == 1?1:10,  _achieve_num * _add_points, pPlayer->M_Achiv_Account_Sum - pPlayer->M_Achiv_Player_Used).c_str());
+			Helper_Chat(pPlayer, Helper_MakeString(" ", ">>> 你升级 %u 倍消耗成就点数： %u 剩余点数： %u  注意：加点小退生效。  ", abs_action %10 == 1?1:10,  _achieve_num * _add_points, pPlayer->M_Achiv_Account_Sum - pPlayer->M_Achiv_Player_Used).c_str());
 			//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG,  __STR(__RED("＝＝　重复操作（注意点数）＝＝　")), GOSSIP_SENDER_MAIN, action);
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__BLUE("＝＝＝＝＝　返回继续　＝＝＝＝　")), GOSSIP_SENDER_MAIN, action /10 * 10);
 			
@@ -738,16 +776,16 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 #pragma region MENU FRAGMENTS
 const FragUpgrade_t _Ability_Menu[_ABILITIES_NUM]=
 {
-	{0, 2, 0,0,0, ZQ_SPELL_PROMOTION_STAT,   __STR("|cff002fa7【属性】最高１０％　|r"), __STR("％　")},
-	{1, 2, 0,0,0, ZQ_SPELL_PROMOTION_DAMAGE, __STR("|cff002fa7【伤害】最高１０％　|r"), __STR("％　")},
-	{2, 4, 0,0,0, ZQ_SPELL_PROMOTION_CRITDM, __STR("|cff002fa7【暴伤】最高２０％　|r"), __STR("％　")},
-	{3, 2, 0,0,0, ZQ_SPELL_PROMOTION_VOIDAM,  __STR("|cff002fa7【免伤】最高１０％　|r"), __STR("％　")},
-	{4, 4, 0,0,0, ZQ_SPELL_PROMOTION_HASTE,  __STR("|cff002fa7【急速】最高２０％　|r"), __STR("％　")},
-	{5, 10, 0, 0,0,0, __STR("|cff002fa7【移速】最高５０％　|r"), __STR("％　")},
-	{6, 1, 0, 0,0,0, __STR("|cff002fa7【天赋】最高５点　|r"), __STR("点　")},
-	{7, 2, 0, 0,0,0, __STR("|cff002fa7【物理吸血】最高１０％　|r"), __STR("％　")},
-	{8, 2, 0, 0,0,0, __STR("|cff002fa7【法术吸血】最高１０％　|r"), __STR("％　")},
-	{9, 2, 0, 0,0,0, __STR("|cff002fa7【武器技能】最高１０点　|r"), __STR("点　")}
+	{0, true, 2, 0,0,0, ZQ_SPELL_PROMOTION_STAT,   __STR("|cff002fa7【属性】最高１０％　|r"), __STR("％　")},
+	{1, true, 2, 0,0,0, ZQ_SPELL_PROMOTION_DAMAGE, __STR("|cff002fa7【伤害】最高１０％　|r"), __STR("％　")},
+	{2, true, 4, 0,0,0, ZQ_SPELL_PROMOTION_CRITDM, __STR("|cff002fa7【暴伤】最高２０％　|r"), __STR("％　")},
+	{3, true, 2, 0,0,0, ZQ_SPELL_PROMOTION_VOIDAM,  __STR("|cff002fa7【免伤】最高１０％　|r"), __STR("％　")},
+	{4, true, 4, 0,0,0, ZQ_SPELL_PROMOTION_HASTE,  __STR("|cff002fa7【急速】最高２０％　|r"), __STR("％　")},
+	{5, true, 10, 0, 0,0,0, __STR("|cff002fa7【移速】最高５０％　|r"), __STR("％　")},
+	{6, true, 1, 0, 0,0,0, __STR("|cff002fa7【天赋】最高５点　|r"), __STR("点　")},
+	{7, true, 2, 0, 0,0,0, __STR("|cff002fa7【物理吸血】最高１０％　|r"), __STR("％　")},
+	{8, true, 2, 0, 0,0,0, __STR("|cff002fa7【法术吸血】最高１０％　|r"), __STR("％　")},
+	{9, true, 2, 0, 0,0,0, __STR("|cff002fa7【武器技能】最高１０点　|r"), __STR("点　")}
 };
 const int __PLAYER_NUM[5] = {1, 15, 25, 45, 60};
 

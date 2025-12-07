@@ -3380,7 +3380,7 @@ void Player::GiveLevel(uint32 level)
     //S8: add item box for new bie
     if(level <= 12)
     {
-        AddItem(ZQ_ITEM_NEWBIE_BOX, 1);
+        AddItem(ZQ_ITEM_NEWBIE_BOX_LEVELUP, 1);
         Helper_Chat(this, ">> 恭喜升级，获得新手装备奖励，请查收背包！  ");
     }
 }
@@ -13737,15 +13737,18 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
 
 	if (true)
     {
-        //old traditional quests
-        if(quest_id < 12000)
+        //old traditional quests, choice items.
+        //if(quest_id < 10000)
+        if(true)
         {
             if (uint32 itemId = pQuest->RewChoiceItemId[reward])
             {
                 ItemPosCountVec dest;
                 if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewChoiceItemCount[reward]) == EQUIP_ERR_OK)
                 {
-                    Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+                    //S8 -- add hero enchant as well.
+                    //Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update, int32 randomPropertyId, int32 item_difficulty)
+                    Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId), 1 /* difficulty */);
 
                     //qzqstar, 241208, try fix errors..
                     if (item && (item->GetProto()))
@@ -13761,9 +13764,11 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
                 }
             }
         }
+        /*
         else
         // custome quests larger than 12000 id..
 		// qzqstar, 240413, fix the RewItems counts = 4
+        
         {
             for (size_t i = 0; i < 4; i++)
             {
@@ -13789,6 +13794,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
                 }
             }
         }
+        */
     }
 
 	//qzqstar, set to true always
@@ -13804,7 +13810,8 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
                 ItemPosCountVec dest;
                 if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewItemCount[i]) == EQUIP_ERR_OK)
                 {
-                    Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+                    //Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+                    Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId), 1 /* difficulty */);
 
 					//qzqstar, 241208, try fix errors..
 					if (item && (item->GetProto()))
@@ -15500,7 +15507,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     /* 12 */M_Achiv_Account_EQ_Nums = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_EQ_NUMS);
     /* 13 */M_Achiv_Account_Bonus_Nums = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_BONUS_NUMS);
     /* 14 */M_Achiv_Account_REWARD = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DAILY_REWARD);
-
+    /* 15 */M_Achiv_Account_Task_Custom_MaxID = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_TASK_CUSTOM_MAXID); //Custom Task done by accounts, max ID
 
     //bitwise for the reputation list, professional list
     M_Achiv_Account_Reputation_List |= DBHelper_GetPlayerReputation_Bits(this);
@@ -15521,7 +15528,15 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     M_Achiv_Player_NumsAP = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_AP);
     M_Achiv_Player_NumsSP = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_SP);
     M_Achiv_Player_DungeonTimes = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_DUNGEON_TIMES);
+    M_Achiv_Player_RacialSpell_Passive = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE);
+    M_Achiv_Player_RacialSpell_Active = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE);
+
+    //No Points caculate
+    M_Achiv_Player_Custom_TaskID = sQZAchievements.GetPlayerData(this, PLAYER_USED_CUSTOM_TASKID); //Current Custom task ID for this player 
     M_Challenge_Mode = sQZAchievements.GetPlayerData(this, PLAYER_USED_CHALLGE_MODE);
+
+    //compare and set the Max ID of Account
+    if(M_Achiv_Account_Task_Custom_MaxID < M_Achiv_Player_Custom_TaskID) M_Achiv_Account_Task_Custom_MaxID = M_Achiv_Player_Custom_TaskID;
 
 	M_Achiv_Account_Sum = sQZAchievements.GetAccountSum(this);
     M_Achiv_Player_Used = sQZAchievements.GetPlayerSum(this);
@@ -16056,6 +16071,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if((M_Achiv_Account_VIP & VIP_SPECIAL_SPELL_HASTE) && (!HasSpell(ZQ_SPELL_VIP_HASTE_ONOFF)))  LearnSpell(ZQ_SPELL_VIP_HASTE_ONOFF, false);
     if((M_Challenge_Mode & CHALLENGING_MODE_ASCE) && (!HasSpell(ZQ_SPELL_CHALLENGE_BONUS_ASCE)))  LearnSpell(ZQ_SPELL_CHALLENGE_BONUS_ASCE, false);
 
+    //Learn Spells according to player race
+    BDHelper_Learn_Race_Spells(this, M_Achiv_Player_RacialSpell_Passive, M_Achiv_Player_RacialSpell_Active);
+
 
     if(_explCount > M_Achiv_Account_Explore)   M_Achiv_Account_Explore = _explCount;
     if(M_Custom_Quest_Done > M_Achiv_Account_Task)  M_Achiv_Account_Task = M_Custom_Quest_Done;
@@ -16063,15 +16081,17 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     
     if(IsGameMaster())
     {
-        Helper_Chat(this, Helper_MakeString("","详细数据：Player :%s,  VIP:%u,\
-            Task:%u, Explore:%u, Pet:%u, Reputation:%u, Profession:%u, Killing:%u, \
-            PVP:%u, Gold:%u, Dungeon1:%u, Dungeon2:%u, maxlevel:%u, EQ:%u, Bonus:%u, Reward:%u.",
-            GetName(), M_Achiv_Account_VIP,
+        Helper_Chat(this, Helper_MakeString("","VIP:%u,\
+            Task:%u, Explore:%u, Pet:%u, Rep:%u, Prof:%u, Kill:%u, \
+            PVP:%u, Gold:%u, DG1:%u, DG2:%u, maxLVL:%u, EQ:%u, Bonus:%u, Reward:%u, Pasv:%u, Actv:%u, TaskID:%u(AccMAX:%d)",
+            M_Achiv_Account_VIP,
             M_Achiv_Account_Task, M_Achiv_Account_Explore, M_Achiv_Account_Pet_Collection, 
             M_Achiv_Account_Reputation_List, M_Achiv_Account_Profession_Skill,
             M_Achiv_Account_Killing_Nums, M_Achiv_Account_PVP_Nums, M_Achiv_Account_Gold_Collect, 
             M_Achiv_Account_Dungeon_NUMS1, M_Achiv_Account_Dungeon_NUMS2, M_Achiv_Account_Max_Level,
-            M_Achiv_Account_EQ_Nums, M_Achiv_Account_Bonus_Nums, M_Achiv_Account_REWARD).c_str());
+            M_Achiv_Account_EQ_Nums, M_Achiv_Account_Bonus_Nums, M_Achiv_Account_REWARD, 
+            M_Achiv_Player_RacialSpell_Passive, M_Achiv_Player_RacialSpell_Active,
+            M_Achiv_Player_Custom_TaskID, M_Achiv_Account_Task_Custom_MaxID).c_str());
     }
 	//2. check if has chenyi or zhanpao of that level
 	//   get the pos and check if's same with ID ... plus level_chenyi/zhanpao
@@ -17588,6 +17608,8 @@ void Player::SaveToDB(bool online, bool force)
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_EQ_NUMS, M_Achiv_Account_EQ_Nums);
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_BONUS_NUMS, M_Achiv_Account_Bonus_Nums);
     sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DAILY_REWARD, M_Achiv_Account_REWARD);
+    sQZAchievements.SetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_TASK_CUSTOM_MAXID, M_Achiv_Account_Task_Custom_MaxID);
+    
 
     //set the player data
     sQZAchievements.SetPlayerData(this, PLAYER_USED_LEVEL_CHENYI, M_Achiv_Player_Chenyi);
@@ -17603,6 +17625,10 @@ void Player::SaveToDB(bool online, bool force)
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_SPIRIT, M_Achiv_Player_NumsSpirit);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_AP, M_Achiv_Player_NumsAP);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_SP, M_Achiv_Player_NumsSP);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_DUNGEON_TIMES, M_Achiv_Player_DungeonTimes);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE, M_Achiv_Player_RacialSpell_Passive);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE, M_Achiv_Player_RacialSpell_Active);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_CUSTOM_TASKID, M_Achiv_Player_Custom_TaskID);
     
 	sQZAchievements.Save(this);
 

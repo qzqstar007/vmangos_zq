@@ -163,8 +163,9 @@ uint32 QzqstarAchievements::GetAccAchieveData(Player * _player, uint32 type)
 	switch(type)
 	{
 		case ACHIEVEMENT_ACCOUNT_VIP:				_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data0; break;
-		case ACHIEVEMENT_ACCOUNT_TASK:				_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data1; break;
-		case ACHIEVEMENT_ACCOUNT_EXPLORE:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data2; break;
+		case ACHIEVEMENT_ACCOUNT_TASK:				_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data1 / 1000; break;
+		case ACHIEVEMENT_ACCOUNT_EXPLORE:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data1 % 1000; break;   //data 2, spared. 20251206
+		case ACHIEVEMENT_ACCOUNT_TASK_CUSTOM_MAXID: _data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data2 % 10000; break;
 		case ACHIEVEMENT_ACCOUNT_PET_COLLECTION:	_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data3; break;
 		case ACHIEVEMENT_ACCOUNT_REPUTATION_LIST:	_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data4; break;
 		case ACHIEVEMENT_ACCOUNT_PROFESSION_SKILL:	_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data5; break;
@@ -173,9 +174,9 @@ uint32 QzqstarAchievements::GetAccAchieveData(Player * _player, uint32 type)
 		case ACHIEVEMENT_ACCOUNT_GOLD_COLLECT:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data8; break;
 		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data9; break;
 		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data10; break;
-		case ACHIEVEMENT_ACCOUNT_MAX_LEVEL:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data11; break;
-		case ACHIEVEMENT_ACCOUNT_EQ_NUMS:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data12; break;
-		case ACHIEVEMENT_ACCOUNT_BONUS_NUMS:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data14; break;
+		case ACHIEVEMENT_ACCOUNT_MAX_LEVEL:			_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data11/1000000; break; //combine the eq, bonus as well
+		case ACHIEVEMENT_ACCOUNT_EQ_NUMS:			_data = (_player->M_Achievements[ACHIEVEMENT_ACCOUNT].data11/1000)%1000; break;
+		case ACHIEVEMENT_ACCOUNT_BONUS_NUMS:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data11%1000; break;   //data12/13/14 spared.
 		case ACHIEVEMENT_ACCOUNT_DAILY_REWARD:		_data = _player->M_Achievements[ACHIEVEMENT_ACCOUNT].data15; break;
 		default:  
 			__LOG("[QzqstarAchievements::GetAccAchieveData] Not found data for player:%s, type:%d", _player->GetName(), type);
@@ -197,8 +198,9 @@ void QzqstarAchievements::SetAccAchieveData(Player * _player, uint32 type, uint3
 	switch(type)
 	{
 		case ACHIEVEMENT_ACCOUNT_VIP:			e.data0 = data; break;
-		case ACHIEVEMENT_ACCOUNT_TASK:			e.data1 = data; break;
-		case ACHIEVEMENT_ACCOUNT_EXPLORE:			e.data2 = data; break;
+		case ACHIEVEMENT_ACCOUNT_TASK:				e.data1 = data * 1000 + (e.data1 % 1000); break;
+		case ACHIEVEMENT_ACCOUNT_EXPLORE:			e.data1 = (e.data1 / 1000) * 1000 + data; break;   //data 2, spared. 20251206
+		case ACHIEVEMENT_ACCOUNT_TASK_CUSTOM_MAXID: e.data2 = e.data2/10000 * 10000 + data; break;	//data2, lowest 9999 for custom task maxid
 		case ACHIEVEMENT_ACCOUNT_PET_COLLECTION:	e.data3 = data; break;
 		case ACHIEVEMENT_ACCOUNT_REPUTATION_LIST:	e.data4 = data; break;
 		case ACHIEVEMENT_ACCOUNT_PROFESSION_SKILL:	e.data5 = data; break;
@@ -207,9 +209,9 @@ void QzqstarAchievements::SetAccAchieveData(Player * _player, uint32 type, uint3
 		case ACHIEVEMENT_ACCOUNT_GOLD_COLLECT:	e.data8 = data; break;
 		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS1:	e.data9 = data; break;
 		case ACHIEVEMENT_ACCOUNT_DUNGEON_NUMS2:	e.data10 = data; break;
-		case ACHIEVEMENT_ACCOUNT_MAX_LEVEL:		e.data11 = data; break;
-		case ACHIEVEMENT_ACCOUNT_EQ_NUMS:			e.data12 = data; break;
-		case ACHIEVEMENT_ACCOUNT_BONUS_NUMS:			e.data14 = data; break;
+		case ACHIEVEMENT_ACCOUNT_MAX_LEVEL:				e.data11 = data*1000000 + e.data11%1000000; break; //combine the eq, bonus as well
+		case ACHIEVEMENT_ACCOUNT_EQ_NUMS:				e.data11 = (e.data11/1000000)*1000000 + data * 1000 + e.data11%1000; break;
+		case ACHIEVEMENT_ACCOUNT_BONUS_NUMS:			e.data11 = (e.data11/1000)*1000 + data; break; 
 		case ACHIEVEMENT_ACCOUNT_DAILY_REWARD:			e.data15 = data; break;
 		default:  
 			__LOG("[QzqstarAchievements::SetAccAchieveData] Not found data for player:%s, type:%d", _player->GetName(), type);
@@ -279,6 +281,8 @@ uint32 QzqstarAchievements::GetAccountSum(Player * _player)
 	//data11 - max levels 
 	//if(_player->M_Achiv_Account_Max_Level > 500) sum += 500;
 	//else sum += _player->M_Achiv_Account_Max_Level;		
+	if(_player->M_Achiv_Account_Task_Custom_MaxID > 1000)  sum += 1000;
+	else sum += _player->M_Achiv_Account_Task_Custom_MaxID;
 	
 	//data12 - equipments
 	if(_player->M_Achiv_Account_EQ_Nums > 500) sum += 500;
@@ -353,8 +357,11 @@ uint32 QzqstarAchievements::GetPlayerData(Player * _player, uint32 type)
 		case PLAYER_USED_NUMS_SPIRIT:			_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data2 )%1000; break;
 		case PLAYER_USED_NUMS_SP:				_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data3 / 1000)%1000; break;
 		case PLAYER_USED_NUMS_AP:				_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data3 )%1000; break;
+		case PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE:	_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data4 / 10)%10; break; //use the least two digits
+		case PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE:	_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data4 )%10; break;
 
 		case PLAYER_USED_CHALLGE_MODE:			_data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data9; break;
+		case PLAYER_USED_CUSTOM_TASKID:			_data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data10; break; 
 		default:  
 			__LOG("[QzqstarAchievements::GetPlayerData] Not found data for player:%s, type:%d", _player->GetName(), type);
 			break;
@@ -455,9 +462,30 @@ void QzqstarAchievements::SetPlayerData(Player * _player, uint32 type, uint32 da
 			break;
 		}
 
+		case PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE:
+		case PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE:
+		{
+			uint32 _data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data4;
+			uint32 _passive = (_data / 10) % 10;
+			uint32 _active = (_data ) % 10;
+			switch(type)
+			{
+				case PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE:	_passive = data; break;
+				case PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE:	_active = data; break;
+			}
+			_data = _passive * 10 + _active;
+			_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data4 = _data;
+			break;
+		}
+
 		case PLAYER_USED_CHALLGE_MODE:
 		{
 			_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data9 = data; 
+			break;
+		}
+		case PLAYER_USED_CUSTOM_TASKID:
+		{
+			_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data10 = data; 
 			break;
 		}
 		
@@ -479,7 +507,7 @@ uint32 QzqstarAchievements::GetPlayerSum(Player * _player)
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_ZHANPAO);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_TALENT);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_WEAPON);
-	sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_PET);
+	//sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_PET);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_RESISTANCE);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_STRENGTH);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_AGILITY);
@@ -488,6 +516,9 @@ uint32 QzqstarAchievements::GetPlayerSum(Player * _player)
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_SPIRIT);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_AP);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_SP);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_DUNGEON_TIMES);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE);
 
 	return sum;
 }

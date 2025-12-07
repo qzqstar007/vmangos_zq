@@ -67,7 +67,7 @@
 
 #define ZQ_ITEM_TURTLE              30066   //Turtle, 乌龟
 //Bonus Box
-#define ZQ_ITEM_NEWBIE_BOX          30078
+#define ZQ_ITEM_NEWBIE_BOX_LEVELUP          30078
 #define ZQ_ITEM_BONUS_BOX			30088	//Bonus Box, 奖励宝箱 ~ 30061
 
 //raid Reset 
@@ -554,23 +554,11 @@ dropped good nice pets
 
 */
 
-/* Spell Enchanced.
-7744
-20555
-20575 20576 21563
-20591
-20580
-20549
-20595
-20550
-20572
-20582
-20589
-20577
-20598
-20594
-26296 26297 20554
-20600
+/* Racial Spells removed at s8.
+delete from playercreateinfo_spell
+where spell in (
+7744, 20555, 20575, 20576, 21563, 20591, 20580, 20549, 20595, 20550, 20572, 20582, 20589, 20577, 20598, 20594, 26296, 26297, 20554, 20600
+);
 */
 
 

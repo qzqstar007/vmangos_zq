@@ -55,6 +55,7 @@ enum Achievement_t
 #define ACHIEVEMENT_ACCOUNT_EQ_NUMS				(12)	
 #define ACHIEVEMENT_ACCOUNT_BONUS_NUMS			(14)
 #define ACHIEVEMENT_ACCOUNT_DAILY_REWARD				(15)
+#define ACHIEVEMENT_ACCOUNT_TASK_CUSTOM_MAXID			(16)		//Custom Task done by accounts, max ID
 
 //Player Used Data
 //need caculate and compare with account data
@@ -62,20 +63,23 @@ enum Achievement_t
 #define PLAYER_USED_LEVEL_ZHANPAO				(1)
 #define PLAYER_USED_NUMS_TALENT					(2)
 #define PLAYER_USED_LEVEL_WEAPON				(3)
-#define PLAYER_USED_LEVEL_PET					(4)
-#define PLAYER_USED_NUMS_RESISTANCE					(5)
-#define PLAYER_USED_NUMS_STRENGTH				(6)
-#define PLAYER_USED_NUMS_AGILITY				(7)
-#define PLAYER_USED_NUMS_STAMINA				(8)
-#define PLAYER_USED_NUMS_INTELLECT				(9)
-#define PLAYER_USED_NUMS_SPIRIT					(10)
-#define PLAYER_USED_NUMS_SP						(11)
-#define PLAYER_USED_NUMS_AP						(12)
-#define PLAYER_USED_NUMS_DUNGEON_TIMES			(13)
+#define PLAYER_USED_LEVEL_PET					(99)	//not used
+#define PLAYER_USED_NUMS_RESISTANCE				(4)
+#define PLAYER_USED_NUMS_STRENGTH				(5)
+#define PLAYER_USED_NUMS_AGILITY				(6)
+#define PLAYER_USED_NUMS_STAMINA				(7)
+#define PLAYER_USED_NUMS_INTELLECT				(8)
+#define PLAYER_USED_NUMS_SPIRIT					(9)
+#define PLAYER_USED_NUMS_SP						(10)
+#define PLAYER_USED_NUMS_AP						(11)
+#define PLAYER_USED_NUMS_DUNGEON_TIMES			(12)
+#define PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE	(13)
+#define PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE	(14)
 
 
 //don't need caculate
 #define PLAYER_USED_CHALLGE_MODE				(90)
+#define PLAYER_USED_CUSTOM_TASKID				(100)	//Current Custom task ID for this player 
 
 
 //VIP Features
@@ -106,7 +110,7 @@ enum Achievement_t
 #define CHALLENGING_MODE_MANUFACT		(0x0002)
 #define CHALLENGING_MODE_EQUIPMENT		(0x0004)
 #define CHALLENGING_MODE_TASK			(0x0008)
-#define ZQ_SPELL_CHALLENGE_BONUS_RICH			(0x0010)
+#define CHALLENGING_MODE_RICH			(0x0010)
 #define CHALLENGING_MODE_KILLER_HUMAN	(0x0020)
 #define CHALLENGING_MODE_KILLER_BEAST	(0x0040)
 #define CHALLENGING_MODE_KILLER_UNDEAD	(0x0080)

@@ -211,6 +211,18 @@ void ObjectMgr::LoadAllIdentifiers()
         } while (result->NextRow());
     }
 
+    //s8, custom quest_template
+    result = WorldDatabase.Query("SELECT DISTINCT `entry` FROM `quest_template_custom`");
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 id = fields[0].GetUInt32();
+            m_QuestIdSet.insert(id);
+        } while (result->NextRow());
+    }
+
     m_CreatureIdSet.clear();
     result = WorldDatabase.Query("SELECT DISTINCT `entry` FROM `creature_template`");
 
@@ -6373,9 +6385,10 @@ void ObjectMgr::LoadQuests()
     m_ExclusiveQuestGroups.clear();
 
 	//qzqstar, 250329, remove the quests that larger than some ID
-#define __USER_CUSTOM_QUEST_ID	(12000)
+    #define __USER_CUSTOM_QUEST_ID	(10000)
 	CharacterDatabase.PExecute("DELETE FROM `character_queststatus` WHERE `quest` > '%u'", __USER_CUSTOM_QUEST_ID);
 
+    // Normal quest template
     //                                                                0        1         2             3           4             5       6                  7                8                9
     std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `Method`, `ZoneOrSort`, `MinLevel`, `QuestLevel`, `Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`,"
     //                      10                     11                   12                       13                     14                       15                     16                  17
@@ -6437,8 +6450,70 @@ void ObjectMgr::LoadQuests()
     }
     while (result->NextRow());
 
-    // Post processing
+    //s8. add the quest_template_custom support
+std::unique_ptr<QueryResult> result_custom(WorldDatabase.PQuery("SELECT `entry`, `Method`, `ZoneOrSort`, `MinLevel`, `QuestLevel`, `Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`,"
+    //                      10                     11                   12                       13                     14                       15                     16                  17
+                          "`RepObjectiveFaction`, `RepObjectiveValue`, `RequiredMinRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepFaction`, `RequiredMaxRepValue`, `SuggestedPlayers`, `LimitTime`,"
+    //                      18            19              20             21             22                23                  24           25              26
+                          "`QuestFlags`, `SpecialFlags`, `PrevQuestId`, `NextQuestId`, `ExclusiveGroup`, `NextQuestInChain`, `SrcItemId`, `SrcItemCount`, `SrcSpell`,"
+    //                      27       28         29            30                 31                  32         33                34                35                36
+                          "`Title`, `Details`, `Objectives`, `OfferRewardText`, `RequestItemsText`, `EndText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`,"
+    //                      37            38            39            40            41               42               43               44
+                          "`ReqItemId1`, `ReqItemId2`, `ReqItemId3`, `ReqItemId4`, `ReqItemCount1`, `ReqItemCount2`, `ReqItemCount3`, `ReqItemCount4`,"
+    //                      45              46              47              48              49                 50                 51                 52
+                          "`ReqSourceId1`, `ReqSourceId2`, `ReqSourceId3`, `ReqSourceId4`, `ReqSourceCount1`, `ReqSourceCount2`, `ReqSourceCount3`, `ReqSourceCount4`,"
+    //                      53                    54                    55                    56                    57                       58                       59                       60
+                          "`ReqCreatureOrGOId1`, `ReqCreatureOrGOId2`, `ReqCreatureOrGOId3`, `ReqCreatureOrGOId4`, `ReqCreatureOrGOCount1`, `ReqCreatureOrGOCount2`, `ReqCreatureOrGOCount3`, `ReqCreatureOrGOCount4`,"
+    //                      61               62               63               64
+                          "`ReqSpellCast1`, `ReqSpellCast2`, `ReqSpellCast3`, `ReqSpellCast4`,"
+    //                      65                  66                  67                  68                  69                  70
+                          "`RewChoiceItemId1`, `RewChoiceItemId2`, `RewChoiceItemId3`, `RewChoiceItemId4`, `RewChoiceItemId5`, `RewChoiceItemId6`,"
+    //                      71                     72                     73                     74                     75                     76
+                          "`RewChoiceItemCount1`, `RewChoiceItemCount2`, `RewChoiceItemCount3`, `RewChoiceItemCount4`, `RewChoiceItemCount5`, `RewChoiceItemCount6`,"
+    //                      77            78            79            80            81               82               83               84
+                          "`RewItemId1`, `RewItemId2`, `RewItemId3`, `RewItemId4`, `RewItemCount1`, `RewItemCount2`, `RewItemCount3`, `RewItemCount4`,"
+    //                      85                86                87                88                89                90              91              92              93              94
+                          "`RewRepFaction1`, `RewRepFaction2`, `RewRepFaction3`, `RewRepFaction4`, `RewRepFaction5`, `RewRepValue1`, `RewRepValue2`, `RewRepValue3`, `RewRepValue4`, `RewRepValue5`,"
+    //                      95               96                  97          98              99                   100                 101           102       103       104
+                          "`RewOrReqMoney`, `RewMoneyMaxLevel`, `RewSpell`, `RewSpellCast`, `RewMailTemplateId`, `RewMailDelaySecs`, `PointMapId`, `PointX`, `PointY`, `PointOpt`,"
+    //                      105              106              107              108              109                   110                   111                   112
+                          "`DetailsEmote1`, `DetailsEmote2`, `DetailsEmote3`, `DetailsEmote4`, `DetailsEmoteDelay1`, `DetailsEmoteDelay2`, `DetailsEmoteDelay3`, `DetailsEmoteDelay4`,"
+    //                      113                114              115                  116                  117                  118
+                          "`IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`,"
+    //                      119                       120                       121                       122
+                          "`OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`,"
+    //                      123            124               125         126             127      128                  129                     130
+                          "`StartScript`, `CompleteScript`, `MaxLevel`, `RewMailMoney`, `RewXP`, `RequiredCondition`, `BreadcrumbForQuestId`, `RewRepSpilloverMask`"
+                          " FROM `quest_template_custom` t1 WHERE `patch`=(SELECT max(`patch`) FROM `quest_template_custom` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
+    if (!result_custom)
+    {
+        BarGoLink bar(1);
+        bar.step();
 
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 custom quests definitions");
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`quest_template_custom` table is empty!");
+        return;
+    }
+
+    // create multimap previous quest for each existing quest
+    // some quests can have many previous maps set by NextQuestId in previous quest
+    // for example set of race quests can lead to single not race specific quest
+    BarGoLink bar_custom(result_custom->GetRowCount());
+    do
+    {
+		bar_custom.step();
+        Field* fields = result_custom->Fetch();
+
+        std::unique_ptr<Quest> newQuest = std::make_unique<Quest>(fields);
+        m_QuestTemplatesMap[newQuest->GetQuestId()] = std::move(newQuest);
+    }
+    while (result_custom->NextRow());
+
+    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`quest_template_custom` table Load complete! Counts:%d", result_custom->GetRowCount());
+
+
+    // Post processing
     std::map<uint32, uint32> usedMailTemplates;
 
     for (auto& iter : m_QuestTemplatesMap)

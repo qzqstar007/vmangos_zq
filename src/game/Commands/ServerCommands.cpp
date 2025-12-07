@@ -1146,7 +1146,7 @@ bool ChatHandler::HandleReloadQuestTemplateCommand(char* /*args*/)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading Quest Templates...");
     sObjectMgr.LoadQuests();
-    SendSysMessage("DB table `quest_template` (quest definitions) reloaded.");
+    SendSysMessage("DB table `quest_template/custom` (quest definitions) reloaded.");
 
     // dependent also from `gameobject` but this table not reloaded anyway
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading GameObjects for quests...");

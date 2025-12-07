@@ -68,7 +68,8 @@ typedef struct __spell_dbc_desc {
 	std::string		text;
 }Spell_DBC_t;
 
-extern const Spell_DBC_t __Spells_DBC_Array[630];
+//s8 remove the spell enchant DBC array.
+extern const Spell_DBC_t __Spells_DBC_Array[1];
 
 
 extern uint32_t ZQ_GetRandomEQEnchantment(bool isRare);

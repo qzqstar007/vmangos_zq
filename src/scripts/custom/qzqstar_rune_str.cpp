@@ -185,8 +185,11 @@ const Rune_Spell_Menu_t _Spells_Menu_Shaman[RUNE_SPELLS_NUM] = 	//Shaman
 
 #pragma endregion
 
-const Spell_DBC_t __Spells_DBC_Array[] =
+const Spell_DBC_t __Spells_DBC_Array[1] =
 {
+	{ 11657,	32532,	4502,	 __STR("|命中可能：吸收５５点物理伤害。|") }
+};
+/*
 	//weapons
 	{ 871,	32531,	4501,	 __STR("|命中可能：使你在遭到近战、远程和法术攻击时所承受的伤害值降低７５％。|") },
 	{ 11657,	32532,	4502,	 __STR("|命中可能：吸收５５点物理伤害。|") },
@@ -820,7 +823,7 @@ const Spell_DBC_t __Spells_DBC_Array[] =
 	{ 29636,	29636,	3985,	 __STR("|装备：有一定几率对你的远程攻击目标造成自然伤害。|") },
 	{ 29637,	29637,	3986,	 __STR("|装备：有一定几率对你的远程攻击目标造成自然伤害。|") },
 };
-
+*/
 uint32_t ZQ_GetRandomEQEnchantment(bool isRare)
 {
 	//rare, 1-153

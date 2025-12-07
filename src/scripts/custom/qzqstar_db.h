@@ -89,6 +89,7 @@ extern uint32_t DBHelper_GetPlayerProfs_Bits(Player * player);
 typedef struct _Fragment_Upgrade_t
 {
 	int				_id;
+	bool    		enable;
 	int             multi;
 	uint32			spellId;
 	int             pointsNeed;
@@ -98,7 +99,7 @@ typedef struct _Fragment_Upgrade_t
 	std::string     unit;
 }FragUpgrade_t;
 
-#define PLAYER_ABILITIES_NUM_S8				14
+#define PLAYER_ABILITIES_NUM_S8				16
 extern const FragUpgrade_t Ability_MenuS8[PLAYER_ABILITIES_NUM_S8];
 extern int DBHelper_get_upgrade_points(Player *player,  int ability_type, int curpoints);
 extern int DBHelper_get_used_points(Player *player, int ability_type);
@@ -122,6 +123,16 @@ extern const Teleport_Point_t TP_Raids[7];
 
 extern uint32_t DBHelper_Get_Farm_Times(Player *player, uint32_t maptype, uint32_t mapid);
 extern uint32_t DBHelper_Inc_Farm_Times(Player *player, uint32_t maptype, uint32_t mapid);
+
+
+typedef struct _racial_spell {
+	int32 race;
+	int32 spell_passive;
+	int32 spell_active;
+	//std::string itemName;
+}Racial_Spell_t;
+extern void BDHelper_Learn_Race_Spells(Player *player, uint32_t passive_level, uint32_t active_level);
+
 
 #endif	//_QZQSTAR_DB_H
 
