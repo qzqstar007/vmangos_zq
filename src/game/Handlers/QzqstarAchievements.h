@@ -59,22 +59,23 @@ enum Achievement_t
 
 //Player Used Data
 //need caculate and compare with account data
-#define PLAYER_USED_LEVEL_CHENYI				(0)
-#define PLAYER_USED_LEVEL_ZHANPAO				(1)
+#define PLAYER_USED_LEVEL_CHENYI				(0) //not used
+#define PLAYER_USED_LEVEL_ZHANPAO				(1) //not used
 #define PLAYER_USED_NUMS_TALENT					(2)
 #define PLAYER_USED_LEVEL_WEAPON				(3)
-#define PLAYER_USED_LEVEL_PET					(99)	//not used
-#define PLAYER_USED_NUMS_RESISTANCE				(4)
-#define PLAYER_USED_NUMS_STRENGTH				(5)
-#define PLAYER_USED_NUMS_AGILITY				(6)
-#define PLAYER_USED_NUMS_STAMINA				(7)
-#define PLAYER_USED_NUMS_INTELLECT				(8)
-#define PLAYER_USED_NUMS_SPIRIT					(9)
-#define PLAYER_USED_NUMS_SP						(10)
-#define PLAYER_USED_NUMS_AP						(11)
-#define PLAYER_USED_NUMS_DUNGEON_TIMES			(12)
-#define PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE	(13)
-#define PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE	(14)
+#define PLAYER_USED_LEVEL_PET					(4)	//not used
+#define PLAYER_USED_NUMS_RESISTANCE				(5)
+#define PLAYER_USED_NUMS_STRENGTH				(6)
+#define PLAYER_USED_NUMS_AGILITY				(7)
+#define PLAYER_USED_NUMS_STAMINA				(8)
+#define PLAYER_USED_NUMS_INTELLECT				(9)
+#define PLAYER_USED_NUMS_SPIRIT					(10)
+#define PLAYER_USED_NUMS_SP						(11)
+#define PLAYER_USED_NUMS_AP						(12)
+#define PLAYER_USED_NUMS_DUNGEON_TIMES			(13)
+#define PLAYER_USED_NUMS_DUNGEON_TELEPORT		(14)
+#define PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE	(15)
+#define PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE	(16)
 
 
 //don't need caculate
@@ -93,16 +94,20 @@ enum Achievement_t
 #define VIP_ONEKEY_PICK		(0x00000100)
 #define VIP_SUISHEN_BUFF	(0x00000200)
 #define VIP_SYNC_LEVEL		(0x00000400)
-#define VIP_LEVEL_MASK		(0x000F0000)
-#define VIP_SPEICIAL_MASK	(0x00F00000)
+#define VIP_ZHIYE_BUFFS		(0x00000800)	
+#define VIP_MOUNT_LAND		(0x00001000)
+#define VIP_MOUNT_FLY		(0x00002000)
+#define VIP_MOUNT_TIGER		(0x00004000)
+#define VIP_MOUNT_GRIPH		(0x00008000)
+#define VIP_SPEICIAL_MASK	(0x0F000000)
 
 //S7
 #define VIP_SPECIAL_FREE_STOLE	 (0x01)		//stored in data8
 #define VIP_SPECIAL_FREE_ENCHANT (0x02)		//stored in data8
 
 //S8
-#define VIP_SPECIAL_DG_TELEPORT		(0x00100000)		//stored in data0
-#define VIP_SPECIAL_SPELL_HASTE		(0x00200000)		//haste spell
+#define VIP_SPECIAL_DG_TELEPORT		(0x01000000)		//stored in data0
+#define VIP_SPECIAL_SPELL_HASTE		(0x02000000)		//haste spell
 
 
 //Challenging Mode

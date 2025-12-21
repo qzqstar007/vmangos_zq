@@ -360,7 +360,7 @@ struct ChuanSpellScript : public SpellScript
                         break;
                 }
 
-                if(player->M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_RICH)
+                if(player->M_Challenge_Mode & CHALLENGING_MODE_RICH)
                 {
                     basePoints0 = basePoints0 * 1.5;
                     basePoints1 = basePoints1 * 1.5;

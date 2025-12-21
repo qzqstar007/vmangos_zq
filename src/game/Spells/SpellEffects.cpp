@@ -808,6 +808,9 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					auto player = m_caster->ToPlayer();
 					auto pOffHandItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
 
+                    //return if in lvguan
+                    if( (player->GetRestType() != REST_TYPE_NO) )  return;
+
 					//Check warrior
 					if (player->GetClass() == CLASS_WARRIOR)
 					{
@@ -1061,11 +1064,10 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
                     //S8, leadership
                     do {
-
                         auto _auraID = ZQ_SPELL_CHALLENGE_BONUS_LEADER;
 						auto _points0=0, _points1 = 4;
 
-                        if(player->M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_LEADER)
+                        if(player->M_Challenge_Mode & CHALLENGING_MODE_LEADER)
                         {
                             if(Group * _group = player->GetGroup())
                             {
@@ -1099,7 +1101,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						auto _points0=0, _points1 = 0, _points2=0;
 
 						// 2. check the target player
-                        if(player->M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_RICH)
+                        if(player->M_Challenge_Mode & CHALLENGING_MODE_RICH)
                         {
                             auto _money_gold = player->GetMoney()/10000;
 
@@ -1314,7 +1316,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 						return;
 					}
 
-                    if(itemTarget->GetProto()->ItemId == ZQ_ITEM_CHENYI || itemTarget->GetProto()->ItemId == ZQ_ITEM_ZHANPAO)
+                    if(itemTarget->GetProto()->ItemId >= ZQ_ITEM_CHENYI_START && itemTarget->GetProto()->ItemId <= ZQ_ITEM_ZHANPAO_END)
                     {
                         ChatHandler(player).PSendSysMessage(((std::string)(">>>衬衣、战袍暂时不能重新随机附魔，后续开放<<<")).c_str());
 						return;
@@ -4048,16 +4050,16 @@ void Spell::EffectEnchantItemPerm(SpellEffectIndex effIdx)
     }
 
     // remove old enchanting before applying new if equipped
-    pItemOwner->ApplyEnchantment(itemTarget, PERM_ENCHANTMENT_SLOT, false);
+    //pItemOwner->ApplyEnchantment(itemTarget, PERM_ENCHANTMENT_SLOT, false);
 
-    itemTarget->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantId, 0, 0, m_caster->GetObjectGuid());
+    //itemTarget->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantId, 0, 0, m_caster->GetObjectGuid());
     // add new enchanting if equipped
-    pItemOwner->ApplyEnchantment(itemTarget, PERM_ENCHANTMENT_SLOT, true);
+    //pItemOwner->ApplyEnchantment(itemTarget, PERM_ENCHANTMENT_SLOT, true);
 
     //qzqstar, 250602, modify the PERM_ENCHANTMENT_SLOT to SLOT_4
-    //pItemOwner->ApplyEnchantment(itemTarget, PROP_ENCHANTMENT_SLOT_3, false);
-    //itemTarget->SetEnchantment(PROP_ENCHANTMENT_SLOT_3, enchantId, 0, 0, m_caster->GetObjectGuid());
-    //pItemOwner->ApplyEnchantment(itemTarget, PROP_ENCHANTMENT_SLOT_3, true);
+    pItemOwner->ApplyEnchantment(itemTarget, PROP_ENCHANTMENT_SLOT_3, false);
+    itemTarget->SetEnchantment(PROP_ENCHANTMENT_SLOT_3, enchantId, 0, 0, m_caster->GetObjectGuid());
+    pItemOwner->ApplyEnchantment(itemTarget, PROP_ENCHANTMENT_SLOT_3, true);
 
     //if has spell of ..., enable another slot
 

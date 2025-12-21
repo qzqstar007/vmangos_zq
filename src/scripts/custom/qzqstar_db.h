@@ -99,7 +99,7 @@ typedef struct _Fragment_Upgrade_t
 	std::string     unit;
 }FragUpgrade_t;
 
-#define PLAYER_ABILITIES_NUM_S8				16
+#define PLAYER_ABILITIES_NUM_S8				17
 extern const FragUpgrade_t Ability_MenuS8[PLAYER_ABILITIES_NUM_S8];
 extern int DBHelper_get_upgrade_points(Player *player,  int ability_type, int curpoints);
 extern int DBHelper_get_used_points(Player *player, int ability_type);
@@ -133,6 +133,9 @@ typedef struct _racial_spell {
 }Racial_Spell_t;
 extern void BDHelper_Learn_Race_Spells(Player *player, uint32_t passive_level, uint32_t active_level);
 
+
+
+uint16_t DBHelper_get_random_chest_bonus(void);
 
 #endif	//_QZQSTAR_DB_H
 

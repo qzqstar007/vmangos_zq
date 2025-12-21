@@ -228,6 +228,11 @@ uint32 QzqstarAchievements::GetAccountSum(Player * _player)
 
 	uint32 sum = 0;
 	//data0 - VIP
+	if(_player->M_Achiv_Account_VIP & VIP_MOUNT_LAND) sum += 10;
+	if(_player->M_Achiv_Account_VIP & VIP_MOUNT_FLY) sum += 50;
+	if(_player->M_Achiv_Account_VIP & VIP_MOUNT_TIGER) sum += 300;
+	if(_player->M_Achiv_Account_VIP & VIP_MOUNT_GRIPH) sum += 300;
+
 	//data1 - task
 	if (_player->M_Achiv_Account_Task < 500) sum += _player->M_Achiv_Account_Task; else sum += 500;
 
@@ -248,7 +253,7 @@ uint32 QzqstarAchievements::GetAccountSum(Player * _player)
 	sum += COUNT_ONES(_player->M_Achiv_Account_Reputation_List) * 50;
 
 	//data5 - profession
-	sum += COUNT_ONES(_player->M_Achiv_Account_Profession_Skill) * 100;
+	sum += COUNT_ONES(_player->M_Achiv_Account_Profession_Skill) * 50;
 	
 	//data6 - killing nums
 	if(_player->M_Achiv_Account_Killing_Nums > 1000 * 100) sum += 1000;
@@ -258,9 +263,9 @@ uint32 QzqstarAchievements::GetAccountSum(Player * _player)
 	if(_player->M_Achiv_Account_PVP_Nums > 1000 * 100) sum += 1000;
 	else sum += _player->M_Achiv_Account_PVP_Nums /100;
 
-	//data8 - gold collect, every 10g gives 1 point
-	if(_player->M_Achiv_Account_Gold_Collect > 10000 * 10000) sum += 1000;
-	else sum += _player->M_Achiv_Account_Gold_Collect/100000;
+	//data8 - gold collect, every 20g gives 1 point
+	if(_player->M_Achiv_Account_Gold_Collect > 20000 * 10000) sum += 1000;
+	else sum += _player->M_Achiv_Account_Gold_Collect/200000;
 
 	//data9 - dungeon nums 1
 	_pet = _player->M_Achiv_Account_Dungeon_NUMS1; //reuse the _pet
@@ -281,8 +286,8 @@ uint32 QzqstarAchievements::GetAccountSum(Player * _player)
 	//data11 - max levels 
 	//if(_player->M_Achiv_Account_Max_Level > 500) sum += 500;
 	//else sum += _player->M_Achiv_Account_Max_Level;		
-	if(_player->M_Achiv_Account_Task_Custom_MaxID > 1000)  sum += 1000;
-	else sum += _player->M_Achiv_Account_Task_Custom_MaxID;
+	if(_player->M_Achiv_Account_Task_Custom_MaxID > 100)  sum += 500;
+	else sum += _player->M_Achiv_Account_Task_Custom_MaxID * 5;
 	
 	//data12 - equipments
 	if(_player->M_Achiv_Account_EQ_Nums > 500) sum += 500;
@@ -328,6 +333,26 @@ int32  QzqstarAchievements::InitPlayerData(Player * _player)
 	_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data14 = 0;
 	_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data15 = 0;
 
+    _player->M_Achiv_Player_Chenyi = 0;
+    _player->M_Achiv_Player_Zhanpao = 0;
+    _player->M_Achiv_Player_NumsTalent = 0;
+    _player->M_Achiv_Player_LevelWeapon = 0;
+    _player->M_Achiv_Player_LevelPet = 0;
+    _player->M_Achiv_Player_NumsResistance = 0;
+    _player->M_Achiv_Player_NumsStrength = 0;
+    _player->M_Achiv_Player_NumsAgility = 0;
+    _player->M_Achiv_Player_NumsStamina = 0;
+    _player->M_Achiv_Player_NumsIntellect = 0;
+    _player->M_Achiv_Player_NumsSpirit = 0;
+    _player->M_Achiv_Player_NumsAP = 0;
+    _player->M_Achiv_Player_NumsSP = 0;
+    _player->M_Achiv_Player_DungeonTimes = 0;
+	_player->M_Achiv_Player_DungeonTelePoints = 0;
+    _player->M_Achiv_Player_RacialSpell_Passive = 0;
+    _player->M_Achiv_Player_RacialSpell_Active = 0;
+	_player->M_Achiv_Player_Custom_TaskID = 0;
+	_player->M_Challenge_Mode = 0;
+
 	__LOG("[QzqstarAchievements::Init New Player Data] Name:%s GUID:%u", _player->GetName(), _player->GetGUID());
 
 	return 0;
@@ -339,6 +364,7 @@ uint32 QzqstarAchievements::GetPlayerData(Player * _player, uint32 type)
 
 	//check the player's achievement map if none
 	__init_Player_Entry(_player);
+	//__LOG("[QzqstarAchievements::GetPlayerData] Get Data for player:%s, type:%d, and PET:%d, PASSIV:%d", _player->GetName(), type, PLAYER_USED_LEVEL_PET,PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE);
 
 	uint32 _data = 0;
 	switch(type)
@@ -357,6 +383,7 @@ uint32 QzqstarAchievements::GetPlayerData(Player * _player, uint32 type)
 		case PLAYER_USED_NUMS_SPIRIT:			_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data2 )%1000; break;
 		case PLAYER_USED_NUMS_SP:				_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data3 / 1000)%1000; break;
 		case PLAYER_USED_NUMS_AP:				_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data3 )%1000; break;
+		case PLAYER_USED_NUMS_DUNGEON_TELEPORT:     _data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data4 / 100)%10; break;
 		case PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE:	_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data4 / 10)%10; break; //use the least two digits
 		case PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE:	_data = (_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data4 )%10; break;
 
@@ -462,18 +489,21 @@ void QzqstarAchievements::SetPlayerData(Player * _player, uint32 type, uint32 da
 			break;
 		}
 
+		case PLAYER_USED_NUMS_DUNGEON_TELEPORT:
 		case PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE:
 		case PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE:
 		{
 			uint32 _data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data4;
+			uint32 _teleport = (_data / 100) % 10;
 			uint32 _passive = (_data / 10) % 10;
 			uint32 _active = (_data ) % 10;
 			switch(type)
 			{
+				case PLAYER_USED_NUMS_DUNGEON_TELEPORT:	_teleport = data; break;
 				case PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE:	_passive = data; break;
 				case PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE:	_active = data; break;
 			}
-			_data = _passive * 10 + _active;
+			_data = _teleport * 100 + _passive * 10 + _active;
 			_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data4 = _data;
 			break;
 		}
@@ -507,7 +537,7 @@ uint32 QzqstarAchievements::GetPlayerSum(Player * _player)
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_ZHANPAO);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_TALENT);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_WEAPON);
-	//sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_PET);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_LEVEL_PET);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_RESISTANCE);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_STRENGTH);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_AGILITY);
@@ -519,6 +549,7 @@ uint32 QzqstarAchievements::GetPlayerSum(Player * _player)
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_DUNGEON_TIMES);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE);
 	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE);
+	sum += DBHelper_get_used_points(_player, PLAYER_USED_NUMS_DUNGEON_TELEPORT);
 
 	return sum;
 }

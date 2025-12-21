@@ -821,7 +821,7 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
         return 0;
 
     // the chenyi and zhanpao has no random properties
-    if(item_id == ZQ_ITEM_CHENYI || item_id == ZQ_ITEM_ZHANPAO)
+    if(item_id >= ZQ_ITEM_CHENYI_START || item_id <= ZQ_ITEM_ZHANPAO_END)
         return 0;
 
     // check for the quality of 5 -- legend

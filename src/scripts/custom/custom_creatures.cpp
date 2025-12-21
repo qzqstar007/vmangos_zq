@@ -610,8 +610,10 @@ void Enchant(Player* player, Item* item, uint32 enchantid)
         return;
     }
 
-    item->ClearEnchantment(PERM_ENCHANTMENT_SLOT);
-    item->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantid, 0, 0);
+    //item->ClearEnchantment(PERM_ENCHANTMENT_SLOT);
+    //item->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantid, 0, 0);
+    item->ClearEnchantment(PROP_ENCHANTMENT_SLOT_3);
+    item->SetEnchantment(PROP_ENCHANTMENT_SLOT_3, enchantid, 0, 0);
     player->GetSession()->SendNotification("%s succesfully enchanted", item->GetProto()->Name1);
 }
 

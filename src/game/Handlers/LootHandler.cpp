@@ -39,6 +39,8 @@
 #include "Util.h"
 #include "Anticheat.h"
 
+#include "custom/qzqstar_db.h"
+
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
 {
     Player  *player =   GetPlayer();
@@ -190,6 +192,28 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
     InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->itemid, item->count);
     if (msg == EQUIP_ERR_OK)
     {
+        //s8: qzqstar
+        //the item from gameobject.chest must be heroic
+        //get the proto of the item
+        ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(item->itemid);
+
+        if (itemProto && ( itemProto->Class == ITEM_CLASS_ARMOR || itemProto->Class == ITEM_CLASS_WEAPON)&& lguid.GetHigh() == HIGHGUID_GAMEOBJECT)
+        {
+            GameObject* go = player->GetMap()->GetGameObject(lguid);
+            if(go && go->GetGoType() == GAMEOBJECT_TYPE_CHEST)
+            {
+                item->item_difficulty = 1;
+                //box bonus, chest bonus
+                //cast custom spell  Mind Quickening 23723
+                uint32 spellId = DBHelper_get_random_chest_bonus();//PickRandomValue(23723, 13494,13533,21165,6078,2091);
+                if (spellId)
+                {
+                    player->CastSpell(player, spellId, true);
+                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Box Bonus] player:%s SpellID: %u", player->GetName(), spellId);
+                }
+            }
+        }
+
         Item * newitem = player->StoreNewItem(dest, item->itemid, true, item->randomPropertyId, item->item_difficulty);
         if (!newitem)
         {

@@ -364,7 +364,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     float baseAttackPower = GetAttackPowerFromStrengthAndAgility(ranged, GetStat(STAT_STRENGTH), GetStat(STAT_AGILITY));
 
 
-    //S8: add attach modifier
+    //S8: add attack modifier
     baseAttackPower += M_Achiv_Player_NumsAP;
 
     // attack power mods are split into positive and negative field

@@ -932,6 +932,7 @@ class Player final: public Unit
         uint32  M_Achiv_Player_NumsAP;    //NumsAP
         uint32  M_Achiv_Player_NumsSP;    //NumsSP
         uint32  M_Achiv_Player_DungeonTimes;  //additional dungeon times.
+        uint32  M_Achiv_Player_DungeonTelePoints;  //additional dungeon teleport points.
         uint32  M_Achiv_Player_RacialSpell_Passive;    //Racial Skills Passive
         uint32  M_Achiv_Player_RacialSpell_Active;    //Racial Skills Active
         uint32  M_Achiv_Player_Custom_TaskID;         //Current Custom task ID for this player

@@ -732,6 +732,9 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
         {
             if (player->M_Leech_Spell) this->CastCustomSpell(this, ZQ_SPELL_LEECH_SPELL, damage * player->M_Leech_Spell / 100.0f, 0, 0, true);
         }
+
+        //if(player->IsGameMaster())
+		//	sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Player-> Leech:%d, damage: %u, heal %u", player->M_Leech_Spell, damage, (damage * player->M_Leech_Spell / 100.0f));
 	}
 
 	//qzqstar, 250207, reduce the damage for pvp

@@ -51,6 +51,22 @@
 //Faction upgrade items
 #define ZQ_ITEM_FACTION_UPGRADE		30020	//Faction Upgrade, 阵营升级
 
+//Flasks
+//原始黑钻石x50, 冰盖草x50 幽灵菇x50 梦叶草x50      1000G
+#define ZQ_ITEM_FLASK_FREEMOVE      30021   //flask of movement, 自由行动药剂  orig 5634
+#define ZQ_ITEM_FLASK_STONE         30022   //flask of stone, 强效石盾        orig 13455
+#define ZQ_ITEM_FLASK_MAGIC         30023   //flask of magic, 强效奥法        orig 13454
+//猫鼬药剂x20, 巨型绿宝石x20, 连结水晶x50           2000G
+#define ZQ_ITEM_FLASK_MAOYOU        30024	//Flask of Mauritius, 猫鼬药剂      orig 13452
+#define ZQ_ITEM_FLASK_INTELLIGENCE  30025	//Flash of Intelligence, 智慧药剂   orig 13511
+//艾泽拉斯钻石x20, 紫莲花x30，奥术水晶x30        3000G
+#define ZQ_ITEM_FLASK_HUASHI        30026	//Flash of Huashi, 化石药剂     orig 13506
+#define ZQ_ITEM_FLASK_RESIST        30027	//Flash of Resist, 多抗性药剂   orig 13513
+//暗月卡牌 19287 19288 19289 19290            4000G
+#define ZQ_ITEM_FLASK_CHAONENG      30028	//Flask of the Chaoneng, 超能药剂   orig 13512
+#define ZQ_ITEM_FLASK_TITAN         30029	//Flask of the Titan, 泰坦药剂      orig 13510
+
+
 //Newbie Boxes
 #define ZQ_ITEM_NEWBIE_INTRO        30030	//Newbie Intro, 新手介绍
 #define ZQ_ITEM_NEWBIE_BOX			30031	//Newbie Box, 新手宝箱 ~ 30036
@@ -80,9 +96,11 @@
 #define ZQ_ITEM_RAID_NAXX           30097   //Raid NAXX, 副本NAXX
 
 // 30200 - season 8
-#define ZQ_ITEM_ACHIVE_ITEM         30201   //Achievement item, 成就物品
-#define ZQ_ITEM_CHENYI		        30251	//Chenyi Zhanpao, 陈怡之杖
-#define ZQ_ITEM_ZHANPAO		        30261	//Chenyi Zhanpao, 陈怡之杖
+#define ZQ_ITEM_ACHIVE_ITEM         30009   //Achievement item, 成就物品
+#define ZQ_ITEM_CHENYI_START        30400	//Chenyi Zhanpao, 陈怡之杖
+#define ZQ_ITEM_CHENYI_END          30499	//Chenyi Zhanpao, 陈怡之杖
+#define ZQ_ITEM_ZHANPAO_START       30500	//Chenyi Zhanpao, 陈怡之杖
+#define ZQ_ITEM_ZHANPAO_END         30599	//Chenyi Zhanpao, 陈怡之杖
 
 /******************************************************************** 
  *  Spell IDs, largest first (33386).
@@ -95,6 +113,10 @@
 #define ZQ_SPELL_VIP_HASTE			33380	//VIP Haste, 会员急速
 #define ZQ_SPELL_VIP_HASTE_ONOFF    33381	//VIP APSP, 会员ONOFF
 #define ZQ_SPELL_VIP_DMG			33379	//VIP APSP, 会员Damage
+#define ZQ_SPELL_VIP_DEFENCE1		33377	//VIP Defence, 会员防御 
+#define ZQ_SPELL_VIP_DEFENCE2		33376	//VIP Defence, 会员防御 
+
+
 
 //summon creature spells, such as critter, pet, mount, etc.
 #define ZQ_SPELL_SUMMON_PET			33370	//Summon Pet, 召唤宠物
@@ -386,6 +408,12 @@ update creature_template set health_multiplier=500, damage_multiplier=30 where e
 update creature_template set health_multiplier=2000, damage_multiplier=60 where entry in (11988, 12057, 12259, 11502, 12264, 11982, 12098, 12056, 12118, 10184);
 -- alians 12099 11673 11661 11663 11662 12119 11664 11672 11659 11658, 12129
 update creature_template set health_multiplier=500, damage_multiplier=30 where entry in (12099, 11673, 11661, 11663, 11662, 12119, 11664, 11672, 11659, 11658, 12129);
+
+//Drakkisath
+update creature_template set health_multiplier=100, damage_multiplier=30 where entry in (10363, 10430, 10429);
+
+//kahzakke 12397
+update creature_template set health_multiplier=3000, damage_multiplier=300 where entry in (12397, 14889, 14887, 14888, 14890, 6109);
 
 //S8
 update creature_template set health_multiplier=800, damage_multiplier=30 where entry in (11988, 12057, 12259, 11502, 12264, 11982, 12098, 12056, 12118, 10184);

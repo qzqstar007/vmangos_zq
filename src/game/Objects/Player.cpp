@@ -3124,7 +3124,7 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
         // Save to Achievement and store it for further reward
         M_Item_Counts += xp;
 
-        if(M_Item_Counts > level * level * 50)
+        if(M_Item_Counts > level * level * 150)
         {
             M_Item_Counts = 0;
 
@@ -4989,7 +4989,7 @@ void Player::KillPlayer()
 
 		//2. killer mode, lost the money
 		//if (HasSpell(__MODE_RICH))
-		if(M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_RICH)
+		if(M_Challenge_Mode & CHALLENGING_MODE_RICH)
 		{
 			__looseMoney = __totalMoney / 6;
 
@@ -10718,10 +10718,14 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
                 //generate random enchant id
                 auto enchantID = DBHelper_GetSpecialSlotsByLevel(_proto->ItemLevel);
                 //enchant the item
+                /*
                 if(_proto->Class == ITEM_CLASS_ARMOR)
                     pItem->SetEnchantment((EnchantmentSlot)( TEMP_ENCHANTMENT_SLOT ), enchantID, 0, 0);
                 else if (_proto->Class == ITEM_CLASS_WEAPON)
-                    pItem->SetEnchantment((EnchantmentSlot)( PROP_ENCHANTMENT_SLOT_3 ), enchantID, 0, 0);
+                    pItem->SetEnchantment((EnchantmentSlot)( PROP_ENCHANTMENT_SLOT_3 ), enchantID, 0, 0);*/
+
+                if( (_proto->Class == ITEM_CLASS_ARMOR) || (_proto->Class == ITEM_CLASS_WEAPON) )
+                    pItem->SetEnchantment((EnchantmentSlot)( PERM_ENCHANTMENT_SLOT ), enchantID, 0, 0);
             }
 		}
 
@@ -13726,7 +13730,9 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
     for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
     {
         if (pQuest->ReqItemId[i])
-            DestroyItemCount(pQuest->ReqItemId[i], pQuest->ReqItemCount[i], true);
+            //destroy the bank items as well.
+            DestroyItemCount(pQuest->ReqItemId[i], pQuest->ReqItemCount[i], true, false, true);
+            //DestroyItemCount(pQuest->ReqItemId[i], pQuest->ReqItemCount[i], true);
     }
 
     RemoveTimedQuest(quest_id);
@@ -15509,46 +15515,53 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     /* 14 */M_Achiv_Account_REWARD = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_DAILY_REWARD);
     /* 15 */M_Achiv_Account_Task_Custom_MaxID = sQZAchievements.GetAccAchieveData(this, ACHIEVEMENT_ACCOUNT_TASK_CUSTOM_MAXID); //Custom Task done by accounts, max ID
 
-    //bitwise for the reputation list, professional list
-    M_Achiv_Account_Reputation_List |= DBHelper_GetPlayerReputation_Bits(this);
-    M_Achiv_Account_Profession_Skill |= DBHelper_GetPlayerProfs_Bits(this);
 
     //get player used achievements
-    M_Achiv_Player_Chenyi = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_CHENYI);
+    //__LOG("1. Get TYPE:%d", PLAYER_USED_LEVEL_CHENYI);
+    M_Achiv_Player_Chenyi = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_CHENYI); 
+    //__LOG("2. Get TYPE:%d", PLAYER_USED_LEVEL_ZHANPAO);
     M_Achiv_Player_Zhanpao = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_ZHANPAO);
+    //__LOG("3. Get TYPE:%d", PLAYER_USED_NUMS_TALENT);
     M_Achiv_Player_NumsTalent = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_TALENT);
+    //__LOG("4. Get TYPE:%d", PLAYER_USED_LEVEL_WEAPON);
     M_Achiv_Player_LevelWeapon = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_WEAPON);
+    //__LOG("5. Get TYPE:%d", PLAYER_USED_LEVEL_PET);
     M_Achiv_Player_LevelPet = sQZAchievements.GetPlayerData(this, PLAYER_USED_LEVEL_PET);
+    //__LOG("6. Get TYPE:%d", PLAYER_USED_NUMS_RESISTANCE);
     M_Achiv_Player_NumsResistance = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_RESISTANCE);
+    //__LOG("7. Get TYPE:%d", PLAYER_USED_NUMS_STRENGTH); 
     M_Achiv_Player_NumsStrength = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_STRENGTH);
+    //__LOG("8. Get TYPE:%d", PLAYER_USED_NUMS_AGILITY); 
     M_Achiv_Player_NumsAgility = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_AGILITY);
+    //__LOG("9. Get TYPE:%d", PLAYER_USED_NUMS_STAMINA);  
     M_Achiv_Player_NumsStamina = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_STAMINA);
+    //__LOG("10. Get TYPE:%d", PLAYER_USED_NUMS_INTELLECT);
     M_Achiv_Player_NumsIntellect = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_INTELLECT);
+    //__LOG("11. Get TYPE:%d", PLAYER_USED_NUMS_SPIRIT);
     M_Achiv_Player_NumsSpirit = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_SPIRIT);
+    //__LOG("12. Get TYPE:%d", PLAYER_USED_NUMS_AP);
     M_Achiv_Player_NumsAP = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_AP);
+    //__LOG("13. Get TYPE:%d", PLAYER_USED_NUMS_SP); 
     M_Achiv_Player_NumsSP = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_SP);
+    //__LOG("14. Get TYPE:%d", PLAYER_USED_NUMS_DUNGEON_TIMES);
     M_Achiv_Player_DungeonTimes = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_DUNGEON_TIMES);
+    //__LOG("15. Get TYPE:%d", PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE);
     M_Achiv_Player_RacialSpell_Passive = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE);
+    //__LOG("16. Get TYPE:%d", PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE);
     M_Achiv_Player_RacialSpell_Active = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE);
+    //__LOG("17. Get TYPE:%d", PLAYER_USED_NUMS_DUNGEON_TELEPORT);
+    M_Achiv_Player_DungeonTelePoints = sQZAchievements.GetPlayerData(this, PLAYER_USED_NUMS_DUNGEON_TELEPORT);
+
+
 
     //No Points caculate
+    //__LOG("17. Get TYPE:%d", PLAYER_USED_CUSTOM_TASKID);
     M_Achiv_Player_Custom_TaskID = sQZAchievements.GetPlayerData(this, PLAYER_USED_CUSTOM_TASKID); //Current Custom task ID for this player 
+    //__LOG("18. Get TYPE:%d", PLAYER_USED_CHALLGE_MODE);
     M_Challenge_Mode = sQZAchievements.GetPlayerData(this, PLAYER_USED_CHALLGE_MODE);
 
     //compare and set the Max ID of Account
     if(M_Achiv_Account_Task_Custom_MaxID < M_Achiv_Player_Custom_TaskID) M_Achiv_Account_Task_Custom_MaxID = M_Achiv_Player_Custom_TaskID;
-
-	M_Achiv_Account_Sum = sQZAchievements.GetAccountSum(this);
-    M_Achiv_Player_Used = sQZAchievements.GetPlayerSum(this);
-
-	int _restPoints = M_Achiv_Account_Sum - M_Achiv_Player_Used;
-	if (_restPoints < 0)
-	{
-		//ERROR Check
-		__LOG("Error achievement sum and used. player:%s, sum:%u, used:%u. ", GetName(), M_Achiv_Account_Sum, M_Achiv_Player_Used);
-		_restPoints = 0;
-	}
-	ChatHandler(this).PSendSysMessage(Helper_MakeString("","注意：你账号总成就点数：%u，当前角色已经消耗点数：%u, 剩余点数: %u. ", M_Achiv_Account_Sum, M_Achiv_Player_Used, _restPoints).c_str());
 
 
     InitPrimaryProfessions();                               // to max set before any spell loaded
@@ -15905,7 +15918,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if(M_Challenge_Mode & CHALLENGING_MODE_ONELIFE)         { _ModeText.append(__STR("一命模式、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_EQUIPMENT)      { _ModeText.append(__STR("装等模式、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_TASK)            { _ModeText.append(__STR("任务模式、、 ")); __xpRate = 1.0f;}
-    if(M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_RICH)            { _ModeText.append(__STR("富豪模式、、 ")); __xpRate = 1.0f;}
+    if(M_Challenge_Mode & CHALLENGING_MODE_RICH)            { _ModeText.append(__STR("富豪模式、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_HUMAN)    { _ModeText.append(__STR("杀手模式（人形）、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_BEAST)    { _ModeText.append(__STR("杀手模式（野兽）、、 ")); __xpRate = 1.0f;}
     if(M_Challenge_Mode & CHALLENGING_MODE_KILLER_UNDEAD)  { _ModeText.append(__STR("杀手模式（亡灵）、、 ")); __xpRate = 1.0f;}
@@ -16046,8 +16059,25 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 			, true);
 	}*/
 
-    if(HasSpell(ZQ_SPELL_MOUNTS_TIGER)) LearnSpell(ZQ_SPELL_MOUNTS_BONUS_TIGER, false);
-    if(HasSpell(ZQ_SPELL_MOUNTS_GRIYP)) LearnSpell(ZQ_SPELL_MOUNTS_BONUS_GRIYP, false);
+    //bitwise for the reputation list, professional list
+    M_Achiv_Account_Reputation_List |= DBHelper_GetPlayerReputation_Bits(this);
+    M_Achiv_Account_Profession_Skill |= DBHelper_GetPlayerProfs_Bits(this);
+
+    M_Achiv_Account_Sum = sQZAchievements.GetAccountSum(this);
+    M_Achiv_Player_Used = sQZAchievements.GetPlayerSum(this);
+
+	int _restPoints = M_Achiv_Account_Sum - M_Achiv_Player_Used;
+	if (_restPoints < 0)
+	{
+		//ERROR Check
+		__LOG("Error achievement sum and used. player:%s, sum:%u, used:%u. ", GetName(), M_Achiv_Account_Sum, M_Achiv_Player_Used);
+		_restPoints = 0;
+	}
+	ChatHandler(this).PSendSysMessage(Helper_MakeString("","注意：你账号总成就点数：%u，当前角色已经消耗点数：%u, 剩余点数: %u. ", M_Achiv_Account_Sum, M_Achiv_Player_Used, _restPoints).c_str());
+
+
+    if(HasSpell(ZQ_SPELL_MOUNTS_TIGER)) { LearnSpell(ZQ_SPELL_MOUNTS_BONUS_TIGER, false);   LearnSpell(32832, false); }
+    if(HasSpell(ZQ_SPELL_MOUNTS_GRIYP)) { LearnSpell(ZQ_SPELL_MOUNTS_BONUS_GRIYP, false);   LearnSpell(32833, false); }
 
     if(HasItemCount(ZQ_ITEM_MOUNTS_DKM, 1, true) && (!HasSpell(ZQ_SPELL_MOUNTS_BONUS_DKM)))  LearnSpell(ZQ_SPELL_MOUNTS_BONUS_DKM, false);
     else if (HasSpell(ZQ_SPELL_MOUNTS_BONUS_DKM) && (!HasItemCount(ZQ_ITEM_MOUNTS_DKM, 1, true))) RemoveSpell(ZQ_ITEM_MOUNTS_DKM);
@@ -16070,6 +16100,31 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     //learn spell ZQ_SPELL_VIP_HASTE_ONOFF
     if((M_Achiv_Account_VIP & VIP_SPECIAL_SPELL_HASTE) && (!HasSpell(ZQ_SPELL_VIP_HASTE_ONOFF)))  LearnSpell(ZQ_SPELL_VIP_HASTE_ONOFF, false);
     if((M_Challenge_Mode & CHALLENGING_MODE_ASCE) && (!HasSpell(ZQ_SPELL_CHALLENGE_BONUS_ASCE)))  LearnSpell(ZQ_SPELL_CHALLENGE_BONUS_ASCE, false);
+
+    if(HasSpell(ZQ_SPELL_MOUNTS_LAND)) M_Achiv_Account_VIP |= VIP_MOUNT_LAND;
+    if(HasSpell(ZQ_SPELL_MOUNTS_FLY)) M_Achiv_Account_VIP |= VIP_MOUNT_FLY;
+    if(HasSpell(ZQ_SPELL_MOUNTS_TIGER)) M_Achiv_Account_VIP |= VIP_MOUNT_TIGER;
+    if(HasSpell(ZQ_SPELL_MOUNTS_GRIYP)) M_Achiv_Account_VIP |= VIP_MOUNT_GRIPH;
+
+
+    //learn the mount spell if not yet
+    if( (M_Achiv_Account_VIP & VIP_MOUNT_LAND) && (!HasSpell(ZQ_SPELL_MOUNTS_LAND)) ) LearnSpell(ZQ_SPELL_MOUNTS_LAND, false);
+    if( (M_Achiv_Account_VIP & VIP_MOUNT_FLY) && (!HasSpell(ZQ_SPELL_MOUNTS_FLY)) ) LearnSpell(ZQ_SPELL_MOUNTS_FLY, false);
+    if( (M_Achiv_Account_VIP & VIP_MOUNT_TIGER) && (!HasSpell(ZQ_SPELL_MOUNTS_TIGER)) ) LearnSpell(ZQ_SPELL_MOUNTS_TIGER, false);
+    if( (M_Achiv_Account_VIP & VIP_MOUNT_GRIPH) && (!HasSpell(ZQ_SPELL_MOUNTS_GRIYP)) ) LearnSpell(ZQ_SPELL_MOUNTS_GRIYP, false);
+
+    //learn the mount bonus defences
+    if( (M_Achiv_Account_VIP & VIP_MOUNT_TIGER) && (!HasSpell(ZQ_SPELL_VIP_DEFENCE1)) ) LearnSpell(ZQ_SPELL_VIP_DEFENCE1, false);
+    if( (M_Achiv_Account_VIP & VIP_MOUNT_GRIPH) && (!HasSpell(ZQ_SPELL_VIP_DEFENCE2)) ) LearnSpell(ZQ_SPELL_VIP_DEFENCE2, false);
+
+
+    //reove later!!! end of s8
+    if(HasSpell(ZQ_SPELL_AUTOPICK)) M_Achiv_Account_VIP |= VIP_ONEKEY_PICK;
+    if(HasSpell(ZQ_SPELL_BUFF_ALL)) M_Achiv_Account_VIP |= VIP_SUISHEN_BUFF;
+
+    //check the vip spells
+    if((M_Achiv_Account_VIP & VIP_ONEKEY_PICK) && (!HasSpell(ZQ_SPELL_AUTOPICK)))     LearnSpell(ZQ_SPELL_AUTOPICK, false);
+    if((M_Achiv_Account_VIP & VIP_SUISHEN_BUFF) && (!HasSpell(ZQ_SPELL_BUFF_ALL)))    LearnSpell(ZQ_SPELL_BUFF_ALL, false);
 
     //Learn Spells according to player race
     BDHelper_Learn_Race_Spells(this, M_Achiv_Player_RacialSpell_Passive, M_Achiv_Player_RacialSpell_Active);
@@ -17626,6 +17681,7 @@ void Player::SaveToDB(bool online, bool force)
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_AP, M_Achiv_Player_NumsAP);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_SP, M_Achiv_Player_NumsSP);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_DUNGEON_TIMES, M_Achiv_Player_DungeonTimes);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_DUNGEON_TELEPORT, M_Achiv_Player_DungeonTelePoints);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE, M_Achiv_Player_RacialSpell_Passive);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE, M_Achiv_Player_RacialSpell_Active);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_CUSTOM_TASKID, M_Achiv_Player_Custom_TaskID);
@@ -18336,8 +18392,8 @@ bool Player::CheckInstanceCount(uint32 instanceId) const
 	//if (HasSpell(32857)) 
 	//	return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 20);
 
-	//if (HasSpell(ZQ_SPELL_HS_VIP))
-	//	return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 15);
+	if (M_Achiv_Account_VIP & VIP_SPECIAL_DG_TELEPORT)
+		return sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, 20);
 
 	//qzqstar, 250228, check if killer mode, MAX_INSTANCE_PER_ACCOUNT_PER_HOUR should be 1
 	//if (HasSpell(__MODE_MA))

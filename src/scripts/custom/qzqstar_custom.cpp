@@ -168,7 +168,7 @@ bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 		//check the player's slot of chest
 		if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TABARD))
 		{
-			if (pItem->GetProto()->ItemId != ZQ_ITEM_ZHANPAO)
+			if (pItem->GetProto()->ItemId < ZQ_ITEM_ZHANPAO_START)
 			{
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　请确认战袍是否已装备。　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
 			}else if(absAction >= 1 && absAction <= 4)
@@ -205,7 +205,7 @@ bool BG_Menus(Player *player, Creature *_Creature, uint32 sender, uint32 action)
 		//check the player's slot of chest
 		if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TABARD))
 		{
-			if (pItem->GetProto()->ItemId != ZQ_ITEM_ZHANPAO)
+			if (pItem->GetProto()->ItemId < ZQ_ITEM_ZHANPAO_START)
 			{
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＞　请确认战袍是否已装备。　＜＝")), GOSSIP_SENDER_MAIN, __MENU_BG_MAIN);
 			}else if(absAction >= 1 && absAction <= 4)

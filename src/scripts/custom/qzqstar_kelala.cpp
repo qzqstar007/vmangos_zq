@@ -122,10 +122,11 @@ bool Menus_Kelala_Login(Player *player, Creature *_Creature, uint32 sender, uint
 		{
 			//update the account date
 			//sQZAchievements.SetAccAchieveData(player, ACHIEVEMENT_ACCOUNT_DAILY_REWARD, _now);
+			if(_now % 100 > 0) _now -= 1;			
 			player->M_Achiv_Account_REWARD = _now;
 
 			__LOG("[Menus_Kelala_Login] Player:%s got daily reward. time:%u, old:%u", player->GetName(), _now, _accountDate);
-			player->AddItem(ZQ_ITEM_VOUCHER,  1000); 
+			player->AddItem(ZQ_ITEM_VOUCHER,  5); 
 			player->AddItem(ZQ_ITEM_BUFF, 1); 
 
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝＝＝＝＝＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -284,15 +285,24 @@ bool Menus_Kelala_EpicTask(Player *player, Creature *_Creature, uint32 sender, u
 
 	if(__qStatus == QUEST_STATUS_NONE)
 	{
+		//check if quest level too big for player
+		if (_quest && _quest->MinLevel > player->GetLevel())
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　请提升等级后再接任务！　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+			return true;
+		}
+
+
 		if(_quest)
 		{
 			player->AddQuest(_quest, nullptr);
-			Helper_Chat(player, Helper_MakeString(" ", ">>> 你已经自动接到新任务（史诗任务）， 第%u个。  ", player->M_Achiv_Player_Custom_TaskID + 1).c_str());
+			Helper_Chat(player, Helper_MakeString(" ", ">>> 你已经自动接到新任务（史诗任务）： %u   ", player->M_Achiv_Player_Custom_TaskID + 1).c_str());
 		}
 		else
 		{
 			__LOG("[Task Custom] Error for player:%u  QuestID:%u.", player->GetName(), _questID);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　任务系统错误，请联系GM！　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　任务已经完成，或者系统错误，请联系GM！　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 			return true;
 		}	
@@ -320,10 +330,10 @@ bool Menus_Kelala_EpicTask(Player *player, Creature *_Creature, uint32 sender, u
 		//text.append(__NSTR(__qStatus));
 		text.append(__qStatus == QUEST_STATUS_COMPLETE ? __STR(__GREEN("已完成　")) : __STR(__RED("未完成　")));
 		text.append(__STR(" "));
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
-
-		if(__qStatus == QUEST_STATUS_COMPLETE)
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("＝＞　任务完成，领取奖励。　＜＝ "), GOSSIP_SENDER_MAIN, action + 100);
+		if (__qStatus == QUEST_STATUS_COMPLETE)
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, action + 100);
+		else 
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
 		if (player->M_Achiv_Account_Task_Custom_MaxID > player->M_Achiv_Player_Custom_TaskID)
@@ -897,11 +907,6 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Mode main] player:%s, M_Mode:0x%X", player->GetName(), player->M_Challenge_Mode);
 
 			//Five Modes Exit
-			/*					case 1:	 _Mode |= CHALLENGING_MODE_ONELIFE; break;
-					case 2:	 _Mode |= CHALLENGING_MODE_MANUFACT; break;
-					case 3:	 _Mode |= CHALLENGING_MODE_TASK; break;
-					case 4:	 _Mode |= CHALLENGING_MODE_EQUIPMENT; break;
-					case 5:	 _Mode |= ZQ_SPELL_CHALLENGE_BONUS_RICH; break;*/
 			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_ONELIFE) && ( (player->M_Challenge_Mode & CHALLENGING_MODE_DONE_ONELIFE) == 0) ) 
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出一命模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_1);
 			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_MANUFACT) && ( (player->M_Challenge_Mode & CHALLENGING_MODE_DONE_MANUFACT) == 0) ) 
@@ -910,7 +915,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出任务模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_3);
 			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_EQUIPMENT) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_EQUIPMENT) == 0) )
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出装等模式，领取奖励　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_4);
-			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & ZQ_SPELL_CHALLENGE_BONUS_RICH) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_RICH) == 0) )
+			if (player->GetLevel() == 60 && (player->M_Challenge_Mode & CHALLENGING_MODE_RICH) && ((player->M_Challenge_Mode & CHALLENGING_MODE_DONE_RICH) == 0) )
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(__BLUE("＝＞　退出富豪（退后无属性加成、考虑好）　＜＝")), GOSSIP_SENDER_MAIN, __MENU_MODE_SUB_5);
 			if (player->GetLevel() == 60 
 				&& ((player->M_Challenge_Mode & CHALLENGING_MODE_KILLER_MASK) != 0)
@@ -979,9 +984,9 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 		}
 		
 		case __MENU_MODE_SUB_5:
-		{	
+		{		
 			player->M_Challenge_Mode |= CHALLENGING_MODE_DONE_RICH;
-			player->M_Challenge_Mode &= ~ZQ_SPELL_CHALLENGE_BONUS_RICH;
+			player->M_Challenge_Mode &= ~CHALLENGING_MODE_RICH;
 			 //sQZAchievements.SetChallengeMode(player, player->M_Challenge_Mode);
 			sQZAchievements.SetPlayerData(player, PLAYER_USED_CHALLGE_MODE, player->M_Challenge_Mode);
 			player->AddItem(ZQ_ITEM_GOLD_BAR, 5);
@@ -1011,7 +1016,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			//const int _eqLevelEach[] = { 20, 40, 55, 70 };	//Second Stage
 			//const int _eqLevelEach[] = { 18, 35, 60, 70 };	//3rd Stage
 			//const int _eqLevelEach[] = { 15, 30, 52, 80 };		//4th Stage
-			const int _eqLevelEach[] = { 10, 20, 30, 40 };		//4th Stage
+			const int _eqLevelEach[] = { 10, 20, 30, 50 };		//4th Stage
 			
 			//pick the _eqLevelEach for different level of player
 			auto __pick = pLevel < 26 ? 0 : pLevel < 36 ? 1 : pLevel < 46 ? 2 : 3;
@@ -1030,8 +1035,7 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 					_curEQLevel += pItem->GetProto()->ItemLevel;
 					if(pItem->GetProto()->InventoryType == INVTYPE_2HWEAPON) _curEQLevel += pItem->GetProto()->ItemLevel;
 
-					if(pItem->GetEntry() == ZQ_ITEM_CHENYI) _curEQLevel += player->GetLevel();
-					else if(pItem->GetEntry() == ZQ_ITEM_ZHANPAO) _curEQLevel += player->GetLevel();
+					if(pItem->GetEntry() >= ZQ_ITEM_CHENYI_START && pItem->GetEntry() <= ZQ_ITEM_ZHANPAO_END) _curEQLevel += player->GetLevel();
 
 					//check the random properties
 					if(pItem->GetItemRandomPropertyId() > 3300 && pItem->GetItemRandomPropertyId() < 3321)
