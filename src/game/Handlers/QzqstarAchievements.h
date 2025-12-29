@@ -81,6 +81,7 @@ enum Achievement_t
 //don't need caculate
 #define PLAYER_USED_CHALLGE_MODE				(90)
 #define PLAYER_USED_CUSTOM_TASKID				(100)	//Current Custom task ID for this player 
+#define PLAYER_USED_DUNGEON_DIFFICULTY			(110)	//Current Dungeon Difficulty for this player 
 
 
 //VIP Features

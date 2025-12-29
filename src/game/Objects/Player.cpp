@@ -13887,7 +13887,8 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
 			SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
 
 			//qzqstar, 241204, random reward the box if possbile
-			if (roll_chance_i(15))
+			//if (roll_chance_i(15))
+            if(false)
 			{
 				//only non-repeatable quest can offer box...
 				if (GetLevel() < 20) AddItem(30111);
@@ -15559,10 +15560,18 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     M_Achiv_Player_Custom_TaskID = sQZAchievements.GetPlayerData(this, PLAYER_USED_CUSTOM_TASKID); //Current Custom task ID for this player 
     //__LOG("18. Get TYPE:%d", PLAYER_USED_CHALLGE_MODE);
     M_Challenge_Mode = sQZAchievements.GetPlayerData(this, PLAYER_USED_CHALLGE_MODE);
+    M_Dungeon_Difficulty = sQZAchievements.GetPlayerData(this, PLAYER_USED_DUNGEON_DIFFICULTY);
 
     //compare and set the Max ID of Account
     if(M_Achiv_Account_Task_Custom_MaxID < M_Achiv_Player_Custom_TaskID) M_Achiv_Account_Task_Custom_MaxID = M_Achiv_Player_Custom_TaskID;
 
+    //Init the local varibales
+    M_Ticks = 0;
+    for(int _i=0; _i<32; _i++)
+    {
+		M_Spells_Ticks[_i] = 0;
+        M_Spells_Data[_i] = 0;
+    }
 
     InitPrimaryProfessions();                               // to max set before any spell loaded
 
@@ -16158,7 +16167,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     //4. chenyi and zhanpao
 
     //5. defaults to zero
-    M_Dungeon_Difficulty = 0;
 
 
 
@@ -17685,6 +17693,8 @@ void Player::SaveToDB(bool online, bool force)
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_RACIAL_SKILL_PASSIVE, M_Achiv_Player_RacialSpell_Passive);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_NUMS_RACIAL_SKILL_ACTIVE, M_Achiv_Player_RacialSpell_Active);
     sQZAchievements.SetPlayerData(this, PLAYER_USED_CUSTOM_TASKID, M_Achiv_Player_Custom_TaskID);
+    //sQZAchievements.SetPlayerData(this, PLAYER_USED_CHALLGE_MODE, M_Challenge_Mode);
+    sQZAchievements.SetPlayerData(this, PLAYER_USED_DUNGEON_DIFFICULTY, M_Dungeon_Difficulty);
     
 	sQZAchievements.Save(this);
 

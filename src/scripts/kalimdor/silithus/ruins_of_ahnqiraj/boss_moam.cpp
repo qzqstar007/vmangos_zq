@@ -61,8 +61,8 @@ struct boss_moamAI : public ScriptedAI
     void Reset() override
     {
         m_uiTrample_Timer = 6000;
-        m_uiSummonManaFiend_Timer = 90000;
-        m_uiTurnBackFromStone_Timer = 90000;
+        m_uiSummonManaFiend_Timer = 30000;
+        m_uiTurnBackFromStone_Timer = 60000;
         m_uiDrainMana_Timer = 5000;
 
         m_bIsInCombat = false;
@@ -164,7 +164,7 @@ struct boss_moamAI : public ScriptedAI
             if (DoCastSpellIfCan(m_creature, SPELL_ENERGIZE) == CAST_OK)
             {
                 // TODO: Not sure if the armor increase is Blizzlike, please investigate.
-                m_creature->SetArmor(18000);
+                m_creature->SetArmor(28000);
                 for (uint8 i = 0; i < 3; ++i)
                 {
                     // Summon a Mana fiend which will disappear if Moam is reset
@@ -176,8 +176,8 @@ struct boss_moamAI : public ScriptedAI
                                                TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
                 }
 
-                m_uiSummonManaFiend_Timer = 90000;
-                m_uiTurnBackFromStone_Timer = 90000;
+                m_uiSummonManaFiend_Timer = 30000;
+                m_uiTurnBackFromStone_Timer = 30000;
                 m_OGvictim = m_creature->GetVictim()->GetObjectGuid(); /** Memorize actual target to take it back,
                                       once the end of SPELL_ENERGIZE */
                 m_creature->AttackStop();
@@ -200,7 +200,7 @@ struct boss_moamAI : public ScriptedAI
         if (m_uiDrainMana_Timer < uiDiff)
         {
             DoCast(m_creature, SPELL_DRAINMANA);
-            m_uiDrainMana_Timer = 7000;
+            m_uiDrainMana_Timer = 5000;
         }
         else
             m_uiDrainMana_Timer -= uiDiff;

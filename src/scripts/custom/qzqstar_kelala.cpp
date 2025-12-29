@@ -37,6 +37,7 @@
 #define __MENU_KELALA_MAIN				 1000
 #define __MENU_KELALA_LOGIN				 2000
 #define __MENU_KELALA_EPIC_TASK			 3000 //S8 added
+#define __MENU_KELALA_BAG_UPGRADE		 4000 //s8 added
 #define __MENU_KELALA_TASK				 3000
 #define __MENU_KELALA_ACHIEVEMENTS		 4000
 #define __MENU_KELALA_MODE				 5000
@@ -383,6 +384,109 @@ bool Menus_Kelala_EpicTask(Player *player, Creature *_Creature, uint32 sender, u
 #pragma endregion
 
 
+
+#pragma region Bag Upgrade
+
+
+bool Menus_Kelala_BagUpgrade(Player *player, Creature *_Creature, uint32 sender, uint32 action)
+{
+	std::string text = "";
+	uint32 __menu_nums = 0;
+
+	auto abs_action = action - __MENU_KELALA_BAG_UPGRADE;
+
+	if(abs_action == 0)
+	{
+		//display bag upgrade menu
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("　　请将背包放在前四格子里　　　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　１２格－＞１４格　＜＝　")), GOSSIP_SENDER_MAIN, action + 12);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　１４格－＞１６格　＜＝　")), GOSSIP_SENDER_MAIN, action + 14);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　１６格－＞１８格　＜＝　")), GOSSIP_SENDER_MAIN, action + 16);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　１８格－＞２０格　＜＝　")), GOSSIP_SENDER_MAIN, action + 18);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　２０格－＞２２格　＜＝　")), GOSSIP_SENDER_MAIN, action + 20);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　２２格－＞２４格　＜＝　")), GOSSIP_SENDER_MAIN, action + 22);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　２４格－＞２６格　＜＝　")), GOSSIP_SENDER_MAIN, action + 24);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　２６格－＞２８格　＜＝　")), GOSSIP_SENDER_MAIN, action + 26);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　２８格－＞３０格　＜＝　")), GOSSIP_SENDER_MAIN, action + 28);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　３０格－＞３２格　＜＝　")), GOSSIP_SENDER_MAIN, action + 30);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　３２格－＞３４格　＜＝　")), GOSSIP_SENDER_MAIN, action + 32);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　３４格－＞ＭＡＸ　＜＝　")), GOSSIP_SENDER_MAIN, action + 34);		
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＞　返回　＜＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_MAIN);
+	}
+	else if (abs_action >= 12 && abs_action <= 34)
+	{
+		//// Furthor: pow(2, (abs_action - 10) / 2) * 10 Y
+		// or (abs_acton - 10)^3 /2
+		//auto _needGold = (abs_action - 10) * (abs_action - 10) / 4;
+		auto _needSilver = (abs_action - 11) * (abs_action - 11) * (abs_action - 11) * 3;
+		#define __BAG_RES_NUM (2)
+		//check if player has the item of bag upgrade
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("　　↓↓ 请确认以下物品 ↓↓　　　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		for(uint32 i = 0; i < __BAG_RES_NUM; i++)
+		{
+			auto pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + i);
+			if(pItem)
+			{
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(Helper_MakeString(COLOR_BLUE, "<%s> ＝＞　%d 格子 ", pItem->GetProto()->Name1, pItem->GetProto()->ContainerSlots).c_str()), GOSSIP_SENDER_MAIN, __MENU_NONE);
+			}
+		}
+		text = __STR("需要花费：　|cff007733");
+		text.append(__NSTR(_needSilver/100));
+		text.append(__STR("　金　 "));
+		text.append(__NSTR(_needSilver%100));
+		text.append(__STR("　银　 |r  "));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);		
+		text = __STR("转化为：|cff007733");
+		text.append(__NSTR(abs_action+2));
+		text.append(__STR(" 格包  |r  "));
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("＝＝＝＝＞　确定　＜＝＝＝＝　"), GOSSIP_SENDER_MAIN, action + 100);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("＝＝＝＝＞　返回　＜＝＝＝＝　"), GOSSIP_SENDER_MAIN, action/1000*1000);
+	}
+	else if (abs_action >= 112 && abs_action <= 134)
+	{
+		//check if player has enough money 
+		//auto _needGold = (abs_action - 110) * (abs_action - 110) / 4;
+		auto _counts = 0;
+		auto _needSilver = (abs_action - 111) * (abs_action - 111) * (abs_action - 111) * 3;
+
+		for(uint32 i = 0; i < __BAG_RES_NUM; i++)
+		{
+			auto pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + i);
+			if(pItem && pItem->GetProto()->Class == ITEM_CLASS_CONTAINER && pItem->GetProto()->SubClass == ITEM_SUBCLASS_CONTAINER && pItem->GetProto()->ContainerSlots == (abs_action - 100))
+			{
+				_counts ++;
+			}
+		}
+
+		if(player->GetMoney() < _needSilver * 100)
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　金币不够，返回！　＝＝　")), GOSSIP_SENDER_MAIN, action/1000*1000);
+		}
+		else if (_counts < __BAG_RES_NUM)
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__RED("＝＝　背包数量不够，返回！　＝＝　")), GOSSIP_SENDER_MAIN, action/1000*1000);
+		}
+		else
+		{
+			player->ModifyMoney(0 - _needSilver * 100);
+			for(uint32 i = 0; i < __BAG_RES_NUM; i++)
+			{
+				player->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + i, true);
+			}
+			player->AddItem(ZQ_ITEM_BAG_START + (abs_action - 112)/2, 1);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("＝＞　背包升级成功，返回。　＜＝ "), GOSSIP_SENDER_MAIN, action/1000*1000);
+		}
+	}
+
+	player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
+	return true;
+}
+
+
+#pragma endregion
 
 #pragma region Dynamic Task_Generate
 
@@ -1013,10 +1117,10 @@ bool Menus_Kelala_Mode(Player *player, Creature *_Creature, uint32 sender, uint3
 			//get the all levels, and expected level
 			//directly assign the eqlevel
 			//const int _eqLevelEach[] = {25, 40, 55, 70}; // First stage
-			//const int _eqLevelEach[] = { 20, 40, 55, 70 };	//Second Stage
+			const int _eqLevelEach[] = { 20, 30, 40, 50 };	//Second Stage
 			//const int _eqLevelEach[] = { 18, 35, 60, 70 };	//3rd Stage
 			//const int _eqLevelEach[] = { 15, 30, 52, 80 };		//4th Stage
-			const int _eqLevelEach[] = { 10, 20, 30, 50 };		//4th Stage
+			//const int _eqLevelEach[] = { 10, 20, 30, 50 };		//4th Stage
 			
 			//pick the _eqLevelEach for different level of player
 			auto __pick = pLevel < 26 ? 0 : pLevel < 36 ? 1 : pLevel < 46 ? 2 : 3;
@@ -2250,7 +2354,9 @@ bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 acti
 
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　史诗任务　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_EPIC_TASK);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
-
+	
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　背包升级　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_BAG_UPGRADE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　成就系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_ACHIEVEMENTS);
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
@@ -2351,6 +2457,11 @@ bool Kelala_Menus(Player *player, Creature *_cr, uint32 sender, uint32 action)
 	else if (action >= __MENU_KELALA_EPIC_TASK && action <= __MENU_KELALA_EPIC_TASK + __MENU_SIZE)
 	{
 		return Menus_Kelala_EpicTask(player, _cr, sender, action);
+	}
+	// Bag upgrade menu
+	else if (action >= __MENU_KELALA_BAG_UPGRADE && action <= __MENU_KELALA_BAG_UPGRADE + __MENU_SIZE)
+	{
+		return Menus_Kelala_BagUpgrade(player, _cr, sender, action);
 	}
 	// Equipment refine menu
 	/*

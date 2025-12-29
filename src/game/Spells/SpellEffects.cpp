@@ -53,6 +53,7 @@
 #include "QzqstarAchievements.h"
 #include "Chat.h"
 #include "custom\qzqstar_id.h"
+#include "custom\qzqstar_db.h"
 
 using namespace Spells;
 
@@ -811,6 +812,9 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     //return if in lvguan
                     if( (player->GetRestType() != REST_TYPE_NO) )  return;
 
+                    player->M_Ticks ++;
+                    
+
 					//Check warrior
 					if (player->GetClass() == CLASS_WARRIOR)
 					{
@@ -1356,8 +1360,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					return;
 				}
 
-				case 32986:
-				case 32987:
+
 				case 32997:	//Scroll Targeting to the Cloths
 				case 32996: //Skill targetting to the Weapons
 				{
@@ -1404,7 +1407,129 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					return;
 				}
 
-				case 32995:
+                //T0 -> T0.5 transfer
+                case 32930:
+				{
+					if (m_caster->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					itemTarget = m_targets.getItemTarget();
+					if (!itemTarget)
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage("Wrong Item!");
+						return;
+					}
+
+					if (itemTarget->IsEquipped())
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>请注意：装备必须放在背包中！只能给自己使用！<<<")).c_str());
+						return;
+					}
+
+                    //then check the id
+                    uint16_t t05_id = DBHelper_convert_t0_t05(itemTarget->GetProto()->ItemId);
+                    if(t05_id == 0)
+                    {
+                        ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>该装备不是T0装备，不能转换为T0.5装备!<<<")).c_str());
+						return;
+                    }
+
+                    //found the t05 and remove the orginal item, and add the new item
+                    ItemPrototype const* pNewItemProto    = sObjectMgr.GetItemPrototype(t05_id);
+                    if(!pNewItemProto)
+                    {
+                        ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>T0.5装备转化错误!<<<")).c_str());
+						return;
+                    }
+                    else
+                    {
+                        auto enchantID = 0;
+                        if(itemTarget->GetEnchantmentId((EnchantmentSlot)( PERM_ENCHANTMENT_SLOT )) > 3000)
+                        {
+                            enchantID = DBHelper_GetSpecialSlotsByLevel(pNewItemProto->ItemLevel);
+                        }
+                        itemTarget->SetEntry(pNewItemProto->ItemId);
+                        itemTarget->SetItemRandomProperties(DBHelper_get_random_talent_enchant_ID(pNewItemProto));
+                        itemTarget->SetEnchantment((EnchantmentSlot)( PERM_ENCHANTMENT_SLOT ), enchantID, 0, 0);
+                        itemTarget->SetGuidValue(ITEM_FIELD_GIFTCREATOR, (1));
+
+                        itemTarget->SetState(ITEM_CHANGED);
+						itemTarget->AddToUpdateQueueOf(m_caster->ToPlayer());
+                    }
+
+					return;
+				}
+
+                //Citiao rerandom
+                case 32931:
+				{
+                    bool _failed = false;
+					if (m_caster->GetTypeId() != TYPEID_PLAYER)
+						return;
+
+					itemTarget = m_targets.getItemTarget();
+					if (!_failed && !itemTarget)
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage("Wrong Item!");
+						_failed = true;
+					}
+
+					if (!_failed && itemTarget->IsEquipped())
+					{
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>请注意：装备必须放在背包中！只能给自己使用！<<<")).c_str());
+						_failed = true;
+					}
+
+                    //then check the id
+                    if(!_failed && (itemTarget->GetProto()->Quality < 3 ||
+                        (itemTarget->GetProto()->Class != ITEM_CLASS_WEAPON && itemTarget->GetProto()->Class != ITEM_CLASS_ARMOR)) )
+                    {
+                        ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>目标物品错误！只能对蓝色品质以上装备使用。<<<")).c_str());
+						_failed = true;
+                    }
+
+                    //get the subclass
+                    uint8_t _subclass = itemTarget->GetProto()->SubClass;
+                    uint8_t _totalCnts = ( _subclass == ITEM_SUBCLASS_ARMOR_CLOTH ? 5 : 
+                                    _subclass == ITEM_SUBCLASS_ARMOR_LEATHER ? 4 : 
+                                    _subclass == ITEM_SUBCLASS_ARMOR_MAIL ? 3 : 
+                                    _subclass == ITEM_SUBCLASS_ARMOR_PLATE ? 2 : 2);
+                    uint8_t _currentCnts = itemTarget->GetGuidValue(ITEM_FIELD_GIFTCREATOR);
+                    //check if too much times
+                    if(!_failed &&  _currentCnts >= _totalCnts)
+                    {
+                        ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>该装备重置次数超过上限，不能重新随机附魔。<<<")).c_str());
+						_failed = true;
+                    }
+
+                    //found the t05 and remove the orginal item, and add the new item
+                    if(!_failed)
+                    {
+                        auto enchantID = 0;
+						const ItemPrototype * pNewItemProto = itemTarget->GetProto();
+                        if(itemTarget->GetEnchantmentId((EnchantmentSlot)( PERM_ENCHANTMENT_SLOT )) > 3000)
+                        {
+                            enchantID = DBHelper_GetSpecialSlotsByLevel(pNewItemProto->ItemLevel);
+                        }
+                        itemTarget->SetEntry(pNewItemProto->ItemId);
+                        itemTarget->SetItemRandomProperties(DBHelper_get_random_talent_enchant_ID(pNewItemProto));
+                        itemTarget->SetEnchantment((EnchantmentSlot)( PERM_ENCHANTMENT_SLOT ), enchantID, 0, 0);
+                        itemTarget->SetGuidValue(ITEM_FIELD_GIFTCREATOR, _currentCnts + 1);
+						ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>你已经成功刷新随机附魔次数：%u , 还剩下  %u  次机会。<<<")).c_str(),
+                            _currentCnts + 1, _totalCnts - (_currentCnts + 1));
+                        itemTarget->SetState(ITEM_CHANGED);
+						itemTarget->AddToUpdateQueueOf(m_caster->ToPlayer());
+                    }
+                    else
+                    {
+                        ChatHandler(m_caster->ToPlayer()).PSendSysMessage(((std::string)(">>>使用重置卷轴失败！<<<")).c_str());
+                        m_caster->ToPlayer()->AddItem(ZQ_ITEM_RERAND_Q4, 1);
+                    }
+
+					return;
+				}
+
+				case 32994:
 				{
 					//qzqstar games
 					//add for random spells
@@ -1425,21 +1550,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					}
 
 					pPlayer->CastSpell(pPlayer, spellId, true, nullptr);
-
-					return;
-				}
-
-				case 32994:
-				{
-					//qzqstar games - killer spell - random level 2
-					/* Remove the spells, due to toomany spells
-					if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
-					return;
-
-					Player* pPlayer = unitTarget->ToPlayer();
-
-					uint32 spellId = PickRandomValue(32311, 32316, 32321, 32326, 32331, 32336, 32341, 32308);
-					pPlayer->CastSpell(pPlayer, spellId, true, nullptr); */
 
 					return;
 				}
@@ -1488,6 +1598,10 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 					return;
 				}
+
+
+
+
 				case 32962:
 				{
 					// qzqstar, 241204, set the "Crafted by ..." property of the item
@@ -5587,7 +5701,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
 
                     // found, remove seal                    
 					// qzqstar keep the seal after judgement
-                    // m_casterUnit->RemoveAurasDueToSpellByCancel(aura->GetId());
+					if (m_casterUnit->IsPlayer() && (m_casterUnit->ToPlayer()->HasSpell(25956) || m_casterUnit->ToPlayer()->HasSpell(25957)))
+					{
+						//keep the seal						
+					}
+					else
+					{
+						m_casterUnit->RemoveAurasDueToSpellByCancel(aura->GetId());
+					}
+
                     break;
                 }
 

@@ -939,6 +939,9 @@ class Player final: public Unit
 
         uint32 M_Dungeon_Difficulty;  //defaults to zero
 
+        uint32 M_Ticks; //Used for some scripts.
+        uint32 M_Spells_Ticks[32]; //Used for some scripts.
+        uint32 M_Spells_Data[32]; //Used for some scripts.
 
 
         Item* AddItem(uint32 itemId, uint32 count = 1);

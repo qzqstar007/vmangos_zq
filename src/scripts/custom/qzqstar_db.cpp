@@ -9553,4 +9553,217 @@ uint16_t DBHelper_get_random_chest_bonus()
 }
 
 
+
+
+std::vector<std::pair<int, int>> t0_items = {
+	// 鬼雾
+	{16698, 22074},
+	{16699, 22072},
+	{16700, 22075},
+	{16701, 22073},
+	{16702, 22070},
+	{16703, 22071},
+	{16704, 22076},
+	{16705, 22077},
+	
+	// 野性之心
+	{16706, 22113},
+	{16714, 22108},
+	{16715, 22107},
+	{16716, 22106},
+	{16717, 22110},
+	{16718, 22112},
+	{16719, 22111},
+	{16720, 22109},
+	
+	// 野兽追猎者
+	{16674, 22060},
+	{16675, 22061},
+	{16676, 22015},
+	{16677, 22013},
+	{16678, 22017},
+	{16679, 22016},
+	{16680, 22010},
+	{16681, 22011},
+	
+	// 迅影
+	{16707, 22005},
+	{16708, 22008},
+	{16709, 22007},
+	{16710, 22004},
+	{16711, 22003},
+	{16712, 22006},
+	{16713, 22002},
+	{16721, 22009},
+	
+	// 虔诚
+	{16690, 22083},
+	{16691, 22084},
+	{16692, 22081},
+	{16693, 22080},
+	{16694, 22085},
+	{16695, 22082},
+	{16696, 22078},
+	{16697, 22079},
+	
+	// 博学者
+	{16682, 22064},
+	{16683, 22063},
+	{16684, 22066},
+	{16685, 22062},
+	{16686, 22065},
+	{16687, 22067},
+	{16688, 22069},
+	{16689, 22068},
+	
+	// 勇气
+	{16730, 21997},
+	{16731, 21999},
+	{16732, 22000},
+	{16733, 22001},
+	{16734, 21995},
+	{16735, 21996},
+	{16736, 21994},
+	{16737, 21998},
+	
+	// 光铸
+	{16722, 22088},
+	{16723, 22086},
+	{16724, 22090},
+	{16725, 22087},
+	{16726, 22089},
+	{16727, 22091},
+	{16728, 22092},
+	{16729, 22093},
+	
+	// 元素
+	{16666, 22102},
+	{16667, 22097},
+	{16668, 22100},
+	{16669, 22101},
+	{16670, 22096},
+	{16671, 22095},
+	{16672, 22099},
+	{16673, 22098}
+};
+uint16_t DBHelper_convert_t0_t05(uint16_t item_id)
+{
+    // 遍历所有映射对
+    for (const auto& mapping : t0_items) {
+        if (mapping.first == item_id) {
+            return mapping.second;  // 找到匹配，返回对应的第二个值
+        }
+    }
+    return 0;  // 没有找到匹配项
+}
+
+
+
+uint16_t DBHelper_get_random_talent_enchant_ID(ItemPrototype const * itemProto)
+{
+	uint16_t _chance = 0;
+	uint16_t _peak_chance = 0;
+	uint16_t _randomID = 0;
+
+	//modify the chance
+	_chance = 40 + itemProto->Quality * 10;
+	if(_chance > 100) _chance = 100;
+
+	//peak chance as well
+	_peak_chance = 5 + itemProto->Quality * 5;
+	if(_peak_chance > 15) _peak_chance = 15;
+
+	//the good items must have 100 chance
+	if(itemProto->ItemLevel > 60)
+	{
+		_chance = 100;
+	}
+
+	if(roll_chance_i(_chance))
+	{
+		uint32 _randMin = 0;
+		uint32 _randMax = 1;
+		uint32 _itemLevel = itemProto->ItemLevel;
+		uint32 _enchantNums = 0;
+		uint32 _enchantStart = 0;
+		#define __MAX_ITEM_LEVEL (80)
+		if(itemProto->InventoryType == INVTYPE_ROBE || itemProto->InventoryType == INVTYPE_CHEST)
+		{
+			_enchantStart = ZQ_ENCHANT_ROBE; _enchantNums = ZQ_ENCHANT_ROBE_NUM;
+		}
+		else if (itemProto->InventoryType == INVTYPE_LEGS)
+		{
+			_enchantStart = ZQ_ENCHANT_LEG; _enchantNums = ZQ_ENCHANT_LEG_NUM;
+		}
+		else if (itemProto->InventoryType == INVTYPE_FEET)
+		{
+			_enchantStart = ZQ_ENCHANT_FEET; _enchantNums = ZQ_ENCHANT_FEET_NUM;
+		}
+		else if (itemProto->InventoryType == INVTYPE_HANDS)
+		{
+			_enchantStart = ZQ_ENCHANT_GLOVE; _enchantNums = ZQ_ENCHANT_GLOVE_NUM;
+		}
+		else if (itemProto->InventoryType == INVTYPE_CLOAK)
+		{
+			_enchantStart = ZQ_ENCHANT_CLOAK; _enchantNums = ZQ_ENCHANT_CLOAK_NUM;
+		}
+		else if (itemProto->InventoryType == INVTYPE_WAIST)
+		{
+			_enchantStart = ZQ_ENCHANT_BELT; _enchantNums = ZQ_ENCHANT_BELT_NUM;
+		}
+		else if (itemProto->InventoryType == INVTYPE_WRISTS)
+		{
+			_enchantStart = ZQ_ENCHANT_SHOUWAN; _enchantNums = ZQ_ENCHANT_SHOUWAN_NUM;
+		}
+		else if (itemProto->InventoryType == INVTYPE_SHOULDERS)
+		{
+			_enchantStart = ZQ_ENCHANT_SHOULDER; _enchantNums = ZQ_ENCHANT_SHOULDER_NUM;
+		}
+		else if (itemProto->InventoryType == INVTYPE_HEAD)
+		{
+			_enchantStart = ZQ_ENCHANT_HEAD; _enchantNums = ZQ_ENCHANT_HEAD_NUM;
+		}
+		/*
+		else if ( (itemProto->InventoryType == INVTYPE_WEAPON)
+			|| (itemProto->InventoryType == INVTYPE_2HWEAPON)
+			|| (itemProto->InventoryType == INVTYPE_WEAPONMAINHAND)
+			|| (itemProto->InventoryType == INVTYPE_WEAPONOFFHAND)
+			|| (itemProto->InventoryType == INVTYPE_RANGED)
+		)
+		{
+			if(roll_chance_i(20)) _enchantStart = ZQ_ENCHANT_WEAPON; _enchantNums = ZQ_ENCHANT_WEAPON_NUM;
+			else if (roll_chance_i(10))
+		}*/
+		else
+		{
+			_enchantNums = 0;_enchantStart=0;
+		}
+
+		if(_enchantNums + _enchantStart != 0)
+		{
+			if(_itemLevel >= __MAX_ITEM_LEVEL) { _randMin = _enchantNums/2; _randMax = _enchantNums; }
+			else if (_itemLevel <= __MAX_ITEM_LEVEL/2) { _randMin = 0; _randMax = _enchantNums/2; }
+			else {_randMin = _enchantNums * (_itemLevel - __MAX_ITEM_LEVEL/2) / __MAX_ITEM_LEVEL ; _randMax =  _enchantNums * _itemLevel/ __MAX_ITEM_LEVEL; }
+			_randomID = urand(_enchantStart + _randMin, _enchantStart + _randMax-1);
+		}
+		else
+		{
+			_randomID = 0;
+		}
+	}
+	
+	if (roll_chance_i(_peak_chance))
+	{
+		_randomID = PickRandomValue(ZQ_ENCHANT_LEECH, ZQ_ENCHANT_HEROIC, ZQ_ENCHANT_HEROIC + 1, ZQ_ENCHANT_HEROIC + 2);
+		uint32 _nxt_rand = urand(1, 100);
+		if (_nxt_rand > 80) 
+			_randomID = PickRandomValue(ZQ_ENCHANT_HEROIC+3, ZQ_ENCHANT_HEROIC + 4, ZQ_ENCHANT_HEROIC + 5,
+						ZQ_ENCHANT_HEROIC_LEECH2, ZQ_ENCHANT_HEROIC_LEECH2+1, ZQ_ENCHANT_HEROIC_LEECH2+2);
+		else if ((_nxt_rand < 10)  && (itemProto->Quality >= 3))
+			_randomID = PickRandomValue(ZQ_ENCHANT_HEROIC + 6, ZQ_ENCHANT_HEROIC_LEECH2 + 3);
+	} 
+
+	return _randomID;
+}
+
 #pragma endregion

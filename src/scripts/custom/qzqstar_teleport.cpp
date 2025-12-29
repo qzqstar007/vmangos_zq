@@ -315,7 +315,7 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 			//uint32 _achievedDifficulty = (_playerRaidsInfo >> 2) & 0x03;
 			//text.append(__STR(" => "));
 			//text.append(__DUNGEONS_DIFFICULTY_MINIMUM[_achievedDifficulty]);
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT1 + i); //add the difficulty to the menu
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(text), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT2 + i); //add the difficulty to the menu
 		}
 
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE);	
@@ -353,26 +353,27 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 		//get the real actions = acID
 		uint32 _acID = action - __MENU_TELEPORT_RAIDS_MAIN - __MENU_TELEPORT_RAIDS_ACT1;
 		//get the dungeon information
-		uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_RAIDS, player, _acID);
-
+		//uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_RAIDS, player, _acID);
+		/*
 		//lower 2bit is current difficulty, higher 2bit is achieved difficulty.
-		uint32 _currentDifficulty = _playerDungeonInfo & 0x03;
-		uint32 _achievedDifficulty = (_playerDungeonInfo >> 2) & 0x03;
+		//uint32 _currentDifficulty = _playerDungeonInfo & 0x03;
+		//uint32 _achievedDifficulty = (_playerDungeonInfo >> 2) & 0x03;
 
 		//display the info
-		text.append(__STR("当前地图：　"));
-		text.append(__STR(TP_Raids[_acID].name));
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE); 
+		//text.append(__STR("当前地图：　"));
+		//text.append(__STR(TP_Raids[_acID].name));
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE); 
 
-		text = "";
-		text.append(__STR("可挑战难度：　"));
-		text.append(__DUNGEONS_DIFFICULTY_MINIMUM[_achievedDifficulty]);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE); 
+		//text = "";
+		//text.append(__STR("可挑战难度：　"));
+		//text.append(__DUNGEONS_DIFFICULTY_MINIMUM[_achievedDifficulty]);
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(text), GOSSIP_SENDER_MAIN, __MENU_NONE); 
 
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE); 
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("＝＝＝选择难度传送＝＝＝ "), GOSSIP_SENDER_MAIN,  __MENU_NONE);
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_NONE); 
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR("＝＝＝选择难度传送＝＝＝ "), GOSSIP_SENDER_MAIN,  __MENU_NONE);
 
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__DUNGEONS_DIFFICULTY[0]), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT2 + _acID + 0); 
+		//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__DUNGEONS_DIFFICULTY[0]), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_RAIDS_MAIN + __MENU_TELEPORT_RAIDS_ACT2 + _acID + 0); 
+
 
 		for (uint32 i = 1; i < 4; i++)
 		{
@@ -385,7 +386,7 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 			{
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, __STR(__DUNGEONS_DIFFICULTY_DISABLED[i]), GOSSIP_SENDER_MAIN, __MENU_NONE); 
 			}
-		}
+		}*/
 	}
 
 	//FIX bug: i * 32 means, max might be about 200, 6*32...
@@ -398,19 +399,21 @@ bool Menus_teleport_Raids(Player *player, Creature *_cr, uint32 sender, uint32 a
 		uint32 _acID = _localBytes & 0x1F;
 
 		//difficulty is higher 3 bit, 0 means normal, 1 means trial, 2 means hell, 3 means nightmare.
-		uint32 _difficulty = (_localBytes >> 5) & 0x03;
+		//uint32 _difficulty = (_localBytes >> 5) & 0x03;
+		uint32 _difficulty = 1;
 
 		//get the dungeon information
-		uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_RAIDS, player, _acID);	
+		//uint32 _playerDungeonInfo = sQZAchievements.GetDungeonsInfo(ACHIEVEMENTS_RAIDS, player, _acID);	
 		//save the current difficulty
-		_playerDungeonInfo &= 0x0C; //clear the lower 4 bit, keep the higher 4 bit.
-		_playerDungeonInfo |= _difficulty; //set the lower 4 bit to the difficulty.
-		sQZAchievements.SetDungeonsInfo(ACHIEVEMENTS_RAIDS, player, _acID, _playerDungeonInfo); //save the dungeon information to the player's achievements vector.
+		//_playerDungeonInfo &= 0x0C; //clear the lower 4 bit, keep the higher 4 bit.
+		//_playerDungeonInfo |= _difficulty; //set the lower 4 bit to the difficulty.
+		//sQZAchievements.SetDungeonsInfo(ACHIEVEMENTS_RAIDS, player, _acID, _playerDungeonInfo); //save the dungeon information to the player's achievements vector.
+		player->M_Dungeon_Difficulty = _difficulty;
 
 		player->CLOSE_GOSSIP_MENU();
 		//chathandler ...
 		std::string monsterName = "所有BOSS";
-		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Raids[_acID].name.c_str(), _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("试炼　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "), monsterName.c_str());
+		ChatHandler(player).PSendSysMessage(ZQ_MANGOS_STRING_DUNGEON_PLAYER_TELEPORT, TP_Raids[_acID].name.c_str(), _difficulty==0?__STR("普通　 "):_difficulty==1?__STR("英雄　 "):_difficulty==2?__STR("地狱　 "):__STR("梦魇　 "), monsterName.c_str());
 		
 		//teleport to the dungeon.
 		player->TeleportTo(TP_Raids[_acID].tele_mapid, TP_Raids[_acID].tele_x, TP_Raids[_acID].tele_y, TP_Raids[_acID].tele_z, TP_Raids[_acID].tele_o, TELE_TO_FORCE_MAP_CHANGE);
@@ -638,18 +641,18 @@ bool Menus_teleport_Common(Player *player, Creature *_cr, uint32 sender, uint32 
 			else if(_abs_skill == 11) 	{spell_id1 = 19902; skill_id1 = SKILL_FIRST_AID;}
 			else if(_abs_skill == 12) 	{spell_id1 = 18261; skill_id1 = SKILL_COOKING;}
 			*/
-			if(_abs_skill == 1) 		{spell_id1 = 11994; skill_id1 = SKILL_HERBALISM;}
-			else if(_abs_skill == 2) 	{spell_id1 = 11612; skill_id1 = SKILL_ALCHEMY;}
-			else if(_abs_skill == 3) 	{spell_id1 = 10249; skill_id1 = SKILL_MINING;}
-			else if(_abs_skill == 4) 	{spell_id1 = 9786;  skill_id1 = SKILL_BLACKSMITHING;}
-			else if(_abs_skill == 5) 	{spell_id1 = 10769; skill_id1 = SKILL_SKINNING;}
-			else if(_abs_skill == 6) 	{spell_id1 = 10663; skill_id1 = SKILL_LEATHERWORKING;}
-			else if(_abs_skill == 7) 	{spell_id1 = 12181; skill_id1 = SKILL_TAILORING;}
-			else if(_abs_skill == 8) 	{spell_id1 = 13921; skill_id1 = SKILL_ENCHANTING;}
-			else if(_abs_skill == 9) 	{spell_id1 = 12657; skill_id1 = SKILL_ENGINEERING;}
-			else if(_abs_skill == 10) 	{spell_id1 = 18249; skill_id1 = SKILL_FISHING;}
-			else if(_abs_skill == 11) 	{spell_id1 = 19902; skill_id1 = SKILL_FIRST_AID;}
-			else if(_abs_skill == 12) 	{spell_id1 = 18261; skill_id1 = SKILL_COOKING;}
+			if(_abs_skill == 1) 		{spell_id1 = 11993; skill_id1 = SKILL_HERBALISM;}
+			else if(_abs_skill == 2) 	{spell_id1 = 11611; skill_id1 = SKILL_ALCHEMY;}
+			else if(_abs_skill == 3) 	{spell_id1 = 10248; skill_id1 = SKILL_MINING;}
+			else if(_abs_skill == 4) 	{spell_id1 = 9785;  skill_id1 = SKILL_BLACKSMITHING;}
+			else if(_abs_skill == 5) 	{spell_id1 = 10768; skill_id1 = SKILL_SKINNING;}
+			else if(_abs_skill == 6) 	{spell_id1 = 10662; skill_id1 = SKILL_LEATHERWORKING;}
+			else if(_abs_skill == 7) 	{spell_id1 = 12180; skill_id1 = SKILL_TAILORING;}
+			else if(_abs_skill == 8) 	{spell_id1 = 13920; skill_id1 = SKILL_ENCHANTING;}
+			else if(_abs_skill == 9) 	{spell_id1 = 12656; skill_id1 = SKILL_ENGINEERING;}
+			else if(_abs_skill == 10) 	{spell_id1 = 18248; skill_id1 = SKILL_FISHING;}
+			else if(_abs_skill == 11) 	{spell_id1 = 10846; skill_id1 = SKILL_FIRST_AID;}
+			else if(_abs_skill == 12) 	{spell_id1 = 18260; skill_id1 = SKILL_COOKING;}
 			if(spell_id1 && skill_id1)
 			{
 				player->LearnSpell(spell_id1, false);
@@ -727,7 +730,7 @@ bool Menus_teleport_Main(Player *player, Creature *_cr, uint32 sender, uint32 ac
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	}
 
-	if(player->GetLevel() >= 60) 
+	if(player->GetLevel() >= 58) 
 	{
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　团本传送　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_TELEPORT_RAIDS);
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);

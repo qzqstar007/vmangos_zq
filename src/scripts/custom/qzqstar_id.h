@@ -44,6 +44,9 @@
 #define ZQ_ITEM_PET_FOOD			30011	//Pet Food, 宠物食物
 
 #define ZQ_ITEM_BAG_HUNTER			30012	//Bag Hunter, 猎人背包
+#define ZQ_ITEM_RERAND_T05			30013	//Random T05, 随机T05
+#define ZQ_ITEM_RERAND_Q4			30014	//Random Q4, 随机Q4
+
 
 #define ZQ_ITEM_GOLD_COIN           30016   //Gold Bar, 金条
 #define ZQ_ITEM_GOLD_BAR            30018   //Gold Bar, 金砖
@@ -94,6 +97,9 @@
 #define ZQ_ITEM_RAID_BWL            30095   //Raid FX, 副本废墟
 #define ZQ_ITEM_RAID_TAQ            30096   //Raid TAQ, 副本TZQ
 #define ZQ_ITEM_RAID_NAXX           30097   //Raid NAXX, 副本NAXX
+
+//BAG
+#define ZQ_ITEM_BAG_START           30101   //14 slots.
 
 // 30200 - season 8
 #define ZQ_ITEM_ACHIVE_ITEM         30009   //Achievement item, 成就物品
@@ -412,7 +418,8 @@ update creature_template set health_multiplier=500, damage_multiplier=30 where e
 //Drakkisath
 update creature_template set health_multiplier=100, damage_multiplier=30 where entry in (10363, 10430, 10429);
 
-//kahzakke 12397
+//kahzakke 12397 and four dragons
+update creature_template set health_multiplier=3000, damage_multiplier=300 where entry in (12397, 14889, 14887, 14888, 14890, 6109);
 update creature_template set health_multiplier=3000, damage_multiplier=300 where entry in (12397, 14889, 14887, 14888, 14890, 6109);
 
 //S8
@@ -434,8 +441,10 @@ update creature_template set health_multiplier=2500, damage_multiplier=70 where 
 update spell_template set castingTimeIndex=1, recoveryTime=1000 where entry = 19873;
 
 -- AQ boss
--- 15339, 15370, 15369, 15348, 15341, 15340
-update creature_template set health_multiplier=3000, damage_multiplier=80 where entry in (15339, 15370, 15369, 15348, 15341, 15340);
+-- 15339, 15370, 15369, 15348, 15341, 15340 - FX
+update creature_template set health_multiplier=1100, damage_multiplier=30 where entry in (15339, 15370, 15369, 15348, 15341, 15340);
+update creature_template set health_multiplier=600, damage_multiplier=20 where entry in (15527); //mana fiend
+
 -- 15510, 15543,15727,15511,15509,15517,15516,15275,15276,15544,15299,15263
 update creature_template set health_multiplier=3500, damage_multiplier=90 where entry in (15510, 15543,15727,15511,15509,15517,15516,15275,15276,15544,15299,15263);
 

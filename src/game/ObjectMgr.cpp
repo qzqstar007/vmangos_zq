@@ -6384,9 +6384,10 @@ void ObjectMgr::LoadQuests()
 
     m_ExclusiveQuestGroups.clear();
 
+    
 	//qzqstar, 250329, remove the quests that larger than some ID
-    #define __USER_CUSTOM_QUEST_ID	(10000)
-	CharacterDatabase.PExecute("DELETE FROM `character_queststatus` WHERE `quest` > '%u'", __USER_CUSTOM_QUEST_ID);
+    //#define __USER_CUSTOM_QUEST_ID	(10000)
+	//CharacterDatabase.PExecute("DELETE FROM `character_queststatus` WHERE `quest` > '%u'", __USER_CUSTOM_QUEST_ID);
 
     // Normal quest template
     //                                                                0        1         2             3           4             5       6                  7                8                9

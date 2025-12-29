@@ -69,7 +69,8 @@ struct WarriorShieldSlamScript : SpellScript
         if (effIdx == EFFECT_INDEX_1 && spell->m_casterUnit)
         {
             uint32_t multiplier = 1;
-            if(spell->m_casterUnit->HasSpell(31033)) multiplier = 50;
+            if(spell->m_casterUnit->HasSpell(12311)) multiplier = 8;
+            if(spell->m_casterUnit->HasSpell(12958)) multiplier = 15;
             spell->damage += spell->m_casterUnit->GetShieldBlockValue() * multiplier;
         }
         return true;

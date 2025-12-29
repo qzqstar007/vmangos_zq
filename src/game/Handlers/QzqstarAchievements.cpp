@@ -352,6 +352,7 @@ int32  QzqstarAchievements::InitPlayerData(Player * _player)
     _player->M_Achiv_Player_RacialSpell_Active = 0;
 	_player->M_Achiv_Player_Custom_TaskID = 0;
 	_player->M_Challenge_Mode = 0;
+	_player->M_Dungeon_Difficulty = 0;
 
 	__LOG("[QzqstarAchievements::Init New Player Data] Name:%s GUID:%u", _player->GetName(), _player->GetGUID());
 
@@ -389,6 +390,7 @@ uint32 QzqstarAchievements::GetPlayerData(Player * _player, uint32 type)
 
 		case PLAYER_USED_CHALLGE_MODE:			_data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data9; break;
 		case PLAYER_USED_CUSTOM_TASKID:			_data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data10; break; 
+		case PLAYER_USED_DUNGEON_DIFFICULTY:	_data = _player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data11; break;
 		default:  
 			__LOG("[QzqstarAchievements::GetPlayerData] Not found data for player:%s, type:%d", _player->GetName(), type);
 			break;
@@ -516,6 +518,11 @@ void QzqstarAchievements::SetPlayerData(Player * _player, uint32 type, uint32 da
 		case PLAYER_USED_CUSTOM_TASKID:
 		{
 			_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data10 = data; 
+			break;
+		}
+		case PLAYER_USED_DUNGEON_DIFFICULTY:
+		{
+			_player->M_Achievements[ACHIEVEMENT_PLAYER_DATA].data11 = data; 
 			break;
 		}
 		

@@ -510,6 +510,12 @@ Map* MapManager::CreateInstance(uint32 id, Player* player)
     bool newlyGeneratedInstanceId = false;
     MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(id);
 
+    if(entry == nullptr)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MapManager::CreateInstance: ERROR Player:%s, mapid %d", player->GetName(), id);
+        return nullptr;
+    }
+        
     //qzqstar, 250513, get the ac mapid
     uint32 ac_mapid = QZQSTAR_GET_AC_MAPID(id);
     //Achievement_t _mapType = ACHIEVEMENTS_DUNGEONS;
@@ -519,6 +525,9 @@ Map* MapManager::CreateInstance(uint32 id, Player* player)
     uint32 _map_difficulty = player->M_Dungeon_Difficulty;
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "MapManager::CreateInstance: Player:%s, mapid %d, ac_mapid %d, difficulty %d", player->GetName(), id, ac_mapid, _map_difficulty);
 
+    //fixed difficulties
+    if(entry->IsRaid())
+        _map_difficulty = 1;
 
     if (entry->IsBattleGround())
     {

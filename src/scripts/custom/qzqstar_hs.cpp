@@ -626,12 +626,17 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 	else if (abs_action == 30)
 	{
 		//display the menus
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝　重置点数　＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(" "), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
-		//caculate how much gold should be used.
-
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, __STR(__BLUE("＝＝＝＝＝　返回　＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
-
+		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝　点击字条、分配点数　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_NONE);
+		#define PAGE_SIZE (PLAYER_ABILITIES_NUM_S8)
+		for (size_t i = 0; i < PAGE_SIZE; i++)
+		{
+			text = "";
+			text.append(__STR("|cff002fa7重置：　"));
+			text.append(__STR(Ability_MenuS8[i].desc));
+			text.append(__STR("|r"));
+			if(Ability_MenuS8[i].enable) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TABARD, __STR(text), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN + i + 300);	
+		}
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＝＝　返回　＝＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
 		pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
 		return;
 	}
@@ -771,7 +776,35 @@ void Menus_Achieve_Main(Player *player, Creature *_Creature, uint32 sender, uint
 			pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
 		}
 	}
-		
+	else if (abs_action >= 300 && abs_action < 400)
+	{
+		uint32 _realAction = (abs_action - 300);
+		if (_realAction >= PLAYER_ABILITIES_NUM_S8) return;
+		_ability_values[_realAction] = 0;
+
+		pPlayer->M_Achiv_Player_Chenyi = _ability_values[0];
+		pPlayer->M_Achiv_Player_Zhanpao = _ability_values[1];
+		pPlayer->M_Achiv_Player_NumsTalent = _ability_values[2];
+		pPlayer->M_Achiv_Player_LevelWeapon = _ability_values[3];
+		pPlayer->M_Achiv_Player_LevelPet = _ability_values[4];
+		pPlayer->M_Achiv_Player_NumsResistance = _ability_values[5];
+		pPlayer->M_Achiv_Player_NumsStrength = _ability_values[6];
+		pPlayer->M_Achiv_Player_NumsAgility = _ability_values[7];
+		pPlayer->M_Achiv_Player_NumsStamina = _ability_values[8];
+		pPlayer->M_Achiv_Player_NumsIntellect = _ability_values[9];
+		pPlayer->M_Achiv_Player_NumsSpirit = _ability_values[10];
+		pPlayer->M_Achiv_Player_NumsSP = _ability_values[11];
+		pPlayer->M_Achiv_Player_NumsAP = _ability_values[12];		
+		pPlayer->M_Achiv_Player_DungeonTimes = _ability_values[13];
+		pPlayer->M_Achiv_Player_DungeonTelePoints = _ability_values[14];
+		pPlayer->M_Achiv_Player_RacialSpell_Passive = _ability_values[15];
+		pPlayer->M_Achiv_Player_RacialSpell_Active = _ability_values[16];
+
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__RED("＝＝　重置成功，小退生效　＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, __STR(__BLUE("＝＝＝＝＝　返回继续　＝＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_ACHIEVE_MAIN);
+	
+		pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pPlayer->GetGUID());
+	}
 }
 #pragma endregion
 

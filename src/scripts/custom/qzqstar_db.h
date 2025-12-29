@@ -137,5 +137,9 @@ extern void BDHelper_Learn_Race_Spells(Player *player, uint32_t passive_level, u
 
 uint16_t DBHelper_get_random_chest_bonus(void);
 
+uint16_t DBHelper_get_random_talent_enchant_ID(ItemPrototype const *);
+
+uint16_t DBHelper_convert_t0_t05(uint16_t item_id);
+
 #endif	//_QZQSTAR_DB_H
 
