@@ -141,5 +141,11 @@ uint16_t DBHelper_get_random_talent_enchant_ID(ItemPrototype const *);
 
 uint16_t DBHelper_convert_t0_t05(uint16_t item_id);
 
+
+uint16_t DBHelper_Get_Next_ElementSpell(Player *player);
+
+
+
+
 #endif	//_QZQSTAR_DB_H
 

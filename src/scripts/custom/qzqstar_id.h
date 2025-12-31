@@ -166,6 +166,25 @@
 #define SPELL_ENCHANT_ARMOR_BEGIN       32521
 #define SPELL_ENCHANT_JEWELRY_BEGIN     32526
 
+#define ZQ_SPELL_DMF_GRAND_TRIGGER      33111   //DMF Grand Trigger, 伟大触发
+#define ZQ_SPELL_DMF_GRAND_DUMMY        33112   //DMF Grand Trigger OnOff, 伟大触发(DUMMY)
+#define ZQ_SPELL_DMF_GRAND_EFFECT1      33113   //DMF Grand Effect1, 伟大触发效果1 - Strength, Agility, Stamima
+#define ZQ_SPELL_DMF_GRAND_EFFECT2      33114   //DMF Grand Effect2, 伟大触发效果2 - Intellect, Spirit
+
+#define ZQ_SPELL_DIABLO_ROYAL_RING         33115   //DMF Diablo Royal Ring, 暗黑皇家华戒
+
+#define ZQ_SPELL_DIABLO_ELEMENTS_RING       33121   //DMF Diablo All Can Ring, 全能法戒
+#define ZQ_SPELL_DIABLO_ELEMENTS_DUMMY      33122   //DMF Diablo All Can Ring, 全能法戒
+#define ZQ_SPELL_DIABLO_ELEMENTS_COUNTS     (7)
+#define ZQ_SPELL_DIABLO_ELEMENTS_PHY        33123   //DMF Diablo All Can Ring, 物理
+#define ZQ_SPELL_DIABLO_ELEMENTS_HOLY       33124   //DMF Diablo All Can Ring, 神圣
+#define ZQ_SPELL_DIABLO_ELEMENTS_FIRE       33125   //DMF Diablo All Can Ring, 
+#define ZQ_SPELL_DIABLO_ELEMENTS_NATURE     33126   //DMF Diablo All Can Ring, 
+#define ZQ_SPELL_DIABLO_ELEMENTS_FROST      33127   //DMF Diablo All Can Ring, 
+#define ZQ_SPELL_DIABLO_ELEMENTS_SHADOW     33128   //DMF Diablo All Can Ring, 
+#define ZQ_SPELL_DIABLO_ELEMENTS_ARCANE     33129   //DMF Diablo All Can Ring, 
+
+
 #define ZQ_SPELL_MOUNTS_REINDEER            32980   //Mounts, 麋鹿新手坐骑
 #define ZQ_SPELL_MOUNTS_REINDEER_LEARN      32981   //Mounts, 麋鹿新手坐骑
 #define ZQ_SPELL_MOUNTS_LAND                32982   //Mounts, 坐骑100%

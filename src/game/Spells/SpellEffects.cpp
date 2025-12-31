@@ -813,7 +813,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     if( (player->GetRestType() != REST_TYPE_NO) )  return;
 
                     player->M_Ticks ++;
-                    
+
 
 					//Check warrior
 					if (player->GetClass() == CLASS_WARRIOR)
@@ -1177,6 +1177,48 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					return;
 				}
 
+                //qzqstar, 251230, the grand spell
+                case ZQ_SPELL_DMF_GRAND_DUMMY:
+                {
+                    //check the player valid
+                    if (m_caster && m_caster->IsPlayer())
+                    {
+                        auto player = (Player *)m_caster;
+                        //get the player's stat and decide which is the largest
+                        auto _str = player->GetStat(STAT_STRENGTH);
+                        auto _agi = player->GetStat(STAT_AGILITY);
+                        //auto _sta = player->GetStat(STAT_STAMINA);
+                        auto _int = player->GetStat(STAT_INTELLECT);
+                        auto _spi = player->GetStat(STAT_SPIRIT);
+
+                        //check which is the largest
+                        auto _max = _str;
+                        auto _index = 0;
+                        if(_agi > _max) { _max = _agi; _index = 1;}
+                        //if(_sta > _max) { _max = _sta; _index = 2;}
+                        if(_int > _max) { _max = _int; _index = 3;}
+                        if(_spi > _max) { _max = _spi; _index = 4;}
+
+                        if(_index == 0) player->CastCustomSpell(player, ZQ_SPELL_DMF_GRAND_EFFECT1, 299, 0, 0, true, nullptr);
+                        else if(_index == 1) player->CastCustomSpell(player, ZQ_SPELL_DMF_GRAND_EFFECT1, 0, 299, 0, true, nullptr);
+                        //else if(_index == 2) player->CastCustomSpell(player, ZQ_SPELL_DMF_GRAND_EFFECT1, 0, 0, 299, true, nullptr);
+                        else if(_index == 3) player->CastCustomSpell(player, ZQ_SPELL_DMF_GRAND_EFFECT2, 299, 0, 0, true, nullptr);
+                        else if(_index == 4) player->CastCustomSpell(player, ZQ_SPELL_DMF_GRAND_EFFECT2, 0, 299, 0, true, nullptr);
+
+                    }       
+                    return;
+                }
+
+                case ZQ_SPELL_DIABLO_ELEMENTS_DUMMY:
+                {
+                    if (m_caster && m_caster->IsPlayer())
+                    {
+						auto player = m_caster->ToPlayer();
+                        auto nextSpells = DBHelper_Get_Next_ElementSpell(player);
+                        if(nextSpells) player->CastSpell(player, nextSpells, true, nullptr);
+                    }
+                    return;
+                }
 
 				//qzqstar, 250312, auto buff depend on level
 				case ZQ_SPELL_BUFF_ALL: 

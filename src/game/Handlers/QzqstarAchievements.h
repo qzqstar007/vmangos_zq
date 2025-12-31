@@ -83,6 +83,12 @@ enum Achievement_t
 #define PLAYER_USED_CUSTOM_TASKID				(100)	//Current Custom task ID for this player 
 #define PLAYER_USED_DUNGEON_DIFFICULTY			(110)	//Current Dungeon Difficulty for this player 
 
+/*        uint32 M_Ticks; //Used for some scripts.
+        uint32 M_Spells_Ticks[32]; //Used for some scripts.
+        uint32 M_Spells_Data[32]; //Used for some scripts.
+*/
+#define PLAYER_SPELLS_DATA_IDX_ALL_ELEMENTS	(0)
+
 
 //VIP Features
 #define VIP_SUISHEN_ROBOT	(0x00000001)
