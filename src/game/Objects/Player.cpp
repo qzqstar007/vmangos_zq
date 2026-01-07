@@ -16131,9 +16131,16 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if(HasSpell(ZQ_SPELL_AUTOPICK)) M_Achiv_Account_VIP |= VIP_ONEKEY_PICK;
     if(HasSpell(ZQ_SPELL_BUFF_ALL)) M_Achiv_Account_VIP |= VIP_SUISHEN_BUFF;
 
-    //check the vip spells
+    //check the vip spells, keep the ZQ_SPELL_BUFF_ALL, it can be used for others
     if((M_Achiv_Account_VIP & VIP_ONEKEY_PICK) && (!HasSpell(ZQ_SPELL_AUTOPICK)))     LearnSpell(ZQ_SPELL_AUTOPICK, false);
     if((M_Achiv_Account_VIP & VIP_SUISHEN_BUFF) && (!HasSpell(ZQ_SPELL_BUFF_ALL)))    LearnSpell(ZQ_SPELL_BUFF_ALL, false);
+
+    if(M_Achiv_Account_VIP & VIP_SUISHEN_BUFF)
+    {
+        if(!HasSpell(ZQ_SPELL_BUFF_DRAGON_SLAYER_PASV)) LearnSpell(ZQ_SPELL_BUFF_DRAGON_SLAYER_PASV, false);
+        if(GetLevel() >= 25 && !HasSpell(ZQ_SPELL_BUFF_WARCHIEF_PSAV)) LearnSpell(ZQ_SPELL_BUFF_WARCHIEF_PSAV, false);
+        if(GetLevel() >= 45 && !HasSpell(ZQ_SPELL_BUFF_ZANDALA_PSAV)) LearnSpell(ZQ_SPELL_BUFF_ZANDALA_PSAV, false);
+    }
 
     //Learn Spells according to player race
     BDHelper_Learn_Race_Spells(this, M_Achiv_Player_RacialSpell_Passive, M_Achiv_Player_RacialSpell_Active);
@@ -19193,6 +19200,12 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature const
     uint32 totalcost = 0;
     uint32 lastPath = 0;
     uint32 lastNode = nodes[1];
+
+    //Direct go there.
+	TaxiNodesEntry const* _finalNode = sObjectMgr.GetTaxiNodeEntry(nodes[nodes.size()-1]);
+	if (_finalNode)  TeleportTo(_finalNode->map_id, _finalNode->x, _finalNode->y, _finalNode->z, GetOrientation());
+	return true;
+
     sObjectMgr.GetTaxiPath(sourcenode, lastNode, sourcepath, sourceCost);
     if (!sourcepath)
     {

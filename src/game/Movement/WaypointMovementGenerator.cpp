@@ -392,6 +392,7 @@ void FlightPathMovementGenerator::Interrupt(Player & player)
 void FlightPathMovementGenerator::Reset(Player & player, float modSpeed)
 {
     player.GetHostileRefManager().setOnlineOfflineState(false);
+
     player.AddUnitState(UNIT_STATE_TAXI_FLIGHT);
     player.SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_REMOVE_CLIENT_CONTROL | UNIT_FLAG_TAXI_FLIGHT);
 

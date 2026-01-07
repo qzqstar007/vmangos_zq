@@ -81,6 +81,44 @@ SpellScript* GetScript_PriestPowerWordShield(SpellEntry const*)
     return new PriestPowerWordShieldScript();
 }
 
+/* Chastise the target, causing level * 10 Holy damage. 
+If the target is an enemy, they are stunned for up to 3 sec. 
+If the target is an ally, their attack and casting speed is increased by 10% for 15 sec. 
+*/
+struct ChastiseSpellScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            if (Player* pPlayer = spell->m_caster->ToPlayer())
+            {
+                uint32 heal = 31146;
+                uint32 hurt = 5648;
+
+				Unit* pTarget = spell->GetUnitTarget();
+
+                //set the damage
+                spell->damage = pPlayer->GetLevel() * 10;
+
+                if (pPlayer->IsFriendlyTo(pTarget))
+                {
+                    if(pTarget ->GetHealth() < spell->damage * 3) 
+                    {
+                        spell->damage = pTarget ->GetHealth() / 3;
+                        if(spell->damage > 1)  spell->damage -= 1;
+                    }
+                    pPlayer->CastSpell(pTarget, heal, true);
+                }
+                else
+                    pPlayer->CastSpell(pTarget, hurt, true);
+                
+            }
+        }
+        return true;
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     Script* newscript;
@@ -93,5 +131,10 @@ void AddSC_priest_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_priest_power_word_shield";
     newscript->GetSpellScript = &GetScript_PriestPowerWordShield;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_priest_chastise";
+    newscript->GetSpellScript = [](SpellEntry const*) -> SpellScript* { return new ChastiseSpellScript(); };
     newscript->RegisterSelf();
 }

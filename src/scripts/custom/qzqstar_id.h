@@ -144,8 +144,11 @@
 
 #define ZQ_SPELL_SPELL_DIFFICULTY0  33350	//Spell Difficulty 0, Wolrd Difficutly 0
 #define ZQ_SPELL_SPELL_DIFFICULTY1	33351	//Spell Difficulty 1, 副本难度1
-#define ZQ_SPELL_SPELL_DIFFICULTY2	33352	//Spell Difficulty 2, 副本难度2
-#define ZQ_SPELL_SPELL_DIFFICULTY3	33353	//Spell Difficulty 3, 副本难度3
+//#define ZQ_SPELL_SPELL_DIFFICULTY2	33352	//Spell Difficulty 2, 副本难度2
+//#define ZQ_SPELL_SPELL_DIFFICULTY3	33353	//Spell Difficulty 3, 副本难度3
+#define ZQ_SPELL_BUFF_DRAGON_SLAYER_PASV 33352   //Call of Dragon slayer -- passive
+#define ZQ_SPELL_BUFF_WARCHIEF_PSAV      33353   //Call of Warchief -- passive
+#define ZQ_SPELL_BUFF_ZANDALA_PSAV       33354   //Call of ZANDALA -- passive
 
 #define ZQ_SPELL_BUFF_ALL           33355   //Spell of Buff all
 #define ZQ_SPELL_BUFF_DRAGON_SLAYER 33356   //Call of Dragon slayer
@@ -234,7 +237,7 @@
 
 #define ZQ_SPELL_RUNE_TRIG              31246   //Rune Trigger, 符文触发
 #define ZQ_SPELL_RUNE_TRIGGED           31245   //Rune Trigger, 符文触发
-#define ZQ_SPELL_JIBAN                  31244   //羁绊系统
+#define ZQ_SPELL_AIO                    31244   //Spell All IN ONE
 
 #define ZQ_SPELL_RUNE_END               31192	//Rune, 符文 - End
 #define ZQ_SPELL_RUNE_START             31021	//Rune, 符文 - Start
@@ -425,8 +428,15 @@ update spell_template set startRecoveryTime=1100 where startRecoveryTime=1500;
 update creature_template set gold_min = gold_min/20, gold_max=gold_max/20 where gold_max > 50000;
 
 //ZG BOSS
-update creature_template set health_multiplier=1500, damage_multiplier=50 where entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
-update creature_template set health_multiplier=500, damage_multiplier=30 where entry in (14510,14509,14507, 14517, 14515, 11382, 14834, 11380);
+11380,11382,14507,14509,14510,14517,14515
+update creature_template set health_multiplier=1500, damage_multiplier=50 where entry in (14510,14509,14599,14507, 14517, 14515, 11382, 14834, 11380);
+15101 //pathner
+update creature_template set health_multiplier=20, damage_multiplier=10 where entry in (15101);
+14986 //shade of jido
+update creature_template set health_multiplier=2, damage_multiplier=1 where entry in (14986);
+
+//NPC change
+update creature set patch_max=9 where id in (14903,14902,15042,14905,14904);
 
 //MC BOSS, and ONYKIA
 11988 12057 12259 11502 12264 11982 12098 12056 12118

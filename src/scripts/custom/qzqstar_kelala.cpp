@@ -45,6 +45,7 @@
 #define __MENU_KELALA_SOCIAL			 7000
 #define __MENU_KELALA_EQUIP_REFINE		 7000
 #define __MENU_KELALA_REP				 8000
+#define __MENU_KELALA_CDK				 9000	//S8 CDK
 #define __MENU_KELALA_EQUIP_COLLECTS     				10000
 #define __MENU_KELALA_EQUIP_COLLECTS_WORLD				11000
 #define __MENU_KELALA_EQUIP_COLLECTS_DUNGEON 			12000
@@ -2336,6 +2337,25 @@ bool Menus_Kelala_EquipCollects(Player *player, Creature *_Creature, uint32 acti
 
 #pragma endregion
 
+
+#pragma region CDK Menu
+
+bool Menus_Kelala_CDK(Player *player, Creature *_Creature, uint32 action, char const* code = nullptr)
+{
+	if(code)
+	{
+		__LOG("[Menus_Kelala_CDK] PLAYER:[%u][%s] === code: %s", player->GetGUID(), player->GetName(), code);
+	}
+	else
+	{
+		__LOG("[Menus_Kelala_CDK] PLAYER:[%u][%s] === code: NULL", player->GetGUID(), player->GetName());
+	}
+
+	return true;
+}
+
+#pragma endregion
+
 bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 action)
 {
 	//check if player is null and go is null
@@ -2356,6 +2376,9 @@ bool Menus_Kelala_Main(Player *player, Creature *_cr, uint32 sender, uint32 acti
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 	
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　背包升级　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_BAG_UPGRADE);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
+
+	player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＞　兑换ＣＤ　ＫＥＹ　＜＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_CDK, "12345677", true);
 	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, " ", GOSSIP_SENDER_MAIN, __MENU_NONE);
 
 	//player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, __STR(__BLUE("＝＝＝＞　成就系统　＜＝＝＝　")), GOSSIP_SENDER_MAIN, __MENU_KELALA_ACHIEVEMENTS);
@@ -2433,6 +2456,15 @@ bool Menus_Kelala_Newbie(Player *player, Creature *_cr, uint32 sender, uint32 ac
 }
 
 //define a wrapper function for the equip system menus
+
+bool Kelala_Menus_Code(Player *player, Creature *_cr, uint32 sender, uint32 action, char const* code = nullptr)
+{
+	// CDK menu
+	if (action >= __MENU_KELALA_CDK && action <= __MENU_KELALA_CDK + __MENU_SIZE)
+	{
+		return Menus_Kelala_CDK(player, _cr, action, code);
+	}
+}
 bool Kelala_Menus(Player *player, Creature *_cr, uint32 sender, uint32 action)
 {
 	//check if player is null and go is null
@@ -2463,6 +2495,7 @@ bool Kelala_Menus(Player *player, Creature *_cr, uint32 sender, uint32 action)
 	{
 		return Menus_Kelala_BagUpgrade(player, _cr, sender, action);
 	}
+
 	// Equipment refine menu
 	/*
 	else if (action >= __MENU_KELALA_EQUIP_REFINE && action <= __MENU_KELALA_EQUIP_REFINE + __MENU_SIZE)
@@ -2521,6 +2554,7 @@ void AddSC_qzqstar_kelala()
 	newscript->Name = "qzqstar_kelala";
 	newscript->pGossipHello = [](Player *p, Creature *c) -> bool { return Kelala_Menus(p, c, 0, __MENU_KELALA_MAIN); };
 	newscript->pGossipSelect = &Kelala_Menus;
+	newscript->pGossipSelectWithCode = &Kelala_Menus_Code;
 	newscript->RegisterSelf(false);
 }
 

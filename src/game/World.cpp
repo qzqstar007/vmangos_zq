@@ -2117,6 +2117,7 @@ void World::Update(uint32 diff)
     // Maintenance checker
     if (m_MaintenanceTimeChecker < diff)
     {
+        //S8, no need to restart and maitenance
         sHonorMaintenancer.CheckMaintenanceDay();
         m_MaintenanceTimeChecker = 60000;
     }

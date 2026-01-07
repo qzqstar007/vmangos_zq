@@ -809,71 +809,135 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					auto player = m_caster->ToPlayer();
 					auto pOffHandItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
 
+                    //remove the suishen buff if has passv
+                    if(player->HasSpell(ZQ_SPELL_BUFF_DRAGON_SLAYER_PASV) && player->HasAura(ZQ_SPELL_BUFF_DRAGON_SLAYER))
+                    {
+                        ChatHandler(player).PSendSysMessage(((std::string)(">>>你已经有世界被动BUFF，无法再使用。<<<")).c_str());
+                        player->RemoveAurasDueToSpell(ZQ_SPELL_BUFF_DRAGON_SLAYER);
+                    }
+                    if(player->HasSpell(ZQ_SPELL_BUFF_WARCHIEF_PSAV) && player->HasAura(ZQ_SPELL_BUFF_WARCHIEF))
+                        player->RemoveAurasDueToSpell(ZQ_SPELL_BUFF_WARCHIEF);
+                    if(player->HasSpell(ZQ_SPELL_BUFF_ZANDALA_PSAV) && player->HasAura(ZQ_SPELL_BUFF_ZANDALA))
+                        player->RemoveAurasDueToSpell(ZQ_SPELL_BUFF_ZANDALA);
+
                     //return if in lvguan
                     if( (player->GetRestType() != REST_TYPE_NO) )  return;
 
                     player->M_Ticks ++;
 
+                    //3 points, + dmg,  - void dmg, + crit dmg
+                    int32_t basepoints[3]  = {0};
+
+                    //first caculate the players mode
+                    if(player->M_Challenge_Mode & CHALLENGING_MODE_LEADER)
+                    {
+						int32_t _points0 = 0, _points1 = 4;
+                        if(Group * _group = player->GetGroup())
+                        {
+                            if(_group->IsLeader(player->GetGUID()))
+                            {
+                                if(_group->isRaidGroup()) { _points0 = 6; _points1 = -8;}
+                                else {_points0 = 4; _points1 = -6;}
+                            }
+                            else
+                            {
+                                _points0=0, _points1 = -2;
+                            }
+                        }
+
+                        basepoints[0] += _points0; 
+                        basepoints[1] += _points1;
+                    }
+
+                    //Check the Rich Mode for player
+                    if(player->M_Challenge_Mode & CHALLENGING_MODE_RICH)
+                    {
+                        auto _money_gold = player->GetMoney()/10000;
+                        int32_t _points0=0, _points1 = 0, _points2=0;
+
+                        if(_money_gold >= 10000)
+                        {
+                            _points0 = 15; _points1 = -11; _points2 = 9;
+                        }else if (_money_gold >= 5000)
+                        {
+                            _points0 = 13; _points1 = -9; _points2 = 7;
+                        }else if (_money_gold >= 1000)
+                        {
+                            _points0 = 11; _points1 = -7; _points2 = 5;
+                        }else if (_money_gold >= 500)
+                        {
+                            _points0 = 7; _points1 = -5; _points2 = 4;
+                        }else if (_money_gold >= 200)
+                        {
+                            _points0 = 5; _points1 = -4; _points2 = 3;
+                        }
+                        else if (_money_gold >= 100)
+                        {
+                            _points0 = 3; _points1 = -3; _points2 = 2;
+                        }
+                        else if (_money_gold >= 10)
+                        {
+                            _points0 = 1; _points1 = -2; _points2 = 1;
+                        }
+
+                        basepoints[0] += _points0; 
+                        basepoints[1] += _points1;
+                        basepoints[2] += _points2;
+                    }
+
+
 
 					//Check warrior
 					if (player->GetClass() == CLASS_WARRIOR)
 					{
+                        int32_t _points0 = 0, _points1 = 0, _points2 = 0;
 						//1. check if Has spell - defense
-						if (player->HasSpell(31033) && !(player->HasAura(31034)))
+						if (player->HasSpell(31033))
 						{
 							//get offhand item
 							if (pOffHandItem && pOffHandItem->GetProto()->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
-								player->CastSpell(player, 31034, true, nullptr);
-						}
-						else if (player->HasAura(31034))
-						{
-							//remove if hasn't spell or not equiped a shield
-							if ((!player->HasSpell(31033)) || (!pOffHandItem) || (pOffHandItem && pOffHandItem->GetProto()->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD))
-								player->RemoveAurasDueToSpell(31034);
+                            {
+                                _points0 = 10; _points1=-5;
+                            }
 						}
 
 						//2. check the aspiration of battle
-						// 31027, 31028
 						// less health, more damage, max damage 33%, -16% void damage
 						if (player->HasSpell(31027))
 						{
 							int32 maxHealth = player->GetMaxHealth();
 							int32 curHealth = player->GetHealth();
-
 							int32 ratio = curHealth * 100 / maxHealth;
-
 							if (ratio > 100) ratio = 100;
-
 							//set to real
 							ratio = (100 - ratio) / 4;
+                            _points0 += ratio;
+                            _points1 -= ratio/2;
+						}
 
-							player->CastCustomSpell(player, 31028, ratio, 0 - ratio, 0, true, nullptr);
-						}
-						else if (player->HasAura(31028) && (!player->HasSpell(31027)))
-						{
-							player->RemoveAurasDueToSpell(31028);
-						}
+                        basepoints[0] += _points0; basepoints[1] += _points1; basepoints[2] += _points2;
 					}
 
 					//Check Hunter
 					else if (player->GetClass() == CLASS_HUNTER)
 					{
+                        int32_t _points0 = 0, _points1 = 0, _points2 = 0;
+
 						//check if solo
-						if (player->HasSpell(31123) && (player->GetPet() == nullptr) && (!player->HasAura(31124)))
+						if (player->HasSpell(31123) && (player->GetPet() == nullptr))
 						{
-							player->CastSpell(player, 31124, true, nullptr);
+							_points0 = 30;
 						}
-						else if (player->HasAura(31124) && player->GetPet())
-						{
-							//remove if hasn't spell or has pet
-							player->RemoveAurasDueToSpell(31124);
-						}
+
+                        basepoints[0] += _points0; basepoints[1] += _points1; basepoints[2] += _points2;
 					}
 
 					//Check Mage
 					else if (player->GetClass() == CLASS_MAGE)
 					{
-						//check if has glass canon
+                        int32_t _points0 = 0, _points1 = 0, _points2 = 0;
+
+                        //check if has glass canon
 						if (player->HasSpell(31051))
 						{
 							//int32 maxMana = player->GetMaxPower(POWER_MANA);
@@ -882,19 +946,13 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 							int32 curHealth = player->GetMaxHealth();
 
 							if (curHealth < 10) curHealth = 10;
-
 							int32 __points = 0;
 							if (curMana > curHealth) __points = curMana * 100 / curHealth - 100;
-
 							if (__points > 600) __points = 600;
+                            _points0 = __points/4;
+						}
 
-							//BASIC_LOG("Health:%d, MANA:%d, points=%d", maxHealth, maxMana, __points/3);
-							player->CastCustomSpell(player, 31052, __points / 4, {}, {}, true, nullptr);
-						}
-						else if (player->HasAura(31052) && (!player->HasSpell(31051)))
-						{
-							player->RemoveAurasDueToSpell(31052);
-						}
+                        basepoints[0] += _points0; basepoints[1] += _points1; basepoints[2] += _points2;
 					}
 
 					//Check Mage
@@ -912,8 +970,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 							else if (ratio > 100) ratio = 100;
 
 							ratio = (ratio - 49) * 2 - 1;
-
-							player->CastCustomSpell(player, 31074, ratio, ratio/4, {}, true, nullptr);
+							player->CastCustomSpell(player, 31074, ratio, ratio/3, {}, true, nullptr);
 						}
 						else if (player->HasAura(31074) && (!player->HasSpell(31073)))
 						{
@@ -924,19 +981,18 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 					//Check Druid
 					else if (player->GetClass() == CLASS_DRUID)
 					{
+                        int32 __points1 = 0, __points2 = 0, __points3 = 0;
 						//check if has transformers
 						if (player->HasSpell(31105))
 						{
-							int32 __points1 = 0, __points2 = 0, __points3 = 0;
-
 							switch (player->GetShapeshiftForm())
 							{
 							case FORM_BEAR:
 							case FORM_DIREBEAR:
-								__points1 = -11;
+								__points2 = -11;
 								break;
 							case FORM_CAT:
-								__points2 = 19;
+								__points1 = 19;
 								break;
 							case FORM_MOONKIN:
 								__points3 = 24;
@@ -944,29 +1000,21 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 							default:
 								break;
 							}
+						}
 
-							player->CastCustomSpell(player, 31106, __points1, __points2, __points3, true, nullptr);
-						}
-						else if (player->HasAura(31106))
-						{
-							player->RemoveAurasDueToSpell(31106);
-						}
 
 						//check if has armor blade
 						if (player->HasSpell(31107))
 						{
-							int32 __points1 = 0, __points2 = 0, __points3 = 0;
 							int32 armor_points = player->GetArmor();
-							__points1 = armor_points / 1000;
-							player->CastCustomSpell(player, 31108, __points1, __points2, __points3, true, nullptr);
+							__points1 += armor_points / 1000;
 						}
-						else if (player->HasAura(31108))
-						{
-							player->RemoveAurasDueToSpell(31108);
-						}
+
+                        basepoints[0] += __points1; basepoints[1] += __points2; basepoints[2] += __points3;
 					}
 
 					// qzqstar, 250204, the bonding ralation system
+                    #if 0
 					do {
 						// each class add 1% all stat to self.
 						// 1. first get the player class
@@ -1025,9 +1073,8 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 								player->RemoveAurasDueToSpell(_auraID);
 							}
 						}
-
-
 					} while (0);
+                    #endif
 
 
                     //qzqstar, the fly mount
@@ -1067,6 +1114,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
 
                     //S8, leadership
+                    #if 0
                     do {
                         auto _auraID = ZQ_SPELL_CHALLENGE_BONUS_LEADER;
 						auto _points0=0, _points1 = 4;
@@ -1095,19 +1143,21 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         }
                         */
 					} while (0);
+                    #endif
 
                     // qzqstar, 250702, the rich achievement bonus system
+                    #if 0
 					do {
 						// each class add 1% all stat to self.
 						// 1. first get the player class
 						auto _auraID = ZQ_SPELL_CHALLENGE_BONUS_RICH;
 						auto _apply = true;
-						auto _points0=0, _points1 = 0, _points2=0;
 
 						// 2. check the target player
                         if(player->M_Challenge_Mode & CHALLENGING_MODE_RICH)
                         {
                             auto _money_gold = player->GetMoney()/10000;
+						    auto _points0=0, _points1 = 0, _points2=0;
 
                             if(_money_gold >= 10000)
                             {
@@ -1154,12 +1204,14 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         }
 
 					} while (0);
+                    #endif
 
-
+                    //Finally cast the spell
+                    player->CastCustomSpell(player, ZQ_SPELL_AIO, basepoints[0], basepoints[1], basepoints[2], true, nullptr);
                     
                     do{
-                        //if(player->HasSpell(ZQ_SPELL_VIP_HASTE))
-                        if(0)
+                        if(player->HasSpell(ZQ_SPELL_VIP_HASTE))
+                        //if(0)
                         {
                             //check if player's near to others
                             //auto p = player->FindNearestPlayer(10);
@@ -1170,7 +1222,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                                 //player->M_Leech_Phy = 5;
                                 //player->M_Leech_Spell = 5;
                             }
-
                         }
                     }while(0);
 
@@ -1536,6 +1587,18 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                                     _subclass == ITEM_SUBCLASS_ARMOR_LEATHER ? 4 : 
                                     _subclass == ITEM_SUBCLASS_ARMOR_MAIL ? 3 : 
                                     _subclass == ITEM_SUBCLASS_ARMOR_PLATE ? 2 : 2);
+                    //Add extra cnts if Quality is 4 and SubClass is Plate
+                    if(itemTarget->GetProto()->Quality == 4)
+                    {
+                        _totalCnts += 1;
+                    }
+
+                    //add extra cnts is item level is larger than 60
+                    if(itemTarget->GetProto()->ItemLevel > 61)
+                    {
+                        _totalCnts += (itemTarget->GetProto()->ItemLevel - 60)/2;
+                    }
+
                     uint8_t _currentCnts = itemTarget->GetGuidValue(ITEM_FIELD_GIFTCREATOR);
                     //check if too much times
                     if(!_failed &&  _currentCnts >= _totalCnts)
